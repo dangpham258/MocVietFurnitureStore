@@ -94,12 +94,41 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
+	<dependency>
+		<groupId>org.springframework.security</groupId>
+		<artifactId>spring-security-test</artifactId>
+		<scope>test</scope>
+	</dependency>
+	
+	<!-- JWT -->
+	<dependency>
+		<groupId>io.jsonwebtoken</groupId>
+		<artifactId>jjwt-api</artifactId>
+		<version>0.12.3</version>
+	</dependency>
+	<dependency>
+		<groupId>io.jsonwebtoken</groupId>
+		<artifactId>jjwt-impl</artifactId>
+		<version>0.12.3</version>
+		<scope>runtime</scope>
+	</dependency>
+	<dependency>
+		<groupId>io.jsonwebtoken</groupId>
+		<artifactId>jjwt-jackson</artifactId>
+		<version>0.12.3</version>
+		<scope>runtime</scope>
+	</dependency>
+	
+	<!-- Sitemesh - TEMPORARILY DISABLED (not compatible with Spring Boot 3 / jakarta.servlet) -->
+	<!-- TODO: Update to Sitemesh 4 when available or use Thymeleaf Layout Dialect -->
+	<!--
+	<dependency>
+		<groupId>org.sitemesh</groupId>
+		<artifactId>sitemesh</artifactId>
+		<version>3.0.1</version>
+	</dependency>
+	-->
+</dependencies>
 
 	<build>
 		<plugins>
