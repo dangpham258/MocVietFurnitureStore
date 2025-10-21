@@ -26,11 +26,7 @@ public class AuthController {
     
     @GetMapping("/")
     public String home() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
-            return "redirect:/dashboard";
-        }
-        return "redirect:/login";
+        return "index";
     }
     
     @GetMapping("/login")
