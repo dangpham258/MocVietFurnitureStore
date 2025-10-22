@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/fragments/admin_layout}">
+<head>
+    <title>Báo cáo & Thống kê - Admin Panel</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">Báo cáo & Thống kê</h2>
+            <p class="text-muted mb-0">Tổng quan doanh thu và hoạt động hệ thống</p>
+        </div>
+        <div>
+            <button class="btn btn-outline-primary me-2">
+                <i class="bi bi-download me-2"></i>Xuất Excel
+            </button>
+            <button class="btn btn-outline-secondary">
+                <i class="bi bi-calendar me-2"></i>Chọn khoảng thời gian
+            </button>
+        </div>
+    </div>
+    
+    <!-- Date Range Filter -->
+    <div class="card admin-card mb-4">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3">
+                    <label class="form-label">Từ ngày</label>
+                    <input type="date" class="form-control" value="2025-01-01">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Đến ngày</label>
+                    <input type="date" class="form-control" value="2025-01-31">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Loại báo cáo</label>
+                    <select class="form-select">
+                        <option value="all">Tất cả</option>
+                        <option value="revenue">Doanh thu</option>
+                        <option value="orders">Đơn hàng</option>
+                        <option value="customers">Khách hàng</option>
+                        <option value="products">Sản phẩm</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">&nbsp;</label>
+                    <button class="btn btn-admin-primary w-100">
+                        <i class="bi bi-search me-2"></i>Tạo báo cáo
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Revenue Stats -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card stats-card">
+                <div class="card-body text-center">
+                    <i class="bi bi-currency-dollar display-4 mb-3"></i>
+                    <h3 class="mb-1">2.5M</h3>
+                    <small>Doanh thu tháng</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card stats-card">
+                <div class="card-body text-center">
+                    <i class="bi bi-graph-up display-4 mb-3"></i>
+                    <h3 class="mb-1">+15%</h3>
+                    <small>Tăng trưởng</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card stats-card">
+                <div class="card-body text-center">
+                    <i class="bi bi-bag-check display-4 mb-3"></i>
+                    <h3 class="mb-1">89</h3>
+                    <small>Đơn hàng</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card stats-card">
+                <div class="card-body text-center">
+                    <i class="bi bi-people display-4 mb-3"></i>
+                    <h3 class="mb-1">45</h3>
+                    <small>Khách hàng mới</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Charts Row -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <div class="card admin-card">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-graph-up me-2"></i>
+                        Doanh thu theo thời gian
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="revenueChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card admin-card">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-pie-chart me-2"></i>
+                        Đơn hàng theo trạng thái
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="orderStatusChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Reports Tables -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card admin-card">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-trophy me-2"></i>
+                        Top sản phẩm bán chạy
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Sản phẩm</th>
+                                    <th>Đã bán</th>
+                                    <th>Doanh thu</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="/static/images/products/placeholder.jpg" class="rounded me-2" width="40" height="40">
+                                            <div>
+                                                <div class="fw-bold">Sofa vải 3 chỗ</div>
+                                                <small class="text-muted">Phòng khách</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><span class="badge bg-primary">25</span></td>
+                                    <td>299.75M</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="/static/images/products/placeholder.jpg" class="rounded me-2" width="40" height="40">
+                                            <div>
+                                                <div class="fw-bold">Bàn ăn gỗ óc chó 6 ghế</div>
+                                                <small class="text-muted">Phòng ăn</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><span class="badge bg-primary">18</span></td>
+                                    <td>233.82M</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="/static/images/products/placeholder.jpg" class="rounded me-2" width="40" height="40">
+                                            <div>
+                                                <div class="fw-bold">Giường gỗ 1m6</div>
+                                                <small class="text-muted">Phòng ngủ</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><span class="badge bg-primary">15</span></td>
+                                    <td>134.85M</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card admin-card">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-star me-2"></i>
+                        Top khách hàng VIP
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Khách hàng</th>
+                                    <th>Đơn hàng</th>
+                                    <th>Tổng tiền</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px;">
+                                                <i class="bi bi-person text-white"></i>
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold">Trần Khách A</div>
+                                                <small class="text-muted">cust_a@mocviet.vn</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><span class="badge bg-success">8</span></td>
+                                    <td>45.2M</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="bg-success rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px;">
+                                                <i class="bi bi-person text-white"></i>
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold">Đỗ Khách B</div>
+                                                <small class="text-muted">cust_b@mocviet.vn</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><span class="badge bg-success">6</span></td>
+                                    <td>32.8M</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="bg-warning rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px;">
+                                                <i class="bi bi-person text-white"></i>
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold">Nguyễn Khách C</div>
+                                                <small class="text-muted">cust_c@mocviet.vn</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><span class="badge bg-success">4</span></td>
+                                    <td>28.5M</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Revenue Chart
+const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+new Chart(revenueCtx, {
+    type: 'line',
+    data: {
+        labels: ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12'],
+        datasets: [{
+            label: 'Doanh thu (triệu VNĐ)',
+            data: [120, 150, 180, 200, 220, 250, 280, 300, 280, 320, 350, 400],
+            borderColor: '#667eea',
+            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+            tension: 0.4
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: false
+            }
+        }
+    }
+});
+
+// Order Status Chart
+const orderStatusCtx = document.getElementById('orderStatusChart').getContext('2d');
+new Chart(orderStatusCtx, {
+    type: 'doughnut',
+    data: {
+        labels: ['Hoàn thành', 'Đang giao', 'Chờ xử lý', 'Đã hủy'],
+        datasets: [{
+            data: [65, 20, 10, 5],
+            backgroundColor: ['#28a745', '#17a2b8', '#ffc107', '#dc3545']
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom'
+            }
+        }
+    }
+});
+</script>
+</body>
+</html>

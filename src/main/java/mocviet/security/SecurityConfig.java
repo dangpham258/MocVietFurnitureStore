@@ -25,6 +25,7 @@ public class SecurityConfig {
     
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final UserDetailsService userDetailsService;
+    private final CustomAuthenticationSuccessHandler customSuccessHandler;
     
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -60,17 +61,21 @@ public class SecurityConfig {
                     "/api/auth/**"
                 ).permitAll()
                 .requestMatchers("/admin/**").hasRole("ADMIN")
-                .requestMatchers("/manager/**").hasAnyRole("ADMIN", "MANAGER")
+                .requestMatchers("/manager/**").hasRole("MANAGER")
                 .requestMatchers("/delivery/**").hasRole("DELIVERY")
+                .requestMatchers("/customer/**", "/profile/**", "/orders/**", "/cart/**", "/wishlist/**").hasRole("CUSTOMER")
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                .maximumSessions(1)
+                .maxSessionsPreventsLogin(false)
             )
             .authenticationProvider(authenticationProvider())
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
             .formLogin(form -> form
                 .loginPage("/login")
+                .successHandler(customSuccessHandler)
                 .permitAll()
             )
             .logout(logout -> logout

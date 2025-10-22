@@ -49,9 +49,9 @@ public class AuthService {
             return MessageResponse.error("Email đã được sử dụng");
         }
         
-        // Get USER role
-        Role userRole = roleRepository.findByName("USER")
-                .orElseThrow(() -> new RuntimeException("Role USER not found"));
+        // Get CUSTOMER role
+        Role userRole = roleRepository.findByName("CUSTOMER")
+                .orElseThrow(() -> new RuntimeException("Role CUSTOMER not found"));
         
         // Create new user
         User user = new User();

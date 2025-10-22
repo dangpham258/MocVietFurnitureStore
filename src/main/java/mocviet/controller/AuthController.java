@@ -7,6 +7,7 @@ import mocviet.dto.AuthResponse;
 import mocviet.dto.LoginRequest;
 import mocviet.dto.MessageResponse;
 import mocviet.dto.RegisterRequest;
+import mocviet.entity.User;
 import mocviet.service.AuthService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -33,7 +34,21 @@ public class AuthController {
     public String showLoginPage(Model model) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
-            return "redirect:/dashboard";
+            // User đã đăng nhập, chuyển hướng đến trang phù hợp
+            User user = (User) auth.getPrincipal();
+            String role = user.getRole().getName();
+            
+            switch (role) {
+                case "ADMIN":
+                    return "redirect:/admin";
+                case "MANAGER":
+                    return "redirect:/manager";
+                case "DELIVERY":
+                    return "redirect:/delivery";
+                case "CUSTOMER":
+                default:
+                    return "redirect:/";
+            }
         }
         
         model.addAttribute("loginRequest", new LoginRequest());
