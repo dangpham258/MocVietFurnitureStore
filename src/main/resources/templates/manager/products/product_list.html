@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{manager/fragments/manager_layout}">
+<head>
+    <title>Quản lý sản phẩm - Mộc Việt</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="mb-1">Quản lý sản phẩm</h2>
+                    <p class="text-muted mb-0">Danh sách và quản lý sản phẩm</p>
+                </div>
+                <a href="/manager/products/create" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Thêm sản phẩm mới
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Search and Filter -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form method="get" action="/manager/products">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label for="keyword" class="form-label">Tìm kiếm</label>
+                                <input type="text" class="form-control" id="keyword" name="keyword" 
+                                       th:value="${keyword}" placeholder="Tên sản phẩm, mô tả...">
+                            </div>
+                            <div class="col-md-3">
+                                <label for="categoryId" class="form-label">Danh mục</label>
+                                <select class="form-select" id="categoryId" name="categoryId">
+                                    <option value="">Tất cả danh mục</option>
+                                    <option th:each="category : ${categories}" 
+                                            th:value="${category.id}" 
+                                            th:text="${category.name}"
+                                            th:selected="${categoryId != null && categoryId == category.id}"></option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label for="sortBy" class="form-label">Sắp xếp</label>
+                                <select class="form-select" id="sortBy" name="sortBy">
+                                    <option value="name" th:selected="${sortBy == 'name'}">Tên</option>
+                                    <option value="created_at" th:selected="${sortBy == 'created_at'}">Ngày tạo</option>
+                                    <option value="sold_qty" th:selected="${sortBy == 'sold_qty'}">Đã bán</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label for="sortDir" class="form-label">Thứ tự</label>
+                                <select class="form-select" id="sortDir" name="sortDir">
+                                    <option value="asc" th:selected="${sortDir == 'asc'}">Tăng dần</option>
+                                    <option value="desc" th:selected="${sortDir == 'desc'}">Giảm dần</option>
+                                </select>
+                            </div>
+                            <div class="col-md-1">
+                                <label class="form-label">&nbsp;</label>
+                                <button type="submit" class="btn btn-outline-primary d-block w-100">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Products Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Danh sách sản phẩm</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Tên sản phẩm</th>
+                                    <th>Danh mục</th>
+                                    <th>Bộ sưu tập</th>
+                                    <th>Trạng thái</th>
+                                    <th>Đã bán</th>
+                                    <th>Ngày tạo</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="product : ${products.content}">
+                                    <td th:text="${product.id}"></td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="me-3">
+                                                <div class="bg-light rounded" style="width: 40px; height: 40px;"></div>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-0" th:text="${product.name}"></h6>
+                                                <small class="text-muted" th:text="${product.slug}"></small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info" th:text="${product.category.name}"></span>
+                                    </td>
+                                    <td>
+                                        <span th:if="${product.collection != null}" 
+                                              class="badge bg-secondary" 
+                                              th:text="${product.collection.name}"></span>
+                                        <span th:unless="${product.collection != null}" 
+                                              class="text-muted">-</span>
+                                    </td>
+                                    <td>
+                                        <span th:if="${product.isActive}" 
+                                              class="badge bg-success">Hoạt động</span>
+                                        <span th:unless="${product.isActive}" 
+                                              class="badge bg-danger">Ẩn</span>
+                                    </td>
+                                    <td th:text="${product.soldQty}"></td>
+                                    <td th:text="${#temporals.format(product.createdAt, 'dd/MM/yyyy')}"></td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a th:href="@{/manager/products/{id}(id=${product.id})}" 
+                                               class="btn btn-sm btn-outline-info" title="Xem chi tiết">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a th:href="@{/manager/products/{id}/edit(id=${product.id})}" 
+                                               class="btn btn-sm btn-outline-warning" title="Chỉnh sửa">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a th:href="@{/manager/products/{id}/variants(id=${product.id})}" 
+                                               class="btn btn-sm btn-outline-primary" title="Biến thể">
+                                                <i class="fas fa-layer-group"></i>
+                                            </a>
+                                            <form th:action="@{/manager/products/{id}/toggle(id=${product.id})}" 
+                                                  method="post" class="d-inline">
+                                                <button type="submit" 
+                                                        th:class="${product.isActive} ? 'btn btn-sm btn-outline-danger' : 'btn btn-sm btn-outline-success'"
+                                                        th:title="${product.isActive} ? 'Ẩn sản phẩm' : 'Hiện sản phẩm'"
+                                                        onclick="return confirm('Bạn có chắc chắn muốn thay đổi trạng thái sản phẩm?')">
+                                                    <i th:class="${product.isActive} ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr th:if="${products.content.isEmpty()}">
+                                    <td colspan="8" class="text-center py-4">
+                                        <div class="text-muted">
+                                            <i class="fas fa-box-open fa-2x mb-3"></i>
+                                            <p>Không có sản phẩm nào</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Pagination -->
+    <div class="row mt-4" th:if="${products.totalPages > 1}">
+        <div class="col-12">
+            <nav aria-label="Product pagination">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                        <a class="page-link" th:href="@{/manager/products(page=${currentPage - 1}, size=${products.size}, sortBy=${sortBy}, sortDir=${sortDir}, keyword=${keyword}, categoryId=${categoryId})}">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    </li>
+                    <li class="page-item" th:each="i : ${#numbers.sequence(0, products.totalPages - 1)}" 
+                        th:classappend="${i == currentPage} ? 'active'">
+                        <a class="page-link" th:href="@{/manager/products(page=${i}, size=${products.size}, sortBy=${sortBy}, sortDir=${sortDir}, keyword=${keyword}, categoryId=${categoryId})}" 
+                           th:text="${i + 1}"></a>
+                    </li>
+                    <li class="page-item" th:classappend="${currentPage == products.totalPages - 1} ? 'disabled'">
+                        <a class="page-link" th:href="@{/manager/products(page=${currentPage + 1}, size=${products.size}, sortBy=${sortBy}, sortDir=${sortDir}, keyword=${keyword}, categoryId=${categoryId})}">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+</body>
+</html>

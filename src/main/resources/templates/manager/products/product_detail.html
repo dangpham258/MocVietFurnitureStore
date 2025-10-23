@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{manager/fragments/manager_layout}">
+<head>
+    <title>Chi tiết sản phẩm - Mộc Việt</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="mb-1" th:text="${product.name}">Tên sản phẩm</h2>
+                    <p class="text-muted mb-0">Chi tiết thông tin sản phẩm</p>
+                </div>
+                <div class="btn-group">
+                    <a th:href="@{/manager/products/{id}/edit(id=${product.id})}" class="btn btn-warning">
+                        <i class="fas fa-edit me-2"></i>Chỉnh sửa
+                    </a>
+                    <a th:href="@{/manager/products}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Quay lại
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Thông tin cơ bản -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Thông tin cơ bản</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Tên sản phẩm:</label>
+                                <p class="mb-0" th:text="${product.name}"></p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Slug:</label>
+                                <p class="mb-0" th:text="${product.slug}"></p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Danh mục:</label>
+                                <p class="mb-0">
+                                    <span class="badge bg-info" th:text="${product.category.name}"></span>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Bộ sưu tập:</label>
+                                <p class="mb-0">
+                                    <span th:if="${product.collection != null}" 
+                                          class="badge bg-secondary" 
+                                          th:text="${product.collection.name}"></span>
+                                    <span th:unless="${product.collection != null}" 
+                                          class="text-muted">Không có</span>
+                                </p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Trạng thái:</label>
+                                <p class="mb-0">
+                                    <span th:if="${product.isActive}" class="badge bg-success">Hoạt động</span>
+                                    <span th:unless="${product.isActive}" class="badge bg-danger">Ẩn</span>
+                                </p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Ngày tạo:</label>
+                                <p class="mb-0" th:text="${#temporals.format(product.createdAt, 'dd/MM/yyyy HH:mm')}"></p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3" th:if="${product.description != null && !product.description.isEmpty()}">
+                        <label class="form-label fw-bold">Mô tả:</label>
+                        <p class="mb-0" th:text="${product.description}"></p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Thống kê -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Thống kê</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-3">
+                            <div class="border rounded p-3">
+                                <h4 class="text-primary mb-1" th:text="${product.views}">0</h4>
+                                <p class="text-muted mb-0">Lượt xem</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="border rounded p-3">
+                                <h4 class="text-success mb-1" th:text="${product.soldQty}">0</h4>
+                                <p class="text-muted mb-0">Đã bán</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="border rounded p-3">
+                                <h4 class="text-warning mb-1" th:text="${product.avgRating != null ? product.avgRating : '0.0'}">0.0</h4>
+                                <p class="text-muted mb-0">Đánh giá TB</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="border rounded p-3">
+                                <h4 class="text-info mb-1" th:text="${product.totalReviews}">0</h4>
+                                <p class="text-muted mb-0">Số đánh giá</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <!-- Hành động nhanh -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Hành động nhanh</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a th:href="@{/manager/products/{id}/edit(id=${product.id})}" class="btn btn-warning">
+                            <i class="fas fa-edit me-2"></i>Chỉnh sửa sản phẩm
+                        </a>
+                        <a th:href="@{/manager/products/{id}/variants(id=${product.id})}" class="btn btn-primary">
+                            <i class="fas fa-layer-group me-2"></i>Quản lý biến thể
+                        </a>
+                        <form th:action="@{/manager/products/{id}/toggle(id=${product.id})}" method="post" class="d-inline">
+                            <button type="submit" 
+                                    th:class="${product.isActive} ? 'btn btn-danger w-100' : 'btn btn-success w-100'"
+                                    th:text="${product.isActive ? 'Ẩn sản phẩm' : 'Hiện sản phẩm'}"
+                                    onclick="return confirm('Bạn có chắc chắn muốn thay đổi trạng thái sản phẩm?')">
+                                <i th:class="${product.isActive} ? 'fas fa-eye-slash me-2' : 'fas fa-eye me-2'"></i>
+                                <span th:text="${product.isActive ? 'Ẩn sản phẩm' : 'Hiện sản phẩm'}"></span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Thông tin bổ sung -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Thông tin bổ sung</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">ID:</label>
+                        <p class="mb-0" th:text="${product.id}"></p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Số biến thể:</label>
+                        <p class="mb-0" th:text="${#lists.size(variants)}"></p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Tổng tồn kho:</label>
+                        <p class="mb-0" th:text="${#aggregates.sum(variants.![stockQty])}"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Danh sách biến thể -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Danh sách biến thể</h5>
+                    <a th:href="@{/manager/products/{id}/variants(id=${product.id})}" class="btn btn-primary btn-sm">
+                        <i class="fas fa-plus me-2"></i>Thêm biến thể
+                    </a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Màu sắc</th>
+                                    <th>Loại</th>
+                                    <th>SKU</th>
+                                    <th>Giá gốc</th>
+                                    <th>Giá bán</th>
+                                    <th>Tồn kho</th>
+                                    <th>Trạng thái</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="variant : ${variants}">
+                                    <td th:text="${variant.id}"></td>
+                                    <td>
+                                        <span class="badge bg-info" th:text="${variant.color.name}"></span>
+                                    </td>
+                                    <td th:text="${variant.typeName}"></td>
+                                    <td>
+                                        <code th:text="${variant.sku}"></code>
+                                    </td>
+                                    <td th:text="${#numbers.formatDecimal(variant.price, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"></td>
+                                    <td th:text="${#numbers.formatDecimal(variant.salePrice, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"></td>
+                                    <td>
+                                        <span th:class="${variant.stockQty <= 5} ? 'text-warning fw-bold' : 'text-success'"
+                                              th:text="${variant.stockQty}"></span>
+                                    </td>
+                                    <td>
+                                        <span th:if="${variant.isActive}" class="badge bg-success">Hoạt động</span>
+                                        <span th:unless="${variant.isActive}" class="badge bg-danger">Ẩn</span>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <button class="btn btn-sm btn-outline-warning" title="Chỉnh sửa">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-danger" title="Xóa">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr th:if="${variants.isEmpty()}">
+                                    <td colspan="9" class="text-center py-4">
+                                        <div class="text-muted">
+                                            <i class="fas fa-layer-group fa-2x mb-3"></i>
+                                            <p>Chưa có biến thể nào</p>
+                                            <a th:href="@{/manager/products/{id}/variants(id=${product.id})}" class="btn btn-primary">
+                                                <i class="fas fa-plus me-2"></i>Thêm biến thể đầu tiên
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
