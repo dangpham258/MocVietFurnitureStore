@@ -16,8 +16,20 @@
                 </div>
                 <div class="col-md-6 text-end small">
                     <span sec:authorize="isAuthenticated()">
-                        Xin chào, <span sec:authentication="name"></span> | 
-                        <a href="/logout" class="text-white text-decoration-none">Đăng xuất</a>
+                        <div class="dropdown d-inline-block">
+                        <!-- Xin chào, <span sec:authentication="name"></span> | 
+                        <a href="/logout" class="text-white text-decoration-none">Đăng xuất</a> -->
+                            <a class="text-white text-decoration-none dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                                Xin chào, <span sec:authentication="name"></span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="/user/profile">Thông tin tài khoản</a></li>
+                                <li><a class="dropdown-item" href="/user/orders">Đơn hàng của tôi</a></li>
+                                <li><a class="dropdown-item" href="/user/wishlist">Danh sách yêu thích</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="/logout">Đăng xuất</a></li>
+                            </ul>
+                        </div>
                     </span>
                     <span sec:authorize="!isAuthenticated()">
                         <a href="/login" class="text-white text-decoration-none">Đăng nhập</a> / 
