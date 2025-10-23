@@ -15,7 +15,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/user/profile")
@@ -88,8 +90,8 @@ public class ProfileController {
     
     @PostMapping("/change-password")
     public String changePassword(@Valid @ModelAttribute PasswordChangeRequest request,
-                                BindingResult bindingResult,
-                                RedirectAttributes redirectAttributes) {
+                                 BindingResult bindingResult,
+                                 RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("error", "Vui lòng nhập đầy đủ thông tin");
             return "redirect:/user/profile";
@@ -105,10 +107,33 @@ public class ProfileController {
         return "redirect:/user/profile";
     }
     
+    // AJAX endpoint cho thay đổi mật khẩu
+    @PostMapping("/change-password-ajax")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> changePasswordAjax(@RequestBody PasswordChangeRequest request) {
+        Map<String, Object> response = new HashMap<>();
+        
+        try {
+            profileService.changePassword(request);
+            response.put("success", true);
+            response.put("message", "Thay đổi mật khẩu thành công");
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            response.put("success", false);
+            response.put("message", e.getMessage());
+            response.put("field", "currentPassword"); // Chỉ định field nào có lỗi
+            return ResponseEntity.badRequest().body(response);
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "Có lỗi xảy ra. Vui lòng thử lại sau");
+            return ResponseEntity.status(500).body(response);
+        }
+    }
+    
     @PostMapping("/address/add")
     public String addAddress(@Valid @ModelAttribute AddressRequest request,
-                            BindingResult bindingResult,
-                            RedirectAttributes redirectAttributes) {
+                             BindingResult bindingResult,
+                             RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("error", "Vui lòng nhập đầy đủ thông tin địa chỉ");
             return "redirect:/user/profile";
@@ -117,8 +142,10 @@ public class ProfileController {
         try {
             profileService.addAddress(request);
             redirectAttributes.addFlashAttribute("success", "Thêm địa chỉ thành công");
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Không thể thêm địa chỉ lúc này. Vui lòng thử lại sau");
         }
         
         return "redirect:/user/profile";
@@ -126,9 +153,9 @@ public class ProfileController {
     
     @PostMapping("/address/{id}/update")
     public String updateAddress(@PathVariable Integer id,
-                               @Valid @ModelAttribute AddressRequest request,
-                               BindingResult bindingResult,
-                               RedirectAttributes redirectAttributes) {
+                                @Valid @ModelAttribute AddressRequest request,
+                                BindingResult bindingResult,
+                                RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("error", "Vui lòng nhập đầy đủ thông tin địa chỉ");
             return "redirect:/user/profile";
@@ -137,8 +164,10 @@ public class ProfileController {
         try {
             profileService.updateAddress(id, request);
             redirectAttributes.addFlashAttribute("success", "Cập nhật địa chỉ thành công");
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Không thể sửa địa chỉ lúc này. Vui lòng thử lại sau");
         }
         
         return "redirect:/user/profile";
@@ -146,12 +175,14 @@ public class ProfileController {
     
     @PostMapping("/address/{id}/delete")
     public String deleteAddress(@PathVariable Integer id,
-                               RedirectAttributes redirectAttributes) {
+                                RedirectAttributes redirectAttributes) {
         try {
             profileService.deleteAddress(id);
             redirectAttributes.addFlashAttribute("success", "Xóa địa chỉ thành công");
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Không thể xóa địa chỉ lúc này. Vui lòng thử lại sau");
         }
         
         return "redirect:/user/profile";

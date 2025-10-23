@@ -89,6 +89,12 @@ public class ProfileServiceImpl implements IProfileService {
     public Address addAddress(AddressRequest request) {
         User currentUser = getCurrentUserProfile();
         
+        // Kiểm tra giới hạn 5 địa chỉ
+        long addressCount = addressRepository.countByUserId(currentUser.getId());
+        if (addressCount >= 5) {
+            throw new RuntimeException("Mỗi khách hàng chỉ được có tối đa 5 địa chỉ nhận hàng");
+        }
+        
         // Nếu đặt làm mặc định, bỏ mặc định của các địa chỉ khác
         if (request.getIsDefault()) {
             addressRepository.clearDefaultByUserId(currentUser.getId());

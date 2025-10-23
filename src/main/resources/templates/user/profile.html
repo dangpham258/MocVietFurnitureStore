@@ -115,35 +115,29 @@
                         <h5 class="mb-0"><i class="bi bi-key"></i> Thay đổi mật khẩu</h5>
                     </div>
                     <div class="card-body">
-                        <form th:action="@{/user/profile/change-password}" method="post" th:object="${passwordChangeRequest}">
+                        <form id="changePasswordForm">
                             <div class="row">
                                 <div class="col-md-4 mb-3">
                                     <label for="currentPassword" class="form-label">Mật khẩu hiện tại</label>
-                                    <input type="password" class="form-control" id="currentPassword" th:field="*{currentPassword}">
+                                    <input type="password" class="form-control" id="currentPassword" name="currentPassword">
                                     <small class="form-text text-muted">Bỏ trống nếu không đổi</small>
-                                    <div th:if="${#fields.hasErrors('currentPassword')}" class="text-danger small">
-                                        <span th:errors="*{currentPassword}"></span>
-                                    </div>
+                                    <div id="currentPasswordError" class="text-danger small" style="display: none;"></div>
                                 </div>
                                 <div class="col-md-4 mb-3">
                                     <label for="newPassword" class="form-label">Mật khẩu mới</label>
-                                    <input type="password" class="form-control" id="newPassword" th:field="*{newPassword}">
+                                    <input type="password" class="form-control" id="newPassword" name="newPassword">
                                     <small class="form-text text-muted">Bỏ trống nếu không đổi</small>
-                                    <div th:if="${#fields.hasErrors('newPassword')}" class="text-danger small">
-                                        <span th:errors="*{newPassword}"></span>
-                                    </div>
+                                    <div id="newPasswordError" class="text-danger small" style="display: none;"></div>
                                 </div>
                                 <div class="col-md-4 mb-3">
                                     <label for="confirmPassword" class="form-label">Xác nhận mật khẩu mới</label>
-                                    <input type="password" class="form-control" id="confirmPassword" th:field="*{confirmPassword}">
+                                    <input type="password" class="form-control" id="confirmPassword" name="confirmPassword">
                                     <small class="form-text text-muted">Bỏ trống nếu không đổi</small>
-                                    <div th:if="${#fields.hasErrors('confirmPassword')}" class="text-danger small">
-                                        <span th:errors="*{confirmPassword}"></span>
-                                    </div>
+                                    <div id="confirmPasswordError" class="text-danger small" style="display: none;"></div>
                                 </div>
                             </div>
                             <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                                <button type="submit" class="btn btn-warning">
+                                <button type="submit" class="btn btn-warning" id="changePasswordBtn">
                                     <i class="bi bi-key"></i> Thay đổi mật khẩu
                                 </button>
                             </div>
@@ -154,12 +148,19 @@
                 <!-- Address Management -->
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0"><i class="bi bi-geo-alt"></i> Địa chỉ nhận hàng</h5>
-                        <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#addAddressModal">
+                        <div>
+                            <h5 class="mb-0"><i class="bi bi-geo-alt"></i> Địa chỉ nhận hàng</h5>
+                            <small class="text-muted">Số địa chỉ: <span th:text="${#lists.size(addresses)}"></span>/5</small>
+                        </div>
+                        <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#addAddressModal"
+                                th:disabled="${#lists.size(addresses) >= 5}">
                             <i class="bi bi-plus"></i> Thêm địa chỉ
                         </button>
                     </div>
                     <div class="card-body">
+                        <div th:if="${#lists.size(addresses) >= 5}" class="alert alert-info mb-3">
+                            <i class="bi bi-info-circle"></i> Bạn đã có đủ 5 địa chỉ nhận hàng. Để thêm địa chỉ mới, vui lòng xóa một địa chỉ hiện có.
+                        </div>
                         <div th:if="${#lists.isEmpty(addresses)}" class="text-center text-muted py-4">
                             <i class="bi bi-geo-alt fs-1"></i>
                             <p class="mt-2">Chưa có địa chỉ nào</p>
@@ -214,43 +215,53 @@
                     <h5 class="modal-title">Thêm địa chỉ mới</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <form th:action="@{/user/profile/address/add}" method="post" th:object="${addressRequest}">
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label for="receiverName" class="form-label">Tên người nhận <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="receiverName" th:field="*{receiverName}" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="phone" class="form-label">Số điện thoại <span class="text-danger">*</span></label>
-                            <input type="tel" class="form-control" id="phone" th:field="*{phone}" 
-                                   pattern="[0-9]+" title="Số điện thoại không hợp lệ" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="addressLine" class="form-label">Địa chỉ <span class="text-danger">*</span></label>
-                            <textarea class="form-control" id="addressLine" th:field="*{addressLine}" rows="2" required></textarea>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="city" class="form-label">Tỉnh/Thành phố <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="city" th:field="*{city}" required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="district" class="form-label">Quận/Huyện</label>
-                                <input type="text" class="form-control" id="district" th:field="*{district}">
-                            </div>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="isDefault" th:field="*{isDefault}">
-                            <label class="form-check-label" for="isDefault">
-                                Đặt làm địa chỉ mặc định
-                            </label>
-                        </div>
+                <div th:if="${#lists.size(addresses) >= 5}" class="modal-body">
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle"></i> Bạn đã có đủ 5 địa chỉ nhận hàng. Để thêm địa chỉ mới, vui lòng xóa một địa chỉ hiện có.
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                        <button type="submit" class="btn btn-primary">Thêm địa chỉ</button>
+                    <div class="text-center">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
                     </div>
-                </form>
+                </div>
+                <div th:unless="${#lists.size(addresses) >= 5}">
+                    <form th:action="@{/user/profile/address/add}" method="post" th:object="${addressRequest}">
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label for="receiverName" class="form-label">Tên người nhận <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="receiverName" th:field="*{receiverName}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="phone" class="form-label">Số điện thoại <span class="text-danger">*</span></label>
+                                <input type="tel" class="form-control" id="phone" th:field="*{phone}" 
+                                       pattern="[0-9]+" title="Số điện thoại không hợp lệ" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="addressLine" class="form-label">Địa chỉ <span class="text-danger">*</span></label>
+                                <textarea class="form-control" id="addressLine" th:field="*{addressLine}" rows="2" required></textarea>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="city" class="form-label">Tỉnh/Thành phố <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="city" th:field="*{city}" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="district" class="form-label">Quận/Huyện</label>
+                                    <input type="text" class="form-control" id="district" th:field="*{district}">
+                                </div>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="isDefault" th:field="*{isDefault}">
+                                <label class="form-check-label" for="isDefault">
+                                    Đặt làm địa chỉ mặc định
+                                </label>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                            <button type="submit" class="btn btn-primary">Thêm địa chỉ</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
@@ -428,25 +439,129 @@
                 });
             }
 
-            // Password change form validation
-            const passwordForm = document.querySelector('form[action="/user/profile/change-password"]');
+            // Password change form AJAX
+            const passwordForm = document.getElementById('changePasswordForm');
             if (passwordForm) {
                 passwordForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    // Clear previous errors
+                    clearPasswordErrors();
+                    
+                    const currentPassword = document.getElementById('currentPassword').value;
                     const newPassword = document.getElementById('newPassword').value;
                     const confirmPassword = document.getElementById('confirmPassword').value;
                     
+                    // Client-side validation
                     if (newPassword && newPassword !== confirmPassword) {
-                        e.preventDefault();
-                        alert('Mật khẩu không khớp');
+                        showPasswordError('confirmPassword', 'Mật khẩu không khớp');
                         return false;
                     }
+                    
+                    // Show loading state
+                    const submitBtn = document.getElementById('changePasswordBtn');
+                    const originalText = submitBtn.innerHTML;
+                    submitBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Đang xử lý...';
+                    submitBtn.disabled = true;
+                    
+                    // Prepare data
+                    const formData = {
+                        currentPassword: currentPassword,
+                        newPassword: newPassword,
+                        confirmPassword: confirmPassword
+                    };
+                    
+                    // Send AJAX request
+                    fetch('/user/profile/change-password-ajax', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(formData)
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Success - show success message and clear form
+                            showPasswordSuccess(data.message);
+                            passwordForm.reset();
+                        } else {
+                            // Error - show error message
+                            if (data.field) {
+                                showPasswordError(data.field, data.message);
+                            } else {
+                                showPasswordError('currentPassword', data.message);
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showPasswordError('currentPassword', 'Có lỗi xảy ra. Vui lòng thử lại sau');
+                    })
+                    .finally(() => {
+                        // Restore button state
+                        submitBtn.innerHTML = originalText;
+                        submitBtn.disabled = false;
+                    });
                 });
+            }
+            
+            // Helper functions for password form
+            function clearPasswordErrors() {
+                document.getElementById('currentPasswordError').style.display = 'none';
+                document.getElementById('newPasswordError').style.display = 'none';
+                document.getElementById('confirmPasswordError').style.display = 'none';
+                
+                // Remove error styling
+                document.getElementById('currentPassword').classList.remove('is-invalid');
+                document.getElementById('newPassword').classList.remove('is-invalid');
+                document.getElementById('confirmPassword').classList.remove('is-invalid');
+            }
+            
+            function showPasswordError(fieldId, message) {
+                const errorDiv = document.getElementById(fieldId + 'Error');
+                const inputField = document.getElementById(fieldId);
+                
+                errorDiv.textContent = message;
+                errorDiv.style.display = 'block';
+                inputField.classList.add('is-invalid');
+            }
+            
+            function showPasswordSuccess(message) {
+                // Create success alert
+                const alertDiv = document.createElement('div');
+                alertDiv.className = 'alert alert-success alert-dismissible fade show';
+                alertDiv.innerHTML = `
+                    <i class="bi bi-check-circle"></i> ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
+                
+                // Insert at the top of the password card
+                const passwordCard = document.querySelector('.card:has(#changePasswordForm)');
+                const cardBody = passwordCard.querySelector('.card-body');
+                cardBody.insertBefore(alertDiv, cardBody.firstChild);
+                
+                // Auto-hide after 5 seconds
+                setTimeout(() => {
+                    const bsAlert = new bootstrap.Alert(alertDiv);
+                    bsAlert.close();
+                }, 5000);
             }
 
             // Address form validation
             const addressForms = document.querySelectorAll('form[action*="/address/"]');
             addressForms.forEach(function(form) {
                 form.addEventListener('submit', function(e) {
+                    // Check if adding new address and limit reached
+                    if (form.action.includes('/address/add')) {
+                        const addressCount = document.querySelectorAll('.address-card').length;
+                        if (addressCount >= 5) {
+                            e.preventDefault();
+                            alert('Bạn đã có đủ 5 địa chỉ nhận hàng. Để thêm địa chỉ mới, vui lòng xóa một địa chỉ hiện có.');
+                            return false;
+                        }
+                    }
+                    
                     const phoneField = form.querySelector('input[name="phone"]');
                     if (phoneField) {
                         const phone = phoneField.value.trim();
