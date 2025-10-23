@@ -12,56 +12,135 @@
     <!-- Admin CSS -->
     <link rel="stylesheet" href="/static/css/admin.css">
     
+    <!-- CSS Inline để đảm bảo hamburger hoạt động -->
     <style>
-        .sidebar {
+        /* Basic layout styles */
+        .page-wrapper {
+            display: flex;
+            flex-direction: column;
             min-height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
-        .sidebar .nav-link {
-            color: rgba(255,255,255,0.8) !important;
-            border-radius: 0.5rem;
-            margin: 0.2rem 0;
-            transition: all 0.3s ease;
+        
+        .main-layout {
+            display: flex;
+            flex: 1;
         }
-        .sidebar .nav-link:hover {
-            color: white !important;
-            background: rgba(255,255,255,0.1) !important;
-            transform: translateX(5px);
+        
+        .admin-sidebar {
+            width: 250px;
+            min-width: 250px;
+            background: #e9ecef; /* Xám đậm hơn để dễ nhìn */
+            border-right: 1px solid #dee2e6; /* Viền đậm hơn */
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            z-index: 1000;
+            overflow-y: auto;
+            transition: left 0.3s ease;
+            box-shadow: 2px 0 8px rgba(0,0,0,0.15); /* Bóng đậm hơn */
         }
-        .sidebar .nav-link.active {
-            color: white !important;
-            background: rgba(255,255,255,0.2) !important;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        
+        .admin-sidebar.collapsed {
+            left: -250px;
         }
+        
+        /* Sidebar header styling */
+        .admin-sidebar .text-dark {
+            color: #212529 !important; /* Đen đậm để dễ nhìn */
+        }
+        
+        .admin-sidebar .text-muted {
+            color: #6c757d !important; /* Xám đậm để dễ nhìn */
+        }
+        
+        .admin-sidebar .btn-outline-dark {
+            border-color: #6c757d;
+            color: #6c757d;
+        }
+        
+        .admin-sidebar .btn-outline-dark:hover {
+            background-color: #6c757d;
+            color: white;
+        }
+        
+        /* Nút đăng xuất - Màu đỏ thay vì vàng */
+        .admin-sidebar .nav-link.text-danger {
+            color: #dc3545 !important; /* Đỏ Bootstrap */
+        }
+        
+        .admin-sidebar .nav-link.text-danger:hover {
+            color: #c82333 !important; /* Đỏ đậm khi hover */
+            background-color: #f8d7da; /* Nền đỏ nhạt */
+        }
+        
+        .content-area {
+            margin-left: 250px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            transition: margin-left 0.3s ease;
+        }
+        
+        .admin-sidebar.collapsed ~ .content-area {
+            margin-left: 0;
+        }
+        
         .main-content {
-            background-color: #f8f9fa;
-            min-height: 100vh;
+            background-color: #f8f9fa; /* Sáng hơn sidebar để tạo tương phản */
+            flex: 1;
+            padding: 1.5rem;
         }
+        
         .admin-header {
             background: white;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: sticky !important;
+            top: 0 !important;
+            z-index: 100 !important;
+            transition: all 0.3s ease;
         }
-        /* Force Bootstrap classes */
-        .card {
-            border: none !important;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
-            border-radius: 0.5rem !important;
+        
+        /* Desktop: Ẩn hamburger header khi sidebar mở */
+        @media (min-width: 992px) {
+            .admin-sidebar:not(.collapsed) ~ .content-area .sidebar-toggle {
+                display: none !important;
+            }
         }
-        .btn {
-            border-radius: 0.375rem !important;
+        
+        /* Mobile: Ẩn hamburger header khi sidebar mở */
+        @media (max-width: 991px) {
+            .admin-sidebar {
+                position: fixed !important;
+                top: 0 !important;
+                left: -100% !important;
+                width: 250px !important;
+                z-index: 1050 !important;
+                transition: left 0.3s ease !important;
+            }
+            
+            .admin-sidebar.show {
+                left: 0 !important;
+            }
+            
+            .admin-sidebar.show ~ .content-area .sidebar-toggle {
+                display: none !important;
+            }
+            
+            .content-area {
+                margin-left: 0 !important;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container-fluid">
-        <div class="row">
-            <!-- Sidebar -->
-            <div class="col-md-3 col-lg-2 px-0">
+    <div class="page-wrapper">
+        <!-- Fixed Sidebar -->
                 <div th:replace="~{admin/fragments/admin_sidebar :: sidebar}"></div>
-            </div>
             
-            <!-- Main Content -->
-            <div class="col-md-9 col-lg-10 px-0">
+        <!-- Main Content Area -->
+        <div class="content-area">
                 <!-- Admin Header -->
                 <div th:replace="~{admin/fragments/admin_header :: header}"></div>
                 
@@ -69,13 +148,52 @@
                 <div th:replace="~{admin/fragments/admin_breadcrumb :: breadcrumb}"></div>
                 
                 <!-- Page Content -->
-                <main class="main-content p-4" layout:fragment="content">
+            <main class="main-content" layout:fragment="content">
                     <!-- Page content goes here -->
                 </main>
                 
-                <!-- Admin Footer -->
-                <div th:replace="~{admin/fragments/admin_footer :: footer}"></div>
+            <!-- Footer -->
+            <footer class="admin-footer">
+                <div class="container-fluid">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <small class="text-muted">
+                                © 2025 Mộc Việt Admin Panel. 
+                                <span id="current-time">Hôm nay</span>
+                                <script>
+                                    // Cập nhật thời gian real-time
+                                    function updateTime() {
+                                        const element = document.getElementById('current-time');
+                                        if (element) {
+                                            const now = new Date();
+                                            const timeString = now.toLocaleDateString('vi-VN') + ' ' + now.toLocaleTimeString('vi-VN', {
+                                                hour: '2-digit',
+                                                minute: '2-digit',
+                                                second: '2-digit'
+                                            });
+                                            element.textContent = timeString;
+                                        }
+                                    }
+                                    
+                                    // Cập nhật ngay lập tức và mỗi giây
+                                    updateTime();
+                                    setInterval(updateTime, 1000);
+                                </script>
+                            </small>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <small class="text-muted">
+                                <i class="bi bi-shield-check text-success me-1" style="font-size: 0.5rem;"></i>
+                                Hệ thống bảo mật
+                                <span class="ms-1">
+                                    <i class="bi bi-circle-fill text-success" style="font-size: 0.25rem;"></i>
+                                    Online
+                                </span>
+                            </small>
             </div>
+                    </div>
+                </div>
+            </footer>
         </div>
     </div>
     

@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/fragments/admin_layout}">
+<head>
+    <title>Quản lý màu sắc - Admin Panel</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">Quản lý màu sắc</h2>
+            <p class="text-muted mb-0">Quản lý màu sắc sản phẩm</p>
+        </div>
+        <div>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addColorModal">
+                <i class="bi bi-plus-circle me-1"></i>Thêm màu mới
+            </button>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-primary bg-opacity-10 rounded-circle p-3">
+                                <i class="bi bi-palette text-primary fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h5 class="card-title mb-0">25</h5>
+                            <small class="text-muted">Tổng màu</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-success bg-opacity-10 rounded-circle p-3">
+                                <i class="bi bi-check-circle text-success fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h5 class="card-title mb-0">18</h5>
+                            <small class="text-muted">Đang sử dụng</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-warning bg-opacity-10 rounded-circle p-3">
+                                <i class="bi bi-pause-circle text-warning fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h5 class="card-title mb-0">5</h5>
+                            <small class="text-muted">Tạm dừng</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-danger bg-opacity-10 rounded-circle p-3">
+                                <i class="bi bi-x-circle text-danger fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h5 class="card-title mb-0">2</h5>
+                            <small class="text-muted">Không sử dụng</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3">
+                    <label class="form-label">Tìm kiếm</label>
+                    <input type="text" class="form-control search-input" placeholder="Tìm theo tên màu..." data-target="#colorsTable">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Trạng thái</label>
+                    <select class="form-select">
+                        <option value="">Tất cả</option>
+                        <option value="active">Đang sử dụng</option>
+                        <option value="inactive">Tạm dừng</option>
+                        <option value="unused">Không sử dụng</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Sắp xếp</label>
+                    <select class="form-select">
+                        <option value="name">Tên A-Z</option>
+                        <option value="name_desc">Tên Z-A</option>
+                        <option value="created">Mới nhất</option>
+                        <option value="created_desc">Cũ nhất</option>
+                    </select>
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button class="btn btn-outline-primary w-100">
+                        <i class="bi bi-funnel me-1"></i>Lọc
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Data Table -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white">
+            <h5 class="card-title mb-0">
+                <i class="bi bi-palette me-2"></i>
+                Danh sách màu sắc
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover data-table" id="colorsTable">
+                    <thead>
+                        <tr>
+                            <th data-sort="name">Tên màu</th>
+                            <th>Mã màu</th>
+                            <th>Màu hiển thị</th>
+                            <th>Số sản phẩm</th>
+                            <th>Trạng thái</th>
+                            <th>Ngày tạo</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="fw-bold">Đỏ Cherry</div>
+                                <small class="text-muted">Màu đỏ sang trọng</small>
+                            </td>
+                            <td><code>#DC143C</code></td>
+                            <td><span class="badge" style="background-color: #DC143C; color: white;">Đỏ Cherry</span></td>
+                            <td><span class="badge bg-info">12</span></td>
+                            <td><span class="badge bg-success">Đang sử dụng</span></td>
+                            <td>2024-01-15</td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editColorModal">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <button class="btn btn-outline-danger btn-delete">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="fw-bold">Xanh Navy</div>
+                                <small class="text-muted">Màu xanh cổ điển</small>
+                            </td>
+                            <td><code>#000080</code></td>
+                            <td><span class="badge" style="background-color: #000080; color: white;">Xanh Navy</span></td>
+                            <td><span class="badge bg-info">8</span></td>
+                            <td><span class="badge bg-success">Đang sử dụng</span></td>
+                            <td>2024-01-10</td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editColorModal">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <button class="btn btn-outline-danger btn-delete">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="fw-bold">Vàng Gold</div>
+                                <small class="text-muted">Màu vàng cao cấp</small>
+                            </td>
+                            <td><code>#FFD700</code></td>
+                            <td><span class="badge" style="background-color: #FFD700; color: black;">Vàng Gold</span></td>
+                            <td><span class="badge bg-info">5</span></td>
+                            <td><span class="badge bg-warning">Tạm dừng</span></td>
+                            <td>2024-01-05</td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editColorModal">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <button class="btn btn-outline-danger btn-delete">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Color Modal -->
+<div class="modal fade" id="addColorModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Thêm màu mới</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form class="needs-validation" novalidate>
+                    <div class="mb-3">
+                        <label class="form-label">Tên màu *</label>
+                        <input type="text" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Mã màu HEX *</label>
+                        <input type="text" class="form-control" placeholder="#000000" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Mô tả</label>
+                        <textarea class="form-control" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" checked>
+                            <label class="form-check-label">Kích hoạt ngay</label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary btn-submit">Thêm màu</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Color Modal -->
+<div class="modal fade" id="editColorModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Chỉnh sửa màu</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form class="needs-validation" novalidate>
+                    <div class="mb-3">
+                        <label class="form-label">Tên màu *</label>
+                        <input type="text" class="form-control" value="Đỏ Cherry" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Mã màu HEX *</label>
+                        <input type="text" class="form-control" value="#DC143C" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Mô tả</label>
+                        <textarea class="form-control" rows="3">Màu đỏ cherry sang trọng</textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Trạng thái</label>
+                        <select class="form-select">
+                            <option value="active" selected>Đang sử dụng</option>
+                            <option value="inactive">Tạm dừng</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary btn-submit">Cập nhật</button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

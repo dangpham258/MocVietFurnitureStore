@@ -1,4 +1,4 @@
-package mocviet.controller.admin;
+package mocviet.controller.admin.banners;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -8,15 +8,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("/admin/categories")
+@RequestMapping("/admin/banners")
 @RequiredArgsConstructor
-public class CategoriesController {
+public class BannersController {
     
     @GetMapping({"", "/"})
     @PreAuthorize("hasRole('ADMIN')")
-    public String categories(Model model) {
-        model.addAttribute("pageTitle", "Quản lý Danh mục");
-        model.addAttribute("activeMenu", "categories");
-        return "admin/categories/admin_categories";
+    public String banners(Model model) {
+        model.addAttribute("pageTitle", "Quản lý banner");
+        model.addAttribute("activeMenu", "banners");
+        return "admin/banners/admin_banners";
     }
 }

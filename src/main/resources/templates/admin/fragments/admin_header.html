@@ -8,9 +8,16 @@
 <header th:fragment="header" class="admin-header">
     <div class="d-flex justify-content-between align-items-center p-3">
         <!-- Page Title -->
-        <div>
-            <h4 class="mb-0" th:text="${pageTitle ?: 'Admin Panel'}">Admin Panel</h4>
-            <small class="text-muted" th:text="${pageDescription ?: 'Quản trị hệ thống Mộc Việt'}">Quản trị hệ thống Mộc Việt</small>
+        <div class="d-flex align-items-center">
+            <!-- Desktop & Mobile Menu Toggle -->
+            <button class="btn btn-outline-secondary btn-sm me-3 sidebar-toggle" type="button">
+                <i class="bi bi-list"></i>
+            </button>
+            
+            <div>
+                <h4 class="mb-0" th:text="${pageTitle ?: 'Admin Panel'}">Admin Panel</h4>
+                <small class="text-muted" th:text="${pageDescription ?: 'Quản trị hệ thống Mộc Việt'}">Quản trị hệ thống Mộc Việt</small>
+            </div>
         </div>
         
         <!-- Right Side -->
@@ -44,8 +51,8 @@
                     <li><a class="dropdown-item" href="/admin/profile">
                         <i class="bi bi-person me-2"></i>Thông tin cá nhân
                     </a></li>
-                    <li><a class="dropdown-item" href="/admin/settings">
-                        <i class="bi bi-gear me-2"></i>Cài đặt
+                    <li><a class="dropdown-item" href="/admin/notifications">
+                        <i class="bi bi-bell me-2"></i>Thông báo
                     </a></li>
                     <li><hr class="dropdown-divider"></li>
                     <li><a class="dropdown-item text-danger" href="/logout">

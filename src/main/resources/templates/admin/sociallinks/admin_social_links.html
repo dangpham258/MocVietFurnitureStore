@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/fragments/admin_layout}">
+<head>
+    <title>Quản lý liên kết mạng xã hội - Admin Panel</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">Quản lý liên kết MXH</h2>
+            <p class="text-muted mb-0">Quản lý các liên kết mạng xã hội</p>
+        </div>
+        <div>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addSocialModal">
+                <i class="bi bi-plus-circle me-1"></i>Thêm liên kết
+            </button>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-primary bg-opacity-10 rounded-circle p-3">
+                                <i class="bi bi-share text-primary fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h5 class="card-title mb-0">8</h5>
+                            <small class="text-muted">Tổng liên kết</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-success bg-opacity-10 rounded-circle p-3">
+                                <i class="bi bi-check-circle text-success fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h5 class="card-title mb-0">6</h5>
+                            <small class="text-muted">Đang hoạt động</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-info bg-opacity-10 rounded-circle p-3">
+                                <i class="bi bi-facebook text-info fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h5 class="card-title mb-0">2</h5>
+                            <small class="text-muted">Facebook</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-warning bg-opacity-10 rounded-circle p-3">
+                                <i class="bi bi-instagram text-warning fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h5 class="card-title mb-0">2</h5>
+                            <small class="text-muted">Instagram</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                    <!-- Filters -->
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <label class="form-label">Tìm kiếm</label>
+                                    <input type="text" class="form-control search-input" placeholder="Tìm theo tên, URL..." data-target="#socialLinksTable">
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">Nền tảng</label>
+                                    <select class="form-select">
+                                        <option value="">Tất cả</option>
+                                        <option value="facebook">Facebook</option>
+                                        <option value="instagram">Instagram</option>
+                                        <option value="youtube">YouTube</option>
+                                        <option value="tiktok">TikTok</option>
+                                        <option value="zalo">Zalo</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">Trạng thái</label>
+                                    <select class="form-select">
+                                        <option value="">Tất cả</option>
+                                        <option value="active">Đang hoạt động</option>
+                                        <option value="inactive">Tạm dừng</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">Sắp xếp</label>
+                                    <select class="form-select">
+                                        <option value="platform">Nền tảng</option>
+                                        <option value="name">Tên A-Z</option>
+                                        <option value="created">Mới nhất</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3 d-flex align-items-end">
+                                    <button class="btn btn-admin-primary me-2">
+                                        <i class="bi bi-funnel me-1"></i>Lọc
+                                    </button>
+                                    <button class="btn btn-outline-secondary">
+                                        <i class="bi bi-download me-1"></i>Xuất Excel
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+    <!-- Data Table -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white">
+            <h5 class="card-title mb-0">
+                <i class="bi bi-share me-2"></i>
+                Danh sách liên kết mạng xã hội
+            </h5>
+        </div>
+        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover data-table" id="socialLinksTable">
+                                    <thead>
+                                        <tr>
+                                            <th data-sort="name">Tên liên kết</th>
+                                            <th>Nền tảng</th>
+                                            <th>URL</th>
+                                            <th>Icon</th>
+                                            <th>Vị trí hiển thị</th>
+                                            <th>Trạng thái</th>
+                                            <th>Thao tác</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <div>
+                                                    <div class="fw-bold">Facebook chính thức</div>
+                                                    <small class="text-muted">Trang Facebook chính</small>
+                                                </div>
+                                            </td>
+                                            <td><span class="badge bg-primary">Facebook</span></td>
+                                            <td>
+                                                <a href="https://facebook.com/mocviet" target="_blank" class="text-decoration-none">
+                                                    facebook.com/mocviet
+                                                </a>
+                                            </td>
+                                            <td><i class="bi bi-facebook text-primary fs-4"></i></td>
+                                            <td><span class="badge bg-info">Header</span></td>
+                                            <td><span class="badge bg-success">Hoạt động</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#editSocialLinkModal">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-info me-1" data-bs-toggle="modal" data-bs-target="#viewSocialLinkModal">
+                                                    <i class="bi bi-eye"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger btn-delete">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div>
+                                                    <div class="fw-bold">Instagram chính thức</div>
+                                                    <small class="text-muted">Trang Instagram chính</small>
+                                                </div>
+                                            </td>
+                                            <td><span class="badge bg-warning">Instagram</span></td>
+                                            <td>
+                                                <a href="https://instagram.com/mocviet" target="_blank" class="text-decoration-none">
+                                                    instagram.com/mocviet
+                                                </a>
+                                            </td>
+                                            <td><i class="bi bi-instagram text-warning fs-4"></i></td>
+                                            <td><span class="badge bg-info">Header</span></td>
+                                            <td><span class="badge bg-success">Hoạt động</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#editSocialLinkModal">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-info me-1" data-bs-toggle="modal" data-bs-target="#viewSocialLinkModal">
+                                                    <i class="bi bi-eye"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger btn-delete">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div>
+                                                    <div class="fw-bold">YouTube Channel</div>
+                                                    <small class="text-muted">Kênh YouTube chính thức</small>
+                                                </div>
+                                            </td>
+                                            <td><span class="badge bg-danger">YouTube</span></td>
+                                            <td>
+                                                <a href="https://youtube.com/@mocviet" target="_blank" class="text-decoration-none">
+                                                    youtube.com/@mocviet
+                                                </a>
+                                            </td>
+                                            <td><i class="bi bi-youtube text-danger fs-4"></i></td>
+                                            <td><span class="badge bg-success">Footer</span></td>
+                                            <td><span class="badge bg-success">Hoạt động</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#editSocialLinkModal">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-info me-1" data-bs-toggle="modal" data-bs-target="#viewSocialLinkModal">
+                                                    <i class="bi bi-eye"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger btn-delete">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div>
+                                                    <div class="fw-bold">TikTok chính thức</div>
+                                                    <small class="text-muted">Tài khoản TikTok</small>
+                                                </div>
+                                            </td>
+                                            <td><span class="badge bg-dark">TikTok</span></td>
+                                            <td>
+                                                <a href="https://tiktok.com/@mocviet" target="_blank" class="text-decoration-none">
+                                                    tiktok.com/@mocviet
+                                                </a>
+                                            </td>
+                                            <td><i class="bi bi-tiktok text-dark fs-4"></i></td>
+                                            <td><span class="badge bg-success">Footer</span></td>
+                                            <td><span class="badge bg-success">Hoạt động</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#editSocialLinkModal">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-info me-1" data-bs-toggle="modal" data-bs-target="#viewSocialLinkModal">
+                                                    <i class="bi bi-eye"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger btn-delete">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div>
+                                                    <div class="fw-bold">Zalo Official</div>
+                                                    <small class="text-muted">Trang Zalo chính thức</small>
+                                                </div>
+                                            </td>
+                                            <td><span class="badge bg-info">Zalo</span></td>
+                                            <td>
+                                                <a href="https://zalo.me/mocviet" target="_blank" class="text-decoration-none">
+                                                    zalo.me/mocviet
+                                                </a>
+                                            </td>
+                                            <td><i class="bi bi-chat-dots text-info fs-4"></i></td>
+                                            <td><span class="badge bg-warning">Sidebar</span></td>
+                                            <td><span class="badge bg-warning">Tạm dừng</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#editSocialLinkModal">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-info me-1" data-bs-toggle="modal" data-bs-target="#viewSocialLinkModal">
+                                                    <i class="bi bi-eye"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger btn-delete">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Social Link Modal -->
+    <div class="modal fade" id="addSocialLinkModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Thêm liên kết mạng xã hội</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="needs-validation" novalidate>
+                        <div class="mb-3">
+                            <label class="form-label">Tên liên kết *</label>
+                            <input type="text" class="form-control" placeholder="VD: Facebook chính thức" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Mô tả</label>
+                            <input type="text" class="form-control" placeholder="VD: Trang Facebook chính">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Nền tảng *</label>
+                            <select class="form-select" required>
+                                <option value="">Chọn nền tảng</option>
+                                <option value="facebook">Facebook</option>
+                                <option value="instagram">Instagram</option>
+                                <option value="youtube">YouTube</option>
+                                <option value="tiktok">TikTok</option>
+                                <option value="zalo">Zalo</option>
+                                <option value="twitter">Twitter</option>
+                                <option value="linkedin">LinkedIn</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">URL *</label>
+                            <input type="url" class="form-control" placeholder="https://facebook.com/mocviet" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Icon CSS Class</label>
+                            <input type="text" class="form-control" placeholder="bi bi-facebook">
+                            <div class="form-text">Class icon Bootstrap Icons</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Vị trí hiển thị</label>
+                            <select class="form-select">
+                                <option value="header">Header</option>
+                                <option value="footer">Footer</option>
+                                <option value="sidebar">Sidebar</option>
+                                <option value="all">Tất cả</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Màu sắc</label>
+                            <input type="color" class="form-control form-control-color" value="#1877f2">
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" checked>
+                                <label class="form-check-label">Mở trong tab mới</label>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" checked>
+                                <label class="form-check-label">Kích hoạt ngay</label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-admin-primary btn-submit">Thêm liên kết</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Social Link Modal -->
+    <div class="modal fade" id="editSocialLinkModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Chỉnh sửa liên kết mạng xã hội</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="needs-validation" novalidate>
+                        <div class="mb-3">
+                            <label class="form-label">Tên liên kết *</label>
+                            <input type="text" class="form-control" value="Facebook chính thức" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Mô tả</label>
+                            <input type="text" class="form-control" value="Trang Facebook chính">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Nền tảng *</label>
+                            <select class="form-select" required>
+                                <option value="facebook" selected>Facebook</option>
+                                <option value="instagram">Instagram</option>
+                                <option value="youtube">YouTube</option>
+                                <option value="tiktok">TikTok</option>
+                                <option value="zalo">Zalo</option>
+                                <option value="twitter">Twitter</option>
+                                <option value="linkedin">LinkedIn</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">URL *</label>
+                            <input type="url" class="form-control" value="https://facebook.com/mocviet" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Icon CSS Class</label>
+                            <input type="text" class="form-control" value="bi bi-facebook">
+                            <div class="form-text">Class icon Bootstrap Icons</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Vị trí hiển thị</label>
+                            <select class="form-select">
+                                <option value="header" selected>Header</option>
+                                <option value="footer">Footer</option>
+                                <option value="sidebar">Sidebar</option>
+                                <option value="all">Tất cả</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Màu sắc</label>
+                            <input type="color" class="form-control form-control-color" value="#1877f2">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Trạng thái</label>
+                            <select class="form-select">
+                                <option value="active" selected>Hoạt động</option>
+                                <option value="inactive">Tạm dừng</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" checked>
+                                <label class="form-check-label">Mở trong tab mới</label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-admin-primary btn-submit">Cập nhật</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Social Link Modal -->
+    <div class="modal fade" id="viewSocialLinkModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Chi tiết liên kết mạng xã hội</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-3">
+                        <div class="col-4"><strong>Tên:</strong></div>
+                        <div class="col-8">Facebook chính thức</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-4"><strong>Mô tả:</strong></div>
+                        <div class="col-8">Trang Facebook chính</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-4"><strong>Nền tảng:</strong></div>
+                        <div class="col-8"><span class="badge bg-primary">Facebook</span></div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-4"><strong>URL:</strong></div>
+                        <div class="col-8">
+                            <a href="https://facebook.com/mocviet" target="_blank" class="text-decoration-none">
+                                facebook.com/mocviet
+                            </a>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-4"><strong>Icon:</strong></div>
+                        <div class="col-8">
+                            <i class="bi bi-facebook text-primary fs-4"></i>
+                            <code class="ms-2">bi bi-facebook</code>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-4"><strong>Vị trí:</strong></div>
+                        <div class="col-8"><span class="badge bg-info">Header</span></div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-4"><strong>Màu sắc:</strong></div>
+                        <div class="col-8">
+                            <span class="badge" style="background-color: #1877f2;">#1877f2</span>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-4"><strong>Trạng thái:</strong></div>
+                        <div class="col-8"><span class="badge bg-success">Hoạt động</span></div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-4"><strong>Mở tab mới:</strong></div>
+                        <div class="col-8">
+                            <i class="bi bi-check-circle text-success"></i> Có
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+        </div>
+    </div>
+</div>
+</body>
+</html>

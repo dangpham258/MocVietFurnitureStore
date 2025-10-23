@@ -13,207 +13,570 @@
             <p class="text-muted mb-0">Quản lý tài khoản hệ thống</p>
         </div>
         <div>
-            <button class="btn btn-admin-primary" data-bs-toggle="modal" data-bs-target="#createUserModal">
-                <i class="bi bi-person-plus me-2"></i>Tạo User mới
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">
+                <i class="bi bi-plus-circle me-1"></i>Thêm user
             </button>
         </div>
     </div>
-    
-    <!-- Filters -->
-    <div class="card admin-card mb-4">
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-3">
-                    <label class="form-label">Role</label>
-                    <select class="form-select">
-                        <option value="">Tất cả</option>
-                        <option value="ADMIN">Admin</option>
-                        <option value="MANAGER">Manager</option>
-                        <option value="DELIVERY">Delivery</option>
-                        <option value="CUSTOMER">Customer</option>
-                    </select>
+
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-primary bg-opacity-10 rounded-circle p-3">
+                                <i class="bi bi-people text-primary fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h5 class="card-title mb-0">156</h5>
+                            <small class="text-muted">Tổng Users</small>
+                        </div>
+                    </div>
                 </div>
-                <div class="col-md-3">
-                    <label class="form-label">Trạng thái</label>
-                    <select class="form-select">
-                        <option value="">Tất cả</option>
-                        <option value="active">Hoạt động</option>
-                        <option value="inactive">Khóa</option>
-                    </select>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-success bg-opacity-10 rounded-circle p-3">
+                                <i class="bi bi-check-circle text-success fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h5 class="card-title mb-0">142</h5>
+                            <small class="text-muted">Đang hoạt động</small>
+                        </div>
+                    </div>
                 </div>
-                <div class="col-md-4">
-                    <label class="form-label">Tìm kiếm</label>
-                    <input type="text" class="form-control" placeholder="Username, email, tên...">
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-warning bg-opacity-10 rounded-circle p-3">
+                                <i class="bi bi-shield-check text-warning fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h5 class="card-title mb-0">3</h5>
+                            <small class="text-muted">Admin</small>
+                        </div>
+                    </div>
                 </div>
-                <div class="col-md-2">
-                    <label class="form-label">&nbsp;</label>
-                    <button class="btn btn-outline-primary w-100">
-                        <i class="bi bi-search"></i> Tìm
-                    </button>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-info bg-opacity-10 rounded-circle p-3">
+                                <i class="bi bi-person-check text-info fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h5 class="card-title mb-0">139</h5>
+                            <small class="text-muted">Customer</small>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-    
-    <!-- Users Table -->
-    <div class="card admin-card">
+
+    <!-- Filters -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <label class="form-label">Tìm kiếm</label>
+                                    <input type="text" class="form-control search-input" placeholder="Tìm theo tên, email..." data-target="#usersTable">
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">Vai trò</label>
+                                    <select class="form-select">
+                                        <option value="">Tất cả</option>
+                                        <option value="ADMIN">Admin</option>
+                                        <option value="MANAGER">Manager</option>
+                                        <option value="DELIVERY">Delivery</option>
+                                        <option value="CUSTOMER">Customer</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">Trạng thái</label>
+                                    <select class="form-select">
+                                        <option value="">Tất cả</option>
+                                        <option value="active">Hoạt động</option>
+                                        <option value="inactive">Tạm khóa</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">Sắp xếp</label>
+                                    <select class="form-select">
+                                        <option value="created">Mới nhất</option>
+                                        <option value="name">Tên A-Z</option>
+                                        <option value="last_login">Đăng nhập gần</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3 d-flex align-items-end">
+                                    <button class="btn btn-admin-primary me-2">
+                                        <i class="bi bi-funnel me-1"></i>Lọc
+                                    </button>
+                                    <button class="btn btn-outline-secondary">
+                                        <i class="bi bi-download me-1"></i>Xuất Excel
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+    <!-- Data Table -->
+    <div class="card border-0 shadow-sm">
         <div class="card-header bg-white">
             <h5 class="card-title mb-0">
                 <i class="bi bi-people me-2"></i>
-                Danh sách Users (1,234)
+                Danh sách Users
             </h5>
         </div>
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th>ID</th>
-                            <th>Username</th>
-                            <th>Họ tên</th>
-                            <th>Email</th>
-                            <th>Role</th>
-                            <th>Trạng thái</th>
-                            <th>Ngày tạo</th>
-                            <th>Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td>admin</td>
-                            <td>Nguyễn Admin</td>
-                            <td>admin@mocviet.vn</td>
-                            <td><span class="badge bg-danger">ADMIN</span></td>
-                            <td><span class="badge bg-success">Hoạt động</span></td>
-                            <td>01/01/2025</td>
-                            <td>
-                                <button class="btn btn-sm btn-outline-primary me-1">
-                                    <i class="bi bi-eye"></i>
-                                </button>
-                                <button class="btn btn-sm btn-outline-warning me-1">
-                                    <i class="bi bi-pencil"></i>
-                                </button>
-                                <button class="btn btn-sm btn-outline-danger">
-                                    <i class="bi bi-lock"></i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td>manager</td>
-                            <td>Lê Quản lý</td>
-                            <td>manager@mocviet.vn</td>
-                            <td><span class="badge bg-warning">MANAGER</span></td>
-                            <td><span class="badge bg-success">Hoạt động</span></td>
-                            <td>01/01/2025</td>
-                            <td>
-                                <button class="btn btn-sm btn-outline-primary me-1">
-                                    <i class="bi bi-eye"></i>
-                                </button>
-                                <button class="btn btn-sm btn-outline-warning me-1">
-                                    <i class="bi bi-pencil"></i>
-                                </button>
-                                <button class="btn btn-sm btn-outline-danger">
-                                    <i class="bi bi-lock"></i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>3</td>
-                            <td>delivery_north</td>
-                            <td>Đội Giao Khu Vực Bắc</td>
-                            <td>delivery_north@mocviet.local</td>
-                            <td><span class="badge bg-info">DELIVERY</span></td>
-                            <td><span class="badge bg-success">Hoạt động</span></td>
-                            <td>01/01/2025</td>
-                            <td>
-                                <button class="btn btn-sm btn-outline-primary me-1">
-                                    <i class="bi bi-eye"></i>
-                                </button>
-                                <button class="btn btn-sm btn-outline-warning me-1">
-                                    <i class="bi bi-pencil"></i>
-                                </button>
-                                <button class="btn btn-sm btn-outline-danger">
-                                    <i class="bi bi-lock"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="card-footer bg-white">
-            <nav>
-                <ul class="pagination pagination-sm mb-0">
-                    <li class="page-item disabled">
-                        <a class="page-link" href="#">Trước</a>
-                    </li>
-                    <li class="page-item active">
-                        <a class="page-link" href="#">1</a>
-                    </li>
-                    <li class="page-item">
-                        <a class="page-link" href="#">2</a>
-                    </li>
-                    <li class="page-item">
-                        <a class="page-link" href="#">3</a>
-                    </li>
-                    <li class="page-item">
-                        <a class="page-link" href="#">Sau</a>
-                    </li>
-                </ul>
-            </nav>
-        </div>
-    </div>
-</div>
-
-<!-- Create User Modal -->
-<div class="modal fade" id="createUserModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Tạo User mới</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <form>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Username</label>
-                            <input type="text" class="form-control" required>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Email</label>
-                            <input type="email" class="form-control" required>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Họ tên</label>
-                            <input type="text" class="form-control" required>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Role</label>
-                            <select class="form-select" required>
-                                <option value="">Chọn role</option>
-                                <option value="MANAGER">Manager</option>
-                                <option value="DELIVERY">Delivery</option>
-                                <option value="CUSTOMER">Customer</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Mật khẩu</label>
-                            <input type="password" class="form-control" required>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Số điện thoại</label>
-                            <input type="tel" class="form-control">
+        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover data-table" id="usersTable">
+                                    <thead>
+                                        <tr>
+                                            <th data-sort="name">Thông tin User</th>
+                                            <th>Email</th>
+                                            <th>Vai trò</th>
+                                            <th>Trạng thái</th>
+                                            <th>Đăng nhập cuối</th>
+                                            <th>Ngày tạo</th>
+                                            <th>Thao tác</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <img src="https://via.placeholder.com/40" class="rounded-circle me-2" width="40" height="40">
+                                                    <div>
+                                                        <div class="fw-bold">admin</div>
+                                                        <small class="text-muted">Administrator</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>admin@mocviet.com</td>
+                                            <td><span class="badge bg-danger">ADMIN</span></td>
+                                            <td><span class="badge bg-success">Hoạt động</span></td>
+                                            <td>2024-10-23 14:30</td>
+                                            <td>2024-01-01</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#editUserModal">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-info me-1" data-bs-toggle="modal" data-bs-target="#viewUserModal">
+                                                    <i class="bi bi-eye"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-warning me-1" data-bs-toggle="modal" data-bs-target="#resetPasswordModal">
+                                                    <i class="bi bi-key"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <img src="https://via.placeholder.com/40" class="rounded-circle me-2" width="40" height="40">
+                                                    <div>
+                                                        <div class="fw-bold">manager01</div>
+                                                        <small class="text-muted">Manager</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>manager@mocviet.com</td>
+                                            <td><span class="badge bg-warning">MANAGER</span></td>
+                                            <td><span class="badge bg-success">Hoạt động</span></td>
+                                            <td>2024-10-23 10:15</td>
+                                            <td>2024-01-15</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#editUserModal">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-info me-1" data-bs-toggle="modal" data-bs-target="#viewUserModal">
+                                                    <i class="bi bi-eye"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-warning me-1" data-bs-toggle="modal" data-bs-target="#resetPasswordModal">
+                                                    <i class="bi bi-key"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger btn-delete">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <img src="https://via.placeholder.com/40" class="rounded-circle me-2" width="40" height="40">
+                                                    <div>
+                                                        <div class="fw-bold">delivery01</div>
+                                                        <small class="text-muted">Delivery Staff</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>delivery@mocviet.com</td>
+                                            <td><span class="badge bg-info">DELIVERY</span></td>
+                                            <td><span class="badge bg-success">Hoạt động</span></td>
+                                            <td>2024-10-23 08:45</td>
+                                            <td>2024-02-01</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#editUserModal">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-info me-1" data-bs-toggle="modal" data-bs-target="#viewUserModal">
+                                                    <i class="bi bi-eye"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-warning me-1" data-bs-toggle="modal" data-bs-target="#resetPasswordModal">
+                                                    <i class="bi bi-key"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger btn-delete">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <img src="https://via.placeholder.com/40" class="rounded-circle me-2" width="40" height="40">
+                                                    <div>
+                                                        <div class="fw-bold">customer001</div>
+                                                        <small class="text-muted">Nguyễn Văn A</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>nguyenvana@email.com</td>
+                                            <td><span class="badge bg-primary">CUSTOMER</span></td>
+                                            <td><span class="badge bg-success">Hoạt động</span></td>
+                                            <td>2024-10-22 20:30</td>
+                                            <td>2024-03-15</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#editUserModal">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-info me-1" data-bs-toggle="modal" data-bs-target="#viewUserModal">
+                                                    <i class="bi bi-eye"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-warning me-1" data-bs-toggle="modal" data-bs-target="#resetPasswordModal">
+                                                    <i class="bi bi-key"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger btn-delete">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <img src="https://via.placeholder.com/40" class="rounded-circle me-2" width="40" height="40">
+                                                    <div>
+                                                        <div class="fw-bold">customer002</div>
+                                                        <small class="text-muted">Trần Thị B</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>tranthib@email.com</td>
+                                            <td><span class="badge bg-primary">CUSTOMER</span></td>
+                                            <td><span class="badge bg-danger">Tạm khóa</span></td>
+                                            <td>2024-10-20 15:20</td>
+                                            <td>2024-04-10</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#editUserModal">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-info me-1" data-bs-toggle="modal" data-bs-target="#viewUserModal">
+                                                    <i class="bi bi-eye"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-warning me-1" data-bs-toggle="modal" data-bs-target="#resetPasswordModal">
+                                                    <i class="bi bi-key"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger btn-delete">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
-                </form>
+                </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                <button type="button" class="btn btn-admin-primary">Tạo User</button>
+        </div>
+    </div>
+
+    <!-- Add User Modal -->
+    <div class="modal fade" id="addUserModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Thêm User mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="needs-validation" novalidate>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Username *</label>
+                                    <input type="text" class="form-control" placeholder="VD: user001" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Email *</label>
+                                    <input type="email" class="form-control" placeholder="user@email.com" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Họ và tên *</label>
+                                    <input type="text" class="form-control" placeholder="Nguyễn Văn A" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Số điện thoại</label>
+                                    <input type="tel" class="form-control" placeholder="0901234567">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Mật khẩu *</label>
+                                    <input type="password" class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Xác nhận mật khẩu *</label>
+                                    <input type="password" class="form-control" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Vai trò *</label>
+                                    <select class="form-select" required>
+                                        <option value="">Chọn vai trò</option>
+                                        <option value="ADMIN">Admin</option>
+                                        <option value="MANAGER">Manager</option>
+                                        <option value="DELIVERY">Delivery</option>
+                                        <option value="CUSTOMER">Customer</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Ngày sinh</label>
+                                    <input type="date" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Địa chỉ</label>
+                            <textarea class="form-control" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" checked>
+                                <label class="form-check-label">Kích hoạt ngay</label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-admin-primary btn-submit">Thêm User</button>
+                </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Edit User Modal -->
+    <div class="modal fade" id="editUserModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Chỉnh sửa User</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="needs-validation" novalidate>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Username *</label>
+                                    <input type="text" class="form-control" value="admin" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Email *</label>
+                                    <input type="email" class="form-control" value="admin@mocviet.com" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Họ và tên *</label>
+                                    <input type="text" class="form-control" value="Administrator" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Số điện thoại</label>
+                                    <input type="tel" class="form-control" value="0901234567">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Vai trò *</label>
+                                    <select class="form-select" required>
+                                        <option value="ADMIN" selected>Admin</option>
+                                        <option value="MANAGER">Manager</option>
+                                        <option value="DELIVERY">Delivery</option>
+                                        <option value="CUSTOMER">Customer</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Ngày sinh</label>
+                                    <input type="date" class="form-control" value="1990-01-01">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Địa chỉ</label>
+                            <textarea class="form-control" rows="3">123 Đường ABC, Quận XYZ, Hà Nội</textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Trạng thái</label>
+                            <select class="form-select">
+                                <option value="active" selected>Hoạt động</option>
+                                <option value="inactive">Tạm khóa</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-admin-primary btn-submit">Cập nhật</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- View User Modal -->
+    <div class="modal fade" id="viewUserModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Chi tiết User</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-4 text-center">
+                            <img src="https://via.placeholder.com/120" class="rounded-circle mb-3" width="120" height="120">
+                            <h5>admin</h5>
+                            <p class="text-muted">Administrator</p>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="row mb-2">
+                                <div class="col-4"><strong>Email:</strong></div>
+                                <div class="col-8">admin@mocviet.com</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-4"><strong>Số điện thoại:</strong></div>
+                                <div class="col-8">0901234567</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-4"><strong>Vai trò:</strong></div>
+                                <div class="col-8"><span class="badge bg-danger">ADMIN</span></div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-4"><strong>Trạng thái:</strong></div>
+                                <div class="col-8"><span class="badge bg-success">Hoạt động</span></div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-4"><strong>Đăng nhập cuối:</strong></div>
+                                <div class="col-8">2024-10-23 14:30</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-4"><strong>Ngày tạo:</strong></div>
+                                <div class="col-8">2024-01-01</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-4"><strong>Địa chỉ:</strong></div>
+                                <div class="col-8">123 Đường ABC, Quận XYZ, Hà Nội</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reset Password Modal -->
+    <div class="modal fade" id="resetPasswordModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Đặt lại mật khẩu</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="needs-validation" novalidate>
+                        <div class="mb-3">
+                            <label class="form-label">Username</label>
+                            <input type="text" class="form-control" value="admin" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Mật khẩu mới *</label>
+                            <input type="password" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Xác nhận mật khẩu *</label>
+                            <input type="password" class="form-control" required>
+                        </div>
+                        <div class="alert alert-warning">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            User sẽ cần đăng nhập lại sau khi đặt lại mật khẩu.
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-warning btn-submit">Đặt lại mật khẩu</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
         </div>
     </div>
 </div>

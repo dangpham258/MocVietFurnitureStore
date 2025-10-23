@@ -89,9 +89,22 @@ public class AuthController {
         }
         
         try {
-            authService.login(request, response);
+            AuthResponse authResponse = authService.login(request, response);
             redirectAttributes.addFlashAttribute("success", "Đăng nhập thành công!");
-            return "redirect:/dashboard";
+            
+            // Redirect theo role
+            String role = authResponse.getRole();
+            switch (role) {
+                case "ADMIN":
+                    return "redirect:/admin";
+                case "MANAGER":
+                    return "redirect:/manager";
+                case "DELIVERY":
+                    return "redirect:/delivery";
+                case "CUSTOMER":
+                default:
+                    return "redirect:/";
+            }
         } catch (Exception e) {
             model.addAttribute("error", "Tên đăng nhập hoặc mật khẩu không đúng");
             return "auth/login";
@@ -118,13 +131,6 @@ public class AuthController {
         }
     }
     
-    @GetMapping("/logout")
-    public String logout(HttpServletResponse response, RedirectAttributes redirectAttributes) {
-        authService.logout(response);
-        redirectAttributes.addFlashAttribute("success", "Đăng xuất thành công!");
-        return "redirect:/login";
-    }
-    
     // ===== REST API ENDPOINTS =====
     
     @PostMapping("/api/auth/login")
@@ -137,13 +143,6 @@ public class AuthController {
     @ResponseBody
     public MessageResponse registerApi(@Valid @RequestBody RegisterRequest request) {
         return authService.register(request);
-    }
-    
-    @PostMapping("/api/auth/logout")
-    @ResponseBody
-    public MessageResponse logoutApi(HttpServletResponse response) {
-        authService.logout(response);
-        return MessageResponse.success("Đăng xuất thành công!");
     }
 }
 

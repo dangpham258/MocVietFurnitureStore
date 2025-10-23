@@ -1,22 +1,23 @@
-package mocviet.controller.admin;
+package mocviet.controller.admin.categories;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import lombok.RequiredArgsConstructor;
+
 @Controller
-@RequestMapping("/admin/reports")
+@RequestMapping("/admin/categories")
 @RequiredArgsConstructor
-public class ReportsController {
+public class CategoriesController {
     
     @GetMapping({"", "/"})
     @PreAuthorize("hasRole('ADMIN')")
-    public String reports(Model model) {
-        model.addAttribute("pageTitle", "Báo cáo & Thống kê");
-        model.addAttribute("activeMenu", "reports");
-        return "admin/reports/admin_reports";
+    public String categories(Model model) {
+        model.addAttribute("pageTitle", "Quản lý danh mục");
+        model.addAttribute("activeMenu", "categories");
+        return "admin/categories/admin_categories";
     }
 }

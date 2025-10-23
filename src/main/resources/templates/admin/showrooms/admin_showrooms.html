@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/fragments/admin_layout}">
+<head>
+    <title>Quản lý showroom - Admin Panel</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">Quản lý showroom</h2>
+            <p class="text-muted mb-0">Quản lý các showroom và cửa hàng</p>
+        </div>
+        <div>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addShowroomModal">
+                <i class="bi bi-plus-circle me-1"></i>Thêm showroom
+            </button>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-primary bg-opacity-10 rounded-circle p-3">
+                                <i class="bi bi-shop text-primary fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h5 class="card-title mb-0">5</h5>
+                            <small class="text-muted">Tổng showroom</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-success bg-opacity-10 rounded-circle p-3">
+                                <i class="bi bi-check-circle text-success fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h5 class="card-title mb-0">4</h5>
+                            <small class="text-muted">Đang hoạt động</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-warning bg-opacity-10 rounded-circle p-3">
+                                <i class="bi bi-geo-alt text-warning fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h5 class="card-title mb-0">3</h5>
+                            <small class="text-muted">Tỉnh/thành</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-info bg-opacity-10 rounded-circle p-3">
+                                <i class="bi bi-people text-info fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h5 class="card-title mb-0">25</h5>
+                            <small class="text-muted">Nhân viên</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <label class="form-label">Tìm kiếm</label>
+                                    <input type="text" class="form-control search-input" placeholder="Tìm theo tên, địa chỉ..." data-target="#showroomsTable">
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">Tỉnh/thành</label>
+                                    <select class="form-select">
+                                        <option value="">Tất cả</option>
+                                        <option value="hn">Hà Nội</option>
+                                        <option value="hcm">TP. HCM</option>
+                                        <option value="dn">Đà Nẵng</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">Trạng thái</label>
+                                    <select class="form-select">
+                                        <option value="">Tất cả</option>
+                                        <option value="active">Đang hoạt động</option>
+                                        <option value="maintenance">Bảo trì</option>
+                                        <option value="inactive">Tạm đóng</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">Sắp xếp</label>
+                                    <select class="form-select">
+                                        <option value="name">Tên A-Z</option>
+                                        <option value="city">Tỉnh/thành</option>
+                                        <option value="created">Mới nhất</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3 d-flex align-items-end">
+                                    <button class="btn btn-admin-primary me-2">
+                                        <i class="bi bi-funnel me-1"></i>Lọc
+                                    </button>
+                                    <button class="btn btn-outline-secondary">
+                                        <i class="bi bi-download me-1"></i>Xuất Excel
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+    <!-- Data Table -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white">
+            <h5 class="card-title mb-0">
+                <i class="bi bi-shop me-2"></i>
+                Danh sách showroom
+            </h5>
+        </div>
+        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover data-table" id="showroomsTable">
+                                    <thead>
+                                        <tr>
+                                            <th data-sort="name">Tên showroom</th>
+                                            <th>Địa chỉ</th>
+                                            <th>Tỉnh/thành</th>
+                                            <th>Số điện thoại</th>
+                                            <th>Giờ mở cửa</th>
+                                            <th>Trạng thái</th>
+                                            <th>Thao tác</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <div>
+                                                    <div class="fw-bold">Showroom Mộc Việt Hà Nội</div>
+                                                    <small class="text-muted">Showroom chính</small>
+                                                </div>
+                                            </td>
+                                            <td>123 Đường ABC, Quận XYZ</td>
+                                            <td><span class="badge bg-primary">Hà Nội</span></td>
+                                            <td>024.1234.5678</td>
+                                            <td>8:00 - 22:00</td>
+                                            <td><span class="badge bg-success">Đang hoạt động</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#editShowroomModal">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-info me-1" data-bs-toggle="modal" data-bs-target="#viewShowroomModal">
+                                                    <i class="bi bi-eye"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger btn-delete">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div>
+                                                    <div class="fw-bold">Showroom Mộc Việt TP.HCM</div>
+                                                    <small class="text-muted">Chi nhánh miền Nam</small>
+                                                </div>
+                                            </td>
+                                            <td>456 Đường DEF, Quận 1</td>
+                                            <td><span class="badge bg-success">TP. HCM</span></td>
+                                            <td>028.8765.4321</td>
+                                            <td>8:00 - 22:00</td>
+                                            <td><span class="badge bg-success">Đang hoạt động</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#editShowroomModal">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-info me-1" data-bs-toggle="modal" data-bs-target="#viewShowroomModal">
+                                                    <i class="bi bi-eye"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger btn-delete">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div>
+                                                    <div class="fw-bold">Showroom Mộc Việt Đà Nẵng</div>
+                                                    <small class="text-muted">Chi nhánh miền Trung</small>
+                                                </div>
+                                            </td>
+                                            <td>789 Đường GHI, Quận Hải Châu</td>
+                                            <td><span class="badge bg-warning">Đà Nẵng</span></td>
+                                            <td>0236.1111.2222</td>
+                                            <td>8:00 - 22:00</td>
+                                            <td><span class="badge bg-success">Đang hoạt động</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#editShowroomModal">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-info me-1" data-bs-toggle="modal" data-bs-target="#viewShowroomModal">
+                                                    <i class="bi bi-eye"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger btn-delete">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div>
+                                                    <div class="fw-bold">Showroom Mộc Việt Cần Thơ</div>
+                                                    <small class="text-muted">Chi nhánh Đồng bằng sông Cửu Long</small>
+                                                </div>
+                                            </td>
+                                            <td>321 Đường JKL, Quận Ninh Kiều</td>
+                                            <td><span class="badge bg-info">Cần Thơ</span></td>
+                                            <td>0292.3333.4444</td>
+                                            <td>8:00 - 22:00</td>
+                                            <td><span class="badge bg-warning">Bảo trì</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#editShowroomModal">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-info me-1" data-bs-toggle="modal" data-bs-target="#viewShowroomModal">
+                                                    <i class="bi bi-eye"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger btn-delete">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div>
+                                                    <div class="fw-bold">Showroom Mộc Việt Hải Phòng</div>
+                                                    <small class="text-muted">Chi nhánh miền Bắc</small>
+                                                </div>
+                                            </td>
+                                            <td>654 Đường MNO, Quận Lê Chân</td>
+                                            <td><span class="badge bg-secondary">Hải Phòng</span></td>
+                                            <td>0225.5555.6666</td>
+                                            <td>8:00 - 22:00</td>
+                                            <td><span class="badge bg-danger">Tạm đóng</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#editShowroomModal">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-info me-1" data-bs-toggle="modal" data-bs-target="#viewShowroomModal">
+                                                    <i class="bi bi-eye"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger btn-delete">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Showroom Modal -->
+    <div class="modal fade" id="addShowroomModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Thêm showroom mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="needs-validation" novalidate>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Tên showroom *</label>
+                                    <input type="text" class="form-control" placeholder="VD: Showroom Mộc Việt Hà Nội" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Mô tả</label>
+                                    <input type="text" class="form-control" placeholder="VD: Showroom chính">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Địa chỉ đầy đủ *</label>
+                            <textarea class="form-control" rows="3" placeholder="Số nhà, đường, phường/xã, quận/huyện" required></textarea>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">Tỉnh/thành *</label>
+                                    <select class="form-select" required>
+                                        <option value="">Chọn tỉnh/thành</option>
+                                        <option value="hn">Hà Nội</option>
+                                        <option value="hcm">TP. Hồ Chí Minh</option>
+                                        <option value="dn">Đà Nẵng</option>
+                                        <option value="hp">Hải Phòng</option>
+                                        <option value="ct">Cần Thơ</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">Số điện thoại *</label>
+                                    <input type="tel" class="form-control" placeholder="024.1234.5678" required>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" class="form-control" placeholder="showroom@mocviet.com">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Giờ mở cửa</label>
+                                    <input type="text" class="form-control" placeholder="8:00 - 22:00">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Ngày nghỉ</label>
+                                    <input type="text" class="form-control" placeholder="Chủ nhật">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Mô tả chi tiết</label>
+                            <textarea class="form-control" rows="4" placeholder="Mô tả về showroom, dịch vụ, sản phẩm..."></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Hình ảnh showroom</label>
+                            <input type="file" class="form-control" accept="image/*" multiple>
+                            <div class="form-text">Có thể chọn nhiều hình ảnh</div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" checked>
+                                <label class="form-check-label">Kích hoạt ngay</label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-admin-primary btn-submit">Thêm showroom</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Showroom Modal -->
+    <div class="modal fade" id="editShowroomModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Chỉnh sửa showroom</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="needs-validation" novalidate>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Tên showroom *</label>
+                                    <input type="text" class="form-control" value="Showroom Mộc Việt Hà Nội" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Mô tả</label>
+                                    <input type="text" class="form-control" value="Showroom chính">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Địa chỉ đầy đủ *</label>
+                            <textarea class="form-control" rows="3" required>123 Đường ABC, Quận XYZ, Hà Nội</textarea>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">Tỉnh/thành *</label>
+                                    <select class="form-select" required>
+                                        <option value="hn" selected>Hà Nội</option>
+                                        <option value="hcm">TP. Hồ Chí Minh</option>
+                                        <option value="dn">Đà Nẵng</option>
+                                        <option value="hp">Hải Phòng</option>
+                                        <option value="ct">Cần Thơ</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">Số điện thoại *</label>
+                                    <input type="tel" class="form-control" value="024.1234.5678" required>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" class="form-control" value="hanoi@mocviet.com">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Giờ mở cửa</label>
+                                    <input type="text" class="form-control" value="8:00 - 22:00">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Ngày nghỉ</label>
+                                    <input type="text" class="form-control" value="Chủ nhật">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Mô tả chi tiết</label>
+                            <textarea class="form-control" rows="4">Showroom chính của Mộc Việt tại Hà Nội với diện tích 500m2, trưng bày đầy đủ các sản phẩm nội thất gỗ cao cấp...</textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Hình ảnh hiện tại</label>
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <img src="https://via.placeholder.com/100x80" class="img-fluid rounded mb-2">
+                                </div>
+                                <div class="col-md-3">
+                                    <img src="https://via.placeholder.com/100x80" class="img-fluid rounded mb-2">
+                                </div>
+                            </div>
+                            <input type="file" class="form-control" accept="image/*" multiple>
+                            <div class="form-text">Để trống nếu không muốn thay đổi hình ảnh</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Trạng thái</label>
+                            <select class="form-select">
+                                <option value="active" selected>Đang hoạt động</option>
+                                <option value="maintenance">Bảo trì</option>
+                                <option value="inactive">Tạm đóng</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-admin-primary btn-submit">Cập nhật</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Showroom Modal -->
+    <div class="modal fade" id="viewShowroomModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Chi tiết showroom</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Hình ảnh showroom:</h6>
+                            <div class="row">
+                                <div class="col-md-6 mb-2">
+                                    <img src="https://via.placeholder.com/200x150" class="img-fluid rounded">
+                                </div>
+                                <div class="col-md-6 mb-2">
+                                    <img src="https://via.placeholder.com/200x150" class="img-fluid rounded">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="row mb-2">
+                                <div class="col-4"><strong>Tên:</strong></div>
+                                <div class="col-8">Showroom Mộc Việt Hà Nội</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-4"><strong>Địa chỉ:</strong></div>
+                                <div class="col-8">123 Đường ABC, Quận XYZ, Hà Nội</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-4"><strong>Tỉnh/thành:</strong></div>
+                                <div class="col-8"><span class="badge bg-primary">Hà Nội</span></div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-4"><strong>SĐT:</strong></div>
+                                <div class="col-8">024.1234.5678</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-4"><strong>Email:</strong></div>
+                                <div class="col-8">hanoi@mocviet.com</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-4"><strong>Giờ mở cửa:</strong></div>
+                                <div class="col-8">8:00 - 22:00</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-4"><strong>Ngày nghỉ:</strong></div>
+                                <div class="col-8">Chủ nhật</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-4"><strong>Trạng thái:</strong></div>
+                                <div class="col-8"><span class="badge bg-success">Đang hoạt động</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <h6>Mô tả:</h6>
+                    <p>Showroom chính của Mộc Việt tại Hà Nội với diện tích 500m2, trưng bày đầy đủ các sản phẩm nội thất gỗ cao cấp. Có đội ngũ tư vấn chuyên nghiệp và dịch vụ khách hàng tốt nhất.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/fragments/admin_layout}">
+<head>
+    <title>Quản lý phí vận chuyển - Admin Panel</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">Quản lý phí vận chuyển</h2>
+            <p class="text-muted mb-0">Quản lý chi phí và phương thức vận chuyển</p>
+        </div>
+        <div>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addMethodModal">
+                <i class="bi bi-plus-circle me-1"></i>Thêm phương thức
+            </button>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-primary bg-opacity-10 rounded-circle p-3">
+                                <i class="bi bi-truck text-primary fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h5 class="card-title mb-0">4</h5>
+                            <small class="text-muted">Phương thức</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-success bg-opacity-10 rounded-circle p-3">
+                                <i class="bi bi-check-circle text-success fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h5 class="card-title mb-0">3</h5>
+                            <small class="text-muted">Đang hoạt động</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-info bg-opacity-10 rounded-circle p-3">
+                                <i class="bi bi-geo-alt text-info fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h5 class="card-title mb-0">63</h5>
+                            <small class="text-muted">Khu vực</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-warning bg-opacity-10 rounded-circle p-3">
+                                <i class="bi bi-currency-dollar text-warning fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h5 class="card-title mb-0">45k</h5>
+                            <small class="text-muted">Phí TB</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabs -->
+    <ul class="nav nav-tabs mb-4" id="shippingTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="methods-tab" data-bs-toggle="tab" data-bs-target="#methods" type="button" role="tab">
+                <i class="bi bi-truck me-1"></i>Phương thức vận chuyển
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="zones-tab" data-bs-toggle="tab" data-bs-target="#zones" type="button" role="tab">
+                <i class="bi bi-geo-alt me-1"></i>Khu vực giao hàng
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="rates-tab" data-bs-toggle="tab" data-bs-target="#rates" type="button" role="tab">
+                <i class="bi bi-calculator me-1"></i>Bảng giá
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="shippingTabsContent">
+        <!-- Phương thức vận chuyển -->
+        <div class="tab-pane fade show active" id="methods" role="tabpanel">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="mb-0">Phương thức vận chuyển</h5>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addMethodModal">
+                    <i class="bi bi-plus-circle me-1"></i>Thêm phương thức
+                </button>
+            </div>
+
+            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div>
+                                                    <h6 class="card-title">Giao hàng tiêu chuẩn</h6>
+                                                    <p class="card-text text-muted">Giao hàng trong 3-5 ngày làm việc</p>
+                                                    <span class="badge bg-success">Hoạt động</span>
+                                                </div>
+                                                <div class="dropdown">
+                                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                                                        <i class="bi bi-three-dots"></i>
+                                                    </button>
+                                                    <ul class="dropdown-menu">
+                                                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editMethodModal">
+                                                            <i class="bi bi-pencil me-2"></i>Chỉnh sửa
+                                                        </a></li>
+                                                        <li><a class="dropdown-item" href="#">
+                                                            <i class="bi bi-pause me-2"></i>Tạm dừng
+                                                        </a></li>
+                                                        <li><hr class="dropdown-divider"></li>
+                                                        <li><a class="dropdown-item text-danger" href="#">
+                                                            <i class="bi bi-trash me-2"></i>Xóa
+                                                        </a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div>
+                                                    <h6 class="card-title">Giao hàng nhanh</h6>
+                                                    <p class="card-text text-muted">Giao hàng trong 1-2 ngày làm việc</p>
+                                                    <span class="badge bg-success">Hoạt động</span>
+                                                </div>
+                                                <div class="dropdown">
+                                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                                                        <i class="bi bi-three-dots"></i>
+                                                    </button>
+                                                    <ul class="dropdown-menu">
+                                                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editMethodModal">
+                                                            <i class="bi bi-pencil me-2"></i>Chỉnh sửa
+                                                        </a></li>
+                                                        <li><a class="dropdown-item" href="#">
+                                                            <i class="bi bi-pause me-2"></i>Tạm dừng
+                                                        </a></li>
+                                                        <li><hr class="dropdown-divider"></li>
+                                                        <li><a class="dropdown-item text-danger" href="#">
+                                                            <i class="bi bi-trash me-2"></i>Xóa
+                                                        </a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div>
+                                                    <h6 class="card-title">Giao hàng siêu tốc</h6>
+                                                    <p class="card-text text-muted">Giao hàng trong ngày</p>
+                                                    <span class="badge bg-success">Hoạt động</span>
+                                                </div>
+                                                <div class="dropdown">
+                                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                                                        <i class="bi bi-three-dots"></i>
+                                                    </button>
+                                                    <ul class="dropdown-menu">
+                                                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editMethodModal">
+                                                            <i class="bi bi-pencil me-2"></i>Chỉnh sửa
+                                                        </a></li>
+                                                        <li><a class="dropdown-item" href="#">
+                                                            <i class="bi bi-pause me-2"></i>Tạm dừng
+                                                        </a></li>
+                                                        <li><hr class="dropdown-divider"></li>
+                                                        <li><a class="dropdown-item text-danger" href="#">
+                                                            <i class="bi bi-trash me-2"></i>Xóa
+                                                        </a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div>
+                                                    <h6 class="card-title">Tự vận chuyển</h6>
+                                                    <p class="card-text text-muted">Khách hàng tự đến lấy hàng</p>
+                                                    <span class="badge bg-warning">Tạm dừng</span>
+                                                </div>
+                                                <div class="dropdown">
+                                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                                                        <i class="bi bi-three-dots"></i>
+                                                    </button>
+                                                    <ul class="dropdown-menu">
+                                                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editMethodModal">
+                                                            <i class="bi bi-pencil me-2"></i>Chỉnh sửa
+                                                        </a></li>
+                                                        <li><a class="dropdown-item" href="#">
+                                                            <i class="bi bi-play me-2"></i>Kích hoạt
+                                                        </a></li>
+                                                        <li><hr class="dropdown-divider"></li>
+                                                        <li><a class="dropdown-item text-danger" href="#">
+                                                            <i class="bi bi-trash me-2"></i>Xóa
+                                                        </a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Khu vực giao hàng -->
+                        <div class="tab-pane fade" id="zones" role="tabpanel">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="mb-0">Khu vực giao hàng</h5>
+                                <button class="btn btn-admin-primary" data-bs-toggle="modal" data-bs-target="#addZoneModal">
+                                    <i class="bi bi-plus-circle me-1"></i>Thêm khu vực
+                                </button>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Tên khu vực</th>
+                                                    <th>Mã tỉnh/thành</th>
+                                                    <th>Phí cơ bản</th>
+                                                    <th>Thời gian giao</th>
+                                                    <th>Trạng thái</th>
+                                                    <th>Thao tác</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>Hà Nội</td>
+                                                    <td>HN</td>
+                                                    <td>30,000đ</td>
+                                                    <td>1-2 ngày</td>
+                                                    <td><span class="badge bg-success">Hoạt động</span></td>
+                                                    <td>
+                                                        <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#editZoneModal">
+                                                            <i class="bi bi-pencil"></i>
+                                                        </button>
+                                                        <button class="btn btn-sm btn-outline-danger btn-delete">
+                                                            <i class="bi bi-trash"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>TP. Hồ Chí Minh</td>
+                                                    <td>HCM</td>
+                                                    <td>35,000đ</td>
+                                                    <td>1-2 ngày</td>
+                                                    <td><span class="badge bg-success">Hoạt động</span></td>
+                                                    <td>
+                                                        <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#editZoneModal">
+                                                            <i class="bi bi-pencil"></i>
+                                                        </button>
+                                                        <button class="btn btn-sm btn-outline-danger btn-delete">
+                                                            <i class="bi bi-trash"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Đà Nẵng</td>
+                                                    <td>DN</td>
+                                                    <td>40,000đ</td>
+                                                    <td>2-3 ngày</td>
+                                                    <td><span class="badge bg-success">Hoạt động</span></td>
+                                                    <td>
+                                                        <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#editZoneModal">
+                                                            <i class="bi bi-pencil"></i>
+                                                        </button>
+                                                        <button class="btn btn-sm btn-outline-danger btn-delete">
+                                                            <i class="bi bi-trash"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Bảng giá -->
+                        <div class="tab-pane fade" id="rates" role="tabpanel">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="mb-0">Bảng giá vận chuyển</h5>
+                                <button class="btn btn-admin-primary" data-bs-toggle="modal" data-bs-target="#addRateModal">
+                                    <i class="bi bi-plus-circle me-1"></i>Thêm bảng giá
+                                </button>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Phương thức</th>
+                                                    <th>Khu vực</th>
+                                                    <th>Trọng lượng từ</th>
+                                                    <th>Trọng lượng đến</th>
+                                                    <th>Phí vận chuyển</th>
+                                                    <th>Thao tác</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>Giao hàng tiêu chuẩn</td>
+                                                    <td>Hà Nội</td>
+                                                    <td>0kg</td>
+                                                    <td>5kg</td>
+                                                    <td>30,000đ</td>
+                                                    <td>
+                                                        <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#editRateModal">
+                                                            <i class="bi bi-pencil"></i>
+                                                        </button>
+                                                        <button class="btn btn-sm btn-outline-danger btn-delete">
+                                                            <i class="bi bi-trash"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Giao hàng tiêu chuẩn</td>
+                                                    <td>Hà Nội</td>
+                                                    <td>5kg</td>
+                                                    <td>10kg</td>
+                                                    <td>50,000đ</td>
+                                                    <td>
+                                                        <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#editRateModal">
+                                                            <i class="bi bi-pencil"></i>
+                                                        </button>
+                                                        <button class="btn btn-sm btn-outline-danger btn-delete">
+                                                            <i class="bi bi-trash"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Giao hàng nhanh</td>
+                                                    <td>TP. Hồ Chí Minh</td>
+                                                    <td>0kg</td>
+                                                    <td>5kg</td>
+                                                    <td>50,000đ</td>
+                                                    <td>
+                                                        <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#editRateModal">
+                                                            <i class="bi bi-pencil"></i>
+                                                        </button>
+                                                        <button class="btn btn-sm btn-outline-danger btn-delete">
+                                                            <i class="bi bi-trash"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Method Modal -->
+    <div class="modal fade" id="addMethodModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Thêm phương thức vận chuyển</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="needs-validation" novalidate>
+                        <div class="mb-3">
+                            <label class="form-label">Tên phương thức *</label>
+                            <input type="text" class="form-control" placeholder="VD: Giao hàng tiêu chuẩn" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Mô tả</label>
+                            <textarea class="form-control" rows="3" placeholder="Mô tả về phương thức vận chuyển"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Thời gian giao hàng</label>
+                            <input type="text" class="form-control" placeholder="VD: 3-5 ngày làm việc">
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" checked>
+                                <label class="form-check-label">Kích hoạt ngay</label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-admin-primary btn-submit">Thêm phương thức</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Zone Modal -->
+    <div class="modal fade" id="addZoneModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Thêm khu vực giao hàng</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="needs-validation" novalidate>
+                        <div class="mb-3">
+                            <label class="form-label">Tên khu vực *</label>
+                            <input type="text" class="form-control" placeholder="VD: Hà Nội" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Mã tỉnh/thành *</label>
+                            <input type="text" class="form-control" placeholder="VD: HN" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Phí cơ bản *</label>
+                            <input type="number" class="form-control" placeholder="30000" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Thời gian giao hàng</label>
+                            <input type="text" class="form-control" placeholder="VD: 1-2 ngày">
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" checked>
+                                <label class="form-check-label">Kích hoạt ngay</label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-admin-primary btn-submit">Thêm khu vực</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Rate Modal -->
+    <div class="modal fade" id="addRateModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Thêm bảng giá vận chuyển</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="needs-validation" novalidate>
+                        <div class="mb-3">
+                            <label class="form-label">Phương thức *</label>
+                            <select class="form-select" required>
+                                <option value="">Chọn phương thức</option>
+                                <option value="standard">Giao hàng tiêu chuẩn</option>
+                                <option value="fast">Giao hàng nhanh</option>
+                                <option value="express">Giao hàng siêu tốc</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Khu vực *</label>
+                            <select class="form-select" required>
+                                <option value="">Chọn khu vực</option>
+                                <option value="hn">Hà Nội</option>
+                                <option value="hcm">TP. Hồ Chí Minh</option>
+                                <option value="dn">Đà Nẵng</option>
+                            </select>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Trọng lượng từ (kg) *</label>
+                                    <input type="number" class="form-control" placeholder="0" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Trọng lượng đến (kg) *</label>
+                                    <input type="number" class="form-control" placeholder="5" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Phí vận chuyển *</label>
+                            <input type="number" class="form-control" placeholder="30000" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-admin-primary btn-submit">Thêm bảng giá</button>
+        </div>
+    </div>
+</div>
+</body>
+</html>
