@@ -8,34 +8,39 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "OTP")
+@Table(name = "Conversation")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class OTP {
+public class Conversation {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id")
     private User user;
     
-    @Column(name = "code", nullable = false, length = 10)
-    private String code;
+    @Column(name = "guest_name", length = 120)
+    private String guestName;
     
-    @Column(name = "purpose", nullable = false, length = 30)
-    private String purpose;
+    @Column(name = "guest_email", length = 120)
+    private String guestEmail;
     
-    @Column(name = "is_used", nullable = false)
-    private Boolean isUsed = false;
-    
-    @Column(name = "expires_at", nullable = false)
-    private LocalDateTime expiresAt;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false, length = 20)
+    private ConversationStatus status = ConversationStatus.OPEN;
     
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
+    
+    @Column(name = "closed_at")
+    private LocalDateTime closedAt;
+    
+    public enum ConversationStatus {
+        OPEN, CLOSED
+    }
     
     @PrePersist
     protected void onCreate() {

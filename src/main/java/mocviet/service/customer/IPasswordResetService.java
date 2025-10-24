@@ -1,4 +1,4 @@
-package mocviet.service;
+package mocviet.service.customer;
 
 import mocviet.dto.ForgotPasswordRequest;
 import mocviet.dto.MessageResponse;

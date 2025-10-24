@@ -1,4 +1,4 @@
-package mocviet.service.impl;
+package mocviet.service.customer.impl;
 
 import lombok.RequiredArgsConstructor;
 import mocviet.dto.AddressRequest;
@@ -8,7 +8,7 @@ import mocviet.entity.Address;
 import mocviet.entity.User;
 import mocviet.repository.AddressRepository;
 import mocviet.repository.UserRepository;
-import mocviet.service.IProfileService;
+import mocviet.service.customer.IProfileService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;

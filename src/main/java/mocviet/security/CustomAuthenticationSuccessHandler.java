@@ -23,7 +23,11 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
                                       Authentication authentication) throws IOException, ServletException {
         
         User user = (User) authentication.getPrincipal();
-        String role = user.getRole().getName();
+        String role = "CUSTOMER"; // Default role
+        
+        if (user.getRole() != null && user.getRole().getName() != null) {
+            role = user.getRole().getName();
+        }
         
         // Check if remember me is checked
         String rememberMe = request.getParameter("remember-me");

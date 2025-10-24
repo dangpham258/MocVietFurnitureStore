@@ -6,19 +6,19 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "Roles")
+@Table(name = "ShippingZone")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Role {
+public class ShippingZone {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     
-    @Column(name = "name", nullable = false, unique = true, length = 30)
+    @Column(name = "name", nullable = false, length = 50)
     private String name;
     
-    @Column(name = "description", length = 200)
-    private String description;
+    @Column(name = "slug", nullable = false, unique = true, length = 50)
+    private String slug;
 }

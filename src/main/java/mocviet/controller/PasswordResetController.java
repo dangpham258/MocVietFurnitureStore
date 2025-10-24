@@ -6,7 +6,7 @@ import mocviet.dto.ForgotPasswordRequest;
 import mocviet.dto.MessageResponse;
 import mocviet.dto.ResetPasswordRequest;
 import mocviet.dto.VerifyOTPRequest;
-import mocviet.service.IPasswordResetService;
+import mocviet.service.customer.IPasswordResetService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

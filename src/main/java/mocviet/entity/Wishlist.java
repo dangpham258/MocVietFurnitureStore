@@ -8,11 +8,11 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "Address")
+@Table(name = "Wishlist")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Address {
+public class Wishlist {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,23 +22,9 @@ public class Address {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
     
-    @Column(name = "receiver_name", nullable = false, length = 120)
-    private String receiverName;
-    
-    @Column(name = "phone", nullable = false, length = 20)
-    private String phone;
-    
-    @Column(name = "address_line", nullable = false, length = 255)
-    private String addressLine;
-    
-    @Column(name = "city", nullable = false, length = 100)
-    private String city;
-    
-    @Column(name = "district", length = 100)
-    private String district;
-    
-    @Column(name = "is_default", nullable = false)
-    private Boolean isDefault = false;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id", nullable = false)
+    private Product product;
     
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;

@@ -1,4 +1,4 @@
-package mocviet.controller.user;
+package mocviet.controller.customer;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -7,7 +7,7 @@ import mocviet.dto.PasswordChangeRequest;
 import mocviet.dto.ProfileUpdateRequest;
 import mocviet.entity.Address;
 import mocviet.entity.User;
-import mocviet.service.IProfileService;
+import mocviet.service.customer.IProfileService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
-@RequestMapping("/user/profile")
+@RequestMapping("/customer/profile")
 @RequiredArgsConstructor
 public class ProfileController {
     
@@ -45,7 +45,7 @@ public class ProfileController {
         model.addAttribute("passwordChangeRequest", new PasswordChangeRequest());
         model.addAttribute("addressRequest", new AddressRequest());
         
-        return "user/profile";
+        return "customer/profile";
     }
     
     @PostMapping("/update")
@@ -75,7 +75,7 @@ public class ProfileController {
             model.addAttribute("passwordChangeRequest", new PasswordChangeRequest());
             model.addAttribute("addressRequest", new AddressRequest());
             
-            return "user/profile";
+            return "customer/profile";
         }
         
         try {
@@ -85,7 +85,7 @@ public class ProfileController {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
         
-        return "redirect:/user/profile";
+        return "redirect:/customer/profile";
     }
     
     @PostMapping("/change-password")
@@ -94,7 +94,7 @@ public class ProfileController {
                                  RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("error", "Vui lòng nhập đầy đủ thông tin");
-            return "redirect:/user/profile";
+            return "redirect:/customer/profile";
         }
         
         try {
@@ -104,7 +104,7 @@ public class ProfileController {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
         
-        return "redirect:/user/profile";
+        return "redirect:/customer/profile";
     }
     
     // AJAX endpoint cho thay đổi mật khẩu
@@ -136,7 +136,7 @@ public class ProfileController {
                              RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("error", "Vui lòng nhập đầy đủ thông tin địa chỉ");
-            return "redirect:/user/profile";
+            return "redirect:/customer/profile";
         }
         
         try {
@@ -148,7 +148,7 @@ public class ProfileController {
             redirectAttributes.addFlashAttribute("error", "Không thể thêm địa chỉ lúc này. Vui lòng thử lại sau");
         }
         
-        return "redirect:/user/profile";
+        return "redirect:/customer/profile";
     }
     
     @PostMapping("/address/{id}/update")
@@ -158,7 +158,7 @@ public class ProfileController {
                                 RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("error", "Vui lòng nhập đầy đủ thông tin địa chỉ");
-            return "redirect:/user/profile";
+            return "redirect:/customer/profile";
         }
         
         try {
@@ -170,7 +170,7 @@ public class ProfileController {
             redirectAttributes.addFlashAttribute("error", "Không thể sửa địa chỉ lúc này. Vui lòng thử lại sau");
         }
         
-        return "redirect:/user/profile";
+        return "redirect:/customer/profile";
     }
     
     @PostMapping("/address/{id}/delete")
@@ -185,7 +185,7 @@ public class ProfileController {
             redirectAttributes.addFlashAttribute("error", "Không thể xóa địa chỉ lúc này. Vui lòng thử lại sau");
         }
         
-        return "redirect:/user/profile";
+        return "redirect:/customer/profile";
     }
     
     @PostMapping("/address/{id}/set-default")
@@ -198,7 +198,7 @@ public class ProfileController {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
         
-        return "redirect:/user/profile";
+        return "redirect:/customer/profile";
     }
     
     // AJAX endpoint để lấy thông tin địa chỉ cho edit modal

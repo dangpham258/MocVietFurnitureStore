@@ -1,4 +1,4 @@
-package mocviet.service;
+package mocviet.service.customer;
 
 public interface IOTPScheduledService {
     

@@ -1,4 +1,4 @@
-package mocviet.service;
+package mocviet.service.customer;
 
 import mocviet.dto.AddressRequest;
 import mocviet.dto.PasswordChangeRequest;

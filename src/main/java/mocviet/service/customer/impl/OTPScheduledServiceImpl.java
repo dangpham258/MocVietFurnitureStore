@@ -1,9 +1,9 @@
-package mocviet.service.impl;
+package mocviet.service.customer.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import mocviet.repository.OTPRepository;
-import mocviet.service.IOTPScheduledService;
+import mocviet.service.customer.IOTPScheduledService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

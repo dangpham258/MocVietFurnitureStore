@@ -1,4 +1,4 @@
-package mocviet.service.impl;
+package mocviet.service.customer.impl;
 
 import lombok.RequiredArgsConstructor;
 import mocviet.dto.ForgotPasswordRequest;
@@ -9,7 +9,7 @@ import mocviet.entity.OTP;
 import mocviet.entity.User;
 import mocviet.repository.OTPRepository;
 import mocviet.repository.UserRepository;
-import mocviet.service.IPasswordResetService;
+import mocviet.service.customer.IPasswordResetService;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;

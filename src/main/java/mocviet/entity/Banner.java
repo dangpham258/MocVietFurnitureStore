@@ -8,31 +8,27 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "OTP")
+@Table(name = "Banner")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class OTP {
+public class Banner {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @Column(name = "title", length = 160)
+    private String title;
     
-    @Column(name = "code", nullable = false, length = 10)
-    private String code;
+    @Column(name = "image_url", nullable = false, length = 255)
+    private String imageUrl;
     
-    @Column(name = "purpose", nullable = false, length = 30)
-    private String purpose;
+    @Column(name = "link_url", length = 255)
+    private String linkUrl;
     
-    @Column(name = "is_used", nullable = false)
-    private Boolean isUsed = false;
-    
-    @Column(name = "expires_at", nullable = false)
-    private LocalDateTime expiresAt;
+    @Column(name = "is_active", nullable = false)
+    private Boolean isActive = true;
     
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
