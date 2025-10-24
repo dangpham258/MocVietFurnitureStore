@@ -7,6 +7,7 @@
 </head>
 <body>
 <div layout:fragment="content">
+
     <div class="row">
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center mb-4">
@@ -15,7 +16,7 @@
                     <p class="text-muted mb-0" th:text="'Sản phẩm: ' + ${product.name}"></p>
                 </div>
                 <a th:href="@{/manager/products/{id}(id=${product.id})}" class="btn btn-outline-secondary">
-                    <i class="fas fa-arrow-left me-2"></i>Quay lại
+                    <i class="fas fa-arrow-left me-2"></i>Quay lại chi tiết
                 </a>
             </div>
         </div>
@@ -26,10 +27,11 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-header">
-                    <h5 class="card-title mb-0">Thêm biến thể mới</h5>
+                    <h5 class="card-title mb-0" th:text="${editingVariantId != null} ? 'Chỉnh sửa biến thể' : 'Thêm biến thể mới'"></h5>
                 </div>
                 <div class="card-body">
-                    <form th:action="@{/manager/products/{id}/variants/add(id=${product.id})}" th:object="${variantRequest}" method="post">
+                    <form th:action="${editingVariantId != null} ? @{/manager/products/{id}/variants/{variantId}/update(id=${product.id}, variantId=${editingVariantId})} : @{/manager/products/{id}/variants/add(id=${product.id})}" 
+                          th:object="${variantRequest}" method="post">
                         <div class="row">
                             <div class="col-md-3 mb-3">
                                 <label for="colorId" class="form-label">Màu sắc <span class="text-danger">*</span></label>
@@ -112,9 +114,17 @@
                             </div>
                             <div class="col-md-3 mb-3">
                                 <label class="form-label">&nbsp;</label>
-                                <button type="submit" class="btn btn-primary d-block w-100">
-                                    <i class="fas fa-plus me-2"></i>Thêm biến thể
-                                </button>
+                                <div class="d-flex gap-2">
+                                    <button type="submit" class="btn btn-primary flex-fill">
+                                        <i th:class="${editingVariantId != null} ? 'fas fa-save me-2' : 'fas fa-plus me-2'"></i>
+                                        <span th:text="${editingVariantId != null} ? 'Cập nhật' : 'Thêm biến thể'"></span>
+                                    </button>
+                                    <a th:if="${editingVariantId != null}" 
+                                       th:href="@{/manager/products/{id}/variants(id=${product.id})}" 
+                                       class="btn btn-outline-secondary">
+                                        <i class="fas fa-times me-2"></i>Hủy
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </form>
@@ -168,13 +178,17 @@
                                     </td>
                                     <td>
                                         <div class="btn-group" role="group">
-                                            <button class="btn btn-sm btn-outline-warning" title="Chỉnh sửa">
+                                            <a th:href="@{/manager/products/{id}/variants/{variantId}/edit(id=${product.id}, variantId=${variant.id})}" 
+                                               class="btn btn-sm btn-outline-warning" title="Chỉnh sửa">
                                                 <i class="fas fa-edit"></i>
-                                            </button>
-                                            <button class="btn btn-sm btn-outline-danger" title="Xóa"
-                                                    onclick="return confirm('Bạn có chắc chắn muốn xóa biến thể này?')">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
+                                            </a>
+                                            <form th:action="@{/manager/products/{id}/variants/{variantId}/delete(id=${product.id}, variantId=${variant.id})}" 
+                                                  method="post" class="d-inline">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Xóa"
+                                                        onclick="return confirm('Bạn có chắc chắn muốn xóa biến thể này?')">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
                                         </div>
                                     </td>
                                 </tr>

@@ -22,11 +22,16 @@ public class OTP {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
     
-    @Column(name = "code", length = 10, nullable = false)
+    @Column(name = "code", nullable = false, length = 10)
     private String code;
     
-    @Column(name = "purpose", length = 30, nullable = false)
-    private String purpose; // REGISTER, RESET_PASSWORD
+    @Enumerated(EnumType.STRING)
+    @Column(name = "purpose", nullable = false, length = 30)
+    private Purpose purpose;
+    
+    public enum Purpose {
+        REGISTER, RESET_PASSWORD
+    }
     
     @Column(name = "is_used", nullable = false)
     private Boolean isUsed = false;
@@ -35,6 +40,11 @@ public class OTP {
     private LocalDateTime expiresAt;
     
     @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime createdAt;
+    
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+    }
 }
 

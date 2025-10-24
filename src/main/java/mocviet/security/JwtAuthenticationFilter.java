@@ -49,7 +49,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         SecurityContextHolder.getContext().setAuthentication(authentication);
                     }
                 } else {
-                    System.out.println("No JWT Token found");
+                    // Only log for non-public endpoints to reduce noise
+                    String requestURI = request.getRequestURI();
+                    if (!requestURI.equals("/") && !requestURI.startsWith("/css/") && 
+                        !requestURI.startsWith("/js/") && !requestURI.startsWith("/images/")) {
+                        System.out.println("No JWT Token found for: " + requestURI);
+                    }
                 }
             }
         } catch (Exception ex) {

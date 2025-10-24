@@ -21,7 +21,7 @@
         </div>
     </div>
     
-    <form th:action="@{/manager/products/create}" th:object="${createProductRequest}" method="post">
+    <form th:action="@{/manager/products/create}" th:object="${createProductRequest}" method="post" enctype="multipart/form-data">
         <div class="row">
             <div class="col-lg-8">
                 <div class="card">
@@ -185,6 +185,21 @@
                                     <span class="input-group-text">VNĐ</span>
                                 </div>
                                 <small class="form-text text-muted">Giá bán = Giá gốc - (Giá gốc × % giảm giá)</small>
+                            </div>
+                        </div>
+                        
+                        <!-- Upload ảnh sản phẩm -->
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label for="productImages" class="form-label">Ảnh sản phẩm</label>
+                                <input type="file" class="form-control" id="productImages" name="productImages" 
+                                       multiple accept="image/jpeg,image/jpg,image/png">
+                                <div class="form-text">
+                                    <small class="text-muted">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        Chọn nhiều ảnh cho màu đã chọn. Định dạng: JPG, PNG. Kích thước tối đa: 2MB/ảnh
+                                    </small>
+                                </div>
                             </div>
                         </div>
                     </div>

@@ -135,10 +135,6 @@
                                                class="btn btn-sm btn-outline-warning" title="Chỉnh sửa">
                                                 <i class="fas fa-edit"></i>
                                             </a>
-                                            <a th:href="@{/manager/products/{id}/variants(id=${product.id})}" 
-                                               class="btn btn-sm btn-outline-primary" title="Biến thể">
-                                                <i class="fas fa-layer-group"></i>
-                                            </a>
                                             <form th:action="@{/manager/products/{id}/toggle(id=${product.id})}" 
                                                   method="post" class="d-inline">
                                                 <button type="submit" 

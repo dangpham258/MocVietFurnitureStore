@@ -32,4 +32,7 @@ public class Color {
     
     @OneToMany(mappedBy = "color", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ProductVariant> variants;
+    
+    @OneToMany(mappedBy = "color", fetch = FetchType.LAZY)
+    private List<ProductImage> images;
 }

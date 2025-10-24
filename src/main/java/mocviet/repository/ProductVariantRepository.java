@@ -26,6 +26,9 @@ public interface ProductVariantRepository extends JpaRepository<ProductVariant, 
     @Query("SELECT pv FROM ProductVariant pv WHERE pv.product.id = :productId")
     List<ProductVariant> findByProductId(@Param("productId") Integer productId);
     
+    @Query("SELECT pv FROM ProductVariant pv LEFT JOIN FETCH pv.color WHERE pv.product.id = :productId")
+    List<ProductVariant> findByProductIdWithColor(@Param("productId") Integer productId);
+    
     @Query("SELECT pv FROM ProductVariant pv WHERE pv.stockQty <= :threshold AND pv.isActive = true")
     List<ProductVariant> findLowStockVariants(@Param("threshold") Integer threshold);
     

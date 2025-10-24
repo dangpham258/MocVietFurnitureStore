@@ -22,6 +22,9 @@ public class ProductService {
     private final ProductVariantRepository variantRepository;
     private final CategoryRepository categoryRepository;
     private final ColorRepository colorRepository;
+    private final ProductImageRepository productImageRepository;
+    private final CartItemRepository cartItemRepository;
+    private final OrderItemRepository orderItemRepository;
     
     // ===== PRODUCT MANAGEMENT =====
     
@@ -84,7 +87,8 @@ public class ProductService {
         variant.setPrice(request.getPrice());
         variant.setDiscountPercent(request.getDiscountPercent());
         variant.setStockQty(request.getStockQty());
-        variant.setPromotionType(request.getPromotionType());
+        variant.setPromotionType(request.getPromotionType() != null ? 
+            ProductVariant.PromotionType.valueOf(request.getPromotionType()) : null);
         variant.setIsActive(true);
         
         // Calculate sale price
@@ -164,56 +168,30 @@ public class ProductService {
         variant.setPrice(request.getPrice());
         variant.setDiscountPercent(request.getDiscountPercent());
         variant.setStockQty(request.getStockQty());
-        variant.setPromotionType(request.getPromotionType());
+        variant.setPromotionType(request.getPromotionType() != null ? 
+            ProductVariant.PromotionType.valueOf(request.getPromotionType()) : null);
         variant.setIsActive(true);
         variant.setSalePrice(calculateSalePrice(request.getPrice(), request.getDiscountPercent()));
         
         return variantRepository.save(variant);
     }
     
-    @Transactional
-    public ProductVariant updateVariant(Integer variantId, ProductVariantRequest request) {
-        ProductVariant variant = variantRepository.findById(variantId)
-                .orElseThrow(() -> new IllegalArgumentException("Biến thể không tồn tại"));
-        
-        // Validate color exists
-        Color color = colorRepository.findById(request.getColorId())
-                .orElseThrow(() -> new IllegalArgumentException("Màu sắc không tồn tại"));
-        
-        // Check if variant already exists (excluding current variant)
-        Optional<ProductVariant> existingVariant = variantRepository.findByProductAndColorAndType(
-                variant.getProduct().getId(), request.getColorId(), request.getTypeName());
-        if (existingVariant.isPresent() && !existingVariant.get().getId().equals(variantId)) {
-            throw new IllegalArgumentException("Biến thể đã tồn tại");
-        }
-        
-        // Check if SKU already exists (excluding current variant)
-        if (variantRepository.existsBySkuAndIdNot(request.getSku(), variantId)) {
-            throw new IllegalArgumentException("Mã SKU đã tồn tại");
-        }
-        
-        // Update variant
-        variant.setColor(color);
-        variant.setTypeName(request.getTypeName());
-        variant.setSku(request.getSku());
-        variant.setPrice(request.getPrice());
-        variant.setDiscountPercent(request.getDiscountPercent());
-        variant.setStockQty(request.getStockQty());
-        variant.setPromotionType(request.getPromotionType());
-        variant.setSalePrice(calculateSalePrice(request.getPrice(), request.getDiscountPercent()));
-        
-        return variantRepository.save(variant);
-    }
     
     @Transactional
     public void deleteVariant(Integer variantId) {
         ProductVariant variant = variantRepository.findById(variantId)
                 .orElseThrow(() -> new IllegalArgumentException("Biến thể không tồn tại"));
         
-        // Check if this is the last variant
-        List<ProductVariant> variants = variantRepository.findByProductId(variant.getProduct().getId());
-        if (variants.size() <= 1) {
-            throw new IllegalArgumentException("Không thể xóa biến thể cuối cùng");
+        // Check if variant is referenced in CartItem or OrderItems
+        boolean hasCartItems = cartItemRepository.existsByVariantId(variantId);
+        boolean hasOrderItems = orderItemRepository.existsByVariantId(variantId);
+        
+        if (hasCartItems) {
+            throw new IllegalArgumentException("Không thể xóa biến thể đã có trong giỏ hàng");
+        }
+        
+        if (hasOrderItems) {
+            throw new IllegalArgumentException("Không thể xóa biến thể đã có trong đơn hàng");
         }
         
         variantRepository.delete(variant);
@@ -239,7 +217,8 @@ public class ProductService {
         
         variant.setPrice(request.getPrice());
         variant.setDiscountPercent(request.getDiscountPercent());
-        variant.setPromotionType(request.getPromotionType());
+        variant.setPromotionType(request.getPromotionType() != null ? 
+            ProductVariant.PromotionType.valueOf(request.getPromotionType()) : null);
         variant.setSalePrice(calculateSalePrice(request.getPrice(), request.getDiscountPercent()));
         
         variantRepository.save(variant);
@@ -273,23 +252,69 @@ public class ProductService {
     }
     
     public Optional<Product> getProductById(Integer productId) {
-        return productRepository.findById(productId);
+        return productRepository.findByIdWithCategoryAndCollection(productId);
     }
     
     public List<ProductVariant> getProductVariants(Integer productId) {
-        return variantRepository.findByProductId(productId);
+        return variantRepository.findByProductIdWithColor(productId);
+    }
+    
+    public Optional<ProductVariant> getVariantById(Integer variantId) {
+        return variantRepository.findById(variantId);
+    }
+    
+    @Transactional
+    public ProductVariant updateVariant(Integer variantId, ProductVariantRequest request) {
+        ProductVariant variant = variantRepository.findById(variantId)
+                .orElseThrow(() -> new IllegalArgumentException("Biến thể không tồn tại"));
+        
+        // Validate color exists
+        Color color = colorRepository.findById(request.getColorId())
+                .orElseThrow(() -> new IllegalArgumentException("Màu sắc không tồn tại"));
+        
+        if (!color.getIsActive()) {
+            throw new IllegalArgumentException("Màu sắc không đang hoạt động");
+        }
+        
+        // Check SKU uniqueness (excluding current variant)
+        if (!request.getSku().equals(variant.getSku()) && 
+            variantRepository.existsBySkuAndIdNot(request.getSku(), variantId)) {
+            throw new IllegalArgumentException("SKU đã tồn tại");
+        }
+        
+        // Check variant uniqueness (excluding current variant)
+        if (!request.getTypeName().equals(variant.getTypeName()) || 
+            !request.getColorId().equals(variant.getColor().getId())) {
+            if (variantRepository.findByProductAndColorAndType(
+                    variant.getProduct().getId(), request.getColorId(), request.getTypeName())
+                    .isPresent()) {
+                throw new IllegalArgumentException("Biến thể với màu sắc và loại này đã tồn tại");
+            }
+        }
+        
+        // Update variant
+        variant.setColor(color);
+        variant.setTypeName(request.getTypeName());
+        variant.setSku(request.getSku());
+        variant.setPrice(request.getPrice());
+        variant.setDiscountPercent(request.getDiscountPercent());
+        variant.setStockQty(request.getStockQty());
+        variant.setPromotionType(request.getPromotionType() != null ? 
+            ProductVariant.PromotionType.valueOf(request.getPromotionType()) : null);
+        
+        return variantRepository.save(variant);
     }
     
     public List<Category> getCategories() {
-        return categoryRepository.findByTypeAndActive("CATEGORY");
+        return categoryRepository.findLeafCategories();
     }
     
     public List<Category> getCollections() {
-        return categoryRepository.findByTypeAndActive("COLLECTION");
+        return categoryRepository.findByTypeAndActive(Category.CategoryType.COLLECTION);
     }
     
     public List<Color> getColors() {
-        return colorRepository.findActiveColors();
+        return colorRepository.findByIsActiveTrue();
     }
     
     public List<ProductVariant> getLowStockVariants(Integer threshold) {
@@ -322,5 +347,15 @@ public class ProductService {
                 .divide(BigDecimal.valueOf(100));
         
         return price.subtract(discountAmount);
+    }
+    
+    // ===== IMAGE MANAGEMENT =====
+    
+    public List<ProductImage> getProductImages(Integer productId) {
+        return productImageRepository.findByProductIdWithColor(productId);
+    }
+    
+    public List<ProductImage> getProductImagesByColor(Integer productId, Integer colorId) {
+        return productImageRepository.findByProductAndColor(productId, colorId);
     }
 }

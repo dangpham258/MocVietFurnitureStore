@@ -24,4 +24,6 @@ public interface ColorRepository extends JpaRepository<Color, Integer> {
     
     @Query("SELECT c FROM Color c WHERE c.isActive = true ORDER BY c.name")
     List<Color> findActiveColors();
+    
+    List<Color> findByIsActiveTrue();
 }

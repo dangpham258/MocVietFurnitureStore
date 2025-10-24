@@ -23,7 +23,9 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
     Boolean existsBySlugAndIdNot(String slug, Integer id);
     
     @Query("SELECT c FROM Category c WHERE c.type = :type AND c.isActive = true")
-    List<Category> findByTypeAndActive(@Param("type") String type);
+    List<Category> findByTypeAndActive(@Param("type") Category.CategoryType type);
+    
+    List<Category> findByTypeAndIsActiveTrue(Category.CategoryType type);
     
     @Query("SELECT c FROM Category c WHERE c.type = 'CATEGORY' AND c.parent IS NULL AND c.isActive = true")
     List<Category> findRootCategories();
@@ -34,6 +36,6 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
     @Query("SELECT c FROM Category c WHERE c.type = 'COLLECTION' AND c.isActive = true")
     List<Category> findActiveCollections();
     
-    @Query("SELECT c FROM Category c WHERE c.type = 'CATEGORY' AND c.parent IS NULL AND c.isActive = true")
+    @Query("SELECT c FROM Category c WHERE c.type = 'CATEGORY' AND c.parent IS NOT NULL AND c.isActive = true")
     List<Category> findLeafCategories();
 }

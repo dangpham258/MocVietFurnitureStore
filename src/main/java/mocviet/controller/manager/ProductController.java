@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import mocviet.dto.manager.*;
 import mocviet.entity.*;
 import mocviet.service.manager.ProductService;
+import mocviet.service.manager.ImageService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -14,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.validation.Valid;
@@ -27,6 +29,7 @@ import java.util.Optional;
 public class ProductController {
     
     private final ProductService productService;
+    private final ImageService imageService;
     
     // ===== PRODUCT LIST =====
     
@@ -41,8 +44,10 @@ public class ProductController {
             @RequestParam(required = false) Integer categoryId,
             Model model) {
         
+        // Map database column names to entity field names
+        String entityFieldName = mapSortFieldToEntity(sortBy);
         Sort sort = sortDir.equalsIgnoreCase("desc") ? 
-                Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+                Sort.by(entityFieldName).descending() : Sort.by(entityFieldName).ascending();
         Pageable pageable = PageRequest.of(page, size, sort);
         
         Page<Product> products;
@@ -87,6 +92,7 @@ public class ProductController {
     public String createProduct(
             @Valid @ModelAttribute("createProductRequest") CreateProductRequest request,
             BindingResult result,
+            @RequestParam(value = "productImages", required = false) List<MultipartFile> productImages,
             RedirectAttributes redirectAttributes,
             Model model) {
         
@@ -100,7 +106,36 @@ public class ProductController {
         }
         
         try {
-            productService.createProduct(request);
+            // Validate file size before processing
+            if (productImages != null && !productImages.isEmpty()) {
+                for (MultipartFile file : productImages) {
+                    if (!file.isEmpty() && file.getSize() > 2 * 1024 * 1024) { // 2MB
+                        redirectAttributes.addFlashAttribute("error", 
+                            "File " + file.getOriginalFilename() + " quá lớn! Vui lòng chọn file nhỏ hơn 2MB.");
+                        model.addAttribute("categories", productService.getCategories());
+                        model.addAttribute("collections", productService.getCollections());
+                        model.addAttribute("colors", productService.getColors());
+                        model.addAttribute("pageTitle", "Tạo sản phẩm mới");
+                        model.addAttribute("activeMenu", "products");
+                        return "manager/products/product_create";
+                    }
+                }
+            }
+            
+            Product product = productService.createProduct(request);
+            
+            // Upload images if provided
+            if (productImages != null && !productImages.isEmpty() && 
+                productImages.stream().anyMatch(file -> !file.isEmpty())) {
+                try {
+                    imageService.uploadProductImages(product.getId(), request.getColorId(), productImages);
+                } catch (Exception e) {
+                    // Log error but don't fail product creation
+                    redirectAttributes.addFlashAttribute("warning", 
+                        "Sản phẩm đã được tạo nhưng có lỗi khi upload ảnh: " + e.getMessage());
+                }
+            }
+            
             redirectAttributes.addFlashAttribute("success", "Tạo sản phẩm thành công!");
             return "redirect:/manager/products";
         } catch (Exception e) {
@@ -202,9 +237,12 @@ public class ProductController {
         
         Product product = productOpt.get();
         List<ProductVariant> variants = productService.getProductVariants(id);
+        List<ProductImage> images = productService.getProductImages(id);
         
         model.addAttribute("product", product);
         model.addAttribute("variants", variants);
+        model.addAttribute("images", images);
+        model.addAttribute("colors", productService.getColors());
         model.addAttribute("pageTitle", "Chi tiết sản phẩm");
         model.addAttribute("activeMenu", "products");
         
@@ -226,6 +264,7 @@ public class ProductController {
         model.addAttribute("product", product);
         model.addAttribute("variants", variants);
         model.addAttribute("colors", productService.getColors());
+        model.addAttribute("variantRequest", new ProductVariantRequest());
         model.addAttribute("pageTitle", "Quản lý biến thể");
         model.addAttribute("activeMenu", "products");
         
@@ -366,5 +405,160 @@ public class ProductController {
         }
         
         return "redirect:/manager/products";
+    }
+    
+    // ===== IMAGE MANAGEMENT =====
+    
+    @PostMapping("/{id}/images/upload")
+    public String uploadProductImages(
+            @PathVariable Integer id,
+            @RequestParam("colorId") Integer colorId,
+            @RequestParam("files") List<MultipartFile> files,
+            RedirectAttributes redirectAttributes) {
+        
+        try {
+            // Validate file size before processing
+            for (MultipartFile file : files) {
+                if (!file.isEmpty() && file.getSize() > 2 * 1024 * 1024) { // 2MB
+                    redirectAttributes.addFlashAttribute("error", 
+                        "File " + file.getOriginalFilename() + " quá lớn! Vui lòng chọn file nhỏ hơn 2MB.");
+                    return "redirect:/manager/products/" + id;
+                }
+            }
+            
+            imageService.uploadProductImages(id, colorId, files);
+            redirectAttributes.addFlashAttribute("success", "Upload ảnh thành công!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+        
+        return "redirect:/manager/products/" + id;
+    }
+    
+    @PostMapping("/{id}/images/delete")
+    public String deleteProductImages(
+            @PathVariable Integer id,
+            @RequestParam("colorId") Integer colorId,
+            RedirectAttributes redirectAttributes) {
+        
+        try {
+            imageService.deleteProductImages(id, colorId);
+            redirectAttributes.addFlashAttribute("success", "Xóa ảnh thành công!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+        
+        return "redirect:/manager/products/" + id;
+    }
+    
+    @PostMapping("/{id}/variants/{variantId}/delete")
+    public String deleteVariant(
+            @PathVariable Integer id,
+            @PathVariable Integer variantId,
+            RedirectAttributes redirectAttributes) {
+        
+        try {
+            productService.deleteVariant(variantId);
+            redirectAttributes.addFlashAttribute("success", "Xóa biến thể thành công!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+        
+        return "redirect:/manager/products/" + id + "/variants";
+    }
+    
+    @GetMapping("/{id}/variants/{variantId}/edit")
+    public String showEditVariantForm(
+            @PathVariable Integer id,
+            @PathVariable Integer variantId,
+            Model model) {
+        
+        Optional<Product> productOpt = productService.getProductById(id);
+        if (productOpt.isEmpty()) {
+            return "redirect:/manager/products?error=Product not found";
+        }
+        
+        Optional<ProductVariant> variantOpt = productService.getVariantById(variantId);
+        if (variantOpt.isEmpty()) {
+            return "redirect:/manager/products/" + id + "?error=Variant not found";
+        }
+        
+        Product product = productOpt.get();
+        ProductVariant variant = variantOpt.get();
+        
+        // Create edit request with current data
+        ProductVariantRequest editRequest = new ProductVariantRequest();
+        editRequest.setColorId(variant.getColor().getId());
+        editRequest.setTypeName(variant.getTypeName());
+        editRequest.setSku(variant.getSku());
+        editRequest.setPrice(variant.getPrice());
+        editRequest.setDiscountPercent(variant.getDiscountPercent());
+        editRequest.setStockQty(variant.getStockQty());
+        editRequest.setPromotionType(variant.getPromotionType() != null ? variant.getPromotionType().name() : null);
+        
+        model.addAttribute("product", product);
+        model.addAttribute("variants", productService.getProductVariants(id));
+        model.addAttribute("colors", productService.getColors());
+        model.addAttribute("variantRequest", editRequest);
+        model.addAttribute("editingVariantId", variantId);
+        model.addAttribute("pageTitle", "Chỉnh sửa biến thể");
+        model.addAttribute("activeMenu", "products");
+        
+        return "manager/products/product_variants";
+    }
+    
+    @PostMapping("/{id}/variants/{variantId}/update")
+    public String updateVariant(
+            @PathVariable Integer id,
+            @PathVariable Integer variantId,
+            @Valid @ModelAttribute("variantRequest") ProductVariantRequest request,
+            BindingResult result,
+            RedirectAttributes redirectAttributes,
+            Model model) {
+        
+        if (result.hasErrors()) {
+            Optional<Product> productOpt = productService.getProductById(id);
+            if (productOpt.isPresent()) {
+                model.addAttribute("product", productOpt.get());
+                model.addAttribute("variants", productService.getProductVariants(id));
+            }
+            model.addAttribute("colors", productService.getColors());
+            model.addAttribute("editingVariantId", variantId);
+            model.addAttribute("pageTitle", "Chỉnh sửa biến thể");
+            model.addAttribute("activeMenu", "products");
+            return "manager/products/product_variants";
+        }
+        
+        try {
+            productService.updateVariant(variantId, request);
+            redirectAttributes.addFlashAttribute("success", "Cập nhật biến thể thành công!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+        
+        return "redirect:/manager/products/" + id + "/variants";
+    }
+    
+    // ===== UTILITY METHODS =====
+    
+    private String mapSortFieldToEntity(String sortBy) {
+        switch (sortBy.toLowerCase()) {
+            case "name":
+                return "name";
+            case "created_at":
+                return "createdAt";
+            case "sold_qty":
+                return "soldQty";
+            case "views":
+                return "views";
+            case "avg_rating":
+                return "avgRating";
+            case "total_reviews":
+                return "totalReviews";
+            case "is_active":
+                return "isActive";
+            default:
+                return "name"; // default sort by name
+        }
     }
 }

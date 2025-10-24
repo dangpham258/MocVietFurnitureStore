@@ -36,7 +36,7 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
     @Query("SELECT p FROM Product p LEFT JOIN FETCH p.category LEFT JOIN FETCH p.collection WHERE p.isActive = :isActive")
     Page<Product> findByIsActive(@Param("isActive") Boolean isActive, Pageable pageable);
     
-    @Query("SELECT p FROM Product p LEFT JOIN FETCH p.category LEFT JOIN FETCH p.collection WHERE p.name LIKE %:keyword% OR p.description LIKE %:keyword%")
+    @Query("SELECT p FROM Product p LEFT JOIN FETCH p.category LEFT JOIN FETCH p.collection WHERE p.name LIKE CONCAT('%', :keyword, '%') OR p.description LIKE CONCAT('%', :keyword, '%')")
     Page<Product> searchProducts(@Param("keyword") String keyword, Pageable pageable);
     
     @Query("SELECT DISTINCT p FROM Product p JOIN p.variants v WHERE v.stockQty <= :threshold AND p.isActive = true")
@@ -44,4 +44,7 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
     
     @Query("SELECT DISTINCT p FROM Product p JOIN p.variants v WHERE v.stockQty = 0 AND p.isActive = true")
     List<Product> findOutOfStockProducts();
+    
+    @Query("SELECT p FROM Product p LEFT JOIN FETCH p.category LEFT JOIN FETCH p.collection WHERE p.id = :id")
+    Optional<Product> findByIdWithCategoryAndCollection(@Param("id") Integer id);
 }

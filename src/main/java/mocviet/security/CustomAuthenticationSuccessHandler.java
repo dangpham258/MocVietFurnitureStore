@@ -25,25 +25,17 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
         User user = (User) authentication.getPrincipal();
         String role = user.getRole().getName();
         
-        // Check if remember me is checked
-        String rememberMe = request.getParameter("rememberMe");
-        System.out.println("🔍 Remember Me parameter: " + rememberMe);
+        // Always generate JWT token for session management
+        String jwt = tokenProvider.generateToken(authentication);
         
-        if ("true".equals(rememberMe) || "on".equals(rememberMe)) {
-            // Generate JWT token
-            String jwt = tokenProvider.generateToken(authentication);
-            
-            // Set JWT as cookie
-            Cookie cookie = new Cookie("JWT_TOKEN", jwt);
-            cookie.setHttpOnly(true);
-            cookie.setPath("/");
-            cookie.setMaxAge(24 * 60 * 60); // 24 hours
-            response.addCookie(cookie);
-            
-            System.out.println("JWT Cookie created: " + jwt.substring(0, Math.min(20, jwt.length())) + "...");
-        } else {
-            System.out.println("Remember Me not checked, no JWT cookie created");
-        }
+        // Set JWT as cookie
+        Cookie cookie = new Cookie("JWT_TOKEN", jwt);
+        cookie.setHttpOnly(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(24 * 60 * 60); // 24 hours
+        response.addCookie(cookie);
+        
+        System.out.println("JWT Cookie created: " + jwt.substring(0, Math.min(20, jwt.length())) + "...");
         
         switch (role) {
             case "ADMIN":
