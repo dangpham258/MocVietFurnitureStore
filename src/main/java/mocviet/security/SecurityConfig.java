@@ -1,6 +1,5 @@
 package mocviet.security;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,6 +15,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import lombok.RequiredArgsConstructor;
 
 @Configuration
 @EnableWebSecurity
@@ -55,6 +56,7 @@ public class SecurityConfig {
                     "/auth/**",
                     "/login",
                     "/register",
+                    "/password-reset/**",
                     "/css/**",
                     "/js/**",
                     "/images/**",
@@ -63,7 +65,7 @@ public class SecurityConfig {
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 .requestMatchers("/manager/**").hasRole("MANAGER")
                 .requestMatchers("/delivery/**").hasRole("DELIVERY")
-                .requestMatchers("/customer/**", "/profile/**", "/orders/**", "/cart/**", "/wishlist/**", "/user/**").hasRole("CUSTOMER")
+                .requestMatchers("/customer/**", "/profile/**", "/orders/**", "/cart/**", "/wishlist/**").hasRole("CUSTOMER")
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session
@@ -75,12 +77,21 @@ public class SecurityConfig {
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
             .formLogin(form -> form
                 .loginPage("/login")
+                .loginProcessingUrl("/login")
                 .successHandler(customSuccessHandler)
                 .permitAll()
             )
             .logout(logout -> logout
                 .logoutUrl("/logout")
                 .logoutSuccessUrl("/login?logout")
+                .addLogoutHandler((request, response, authentication) -> {
+                    // Clear JWT cookie
+                    jakarta.servlet.http.Cookie cookie = new jakarta.servlet.http.Cookie("JWT_TOKEN", null);
+                    cookie.setHttpOnly(true);
+                    cookie.setPath("/");
+                    cookie.setMaxAge(0);
+                    response.addCookie(cookie);
+                })
                 .permitAll()
             );
         
