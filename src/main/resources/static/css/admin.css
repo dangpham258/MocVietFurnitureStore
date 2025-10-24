@@ -45,18 +45,35 @@ body, html {
     height: 100vh;
     position: fixed;
     top: 0;
-    left: 0;
+    left: -250px !important; /* FORCE ĐÓNG NGAY TỪ ĐẦU - OVERRIDE TẤT CẢ */
     z-index: 1000;
     overflow-y: auto;
     width: 250px; /* Fixed width thay vì percentage */
     min-width: 250px;
-    transition: left 0.3s ease; /* Added transition */
+    transition: none !important; /* TẮT TRANSITION HOÀN TOÀN */
     box-shadow: 2px 0 8px rgba(0,0,0,0.15); /* Bóng đậm hơn */
 }
 
-/* Sidebar collapsed state for desktop */
-.admin-sidebar.collapsed {
-    left: -250px;
+/* FORCE SIDEBAR ĐÓNG NGAY TỪ ĐẦU - OVERRIDE TẤT CẢ CLASS */
+.admin-sidebar.collapsed,
+.admin-sidebar:not(.sidebar-initialized) {
+    left: -250px !important;
+    transition: none !important;
+}
+
+/* Sidebar mở CHỈ KHI đã initialized VÀ không collapsed */
+.admin-sidebar.sidebar-initialized:not(.collapsed) {
+    left: 0 !important;
+}
+
+/* TẮT TRANSITION HOÀN TOÀN */
+.admin-sidebar.no-transition {
+    transition: none !important;
+}
+
+/* BẬT TRANSITION CHỈ KHI USER TƯƠNG TÁC */
+.admin-sidebar.user-interacting {
+    transition: left 0.3s ease !important;
 }
 
 /* Sidebar header styling */
@@ -136,17 +153,21 @@ body, html {
 
 /* Khu vực nội dung (bên phải sidebar) */
 .content-area {
-    margin-left: 250px; /* Fixed margin thay vì percentage */
     flex: 1;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    transition: margin-left 0.3s ease; /* Added transition */
+    transition: margin-left 0.3s ease !important; /* ANIMATION MƯỢT MÀ */
 }
 
-/* Adjust content area when sidebar is collapsed */
+/* CONTENT AREA MỞ KHI SIDEBAR KHÔNG COLLAPSED */
+.admin-sidebar:not(.collapsed) ~ .content-area {
+    margin-left: 250px !important;
+}
+
+/* CONTENT AREA ĐÓNG KHI SIDEBAR COLLAPSED */
 .admin-sidebar.collapsed ~ .content-area {
-    margin-left: 0;
+    margin-left: 0 !important;
 }
 
 /* Nội dung chính - Phong cách tối giản */
@@ -415,35 +436,67 @@ body, html {
     }
 }
 
-/* Mobile và tablet */
+/* Mobile và tablet - FORCE ĐÓNG SIDEBAR KHI RESIZE */
 @media (max-width: 991px) {
-    /* Sidebar trên mobile */
+    /* FORCE SIDEBAR ĐÓNG KHI TAB RESIZE NHỎ */
     .admin-sidebar {
-        position: fixed !important;
-        top: 0 !important;
-        left: -100% !important;
-        width: 250px !important;
-        z-index: 1050 !important;
-        transition: left 0.3s ease !important;
+        left: -250px !important; /* FORCE ĐÓNG */
+        transition: left 0.3s ease !important; /* THÊM TRANSITION */
     }
     
+    /* FORCE SIDEBAR ĐÓNG - OVERRIDE TẤT CẢ CLASS */
+    .admin-sidebar.collapsed,
+    .admin-sidebar:not(.collapsed),
+    .admin-sidebar.sidebar-initialized:not(.collapsed),
+    .admin-sidebar.sidebar-initialized {
+        left: -250px !important; /* FORCE ĐÓNG */
+        transition: left 0.3s ease !important; /* THÊM TRANSITION */
+    }
+    
+    /* Sidebar mở khi có class show - OVERRIDE TẤT CẢ */
     .admin-sidebar.show {
-        left: 0 !important;
+        left: 0 !important; /* CHỈ MỞ KHI CÓ CLASS SHOW */
+        transition: left 0.3s ease !important; /* THÊM TRANSITION */
     }
     
-    /* Hide header toggle when sidebar is open */
-    .admin-sidebar.show ~ .content-area .sidebar-toggle {
-        display: none !important;
+    /* OVERRIDE CSS DESKTOP CHO CLASS SHOW */
+    .admin-sidebar.show.collapsed,
+    .admin-sidebar.show:not(.collapsed),
+    .admin-sidebar.show.sidebar-initialized:not(.collapsed),
+    .admin-sidebar.show.sidebar-initialized {
+        left: 0 !important; /* FORCE MỞ KHI CÓ CLASS SHOW */
+        transition: left 0.3s ease !important; /* THÊM TRANSITION */
     }
     
-    /* Content area trên mobile */
+    /* FORCE CONTENT AREA VỀ 0PX KHI RESIZE */
     .content-area {
-        margin-left: 0 !important;
+        margin-left: 0 !important; /* FORCE VỀ 0PX */
+        transition: margin-left 0.3s ease !important; /* ANIMATION MƯỢT MÀ */
+    }
+    
+    /* FORCE CONTENT AREA VỀ 0PX - OVERRIDE TẤT CẢ CLASS */
+    .admin-sidebar.collapsed ~ .content-area,
+    .admin-sidebar:not(.collapsed) ~ .content-area,
+    .admin-sidebar.sidebar-initialized:not(.collapsed) ~ .content-area,
+    .admin-sidebar.sidebar-initialized ~ .content-area {
+        margin-left: 0 !important; /* FORCE VỀ 0PX */
+        transition: margin-left 0.3s ease !important; /* ANIMATION MƯỢT MÀ */
+    }
+    
+    /* Content area mở khi sidebar có class show */
+    .admin-sidebar.show ~ .content-area {
+        margin-left: 250px !important; /* MỞ KHI SIDEBAR MỞ */
+        transition: margin-left 0.3s ease !important; /* ANIMATION MƯỢT MÀ */
+    }
+    
+    /* Header hamburger luôn hiển thị trên mobile */
+    .sidebar-toggle {
+        display: block !important;
     }
 }
 
-/* Desktop nhỏ */
-@media (max-width: 767.98px) {
+/* Desktop nhỏ - KHÔNG OVERRIDE MOBILE */
+@media (max-width: 767.98px) and (min-width: 768px) {
     .admin-sidebar {
         width: 100%;
         position: relative;

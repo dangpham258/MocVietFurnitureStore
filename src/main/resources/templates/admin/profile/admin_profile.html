@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/fragments/admin_layout}">
+<head>
+    <title>Quản lý tài khoản - Admin Panel</title>
+</head>
+<body>
+<div layout:fragment="content" th:fragment="content" class="main-content">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">Quản lý tài khoản</h2>
+            <p class="text-muted mb-0">Cập nhật thông tin cá nhân và cài đặt tài khoản</p>
+        </div>
+        <div>
+            <span class="badge bg-success fs-6">
+                <i class="bi bi-shield-check me-1"></i>
+                Tài khoản Admin
+            </span>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Profile Information -->
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <!-- Avatar -->
+                    <div class="mb-3">
+                        <img src="https://github.com/mdo.png" alt="Admin Avatar" class="rounded-circle" width="120" height="120">
+                    </div>
+                    
+                    <!-- User Info -->
+                    <h5 class="card-title mb-1" sec:authentication="name">Admin User</h5>
+                    <p class="text-muted mb-2">Quản trị viên hệ thống</p>
+                    <span class="badge bg-primary">ADMIN</span>
+                    
+                    <!-- Quick Stats -->
+                    <div class="row mt-4">
+                        <div class="col-6">
+                            <div class="border-end">
+                                <h6 class="mb-0">156</h6>
+                                <small class="text-muted">Hoạt động</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <h6 class="mb-0">24h</h6>
+                            <small class="text-muted">Trực tuyến</small>
+                        </div>
+                    </div>
+                    
+                    <!-- Upload Avatar Button -->
+                    <button class="btn btn-outline-primary btn-sm mt-3" data-bs-toggle="modal" data-bs-target="#uploadAvatarModal">
+                        <i class="bi bi-camera me-1"></i>Đổi avatar
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Security Info -->
+            <div class="card border-0 shadow-sm mt-3">
+                <div class="card-header bg-white">
+                    <h6 class="card-title mb-0">
+                        <i class="bi bi-shield-lock me-2"></i>
+                        Bảo mật
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span>Mật khẩu</span>
+                        <span class="badge bg-success">Mạnh</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span>2FA</span>
+                        <span class="badge bg-warning">Chưa bật</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>Đăng nhập cuối</span>
+                        <small class="text-muted">2 giờ trước</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Profile Forms -->
+        <div class="col-md-8">
+            <!-- Tabs -->
+            <ul class="nav nav-tabs mb-4" id="profileTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab">
+                        <i class="bi bi-person me-1"></i>Thông tin cá nhân
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="password-tab" data-bs-toggle="tab" data-bs-target="#password" type="button" role="tab">
+                        <i class="bi bi-key me-1"></i>Đổi mật khẩu
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="settings-tab" data-bs-toggle="tab" data-bs-target="#settings" type="button" role="tab">
+                        <i class="bi bi-gear me-1"></i>Cài đặt
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="activity-tab" data-bs-toggle="tab" data-bs-target="#activity" type="button" role="tab">
+                        <i class="bi bi-clock-history me-1"></i>Hoạt động
+                    </button>
+                </li>
+            </ul>
+            
+            <div class="tab-content" id="profileTabsContent">
+                <!-- Profile Information Tab -->
+                <div class="tab-pane fade show active" id="profile" role="tabpanel">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-white">
+                            <h5 class="card-title mb-0">
+                                <i class="bi bi-person me-2"></i>
+                                Thông tin cá nhân
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form class="needs-validation" novalidate>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Họ và tên *</label>
+                                        <input type="text" class="form-control" value="Nguyễn Văn Admin" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Email *</label>
+                                        <input type="email" class="form-control" value="admin@mocviet.com" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Số điện thoại</label>
+                                        <input type="tel" class="form-control" value="0123456789">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Giới tính</label>
+                                        <select class="form-select">
+                                            <option value="male" selected>Nam</option>
+                                            <option value="female">Nữ</option>
+                                            <option value="other">Khác</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Ngày sinh</label>
+                                        <input type="date" class="form-control" value="1990-01-01">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Địa chỉ</label>
+                                        <input type="text" class="form-control" value="123 Đường ABC, Quận 1, TP.HCM">
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">Mô tả</label>
+                                    <textarea class="form-control" rows="3" placeholder="Giới thiệu về bản thân...">Quản trị viên hệ thống Mộc Việt với hơn 5 năm kinh nghiệm trong lĩnh vực nội thất.</textarea>
+                                </div>
+                                
+                                <div class="d-flex justify-content-end">
+                                    <button type="button" class="btn btn-primary btn-submit">
+                                        <i class="bi bi-check-lg me-1"></i>Cập nhật thông tin
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Change Password Tab -->
+                <div class="tab-pane fade" id="password" role="tabpanel">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-white">
+                            <h5 class="card-title mb-0">
+                                <i class="bi bi-key me-2"></i>
+                                Đổi mật khẩu
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form class="needs-validation" novalidate>
+                                <div class="mb-3">
+                                    <label class="form-label">Mật khẩu hiện tại *</label>
+                                    <input type="password" class="form-control" required>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">Mật khẩu mới *</label>
+                                    <input type="password" class="form-control" required minlength="8">
+                                    <div class="form-text">Mật khẩu phải có ít nhất 8 ký tự</div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">Xác nhận mật khẩu mới *</label>
+                                    <input type="password" class="form-control" required minlength="8">
+                                </div>
+                                
+                                <div class="alert alert-warning">
+                                    <i class="bi bi-exclamation-triangle me-2"></i>
+                                    Sau khi đổi mật khẩu, bạn sẽ cần đăng nhập lại.
+                                </div>
+                                
+                                <div class="d-flex justify-content-end">
+                                    <button type="button" class="btn btn-warning btn-submit">
+                                        <i class="bi bi-key me-1"></i>Đổi mật khẩu
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Settings Tab -->
+                <div class="tab-pane fade" id="settings" role="tabpanel">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-white">
+                            <h5 class="card-title mb-0">
+                                <i class="bi bi-gear me-2"></i>
+                                Cài đặt tài khoản
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form class="needs-validation" novalidate>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Ngôn ngữ</label>
+                                        <select class="form-select">
+                                            <option value="vi" selected>Tiếng Việt</option>
+                                            <option value="en">English</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Múi giờ</label>
+                                        <select class="form-select">
+                                            <option value="Asia/Ho_Chi_Minh" selected>GMT+7 (Việt Nam)</option>
+                                            <option value="UTC">UTC</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">Thông báo email</label>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" checked>
+                                        <label class="form-check-label">Nhận thông báo về đơn hàng mới</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" checked>
+                                        <label class="form-check-label">Nhận thông báo về đánh giá mới</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox">
+                                        <label class="form-check-label">Nhận thông báo về tồn kho thấp</label>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">Giao diện</label>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="theme" value="light" checked>
+                                        <label class="form-check-label">Sáng</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="theme" value="dark">
+                                        <label class="form-check-label">Tối</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="theme" value="auto">
+                                        <label class="form-check-label">Tự động</label>
+                                    </div>
+                                </div>
+                                
+                                <div class="d-flex justify-content-end">
+                                    <button type="button" class="btn btn-primary btn-submit">
+                                        <i class="bi bi-check-lg me-1"></i>Lưu cài đặt
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Activity Tab -->
+                <div class="tab-pane fade" id="activity" role="tabpanel">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-white">
+                            <h5 class="card-title mb-0">
+                                <i class="bi bi-clock-history me-2"></i>
+                                Hoạt động gần đây
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="list-group list-group-flush">
+                                <div class="list-group-item border-0 px-0">
+                                    <div class="d-flex align-items-center">
+                                        <div class="flex-shrink-0">
+                                            <i class="bi bi-person-plus text-success me-3"></i>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <div class="d-flex justify-content-between">
+                                                <div>
+                                                    <small class="fw-bold">Tạo user mới</small>
+                                                    <div class="text-muted small">Nguyễn Văn A - Customer</div>
+                                                </div>
+                                                <small class="text-muted">5 phút trước</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="list-group-item border-0 px-0">
+                                    <div class="d-flex align-items-center">
+                                        <div class="flex-shrink-0">
+                                            <i class="bi bi-tags text-primary me-3"></i>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <div class="d-flex justify-content-between">
+                                                <div>
+                                                    <small class="fw-bold">Cập nhật danh mục</small>
+                                                    <div class="text-muted small">Phòng làm việc</div>
+                                                </div>
+                                                <small class="text-muted">10 phút trước</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="list-group-item border-0 px-0">
+                                    <div class="d-flex align-items-center">
+                                        <div class="flex-shrink-0">
+                                            <i class="bi bi-percent text-warning me-3"></i>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <div class="d-flex justify-content-between">
+                                                <div>
+                                                    <small class="fw-bold">Tạo mã giảm giá</small>
+                                                    <div class="text-muted small">SALE20 - 20%</div>
+                                                </div>
+                                                <small class="text-muted">15 phút trước</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="list-group-item border-0 px-0">
+                                    <div class="d-flex align-items-center">
+                                        <div class="flex-shrink-0">
+                                            <i class="bi bi-box-arrow-in-right text-info me-3"></i>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <div class="d-flex justify-content-between">
+                                                <div>
+                                                    <small class="fw-bold">Đăng nhập</small>
+                                                    <div class="text-muted small">Từ IP: 192.168.1.100</div>
+                                                </div>
+                                                <small class="text-muted">2 giờ trước</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="text-center mt-3">
+                                <button class="btn btn-outline-primary">
+                                    <i class="bi bi-arrow-clockwise me-1"></i>Xem thêm
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Upload Avatar Modal -->
+<div class="modal fade" id="uploadAvatarModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Đổi avatar</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form class="needs-validation" novalidate>
+                    <div class="mb-3">
+                        <label class="form-label">Chọn ảnh đại diện</label>
+                        <input type="file" class="form-control" accept="image/*" required>
+                        <div class="form-text">Định dạng: JPG, PNG. Kích thước tối đa: 2MB</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Xem trước</label>
+                        <div class="text-center">
+                            <img src="https://github.com/mdo.png" alt="Preview" class="rounded-circle" width="100" height="100" id="avatarPreview">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary btn-submit">Cập nhật avatar</button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -6,6 +6,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 import lombok.RequiredArgsConstructor;
 
 @Controller
@@ -15,9 +17,15 @@ public class PagesController {
     
     @GetMapping({"", "/"})
     @PreAuthorize("hasRole('ADMIN')")
-    public String pages(Model model) {
+    public String pages(Model model, HttpServletRequest request) {
         model.addAttribute("pageTitle", "Quản lý trang tĩnh");
         model.addAttribute("activeMenu", "pages");
+        
+        // Check if it's an AJAX request
+        if ("XMLHttpRequest".equals(request.getHeader("X-Requested-With"))) {
+            return "admin/pages/admin_pages ::content";
+        }
+        
         return "admin/pages/admin_pages";
     }
 }

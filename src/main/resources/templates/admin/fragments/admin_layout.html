@@ -10,129 +10,8 @@
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <!-- Admin CSS -->
-    <link rel="stylesheet" href="/static/css/admin.css">
+    <link th:href="@{/static/css/admin.css(v=${jsVersion ?: 'HuynhNgocThang'})}" rel="stylesheet">
     
-    <!-- CSS Inline để đảm bảo hamburger hoạt động -->
-    <style>
-        /* Basic layout styles */
-        .page-wrapper {
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-        
-        .main-layout {
-            display: flex;
-            flex: 1;
-        }
-        
-        .admin-sidebar {
-            width: 250px;
-            min-width: 250px;
-            background: #e9ecef; /* Xám đậm hơn để dễ nhìn */
-            border-right: 1px solid #dee2e6; /* Viền đậm hơn */
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 100vh;
-            z-index: 1000;
-            overflow-y: auto;
-            transition: left 0.3s ease;
-            box-shadow: 2px 0 8px rgba(0,0,0,0.15); /* Bóng đậm hơn */
-        }
-        
-        .admin-sidebar.collapsed {
-            left: -250px;
-        }
-        
-        /* Sidebar header styling */
-        .admin-sidebar .text-dark {
-            color: #212529 !important; /* Đen đậm để dễ nhìn */
-        }
-        
-        .admin-sidebar .text-muted {
-            color: #6c757d !important; /* Xám đậm để dễ nhìn */
-        }
-        
-        .admin-sidebar .btn-outline-dark {
-            border-color: #6c757d;
-            color: #6c757d;
-        }
-        
-        .admin-sidebar .btn-outline-dark:hover {
-            background-color: #6c757d;
-            color: white;
-        }
-        
-        /* Nút đăng xuất - Màu đỏ thay vì vàng */
-        .admin-sidebar .nav-link.text-danger {
-            color: #dc3545 !important; /* Đỏ Bootstrap */
-        }
-        
-        .admin-sidebar .nav-link.text-danger:hover {
-            color: #c82333 !important; /* Đỏ đậm khi hover */
-            background-color: #f8d7da; /* Nền đỏ nhạt */
-        }
-        
-        .content-area {
-            margin-left: 250px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            transition: margin-left 0.3s ease;
-        }
-        
-        .admin-sidebar.collapsed ~ .content-area {
-            margin-left: 0;
-        }
-        
-        .main-content {
-            background-color: #f8f9fa; /* Sáng hơn sidebar để tạo tương phản */
-            flex: 1;
-            padding: 1.5rem;
-        }
-        
-        .admin-header {
-            background: white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            position: sticky !important;
-            top: 0 !important;
-            z-index: 100 !important;
-            transition: all 0.3s ease;
-        }
-        
-        /* Desktop: Ẩn hamburger header khi sidebar mở */
-        @media (min-width: 992px) {
-            .admin-sidebar:not(.collapsed) ~ .content-area .sidebar-toggle {
-                display: none !important;
-            }
-        }
-        
-        /* Mobile: Ẩn hamburger header khi sidebar mở */
-        @media (max-width: 991px) {
-            .admin-sidebar {
-                position: fixed !important;
-                top: 0 !important;
-                left: -100% !important;
-                width: 250px !important;
-                z-index: 1050 !important;
-                transition: left 0.3s ease !important;
-            }
-            
-            .admin-sidebar.show {
-                left: 0 !important;
-            }
-            
-            .admin-sidebar.show ~ .content-area .sidebar-toggle {
-                display: none !important;
-            }
-            
-            .content-area {
-                margin-left: 0 !important;
-            }
-        }
-    </style>
 </head>
 <body>
     <div class="page-wrapper">
@@ -200,6 +79,6 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Admin JS -->
-    <script src="/static/js/admin.js"></script>
+    <script th:src="@{/static/js/admin.js(v=${jsVersion ?: 'HuynhNgocThang'})}"></script>
 </body>
 </html>
