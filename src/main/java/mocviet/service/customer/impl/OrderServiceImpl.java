@@ -480,6 +480,7 @@ public class OrderServiceImpl implements IOrderService {
         dto.setQty(item.getQty());
         dto.setUnitPrice(item.getUnitPrice());
         dto.setTotalPrice(item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQty())));
+        dto.setProductSlug(item.getVariant().getProduct().getSlug());
         return dto;
     }
     

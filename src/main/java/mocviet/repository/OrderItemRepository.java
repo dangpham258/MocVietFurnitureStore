@@ -19,9 +19,9 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Integer> {
     List<OrderItem> findByOrderIdOrderByIdAsc(Integer orderId);
     
     /**
-     * Tìm OrderItem theo order ID với fetch ProductVariant và Color
+     * Tìm OrderItem theo order ID với fetch ProductVariant, Color và Product
      */
-    @EntityGraph(attributePaths = {"variant", "variant.color"})
+    @EntityGraph(attributePaths = {"variant", "variant.color", "variant.product"})
     @Query("SELECT oi FROM OrderItem oi WHERE oi.order.id = :orderId ORDER BY oi.id ASC")
     List<OrderItem> findByOrderIdWithVariantAndColor(@Param("orderId") Integer orderId);
     

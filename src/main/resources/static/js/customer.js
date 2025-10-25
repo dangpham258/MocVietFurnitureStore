@@ -241,8 +241,8 @@ class CustomerHeader {
 // GLOBAL FUNCTIONS FOR HTML ONCLICK EVENTS
 // ========================================
 
-// Quantity management functions
-function increaseQuantity(cartItemId) {
+// Quantity management functions - Make them globally available
+window.increaseQuantity = function(cartItemId) {
     const input = document.getElementById(`qty-${cartItemId}`);
     const currentValue = parseInt(input.value);
     const maxValue = parseInt(input.max);
@@ -251,9 +251,9 @@ function increaseQuantity(cartItemId) {
         input.value = currentValue + 1;
         updateQuantity(cartItemId, input.value);
     }
-}
+};
 
-function decreaseQuantity(cartItemId) {
+window.decreaseQuantity = function(cartItemId) {
     const input = document.getElementById(`qty-${cartItemId}`);
     const currentValue = parseInt(input.value);
     
@@ -261,9 +261,9 @@ function decreaseQuantity(cartItemId) {
         input.value = currentValue - 1;
         updateQuantity(cartItemId, input.value);
     }
-}
+};
 
-function updateQuantity(cartItemId, quantity) {
+window.updateQuantity = function(cartItemId, quantity) {
     const quantityInt = parseInt(quantity);
     
     if (quantityInt <= 0) {
@@ -308,9 +308,9 @@ function updateQuantity(cartItemId, quantity) {
         customerApp.cartManager.showAlert('Có lỗi xảy ra. Vui lòng thử lại sau', 'danger');
         console.error('Error updating quantity:', error);
     });
-}
+};
 
-function updateItemTotal(cartItemId) {
+window.updateItemTotal = function(cartItemId) {
     const input = document.getElementById(`qty-${cartItemId}`);
     const quantity = parseInt(input.value);
     
@@ -322,9 +322,9 @@ function updateItemTotal(cartItemId) {
     const total = price * quantity;
     const totalElement = document.getElementById(`total-${cartItemId}`);
     totalElement.textContent = customerApp.cartManager.formatCurrency(total);
-}
+};
 
-function removeItem(cartItemId) {
+window.removeItem = function(cartItemId) {
     if (!confirm('Bạn có chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng?')) {
         return;
     }
@@ -368,9 +368,9 @@ function removeItem(cartItemId) {
         customerApp.cartManager.showAlert('Có lỗi xảy ra. Vui lòng thử lại sau', 'danger');
         console.error('Error removing item:', error);
     });
-}
+};
 
-function proceedToCheckout() {
+window.proceedToCheckout = function() {
     const selectedItemIds = customerApp.cartManager.getSelectedItemIds();
     
     if (selectedItemIds.length === 0) {
@@ -390,9 +390,9 @@ function proceedToCheckout() {
     
     // Redirect to checkout page
     window.location.href = '/customer/checkout';
-}
+};
 
-function updateStockErrors(stockErrors) {
+window.updateStockErrors = function(stockErrors) {
     // Remove existing stock errors
     document.querySelectorAll('.stock-error').forEach(error => error.remove());
     
@@ -421,12 +421,112 @@ function updateStockErrors(stockErrors) {
     });
     
     customerApp.cartManager.updateSelectAllState();
-}
+};
 
 // Global function for adding to cart from product pages
-function addToCart(variantId, quantity = 1) {
+window.addToCart = function(variantId, quantity = 1) {
     return customerApp.cartManager.addToCart(variantId, quantity);
-}
+};
+
+// ========================================
+// ORDER MANAGEMENT FUNCTIONS
+// ========================================
+
+let currentOrderId = null;
+
+// Make functions globally available
+window.filterOrders = function() {
+    const statusSelect = document.getElementById('statusFilter');
+    if (statusSelect) {
+        const status = statusSelect.value;
+        window.location.href = `/customer/orders?status=${status}`;
+    }
+};
+
+window.cancelOrder = function(orderId) {
+    currentOrderId = orderId;
+    const modal = new bootstrap.Modal(document.getElementById('cancelOrderModal'));
+    modal.show();
+};
+
+window.confirmCancelOrder = function() {
+    const reason = document.getElementById('cancelReason').value;
+    
+    fetch(`/customer/orders/${currentOrderId}/cancel`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `reason=${encodeURIComponent(reason)}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert(data.message);
+        }
+    })
+    .catch(error => {
+        alert('Có lỗi xảy ra khi hủy đơn hàng');
+    });
+};
+
+window.requestReturn = function(orderId) {
+    currentOrderId = orderId;
+    const modal = new bootstrap.Modal(document.getElementById('returnRequestModal'));
+    modal.show();
+};
+
+window.confirmReturnRequest = function() {
+    const reason = document.getElementById('returnReason').value;
+    
+    if (!reason.trim()) {
+        alert('Vui lòng nhập lý do trả hàng');
+        return;
+    }
+    
+    fetch(`/customer/orders/${currentOrderId}/return`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `reason=${encodeURIComponent(reason)}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert(data.message);
+        }
+    })
+    .catch(error => {
+        alert('Có lỗi xảy ra khi gửi yêu cầu trả hàng');
+    });
+};
+
+window.reorderProducts = function(orderId) {
+    if (confirm('Bạn có muốn thêm các sản phẩm trong đơn hàng này vào giỏ hàng không?')) {
+        fetch(`/customer/orders/${orderId}/reorder`, {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                if (data.addedCount > 0) {
+                    window.location.href = '/customer/cart';
+                }
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch(error => {
+            alert('Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng');
+        });
+    }
+};
 
 // ========================================
 // INITIALIZATION

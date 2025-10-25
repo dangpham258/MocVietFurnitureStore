@@ -17,4 +17,5 @@ public class OrderItemDTO {
     private Integer qty;
     private BigDecimal unitPrice;
     private BigDecimal totalPrice;
+    private String productSlug;
 }
