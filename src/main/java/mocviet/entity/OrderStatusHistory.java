@@ -22,9 +22,8 @@ public class OrderStatusHistory {
     @JoinColumn(name = "order_id", nullable = false)
     private Orders order;
     
-    @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
-    private Orders.OrderStatus status;
+    private String status;
     
     @Column(name = "note", length = 500)
     private String note;

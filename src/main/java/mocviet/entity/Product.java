@@ -57,7 +57,7 @@ public class Product {
 
     // ===== THÊM MỐI QUAN HỆ OneToMany VÀO ĐÂY =====
     @OneToMany(mappedBy = "product", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<ProductImage> images;
+    private List<ProductImage> productImages;
     
     @OneToMany(mappedBy = "product", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<ProductVariant> variants;
