@@ -19,7 +19,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString(exclude = {"user", "address", "coupon", "orderItems", "statusHistories", "orderDelivery"})
-public class Order {
+public class Orders {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -83,7 +83,7 @@ public class Order {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Order order = (Order) o;
+        Orders order = (Orders) o;
         return Objects.equals(id, order.id);
     }
     

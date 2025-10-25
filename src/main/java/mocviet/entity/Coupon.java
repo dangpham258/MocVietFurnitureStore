@@ -40,5 +40,5 @@ public class Coupon {
     private BigDecimal minOrderAmount = BigDecimal.ZERO;
     
     @OneToMany(mappedBy = "coupon", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<Order> orders;
+    private List<Orders> orders;
 }

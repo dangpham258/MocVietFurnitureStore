@@ -49,10 +49,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         SecurityContextHolder.getContext().setAuthentication(authentication);
                     }
                 } else {
-                    // Only log for non-public endpoints to reduce noise
+                    // Only log for protected endpoints to reduce noise
                     String requestURI = request.getRequestURI();
-                    if (!requestURI.equals("/") && !requestURI.startsWith("/css/") && 
-                        !requestURI.startsWith("/js/") && !requestURI.startsWith("/images/")) {
+                    if (isProtectedEndpoint(requestURI)) {
                         System.out.println("No JWT Token found for: " + requestURI);
                     }
                 }
@@ -82,6 +81,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
         
         return null;
+    }
+    
+    private boolean isProtectedEndpoint(String requestURI) {
+        // Public endpoints that don't need JWT
+        if (requestURI.equals("/") || 
+            requestURI.equals("/login") || 
+            requestURI.equals("/register") ||
+            requestURI.equals("/favicon.ico") ||
+            requestURI.startsWith("/css/") || 
+            requestURI.startsWith("/js/") || 
+            requestURI.startsWith("/images/") ||
+            requestURI.startsWith("/static/") ||
+            requestURI.startsWith("/auth/")) {
+            return false;
+        }
+        
+        // All other endpoints are considered protected
+        return true;
     }
 }
 

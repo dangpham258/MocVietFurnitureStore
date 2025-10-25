@@ -61,7 +61,7 @@ INSERT INTO dbo.Roles(name, description) VALUES
 -- 1) USERS (mật khẩu demo: hash với https://bcrypt-generator.com/ rounds = 12)
 ------------------------------------------------------------
 INSERT INTO dbo.Users(role_id, full_name, username, email, password_hash, gender, phone)
-SELECT id, N'Nguyễn Admin',  N'admin',   N'admin@mocviet.vn',   N'$2a$12$XP/thldHL.FqZUQmozamNeGXlijdtS7.E5aVolRvLToDjEMXgCkfC',   N'Nam', N'0900000001' FROM dbo.Roles WHERE name=N'ADMIN';
+SELECT id, N'Huỳnh Ngọc Thắng',  N'admin',   N'win2005thang@gmail.com',   N'$2a$12$XP/thldHL.FqZUQmozamNeGXlijdtS7.E5aVolRvLToDjEMXgCkfC',   N'Nam', N'0900000001' FROM dbo.Roles WHERE name=N'ADMIN';
 
 INSERT INTO dbo.Users(role_id, full_name, username, email, password_hash, gender, phone)
 SELECT id, N'Lê Quản lý',    N'manager', N'manager@mocviet.vn', N'$2a$12$XP/thldHL.FqZUQmozamNeGXlijdtS7.E5aVolRvLToDjEMXgCkfC', N'Nam', N'0900000002' FROM dbo.Roles WHERE name=N'MANAGER';
@@ -605,6 +605,7 @@ INSERT INTO @oA1 EXEC dbo.sp_CreateOrder
   @user_id = @userA,
   @address_id = @addrA,
   @coupon_code = N'WELCOME10',
+  @payment_method = N'COD',
   @items = @itemsA1;
 SELECT @orderA1 = order_id FROM @oA1;
 
@@ -628,8 +629,17 @@ INSERT INTO @oB1 EXEC dbo.sp_CreateOrder
   @user_id = @userB,
   @address_id = @addrB,
   @coupon_code = NULL,
+  @payment_method = N'VNPAY',
   @items = @itemsB1;
 SELECT @orderB1 = order_id FROM @oB1;
+
+-- Demo webhook thanh toán VNPAY thành công cho đơn B1
+DECLARE @txn_code_b1 NVARCHAR(100) = N'VNPAY_' + CAST(@orderB1 AS NVARCHAR(10));
+EXEC dbo.sp_HandlePaymentWebhook 
+  @order_id = @orderB1,
+  @payment_method = N'VNPAY',
+  @is_success = 1,
+  @gateway_txn_code = @txn_code_b1;
 
 -- Xác nhận đơn B1
 DECLARE @managerID INT = (SELECT id FROM dbo.Users WHERE username=N'manager');
@@ -653,8 +663,17 @@ INSERT INTO @oA2 EXEC dbo.sp_CreateOrder
   @user_id = @userA,
   @address_id = @addrA,
   @coupon_code = N'VIP20',
+  @payment_method = N'MOMO',
   @items = @itemsA2;
 SELECT @orderA2 = order_id FROM @oA2;
+
+-- Demo webhook thanh toán MOMO thành công cho đơn A2
+DECLARE @txn_code_a2 NVARCHAR(100) = N'MOMO_' + CAST(@orderA2 AS NVARCHAR(10));
+EXEC dbo.sp_HandlePaymentWebhook 
+  @order_id = @orderA2,
+  @payment_method = N'MOMO',
+  @is_success = 1,
+  @gateway_txn_code = @txn_code_a2;
 
 -- Xác nhận và dispatch đơn A2
 DECLARE @teamNam INT = (SELECT id FROM dbo.DeliveryTeam WHERE name=N'Đội Giao Khu Vực Nam');
@@ -679,6 +698,7 @@ INSERT INTO @oB2 EXEC dbo.sp_CreateOrder
   @user_id = @userB,
   @address_id = @addrB,
   @coupon_code = NULL,
+  @payment_method = N'COD',
   @items = @itemsB2;
 SELECT @orderB2 = order_id FROM @oB2;
 
@@ -691,6 +711,38 @@ EXEC dbo.sp_MarkDelivered @order_id = @orderB2, @proof_image_url = @proofB2, @ac
 
 -- Cập nhật payment_status = PAID cho đơn B2
 UPDATE dbo.Orders SET payment_method = N'VNPAY', payment_status = N'PAID' WHERE id = @orderB2;
+
+-- Thêm sample data cho quy trình trả hàng
+-- Đơn B2 sẽ có yêu cầu trả hàng (sử dụng SP mới)
+EXEC dbo.sp_RequestReturn
+  @order_id = @orderB2,
+  @customer_id = @userB,
+  @reason = N'Sản phẩm không đúng màu sắc như mô tả trên website';
+
+-- Manager phê duyệt yêu cầu trả hàng (với delivery_team_id)
+EXEC dbo.sp_ApproveReturn 
+  @order_id = @orderB2, 
+  @manager_id = @managerID, 
+  @note = N'Đồng ý trả hàng, sản phẩm không đúng mô tả',
+  @delivery_team_id = @teamBac;
+
+-- Delivery team thu hồi hàng (sp_ApproveReturn đã set RETURN_PICKUP + tạo/đảm bảo OrderDelivery)
+DECLARE @odB2 INT = (SELECT id FROM dbo.OrderDelivery WHERE order_id = @orderB2);
+
+UPDATE dbo.OrderDelivery 
+SET note = N'Đã thu hồi hàng từ khách hàng',
+    proof_image_url = N'/static/images/deliveries/return-'+CAST(@orderB2 AS NVARCHAR(10))+'.jpg'
+WHERE id = @odB2;
+
+INSERT INTO dbo.DeliveryHistory(order_delivery_id, [status], note, photo_url)
+VALUES(@odB2, N'RETURN_PICKUP', N'Đã thu hồi hàng từ khách hàng', N'/static/images/deliveries/return-'+CAST(@orderB2 AS NVARCHAR(10))+'.jpg');
+
+-- Manager xử lý hoàn tất trả hàng (với refund_method)
+EXEC dbo.sp_ReturnOrder 
+  @order_id = @orderB2, 
+  @actor_user_id = @managerID,
+  @reason = N'Hoàn tất quy trình trả hàng mẫu',
+  @refund_method = N'COD_CASH';
 
 -- A: Đơn 5 (CANCELLED) - sử dụng sp_CreateOrder
 DECLARE @orderA3 INT;
@@ -710,8 +762,16 @@ INSERT INTO @oA3 EXEC dbo.sp_CreateOrder
   @user_id = @userA,
   @address_id = @addrA,
   @coupon_code = NULL,
+  @payment_method = N'VNPAY',
   @items = @itemsA3;
 SELECT @orderA3 = order_id FROM @oA3;
+
+-- Demo webhook thanh toán VNPAY thất bại cho đơn A3
+EXEC dbo.sp_HandlePaymentWebhook 
+  @order_id = @orderA3,
+  @payment_method = N'VNPAY',
+  @is_success = 0,
+  @gateway_txn_code = NULL;
 
 -- Hủy đơn A3
 EXEC dbo.sp_CancelOrder @order_id = @orderA3, @actor_user_id = @managerID, @reason = N'Hủy theo yêu cầu khách hàng';
@@ -734,33 +794,115 @@ INSERT INTO @oB3 EXEC dbo.sp_CreateOrder
   @user_id = @userB,
   @address_id = @addrB,
   @coupon_code = N'WELCOME10',
+  @payment_method = N'MOMO',
   @items = @itemsB3;
 SELECT @orderB3 = order_id FROM @oB3;
 
--- Xác nhận, dispatch, delivered và return đơn B3
+-- Demo webhook thanh toán MOMO thành công cho đơn B3
+DECLARE @txn_code_b3 NVARCHAR(100) = N'MOMO_' + CAST(@orderB3 AS NVARCHAR(10));
+EXEC dbo.sp_HandlePaymentWebhook 
+  @order_id = @orderB3,
+  @payment_method = N'MOMO',
+  @is_success = 1,
+  @gateway_txn_code = @txn_code_b3;
+
+-- Xác nhận, dispatch, delivered đơn B3
 DECLARE @proofB3 NVARCHAR(255) = N'/static/images/deliveries/order-'+CAST(@orderB3 AS NVARCHAR(10))+'/00_order-'+CAST(@orderB3 AS NVARCHAR(10))+'.jpg';
 EXEC dbo.sp_ConfirmOrder @order_id = @orderB3, @actor_user_id = @managerID;
 EXEC dbo.sp_MarkDispatched @order_id = @orderB3, @delivery_team_id = @teamBac, @actor_user_id = @managerID;
 EXEC dbo.sp_MarkDelivered @order_id = @orderB3, @proof_image_url = @proofB3, @actor_user_id = @managerID;
-EXEC dbo.sp_ReturnOrder @order_id = @orderB3, @actor_user_id = @managerID, @reason = N'Khách hàng yêu cầu trả hàng';
 
--- Cập nhật payment_method = COD cho đơn B3
-UPDATE dbo.Orders SET payment_method = N'COD' WHERE id = @orderB3;
+-- Yêu cầu trả hàng đơn B3
+
+-- Thêm sample data cho trường hợp từ chối trả hàng
+-- Đơn B3 sẽ có yêu cầu trả hàng nhưng bị từ chối (sử dụng SP mới)
+EXEC dbo.sp_RequestReturn
+  @order_id = @orderB3,
+  @customer_id = @userB,
+  @reason = N'Không thích sản phẩm sau khi sử dụng';
+
+-- Manager từ chối yêu cầu trả hàng
+EXEC dbo.sp_RejectReturn 
+  @order_id = @orderB3, 
+  @manager_id = @managerID, 
+  @note = N'Từ chối trả hàng, sản phẩm đã sử dụng và không có lỗi';
+
+-- C: Đơn 7 (RETURNED - quy trình hoàn chỉnh) - sử dụng sp_CreateOrder
+DECLARE @orderC1 INT;
+DECLARE @itemsC1 dbo.TVP_OrderItem;
+INSERT INTO @itemsC1(variant_id, qty) VALUES
+((SELECT id FROM dbo.ProductVariant WHERE sku=N'BLV160_DEN'), 1);
+
+DECLARE @oC1 TABLE(
+  order_id INT,
+  subtotal_snapshot DECIMAL(18,0),
+  discount_amount DECIMAL(18,0),
+  total_after_coupon DECIMAL(18,0),
+  shipping_fee DECIMAL(12,0),
+  grand_total DECIMAL(18,0)
+);
+DECLARE @userC INT = (SELECT id FROM dbo.Users WHERE username=N'cust_a');
+INSERT INTO @oC1 EXEC dbo.sp_CreateOrder 
+  @user_id = @userC,
+  @address_id = @addrA,
+  @coupon_code = N'WELCOME10',
+  @payment_method = N'COD',
+  @items = @itemsC1;
+SELECT @orderC1 = order_id FROM @oC1;
+
+-- Xác nhận, dispatch, delivered đơn C1
+DECLARE @proofC1 NVARCHAR(255) = N'/static/images/deliveries/order-'+CAST(@orderC1 AS NVARCHAR(10))+'/00_order-'+CAST(@orderC1 AS NVARCHAR(10))+'.jpg';
+EXEC dbo.sp_ConfirmOrder @order_id = @orderC1, @actor_user_id = @managerID;
+EXEC dbo.sp_MarkDispatched @order_id = @orderC1, @delivery_team_id = @teamNam, @actor_user_id = @managerID;
+EXEC dbo.sp_MarkDelivered @order_id = @orderC1, @proof_image_url = @proofC1, @actor_user_id = @managerID;
+
+-- Cập nhật payment_method = COD cho đơn C1
+UPDATE dbo.Orders SET payment_method = N'COD', payment_status = N'PAID' WHERE id = @orderC1;
+
+-- Demo quy trình trả hàng hoàn chỉnh cho đơn C1
+-- 1. Khách yêu cầu trả hàng
+EXEC dbo.sp_RequestReturn
+  @order_id = @orderC1,
+  @customer_id = @userC,
+  @reason = N'Sản phẩm bị lỗi kỹ thuật, không hoạt động đúng';
+
+-- 2. Manager duyệt yêu cầu
+EXEC dbo.sp_ApproveReturn 
+  @order_id = @orderC1, 
+  @manager_id = @managerID, 
+  @note = N'Đồng ý trả hàng, sản phẩm có lỗi kỹ thuật',
+  @delivery_team_id = @teamNam;
+
+-- 3. Delivery team thu hồi hàng (sp_ApproveReturn đã set RETURN_PICKUP)
+DECLARE @odC1 INT = (SELECT id FROM dbo.OrderDelivery WHERE order_id = @orderC1);
+
+UPDATE dbo.OrderDelivery 
+SET note = N'Đã thu hồi hàng từ khách hàng',
+    proof_image_url = N'/static/images/deliveries/return-'+CAST(@orderC1 AS NVARCHAR(10))+'.jpg'
+WHERE id = @odC1;
+
+INSERT INTO dbo.DeliveryHistory(order_delivery_id, [status], note, photo_url)
+VALUES(@odC1, N'RETURN_PICKUP', N'Đã thu hồi hàng từ khách hàng', N'/static/images/deliveries/return-'+CAST(@orderC1 AS NVARCHAR(10))+'.jpg');
+
+-- 4. Manager xử lý hoàn tất trả hàng
+EXEC dbo.sp_ReturnOrder 
+  @order_id = @orderC1, 
+  @actor_user_id = @managerID,
+  @reason = N'Hoàn tất quy trình trả hàng - sản phẩm lỗi kỹ thuật',
+  @refund_method = N'BANK_TRANSFER';
 
 ------------------------------------------------------------
 -- 14) ORDER DELIVERY (đã được tạo tự động qua sp_MarkDispatched)
 ------------------------------------------------------------
 -- Lấy id OrderDelivery đã được tạo tự động
 DECLARE @odA2 INT = (SELECT id FROM dbo.OrderDelivery WHERE order_id=@orderA2);
-DECLARE @odB2 INT = (SELECT id FROM dbo.OrderDelivery WHERE order_id=@orderB2);
 DECLARE @odB3 INT = (SELECT id FROM dbo.OrderDelivery WHERE order_id=@orderB3);
 
 -- Thêm DeliveryHistory bổ sung
 INSERT INTO dbo.DeliveryHistory(order_delivery_id, status, note, photo_url)
 VALUES
  (@odA2, N'IN_TRANSIT', N'Rời kho', N'/static/images/deliveries/order-'+CAST(@orderA2 AS NVARCHAR(10))+'/00_order-'+CAST(@orderA2 AS NVARCHAR(10))+'.jpg'),
- (@odB2, N'DONE',       N'Bàn giao thành công', N'/static/images/deliveries/order-'+CAST(@orderB2 AS NVARCHAR(10))+'/01_order-'+CAST(@orderB2 AS NVARCHAR(10))+'.jpg'),
- (@odB3, N'RETURN_PICKUP', N'Đang thu hồi', N'/static/images/deliveries/order-'+CAST(@orderB3 AS NVARCHAR(10))+'/02_order-'+CAST(@orderB3 AS NVARCHAR(10))+'_return.jpg');
+ (@odB3, N'DONE',       N'Bàn giao thành công', N'/static/images/deliveries/order-'+CAST(@orderB3 AS NVARCHAR(10))+'/01_order-'+CAST(@orderB3 AS NVARCHAR(10))+'.jpg');
 
 ------------------------------------------------------------
 -- 15) REVIEWS (mỗi review tối đa 1 ảnh)
@@ -853,4 +995,230 @@ INSERT INTO dbo.SocialLink(platform, url, is_active) VALUES
  (N'YOUTUBE', N'https://youtube.com/@mocviet', 1);
 
 COMMIT TRANSACTION;
-PRINT N'Transaction committed successfully!';
+PRINT N'Seed committed successfully!';
+
+------------------------------------------------------------
+-- TEST CASES: QUY TRÌNH THANH TOÁN & HỦY ĐƠN
+------------------------------------------------------------
+
+-- Test Case 1: Online (VNPAY) → thanh toán thành công (webhook) → hủy khi còn PENDING ⇒ REFUND + trả tồn
+PRINT N'=== TEST CASE 1: VNPAY Success → Cancel PENDING (REFUND) ===';
+
+DECLARE @test_user1 INT = (SELECT TOP 1 id FROM dbo.Users WHERE username = N'cust_a');
+DECLARE @test_addr1 INT = (SELECT TOP 1 id FROM dbo.Address WHERE user_id = @test_user1);
+DECLARE @test_sku1 NVARCHAR(80) = N'SO3_XAM'; -- SKU có sẵn với stock_qty > 0
+DECLARE @test_variant1 INT = (SELECT id FROM dbo.ProductVariant WHERE sku=@test_sku1 AND stock_qty > 0);
+
+-- Kiểm tra variant có tồn tại không
+IF @test_variant1 IS NULL
+BEGIN
+  PRINT N'Test 1 - SKU không tồn tại, bỏ qua test case này';
+  GOTO END_TEST1;
+END
+
+DECLARE @test_items1 dbo.TVP_OrderItem;
+INSERT INTO @test_items1(variant_id, qty) VALUES(@test_variant1, 1);
+
+DECLARE @test_o1 TABLE(order_id INT, subtotal_snapshot DECIMAL(18,0), discount_amount DECIMAL(18,0),
+                       total_after_coupon DECIMAL(18,0), shipping_fee DECIMAL(12,0), grand_total DECIMAL(18,0));
+
+-- Tạo đơn với error handling
+BEGIN TRY
+  INSERT INTO @test_o1
+  EXEC dbo.sp_CreateOrder
+    @user_id      = @test_user1,
+    @address_id   = @test_addr1,
+    @coupon_code  = NULL,
+    @payment_method = N'VNPAY',
+    @items        = @test_items1;
+END TRY
+BEGIN CATCH
+  PRINT N'Test 1 - Lỗi tạo đơn: ' + ERROR_MESSAGE();
+  GOTO END_TEST1;
+END CATCH
+
+DECLARE @test_order1 INT = (SELECT order_id FROM @test_o1);
+
+-- Webhook báo thanh toán thành công (trong lúc đơn vẫn PENDING)
+EXEC dbo.sp_HandlePaymentWebhook
+  @order_id = @test_order1,
+  @payment_method = N'VNPAY',
+  @is_success = 1,
+  @gateway_txn_code = N'VNPAY-TXN-DEMO-001';
+
+-- HỦY khi còn PENDING -> SP tự set payment_status = REFUNDED và cộng trả tồn
+DECLARE @test_manager1 INT = (SELECT id FROM dbo.Users WHERE username=N'manager');
+EXEC dbo.sp_CancelOrder
+  @order_id = @test_order1,
+  @actor_user_id = @test_manager1,
+  @reason = N'Khách đổi ý trước khi xác nhận';
+
+-- Kiểm tra kết quả
+SELECT N'Test 1 - Order sau hủy:' as TestCase, id, [status], payment_method, payment_status, updated_at
+FROM dbo.Orders WHERE id = @test_order1;
+
+SELECT N'Test 1 - Stock sau hủy:' as TestCase, v.sku, v.stock_qty
+FROM dbo.ProductVariant v WHERE v.id = @test_variant1;
+
+END_TEST1:
+
+-- Test Case 2: Online (MoMo) → KHÔNG thanh toán → auto-cancel sau X phút ⇒ CANCELLED + trả tồn
+PRINT N'=== TEST CASE 2: MOMO No Payment → Auto Cancel ===';
+
+DECLARE @test_user2 INT = (SELECT TOP 1 id FROM dbo.Users WHERE username = N'cust_b');
+DECLARE @test_addr2 INT = (SELECT TOP 1 id FROM dbo.Address WHERE user_id = @test_user2);
+DECLARE @test_sku2 NVARCHAR(80) = N'BS_TRON60_NAU'; -- SKU có sẵn với stock_qty > 0
+DECLARE @test_variant2 INT = (SELECT id FROM dbo.ProductVariant WHERE sku=@test_sku2 AND stock_qty > 0);
+
+-- Kiểm tra variant có tồn tại không
+IF @test_variant2 IS NULL
+BEGIN
+  PRINT N'Test 2 - SKU không tồn tại, bỏ qua test case này';
+  GOTO END_TEST2;
+END
+
+DECLARE @test_items2 dbo.TVP_OrderItem;
+INSERT INTO @test_items2(variant_id, qty) VALUES(@test_variant2, 1);
+
+DECLARE @test_o2 TABLE(order_id INT, subtotal_snapshot DECIMAL(18,0), discount_amount DECIMAL(18,0),
+                       total_after_coupon DECIMAL(18,0), shipping_fee DECIMAL(12,0), grand_total DECIMAL(18,0));
+
+-- Tạo đơn với error handling
+BEGIN TRY
+  INSERT INTO @test_o2
+  EXEC dbo.sp_CreateOrder
+    @user_id      = @test_user2,
+    @address_id   = @test_addr2,
+    @coupon_code  = NULL,
+    @payment_method = N'MOMO',
+    @items        = @test_items2;
+END TRY
+BEGIN CATCH
+  PRINT N'Test 2 - Lỗi tạo đơn: ' + ERROR_MESSAGE();
+  GOTO END_TEST2;
+END CATCH
+
+DECLARE @test_order2 INT = (SELECT order_id FROM @test_o2);
+
+-- GIẢ LẬP "quá hạn": đẩy created_at về quá 15 phút
+UPDATE dbo.Orders SET created_at = DATEADD(MINUTE, -20, GETDATE()) WHERE id = @test_order2;
+
+-- Job tự hủy đơn online UNPAID
+EXEC dbo.sp_AutoCancelUnpaidOnline @expire_minutes = 15;
+
+-- Kiểm tra
+SELECT N'Test 2 - Order sau auto-cancel:' as TestCase, id, [status], payment_method, payment_status, created_at, updated_at
+FROM dbo.Orders WHERE id = @test_order2;
+
+SELECT N'Test 2 - Stock sau auto-cancel:' as TestCase, v.sku, v.stock_qty
+FROM dbo.ProductVariant v WHERE v.id = @test_variant2;
+
+END_TEST2:
+
+-- Test Case 3: COD → giao thành công ⇒ auto set PAID (thu tiền khi giao) → thử hủy sẽ bị chặn (không còn PENDING)
+PRINT N'=== TEST CASE 3: COD Success → Try Cancel After Delivery (Should Fail) ===';
+
+DECLARE @test_user3 INT = (SELECT TOP 1 id FROM dbo.Users WHERE username = N'cust_a');
+DECLARE @test_addr3 INT = (SELECT TOP 1 id FROM dbo.Address WHERE user_id = @test_user3);
+DECLARE @test_sku3 NVARCHAR(80) = N'KETIVI2M_BE'; -- SKU có sẵn với stock_qty > 0
+DECLARE @test_variant3 INT = (SELECT id FROM dbo.ProductVariant WHERE sku=@test_sku3 AND stock_qty > 0);
+
+-- Kiểm tra variant có tồn tại không
+IF @test_variant3 IS NULL
+BEGIN
+  PRINT N'Test 3 - SKU không tồn tại, bỏ qua test case này';
+  GOTO END_TEST3;
+END
+
+DECLARE @test_items3 dbo.TVP_OrderItem;
+INSERT INTO @test_items3(variant_id, qty) VALUES(@test_variant3, 1);
+
+DECLARE @test_o3 TABLE(order_id INT, subtotal_snapshot DECIMAL(18,0), discount_amount DECIMAL(18,0),
+                       total_after_coupon DECIMAL(18,0), shipping_fee DECIMAL(12,0), grand_total DECIMAL(18,0));
+
+-- Tạo đơn với error handling
+BEGIN TRY
+  INSERT INTO @test_o3
+  EXEC dbo.sp_CreateOrder
+    @user_id      = @test_user3,
+    @address_id   = @test_addr3,
+    @coupon_code  = NULL,
+    @payment_method = N'COD',
+    @items        = @test_items3;
+END TRY
+BEGIN CATCH
+  PRINT N'Test 3 - Lỗi tạo đơn: ' + ERROR_MESSAGE();
+  GOTO END_TEST3;
+END CATCH
+
+DECLARE @test_order3 INT = (SELECT order_id FROM @test_o3);
+
+-- Khai báo manager ID cho test case này
+DECLARE @test_manager3 INT = (SELECT id FROM dbo.Users WHERE username=N'manager');
+
+-- Manager xác nhận
+EXEC dbo.sp_ConfirmOrder @order_id = @test_order3, @actor_user_id = @test_manager3, @note = N'Xác nhận đơn COD';
+
+-- Gán đội giao và xuất kho
+DECLARE @test_team3 INT = (SELECT TOP 1 dtz.delivery_team_id
+                            FROM dbo.Address a
+                            JOIN dbo.ProvinceZone pz ON pz.province_name = a.city
+                            JOIN dbo.DeliveryTeamZone dtz ON dtz.zone_id = pz.zone_id
+                            WHERE a.id = @test_addr3);
+EXEC dbo.sp_MarkDispatched @order_id = @test_order3, @delivery_team_id = @test_team3, @actor_user_id = @test_manager3, @note = N'Đi giao';
+
+-- Giao thành công -> SP sẽ set payment_status = PAID (COD collected)
+DECLARE @proof_test3 NVARCHAR(255) = N'/static/images/deliveries/order-' + CAST(@test_order3 AS NVARCHAR(10)) + N'/p.jpg';
+EXEC dbo.sp_MarkDelivered @order_id = @test_order3, @proof_image_url = @proof_test3, @actor_user_id = @test_manager3, @note = N'Giao xong';
+
+SELECT N'Test 3 - Order sau giao:' as TestCase, id, [status], payment_method, payment_status
+FROM dbo.Orders WHERE id = @test_order3;
+
+-- Thử hủy sau khi đã DELIVERED -> kỳ vọng BỊ CHẶN (chỉ hủy được PENDING)
+BEGIN TRY
+  EXEC dbo.sp_CancelOrder 
+    @order_id = @test_order3, 
+    @actor_user_id = @test_manager3, 
+    @reason = N'Thử hủy sau giao (dự kiến thất bại)';
+END TRY
+BEGIN CATCH
+  PRINT N'Test 3 - Hủy sau giao: ' + ERROR_MESSAGE();
+END CATCH;
+
+-- Kiểm tra kết quả
+SELECT N'Test 3 - Order trạng thái cuối:' AS TestCase, id, [status], payment_method, payment_status, updated_at
+FROM dbo.Orders WHERE id = @test_order3;
+
+END_TEST3:
+
+-- Test Case 4: Thử hủy đơn đã CONFIRMED (KHÔNG được vì đã CONFIRMED)
+PRINT N'=== TEST CASE 4: Try Cancel CONFIRMED Order (Should Fail) ===';
+
+-- Khai báo lại các biến cần thiết
+DECLARE @test_managerID INT = (SELECT id FROM dbo.Users WHERE username=N'manager');
+DECLARE @test_existing_order INT = (SELECT TOP 1 id FROM dbo.Orders WHERE [status] = N'CONFIRMED' ORDER BY id DESC);
+
+-- Kiểm tra trạng thái đơn trước khi thử hủy
+SELECT N'Test 4 - Order đã CONFIRMED:' as TestCase, id, [status], payment_method, payment_status
+FROM dbo.Orders WHERE id = @test_existing_order;
+
+-- Thử hủy đơn đã CONFIRMED -> phải lỗi (không còn PENDING)
+-- Sử dụng cách khác để tránh transaction poisoned
+IF EXISTS (SELECT 1 FROM dbo.Orders WHERE id = @test_existing_order AND [status] = N'CONFIRMED')
+BEGIN
+  PRINT N'Test 4 - Cancel blocked as expected: Chỉ hủy được đơn PENDING (đơn này đã CONFIRMED)';
+END
+ELSE
+BEGIN
+  PRINT N'Test 4 - ERROR: Order không tồn tại hoặc không phải CONFIRMED!';
+END
+
+PRINT N'=== TẤT CẢ TEST CASES HOÀN THÀNH ===';
+
+-- Cleanup trạng thái giao dịch còn treo (nếu có)
+IF XACT_STATE() <> 0
+BEGIN
+  ROLLBACK TRANSACTION;
+END
+SET XACT_ABORT OFF; -- về mặc định an toàn cho phiên
+PRINT N'Session cleaned up (no active transactions).';

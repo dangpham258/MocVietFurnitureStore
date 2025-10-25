@@ -15,36 +15,36 @@
 
 ## 3.1.2. Phía Người mua (Customer)
 
-| STT | Chức năng                 | Mô tả chi tiết                                                                                                                                             |
-| --- | ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | Đăng nhập                 | Đăng nhập bằng username/email và mật khẩu. Hệ thống ghi nhớ phiên đăng nhập                                                                                |
-| 2   | Đăng xuất                 | Đăng xuất khỏi hệ thống, xóa session và cookie                                                                                                             |
-| 3   | Quên mật khẩu             | Nhập email → hệ thống gửi OTP → nhập OTP → tạo mật khẩu mới                                                                                                |
-| 4   | Quản lý tài khoản cá nhân | Thay đổi mật khẩu, cập nhật họ tên, giới tính, ngày sinh, SĐT                                                                                              |
-| 5   | Quản lý địa chỉ cá nhân   | Xem danh sách địa chỉ, thêm/sửa/xóa địa chỉ giao hàng, đặt địa chỉ mặc định. Mỗi địa chỉ có: tên người nhận, SĐT, địa chỉ chi tiết, tỉnh/thành, quận/huyện |
-| 6   | Quản lý giỏ hàng          | Xem tổng quan giỏ hàng, thêm sản phẩm với số lượng, cập nhật số lượng, xóa sản phẩm. Kiểm tra tồn kho real-time                                            |
-| 7   | Đặt hàng                  | Chọn địa chỉ giao hàng, áp dụng mã giảm giá (validate ngưỡng tối thiểu), chọn phương thức thanh toán (COD/VNPAY/MOMO), xác nhận đơn hàng → PENDING         |
-| 8   | Quản lý đơn hàng          | Xem lịch sử đơn hàng theo thời gian, theo dõi trạng thái đơn hàng (PENDING/CONFIRMED/DISPATCHED/DELIVERED/CANCELLED/RETURNED), hủy đơn (chỉ khi PENDING)   |
-| 9   | Xem chi tiết đơn hàng     | Xem thông tin chi tiết: danh sách sản phẩm với số lượng và giá tại thời điểm mua, tổng tiền, địa chỉ giao, trạng thái, lịch sử thay đổi trạng thái         |
-| 10  | Đánh giá sản phẩm         | Đánh giá sản phẩm đã mua và giao thành công (DELIVERED). Rating 1-5 sao, nội dung đánh giá, đính kèm 1 hình ảnh. Mỗi lần mua có thể đánh giá riêng         |
-| 11  | Quản lý yêu thích         | Thêm/xóa sản phẩm vào wishlist, xem danh sách yêu thích, nhận thông báo khi sản phẩm từ hết hàng → có hàng trở lại                                         |
-| 12  | Lịch sử xem               | Xem lịch sử 20 sản phẩm đã xem gần nhất, sắp xếp theo thời gian xem                                                                                        |
-| 13  | Chat hỗ trợ               | Gửi tin nhắn cho manager qua chatbox, đính kèm hình ảnh. Xem lịch sử conversation                                                                          |
-| 14  | Nhận thông báo            | Nhận thông báo về: đặt hàng thành công, thay đổi trạng thái đơn hàng, sản phẩm yêu thích có hàng trở lại, phản hồi từ cửa hàng về đánh giá                 |
+| STT | Chức năng                 | Mô tả chi tiết                                                                                                                                                                                                    |
+| --- | ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Đăng nhập                 | Đăng nhập bằng username/email và mật khẩu. Hệ thống ghi nhớ phiên đăng nhập                                                                                                                                       |
+| 2   | Đăng xuất                 | Đăng xuất khỏi hệ thống, xóa session và cookie                                                                                                                                                                    |
+| 3   | Quên mật khẩu             | Nhập email → hệ thống gửi OTP → nhập OTP → tạo mật khẩu mới                                                                                                                                                       |
+| 4   | Quản lý tài khoản cá nhân | Thay đổi mật khẩu, cập nhật họ tên, giới tính, ngày sinh, SĐT                                                                                                                                                     |
+| 5   | Quản lý địa chỉ cá nhân   | Xem danh sách địa chỉ, thêm/sửa/xóa địa chỉ giao hàng, đặt địa chỉ mặc định. Mỗi địa chỉ có: tên người nhận, SĐT, địa chỉ chi tiết, tỉnh/thành, quận/huyện                                                        |
+| 6   | Quản lý giỏ hàng          | Xem tổng quan giỏ hàng, thêm sản phẩm với số lượng, cập nhật số lượng, xóa sản phẩm. Kiểm tra tồn kho real-time                                                                                                   |
+| 7   | Đặt hàng                  | Chọn địa chỉ giao hàng, áp dụng mã giảm giá (validate ngưỡng tối thiểu), chọn phương thức thanh toán (COD/VNPAY/MOMO), xác nhận đơn hàng → PENDING. Với online: redirect sang gateway, webhook xác nhận → PAID    |
+| 8   | Quản lý đơn hàng          | Xem lịch sử đơn hàng theo thời gian, theo dõi trạng thái đơn hàng (PENDING/CONFIRMED/DISPATCHED/DELIVERED/CANCELLED/RETURNED), hủy đơn (chỉ khi PENDING), yêu cầu trả hàng (khi DELIVERED trong 30 ngày)          |
+| 9   | Xem chi tiết đơn hàng     | Xem thông tin chi tiết: danh sách sản phẩm với số lượng và giá tại thời điểm mua, tổng tiền, địa chỉ giao, trạng thái, lịch sử thay đổi trạng thái                                                                |
+| 10  | Đánh giá sản phẩm         | Đánh giá sản phẩm đã mua và giao thành công (DELIVERED). Rating 1-5 sao, nội dung đánh giá, đính kèm 1 hình ảnh. Mỗi lần mua có thể đánh giá riêng                                                                |
+| 11  | Quản lý yêu thích         | Thêm/xóa sản phẩm vào wishlist, xem danh sách yêu thích, nhận thông báo khi sản phẩm từ hết hàng → có hàng trở lại                                                                                                |
+| 12  | Lịch sử xem               | Xem lịch sử 20 sản phẩm đã xem gần nhất, sắp xếp theo thời gian xem                                                                                                                                               |
+| 13  | Chat hỗ trợ               | Gửi tin nhắn cho manager qua chatbox, đính kèm hình ảnh. Xem lịch sử conversation                                                                                                                                 |
+| 14  | Nhận thông báo            | Nhận thông báo về: đặt hàng thành công, thay đổi trạng thái đơn hàng, sản phẩm yêu thích có hàng trở lại, phản hồi từ cửa hàng về đánh giá, yêu cầu trả hàng được duyệt/từ chối, đơn hàng đã được trả & hoàn tiền |
 
 ## 3.1.3. Phía Quản lý cửa hàng (Manager)
 
-| STT | Chức năng                  | Mô tả                                                                                          |
-| --- | -------------------------- | ---------------------------------------------------------------------------------------------- |
-| 1   | Quản lý tài khoản bản thân | Cập nhật hồ sơ hoặc đổi mật khẩu tài khoản bản thân                                            |
-| 2   | Quản lý sản phẩm           | Thêm/sửa/vô hiệu hóa sản phẩm, quản lý biến thể (màu sắc, kích thước), cập nhật giá và tồn kho |
-| 3   | Quản lý đơn hàng           | Xác nhận đơn (PENDING→CONFIRMED), hủy đơn của customer, xem các đơn hàng đã hoàn thành         |
-| 4   | Phân công đội giao hàng    | Phân công đơn hàng cho đội giao hàng phù hợp theo khu vực                                      |
-| 5   | Quản lý tin tức            | Thêm/sửa/ẩn bài viết của chính mình, xem danh sách bài viết đã đăng                            |
-| 6   | Quản lý đánh giá/bình luận | Xem tất cả đánh giá, trả lời đánh giá của khách hàng, ẩn/hiện đánh giá                         |
-| 7   | Trả lời tin nhắn           | Trả lời các tin nhắn từ chatbox của guest và customer                                          |
-| 8   | Quản lý tồn kho            | Nhận thông báo khi tồn kho thấp hoặc hết hàng, cập nhật số lượng tồn                           |
-| 9   | Báo cáo cơ bản             | Doanh thu theo ngày/tháng, sản phẩm bán chạy, đơn hàng theo trạng thái                         |
+| STT | Chức năng                  | Mô tả                                                                                                                  |
+| --- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| 1   | Quản lý tài khoản bản thân | Cập nhật hồ sơ hoặc đổi mật khẩu tài khoản bản thân                                                                    |
+| 2   | Quản lý sản phẩm           | Thêm/sửa/vô hiệu hóa sản phẩm, quản lý biến thể (màu sắc, kích thước), cập nhật giá và tồn kho                         |
+| 3   | Quản lý đơn hàng           | Xác nhận đơn (PENDING→CONFIRMED), hủy đơn của customer, xem các đơn hàng đã hoàn thành, duyệt/từ chối yêu cầu trả hàng |
+| 4   | Phân công đội giao hàng    | Phân công đơn hàng cho đội giao hàng phù hợp theo khu vực                                                              |
+| 5   | Quản lý tin tức            | Thêm/sửa/ẩn bài viết của chính mình, xem danh sách bài viết đã đăng                                                    |
+| 6   | Quản lý đánh giá/bình luận | Xem tất cả đánh giá, trả lời đánh giá của khách hàng, ẩn/hiện đánh giá                                                 |
+| 7   | Trả lời tin nhắn           | Trả lời các tin nhắn từ chatbox của guest và customer                                                                  |
+| 8   | Quản lý tồn kho            | Nhận thông báo khi tồn kho thấp hoặc hết hàng, cập nhật số lượng tồn                                                   |
+| 9   | Báo cáo cơ bản             | Doanh thu theo ngày/tháng, sản phẩm bán chạy, đơn hàng theo trạng thái                                                 |
 
 ## 3.1.4. Phía Admin
 
@@ -69,17 +69,16 @@
 
 ## 3.1.5. Phía Delivery (Đội ngũ vận chuyển)
 
-| STT | Chức năng                     | Mô tả                                                                         |
-| --- | ----------------------------- | ----------------------------------------------------------------------------- |
-| 1   | Quản lý tài khoản bản thân    | Cập nhật hồ sơ hoặc đổi mật khẩu tài khoản bản thân                           |
-| 2   | Quản lý đơn hàng được giao    | Xem danh sách đơn hàng được phân công cho đội của mình                        |
-| 3   | Xem chi tiết đơn hàng         | Xem thông tin sản phẩm, địa chỉ giao, thông tin khách hàng, ghi chú           |
-| 4   | Cập nhật trạng thái giao hàng | Cập nhật trạng thái: RECEIVED → IN_TRANSIT → DONE                             |
-| 5   | Thu hồi hàng                  | Cập nhật trạng thái RETURN_PICKUP khi cần thu hồi hàng                        |
-| 6   | Xác nhận giao hàng            | Chụp ảnh bàn giao, ghi chú vấn đề phát sinh                                   |
-| 7   | Liên hệ khách hàng            | Xem số điện thoại khách hàng để liên hệ                                       |
-| 8   | Báo cáo và thống kê           | Xem lịch sử đơn hàng đã giao, thống kê số đơn hoàn thành theo ngày/tuần/tháng |
-| 9   | Nhận thông báo                | Nhận thông báo khi được phân công đơn mới, yêu cầu thu hồi                    |
+| STT | Chức năng                  | Mô tả chi tiết                                                                                                                                                                                                                                                                                                                    |
+| --- | -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Quản lý tài khoản bản thân | Cập nhật hồ sơ hoặc đổi mật khẩu                                                                                                                                                                                                                                                                                                  |
+| 2   | Quản lý đơn hàng được giao | Xem các đơn đã DISPATCHED có OrderDelivery.status = IN_TRANSIT hoặc RETURN_PICKUP (RETURN_PICKUP chỉ xuất hiện sau khi Manager duyệt sp_ApproveReturn)                                                                                                                                                                            |
+| 3   | Xem chi tiết đơn hàng      | Xem sản phẩm, địa chỉ, SĐT khách, ghi chú, lịch sử giao nhận                                                                                                                                                                                                                                                                      |
+| 4   | Xác nhận giao hàng         | Upload ảnh bàn giao (tùy chọn) + ghi chú → gọi sp_MarkDelivered(order_id, proof_image_url, ...). Hệ thống cập nhật: Orders.status = DELIVERED, OrderDelivery.status = DONE, log lịch sử & thông báo Customer                                                                                                                      |
+| 5   | Thu hồi hàng               | Chỉ xuất hiện sau khi Manager duyệt (đơn có OrderDelivery.status = RETURN_PICKUP). Delivery chọn refund_method và ghi chú → gọi sp_ReturnOrder(order_id, refund_method, ...). Hệ thống: Orders.status = RETURNED, return_status = PROCESSED, payment_status = REFUNDED, cộng tồn, OrderDelivery.status = DONE, thông báo Customer |
+| 6   | Liên hệ khách hàng         | Xem số điện thoại để liên hệ                                                                                                                                                                                                                                                                                                      |
+| 7   | Báo cáo & thống kê         | Lịch sử đơn đã DONE (giao/thu hồi), thống kê theo ngày/tuần/tháng                                                                                                                                                                                                                                                                 |
+| 8   | Nhận thông báo             | Khi được phân công, khi chuyển RETURN_PICKUP, khi đơn DONE                                                                                                                                                                                                                                                                        |
 
 ## 3.1.6. Hệ thống thông báo tự động
 
@@ -89,13 +88,19 @@
 | 2   | Thay đổi trạng thái đơn hàng | Customer   | Khi đơn hàng chuyển trạng thái               |
 | 3   | Sản phẩm có hàng trở lại     | Customer   | Khi sản phẩm yêu thích từ hết hàng → có hàng |
 | 4   | Phản hồi từ cửa hàng         | Customer   | Khi manager trả lời đánh giá                 |
-| 5   | Đơn hàng mới cần xử lý       | Manager    | Khi có đơn hàng mới                          |
-| 6   | Đánh giá mới                 | Manager    | Khi có đánh giá mới từ khách hàng            |
-| 7   | Tồn kho thấp/Hết hàng        | Manager    | Khi tồn kho xuống thấp hoặc hết              |
-| 8   | Tin nhắn mới từ khách        | Manager    | Khi có tin nhắn từ guest/customer            |
-| 9   | Bài viết mới                 | Admin      | Khi manager tạo bài viết mới                 |
-| 10  | Phân công đơn giao           | Delivery   | Khi được phân công đơn hàng mới              |
-| 11  | Yêu cầu thu hồi              | Delivery   | Khi đơn hàng cần thu hồi                     |
+| 5   | Yêu cầu trả hàng được duyệt  | Customer   | Khi manager duyệt yêu cầu trả hàng           |
+| 6   | Đơn hàng đã được trả         | Customer   | Khi hoàn tất quy trình trả hàng & hoàn tiền  |
+| 7   | Yêu cầu trả hàng bị từ chối  | Customer   | Khi manager từ chối yêu cầu trả hàng         |
+| 8   | Đơn hàng mới cần xử lý       | Manager    | Khi có đơn hàng mới                          |
+| 9   | Yêu cầu trả hàng mới         | Manager    | Khi customer gửi yêu cầu trả hàng            |
+| 10  | Đánh giá mới                 | Manager    | Khi có đánh giá mới từ khách hàng            |
+| 11  | Tồn kho thấp/Hết hàng        | Manager    | Khi tồn kho xuống thấp hoặc hết              |
+| 12  | Tin nhắn mới từ khách        | Manager    | Khi có tin nhắn từ guest/customer            |
+| 13  | Bài viết mới                 | Admin      | Khi manager tạo bài viết mới                 |
+| 14  | Phân công đơn giao           | Delivery   | Khi được phân công đơn hàng mới              |
+| 15  | Yêu cầu thu hồi              | Delivery   | Khi đơn hàng cần thu hồi                     |
+
+**Lưu ý:** Trigger `TR_Orders_NotifyStatusChange` hiện không bắn cho `RETURNED` (đã loại trừ), nên thông báo "Đơn hàng đã được trả" đến Customer sẽ đến từ `sp_ReturnOrder` (INSERT thẳng vào UserNotification), không phải trigger đổi trạng thái đơn.
 
 ## 3.1.7. Quy trình nghiệp vụ chính
 
@@ -121,6 +126,8 @@
 - Áp dụng mã giảm giá (nếu có)
 - Chọn phương thức thanh toán: COD/VNPAY/MOMO
 - Xác nhận đơn hàng → Trạng thái PENDING
+- **COD**: Chờ xác nhận từ Manager
+- **VNPAY/MOMO**: Redirect sang gateway → Webhook xác nhận → payment_status = PAID
 
 **Bước 4: Xử lý đơn hàng**
 
@@ -128,12 +135,14 @@
 - Kiểm tra tồn kho và xác nhận đơn → CONFIRMED
 - Chuẩn bị hàng và phân công đội giao → DISPATCHED
 - Delivery nhận hàng và giao → DELIVERED
+- **COD**: Tự động set payment_status = PAID khi giao thành công
 
 **Bước 5: Hoàn tất**
 
 - Customer nhận hàng và thanh toán (nếu COD)
 - Đánh giá sản phẩm (tùy chọn)
 - Đơn hàng hoàn tất
+- **Auto-cancel**: Đơn online UNPAID quá 15 phút → CANCELLED + hoàn kho
 
 ### 3.1.7.2. Quy trình quản lý tồn kho
 
@@ -142,6 +151,7 @@
 - Trừ tồn khi đặt hàng thành công
 - Cộng tồn khi hủy đơn (PENDING → CANCELLED)
 - Cộng tồn khi trả hàng (DELIVERED → RETURNED)
+- Cộng tồn khi auto-cancel đơn online UNPAID (quá 15 phút)
 
 **Cảnh báo tồn kho:**
 
@@ -166,8 +176,7 @@
 **Đơn hàng CONFIRMED:**
 
 - Manager chuẩn bị hàng
-- Manager phân công đội giao → DISPATCHED
-- Tạo OrderDelivery với trạng thái IN_TRANSIT
+- Manager phân công đội giao → DISPATCHED (tạo OrderDelivery với IN_TRANSIT)
 
 **Đơn hàng DISPATCHED:**
 
@@ -251,29 +260,50 @@
 - Manager chọn đơn hàng cần giao
 - Hệ thống tự động gợi ý đội giao theo khu vực
 - Manager xác nhận phân công
-- Tạo OrderDelivery với trạng thái RECEIVED
+- Phân công diễn ra đồng thời với thao tác DISPATCHED qua sp_MarkDispatched; hệ thống sẽ tạo/đặt OrderDelivery.status = IN_TRANSIT
 
 **Delivery xử lý:**
 
 - Nhận thông báo đơn hàng mới
 - Xem chi tiết đơn hàng và địa chỉ giao
-- Cập nhật trạng thái: RECEIVED → IN_TRANSIT → DONE
+- (Giao hàng thường): IN_TRANSIT → DONE (hoàn tất bằng sp_MarkDelivered)
+- (Thu hồi): RETURN_PICKUP → DONE (hoàn tất bằng sp_ReturnOrder)
 - Chụp ảnh bàn giao và ghi chú
 
 ### 3.1.7.9. Quy trình xử lý trả hàng
 
-**Yêu cầu trả hàng:**
+**Bước 1: Khách hàng yêu cầu trả hàng**
 
-- Customer liên hệ qua chat hoặc hotline
-- Manager xem xét lý do trả hàng
-- Quyết định chấp nhận/từ chối trả hàng
+Customer (đơn DELIVERED, ≤ 30 ngày) gửi yêu cầu → sp_RequestReturn.
 
-**Xử lý trả hàng:**
+Hệ thống: return_status = REQUESTED. Thông báo Manager.
 
-- Manager cập nhật đơn hàng → RETURNED
-- Delivery thu hồi hàng (RETURN_PICKUP)
-- Hệ thống tự động cộng lại tồn kho
-- Hoàn tiền cho khách hàng (nếu đã thanh toán)
+**Bước 2: Manager duyệt yêu cầu**
+
+Xem danh sách "REQUESTED".
+
+Duyệt → sp_ApproveReturn: nếu chưa có OrderDelivery thì chọn đội; hệ thống đảm bảo/tạo bản ghi & đặt OrderDelivery.status = RETURN_PICKUP. Thông báo Customer (Approved) & Delivery (Yêu cầu thu hồi).
+
+Từ chối → sp_RejectReturn: return_status = REJECTED. Thông báo Customer (lý do).
+
+**Bước 3: Delivery thu hồi & hoàn tất**
+
+Xử lý các đơn có RETURN_PICKUP.
+
+Delivery không tự đổi trạng thái sang RETURN_PICKUP; trạng thái này chỉ do Manager duyệt (sp_ApproveReturn).
+
+Kiểm tra hàng, chọn refund_method (COD_CASH/BANK_TRANSFER/VNPAY/MOMO), chụp ảnh/ghi chú → sp_ReturnOrder.
+
+Hệ thống tự động:
+
+- Orders.status = RETURNED
+- return_status = PROCESSED
+- payment_status = REFUNDED
+- Cộng lại tồn theo OrderItems
+- OrderDelivery.status = DONE
+- Thông báo Customer "Đã hoàn tiền".
+
+Không có bước Delivery tự đổi sang RETURN_PICKUP. Trạng thái này chỉ do Manager duyệt.
 
 ### 3.1.7.10. Quy trình báo cáo và thống kê
 
@@ -358,19 +388,28 @@
 
 - Thanh toán khi nhận hàng
 - Không cần tích hợp gateway
+- Tự động set payment_status = PAID khi giao thành công
 - Phí ship có thể tính riêng
 
 **VNPAY:**
 
 - Tích hợp API VNPAY
 - Hỗ trợ thẻ ATM, Visa, Mastercard
-- Webhook xác nhận thanh toán
+- Webhook xác nhận thanh toán qua `sp_HandlePaymentWebhook`
+- Auto-cancel nếu không thanh toán trong 15 phút
 
 **MOMO:**
 
 - Tích hợp API MoMo
 - QR code thanh toán
-- Xác nhận thanh toán real-time
+- Webhook xác nhận thanh toán qua `sp_HandlePaymentWebhook`
+- Auto-cancel nếu không thanh toán trong 15 phút
+
+**Auto-cancel System:**
+
+- Job chạy mỗi 5 phút gọi `sp_AutoCancelUnpaidOnline`
+- Hủy đơn online UNPAID quá 15 phút
+- Tự động hoàn kho và set status = CANCELLED
 
 ### 3.1.8.5. Quản lý hình ảnh và media
 

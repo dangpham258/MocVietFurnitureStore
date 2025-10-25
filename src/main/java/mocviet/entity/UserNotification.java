@@ -25,8 +25,8 @@ public class UserNotification {
     @Column(name = "title", nullable = false, length = 200)
     private String title;
     
-    @Column(name = "content", length = 1000)
-    private String content;
+    @Column(name = "message", length = 1000)
+    private String message;
     
     @Column(name = "is_read", nullable = false)
     private Boolean isRead = false;
