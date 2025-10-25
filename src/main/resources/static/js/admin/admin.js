@@ -4,8 +4,8 @@
 // File này chứa tất cả JavaScript cho admin panel
 // Bao gồm: sidebar toggle, form validation, search, modal, etc.
 
-console.log('Admin JS loaded successfully!');
-
+    console.log('Admin JS loaded successfully!');
+    
 // ========================================
 // KHỞI TẠO CÁC TÍNH NĂNG ADMIN
 // ========================================
@@ -74,67 +74,67 @@ function updateHeaderAndBreadcrumb(url) {
     const headerDescription = document.querySelector('.admin-header small');
     
     if (headerTitle && headerDescription) {
-        switch(url) {
-            case '/admin':
-            case '/admin/':
-            case '/admin/dashboard':
-            case '/admin/dashboard/':
-            case '/admin/dashboard/home':
+    switch(url) {
+        case '/admin':
+        case '/admin/':
+        case '/admin/dashboard':
+        case '/admin/dashboard/':
+        case '/admin/dashboard/home':
                 headerTitle.textContent = 'Dashboard Admin';
                 headerDescription.textContent = 'Tổng quan hệ thống Mộc Việt';
-                break;
-            case '/admin/users':
+            break;
+        case '/admin/users':
                 headerTitle.textContent = 'Quản lý Users';
                 headerDescription.textContent = 'Quản lý tài khoản hệ thống';
-                break;
-            case '/admin/colors':
+            break;
+        case '/admin/colors':
                 headerTitle.textContent = 'Quản lý màu sắc';
                 headerDescription.textContent = 'Quản lý màu sắc sản phẩm';
-                break;
-            case '/admin/categories':
+            break;
+        case '/admin/categories':
                 headerTitle.textContent = 'Quản lý danh mục';
                 headerDescription.textContent = 'Quản lý danh mục sản phẩm';
-                break;
-            case '/admin/coupons':
+            break;
+        case '/admin/coupons':
                 headerTitle.textContent = 'Quản lý mã giảm giá';
                 headerDescription.textContent = 'Quản lý mã giảm giá và khuyến mãi';
-                break;
-            case '/admin/shipping':
+            break;
+        case '/admin/shipping':
                 headerTitle.textContent = 'Quản lý phí vận chuyển';
                 headerDescription.textContent = 'Quản lý phí vận chuyển';
-                break;
-            case '/admin/delivery-teams':
+            break;
+        case '/admin/delivery-teams':
                 headerTitle.textContent = 'Quản lý đội giao hàng';
                 headerDescription.textContent = 'Quản lý đội giao hàng';
-                break;
-            case '/admin/banners':
+            break;
+        case '/admin/banners':
                 headerTitle.textContent = 'Quản lý banner';
                 headerDescription.textContent = 'Quản lý banner quảng cáo';
-                break;
-            case '/admin/pages':
+            break;
+        case '/admin/pages':
                 headerTitle.textContent = 'Quản lý trang tĩnh';
                 headerDescription.textContent = 'Quản lý trang tĩnh';
-                break;
-            case '/admin/showrooms':
+            break;
+        case '/admin/showrooms':
                 headerTitle.textContent = 'Quản lý showroom';
                 headerDescription.textContent = 'Quản lý showroom';
-                break;
-            case '/admin/social-links':
+            break;
+        case '/admin/social-links':
                 headerTitle.textContent = 'Quản lý liên kết MXH';
                 headerDescription.textContent = 'Quản lý liên kết mạng xã hội';
-                break;
-            case '/admin/reports':
+            break;
+        case '/admin/reports':
                 headerTitle.textContent = 'Báo cáo & Thống kê';
                 headerDescription.textContent = 'Báo cáo và thống kê hệ thống';
-                break;
-            case '/admin/notifications':
+            break;
+        case '/admin/notifications':
                 headerTitle.textContent = 'Thông báo';
                 headerDescription.textContent = 'Quản lý và theo dõi thông báo hệ thống';
-                break;
-            case '/admin/profile':
+            break;
+        case '/admin/profile':
                 headerTitle.textContent = 'Thông tin cá nhân';
                 headerDescription.textContent = 'Cập nhật thông tin cá nhân và cài đặt tài khoản';
-                break;
+            break;
             default:
                 headerTitle.textContent = 'Admin Panel';
                 headerDescription.textContent = 'Quản trị hệ thống Mộc Việt';
@@ -419,12 +419,12 @@ function initializeBootstrapComponents() {
         }
     });
 
-    // Xử lý khi thay đổi kích thước màn hình
-    window.addEventListener('resize', function() {
-        // CHỜ MỘT CHÚT ĐỂ TRÁNH GIỰT KHI RESIZE
-        setTimeout(() => {
+        // Xử lý khi thay đổi kích thước màn hình
+        window.addEventListener('resize', function() {
+            // CHỜ MỘT CHÚT ĐỂ TRÁNH GIỰT KHI RESIZE
+            setTimeout(() => {
             const sidebar = document.querySelector('.admin-sidebar');
-            
+                
             if (sidebar) {
                 if (window.innerWidth <= 991) {
                     // Chuyển sang mobile: DÙNG CLASS `show` - sidebar đóng mặc định
@@ -469,338 +469,54 @@ function initializeBootstrapComponents() {
     // 6. NOTIFICATION SYSTEM
     // ========================================
     
-    // Notification stack management
-    let notificationStack = [];
-    
-    // Tạo notification popup với animation đẹp và stack support (tối đa 3)
+    // Notification function - sử dụng notification system mới
     function showNotification(message, type = 'info') {
-        // Kiểm tra notification trùng lặp (chỉ kiểm tra type và thời gian)
-        const duplicateIndex = notificationStack.findIndex(notif => {
-            const typeElement = notif.querySelector('.fw-semibold');
-            if (!typeElement) return false;
-            
-            const existingType = typeElement.textContent.trim();
-            const currentTypeText = type === 'success' ? 'Thành công!' : 
-                                  type === 'danger' ? 'Lỗi!' : 
-                                  type === 'warning' ? 'Cảnh báo!' : 'Thông báo!';
-            
-            // Chỉ kiểm tra type và thời gian (trong vòng 2 giây)
-            const notificationTime = notif.dataset.timestamp || 0;
-            const currentTime = Date.now();
-            const timeDiff = currentTime - notificationTime;
-            
-            return existingType === currentTypeText && timeDiff < 2000; // 2 giây
-        });
-        
-        // Nếu trùng lặp thì không hiện
-        if (duplicateIndex > -1) {
-            console.log('Duplicate notification prevented:', message);
+        // Sử dụng notification system mới nếu có
+        if (window.notificationSystem) {
+            window.notificationSystem.show(message, type);
             return;
         }
         
-        // Giới hạn stack tối đa 3 notifications
-        if (notificationStack.length >= 3) {
-            // Xóa notification cũ nhất với animation
-            const oldestNotification = notificationStack.shift();
-            if (oldestNotification && oldestNotification.parentNode) {
-                oldestNotification.style.right = '-400px';
-                oldestNotification.style.opacity = '0';
-                oldestNotification.style.transform = 'translateX(20px)';
-                
-                setTimeout(() => {
-                    if (oldestNotification.parentNode) {
-                        oldestNotification.remove();
-                    }
-                }, 400);
-            }
-        }
-        
-        // Tạo notification element
-        const notification = document.createElement('div');
-        notification.className = `alert alert-${type} alert-dismissible position-fixed notification-popup`;
-        
-        // Calculate position based on stack
-        const stackIndex = notificationStack.length;
-        const topPosition = 20 + (stackIndex * 80); // 80px spacing between notifications
-        
-        notification.style.cssText = `
-            top: ${topPosition}px;
-            right: -300px;
-            z-index: ${9999 + stackIndex};
-            min-width: 250px;
-            max-width: 300px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-            border: none;
-            border-radius: 8px;
-            padding: 12px 16px;
-            font-weight: 500;
-            transform: translateX(0);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            opacity: 0;
-        `;
-        
-        // Icon mapping
-        const iconMap = {
-            'success': 'check-circle-fill',
-            'danger': 'exclamation-triangle-fill',
-            'warning': 'exclamation-triangle-fill',
-            'info': 'info-circle-fill'
-        };
-        
-        notification.innerHTML = `
-            <div class="d-flex align-items-center">
-                <i class="bi bi-${iconMap[type] || 'info-circle-fill'} me-3" style="font-size: 1.2rem;"></i>
-                <div class="flex-grow-1">
-                    <div class="fw-semibold mb-1">${type === 'success' ? 'Thành công!' : type === 'danger' ? 'Lỗi!' : type === 'warning' ? 'Cảnh báo!' : 'Thông báo!'}</div>
-                    <div class="small">${message}</div>
-                </div>
-                <button type="button" class="btn-close btn-close-sm ms-2" data-bs-dismiss="alert" style="opacity: 0.7;"></button>
-            </div>
-        `;
-        
-        // Thêm timestamp để chống spam
-        notification.dataset.timestamp = Date.now();
-        
-        // Thêm vào body và stack
-        document.body.appendChild(notification);
-        notificationStack.push(notification);
-        
-        // Animation slide-in
-        requestAnimationFrame(() => {
-            notification.style.right = '20px';
-            notification.style.opacity = '1';
-        });
-        
-        // Function to remove notification from stack
-        const removeFromStack = () => {
-            const index = notificationStack.indexOf(notification);
-            if (index > -1) {
-                notificationStack.splice(index, 1);
-                // Reposition remaining notifications
-                notificationStack.forEach((notif, i) => {
-                    const newTop = 20 + (i * 80);
-                    notif.style.top = `${newTop}px`;
-                    notif.style.zIndex = `${9999 + i}`;
-                });
-            }
-        };
-        
-        // Tự động ẩn sau 4 giây với animation slide-out
-        setTimeout(() => {
-            if (notification.parentNode) {
-                notification.style.right = '-400px';
-                notification.style.opacity = '0';
-                notification.style.transform = 'translateX(20px)';
-                
-                setTimeout(() => {
-                    if (notification.parentNode) {
-                        notification.remove();
-                        removeFromStack();
-                    }
-                }, 400);
-            }
-        }, 2222);
-        
-        // Close button functionality
-        const closeBtn = notification.querySelector('.btn-close');
-        closeBtn.addEventListener('click', () => {
-            notification.style.right = '-400px';
-            notification.style.opacity = '0';
-            notification.style.transform = 'translateX(20px)';
-            
-            setTimeout(() => {
-                if (notification.parentNode) {
-                    notification.remove();
-                    removeFromStack();
-                }
-            }, 400);
-        });
-    }
-    
-    // Kiểm tra URL parameters để hiển thị notification
-    const urlParams = new URLSearchParams(window.location.search);
-    const message = urlParams.get('message');
-    const messageType = urlParams.get('type') || 'info';
-    
-    if (message) {
-        showNotification(decodeURIComponent(message), messageType);
-        
-        // Xóa parameters khỏi URL
-        const newUrl = window.location.pathname;
-        window.history.replaceState({}, document.title, newUrl);
+        // Fallback cho trường hợp notification system chưa load
+        console.log(`📢 Fallback notification [${type.toUpperCase()}]: ${message}`);
     }
 
     // ========================================
-    // 7. VALIDATION FORM
+    // 7. FORM VALIDATION (NON-PROFILE FORMS ONLY)
     // ========================================
     
-    // Xử lý validation cho các form có class 'needs-validation'
+    // Chỉ xử lý validation cho các form KHÔNG phải profile
     const forms = document.querySelectorAll('.needs-validation');
     
     forms.forEach(function(form) {
-        form.addEventListener('submit', function(event) {
-            event.preventDefault(); // Prevent default form submission
-            
-            // Handle form submission via AJAX
-            handleFormSubmission(form);
-        });
-    });
-    
-    // Function to handle form submission via AJAX
-    function handleFormSubmission(form) {
-        const submitButton = form.querySelector('.btn-submit');
-        
-        // Prevent multiple submissions using both disabled check and processing flag
-        if (submitButton.disabled || submitButton.dataset.processing === 'true') {
+        // Skip profile forms - they are handled by OTP verification
+        if (form.action.includes('/admin/profile/update') || form.action.includes('/admin/profile/change-password')) {
             return;
         }
         
-        // Store original text BEFORE any changes
-        const originalText = submitButton.innerHTML;
-        
-        // Set processing flag and loading state
-        submitButton.dataset.processing = 'true';
-        submitButton.disabled = true;
-        submitButton.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Đang xử lý...';
-        
-        // Collect form data
-        const formData = new FormData(form);
-        const data = Object.fromEntries(formData.entries());
-        
-        // Convert date string to proper format if exists
-        if (data.dob) {
-            const date = new Date(data.dob);
-            data.dob = date.toISOString().split('T')[0];
-        }
-        
-        // Determine endpoint
-        let endpoint = '';
-        if (form.action.includes('/admin/profile/update')) {
-            endpoint = '/admin/profile/update';
-        } else if (form.action.includes('/admin/profile/change-password')) {
-            endpoint = '/admin/profile/change-password';
-        }
-        
-        // Add CSRF token
-        const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
-        const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content');
-        
-        const headers = {
-            'Content-Type': 'application/json',
-            'X-Requested-With': 'XMLHttpRequest'
-        };
-        
-        if (csrfToken && csrfHeader && csrfToken !== '' && csrfHeader !== '') {
-            headers[csrfHeader] = csrfToken;
-        }
-        
-        fetch(endpoint, {
-            method: 'POST',
-            headers: headers,
-            body: JSON.stringify(data)
-        })
-        .then(response => {
-            // Always try to parse JSON, even for error responses
-            return response.json().then(data => ({
-                status: response.status,
-                ok: response.ok,
-                data: data
-            }));
-        })
-        .then(result => {
-            if (result.ok && result.data.success) {
-                showNotification(result.data.message, 'success');
-                
-                // Kiểm tra nếu có redirect (đổi mật khẩu)
-                if (result.data.redirect) {
-                    setTimeout(() => {
-                        window.location.href = result.data.redirect;
-                    }, 2000);
-                } else {
-                    // Reload page cho các trường hợp khác
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 1500);
-                }
-            } else {
-                // Handle both validation errors and other errors
-                const message = result.data.message || 'Có lỗi xảy ra khi xử lý yêu cầu';
-                showNotification(message, 'danger');
-                
-                // Hiển thị validation errors cho từng field
-                if (result.data.errors) {
-                    // Xóa tất cả validation errors cũ
-                    form.querySelectorAll('.is-invalid').forEach(field => {
-                        field.classList.remove('is-invalid');
-                    });
-                    form.querySelectorAll('.invalid-feedback').forEach(feedback => {
-                        feedback.remove();
-                    });
-                    
-                    // Hiển thị validation errors mới
-                    Object.keys(result.data.errors).forEach(fieldName => {
-                        const field = form.querySelector(`[name="${fieldName}"]`);
-                        if (field) {
-                            field.classList.add('is-invalid');
-                            
-                            // Tạo feedback element
-                            const feedback = document.createElement('div');
-                            feedback.className = 'invalid-feedback';
-                            feedback.textContent = result.data.errors[fieldName];
-                            
-                            // Thêm feedback sau field
-                            field.parentNode.appendChild(feedback);
-                        }
-                    });
-                }
+        // Basic HTML5 validation
+        form.addEventListener('submit', function(event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
             }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showNotification('Có lỗi xảy ra khi xử lý yêu cầu', 'danger');
-        })
-        .finally(() => {
-            // Reset button state and clear processing flag
-            submitButton.disabled = false;
-            submitButton.dataset.processing = 'false';
-            submitButton.innerHTML = originalText;
-            
-            // Additional safety timeout to ensure button is reset
-            setTimeout(() => {
-                if (submitButton.disabled || submitButton.dataset.processing === 'true') {
-                    submitButton.disabled = false;
-                    submitButton.dataset.processing = 'false';
-                    submitButton.innerHTML = originalText;
-                }
-            }, 1000);
+            form.classList.add('was-validated');
         });
-    }
-
-    // Real-time validation khi user nhập liệu
-    forms.forEach(function(form) {
+        
+        // Real-time validation
         const fields = form.querySelectorAll('.form-control, .form-select');
         fields.forEach(function(field) {
             field.addEventListener('blur', function() {
                 if (form.classList.contains('was-validated')) {
-                    if (this.checkValidity()) {
-                        this.classList.remove('is-invalid');
-                        this.classList.add('is-valid');
-                    } else {
-                        this.classList.remove('is-valid');
-                        this.classList.add('is-invalid');
-                    }
+                    this.classList.toggle('is-valid', this.checkValidity());
+                    this.classList.toggle('is-invalid', !this.checkValidity());
                 }
             });
             
             field.addEventListener('input', function() {
                 if (form.classList.contains('was-validated')) {
-                    if (this.checkValidity()) {
-                        this.classList.remove('is-invalid');
-                        this.classList.add('is-valid');
-                    } else {
-                        this.classList.remove('is-valid');
-                        this.classList.add('is-invalid');
-                    }
+                    this.classList.toggle('is-valid', this.checkValidity());
+                    this.classList.toggle('is-invalid', !this.checkValidity());
                 }
             });
         });
@@ -1030,8 +746,8 @@ function initializeBootstrapComponents() {
     window.addEventListener('popstate', function(event) {
         // Chỉ load khi thực sự là back/forward, không phải reload
         if (event.state !== null) {
-            const url = window.location.pathname;
-            loadPageContent(url);
+        const url = window.location.pathname;
+        loadPageContent(url);
         }
     });
     

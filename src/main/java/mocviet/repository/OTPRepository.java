@@ -12,8 +12,10 @@ import java.util.Optional;
 public interface OTPRepository extends JpaRepository<OTP, Integer> {
     
     Optional<OTP> findByUserAndCodeAndPurposeAndIsUsedFalseAndExpiresAtAfter(
-            User user, String code, String purpose, LocalDateTime currentTime);
+            User user, String code, OTP.Purpose purpose, LocalDateTime currentTime);
     
     void deleteByExpiresAtBefore(LocalDateTime currentTime);
+    
+    void deleteByUserAndPurposeAndIsUsedFalse(User user, OTP.Purpose purpose);
 }
 

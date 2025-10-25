@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
-public class PasswordChangeRequest {
+public class PasswordChangeOTPRequest {
     
     @NotBlank(message = "Mật khẩu hiện tại không được để trống")
     private String currentPassword;
@@ -20,8 +20,5 @@ public class PasswordChangeRequest {
     @Size(min = 8, max = 50, message = "Xác nhận mật khẩu phải từ 8 đến 50 ký tự")
     private String confirmPassword;
     
-    // OTP code để xác thực
-    @NotBlank(message = "Mã OTP không được để trống")
-    @Pattern(regexp = "^[0-9]{6}$", message = "Mã OTP phải có 6 chữ số")
-    private String otpCode;
+    // Không có OTP field vì đây là request để gửi OTP
 }

@@ -46,6 +46,13 @@ public class AdminProfileServiceImpl implements AdminProfileService {
         log.info("Request data - Email: {}, FullName: {}, Phone: {}, Gender: {}, DOB: {}", 
                 request.getEmail(), request.getFullName(), request.getPhone(), request.getGender(), request.getDob());
         
+        // Kiểm tra email uniqueness nếu email thay đổi
+        if (!currentUser.getEmail().equals(request.getEmail())) {
+            if (userRepository.existsByEmailAndIdNot(request.getEmail(), currentUser.getId())) {
+                throw new IllegalArgumentException("Email đã được sử dụng bởi tài khoản khác");
+            }
+        }
+        
         // Cập nhật thông tin
         currentUser.setEmail(request.getEmail());
         currentUser.setFullName(request.getFullName());
@@ -82,11 +89,6 @@ public class AdminProfileServiceImpl implements AdminProfileService {
         // Kiểm tra mật khẩu hiện tại
         if (!verifyCurrentPassword(currentUser, request.getCurrentPassword())) {
             throw new IllegalArgumentException("Mật khẩu hiện tại không đúng");
-        }
-        
-        // Kiểm tra mật khẩu mới và xác nhận
-        if (!request.getNewPassword().equals(request.getConfirmPassword())) {
-            throw new IllegalArgumentException("Mật khẩu mới và xác nhận không khớp");
         }
         
         // Mã hóa mật khẩu mới

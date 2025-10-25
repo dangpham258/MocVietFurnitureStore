@@ -10,7 +10,7 @@ import lombok.Data;
 import java.time.LocalDate;
 
 @Data
-public class ProfileUpdateRequest {
+public class ProfileUpdateOTPRequest {
     
     @NotBlank(message = "Email không được để trống")
     @Email(message = "Email không hợp lệ")
@@ -29,8 +29,5 @@ public class ProfileUpdateRequest {
     @Past(message = "Ngày sinh phải là ngày trong quá khứ")
     private LocalDate dob;
     
-    // OTP code để xác thực
-    @NotBlank(message = "Mã OTP không được để trống")
-    @Pattern(regexp = "^[0-9]{6}$", message = "Mã OTP phải có 6 chữ số")
-    private String otpCode;
+    // Không có OTP field vì đây là request để gửi OTP
 }

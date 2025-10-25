@@ -506,124 +506,148 @@ body, html {
 }
 
 /* ========================================
-   16. NOTIFICATION ANIMATIONS
+   16. NOTIFICATION SYSTEM STYLES
    ======================================== */
 
-.notification-popup {
-    backdrop-filter: blur(10px);
-    background: rgba(255, 255, 255, 1) !important;
+/* Notification Container */
+.notification-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    max-width: 400px;
+    width: 400px; /* Fixed width để tránh thay đổi kích thước */
+    min-width: 300px; /* Minimum width */
+}
+
+/* Notification Item */
+.notification-item {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    margin-bottom: 10px;
+    overflow: hidden;
+    animation: slideInRight 0.3s ease-out;
     border-left: 4px solid;
-    border: 1px solid rgba(0,0,0,0.15);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
-    color: #000000 !important;
-    font-weight: 900 !important;
-    font-size: 1rem !important;
+    position: relative;
+    width: 100%; /* Full width của container */
+    min-height: 60px; /* Minimum height để tránh nhảy */
+    display: flex;
+    flex-direction: column;
 }
 
-.notification-popup.alert-success {
-    border-left-color: #198754;
-    color: #ffffff !important;
-    background: #198754 !important;
-    border-left: 4px solid #146c43;
-    font-weight: 700 !important;
+.notification-item.removing {
+    animation: slideOutRight 0.3s ease-in;
 }
 
-.notification-popup.alert-danger {
+/* Notification Types */
+.notification-item.success {
+    border-left-color: #28a745;
+}
+
+.notification-item.danger {
     border-left-color: #dc3545;
-    color: #ffffff !important;
-    background: #dc3545 !important;
-    border-left: 4px solid #b02a37;
-    font-weight: 700 !important;
 }
 
-.notification-popup.alert-warning {
-    border-left-color: #fd7e14;
-    color: #ffffff !important;
-    background: #fd7e14 !important;
-    border-left: 4px solid #e8590c;
-    font-weight: 700 !important;
+.notification-item.warning {
+    border-left-color: #ffc107;
 }
 
-.notification-popup.alert-info {
-    border-left-color: #0dcaf0;
-    color: #ffffff !important;
-    background: #0dcaf0 !important;
-    border-left: 4px solid #0aa2c0;
-    font-weight: 700 !important;
+.notification-item.info {
+    border-left-color: #17a2b8;
 }
 
-.notification-popup .btn-close {
-    background: rgba(0, 0, 0, 0.4) !important;
-    border: 1px solid rgba(255, 255, 255, 0.9) !important;
-    font-size: 0.7rem !important;
-    opacity: 1 !important;
-    font-weight: 900 !important;
-    transition: all 0.2s ease;
-    border-radius: 2px;
-    width: 4px;
-    height: 4px;
+/* Notification Content */
+.notification-content {
+    padding: 15px 20px;
+    font-size: 14px;
+    line-height: 1.4;
+    flex: 1; /* Fill remaining space */
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Center content vertically */
+}
+
+.notification-header {
     display: flex;
     align-items: center;
-    justify-content: center;
-    color: #ffffff !important;
-    position: relative;
+    margin-bottom: 8px;
 }
 
-.notification-popup .btn-close::before {
-    content: "×";
-    font-size: 0.8rem;
-    font-weight: 900;
-    color: #ffffff;
-    text-shadow: 0 0 1px rgba(0,0,0,0.8);
-    line-height: 1;
+.notification-icon {
+    font-size: 1.2rem;
+    margin-right: 10px;
 }
 
-.notification-popup.alert-success .btn-close {
-    color: #ffffff !important;
+.notification-success .notification-icon {
+    color: #28a745;
 }
 
-.notification-popup.alert-danger .btn-close {
-    color: #ffffff !important;
+.notification-danger .notification-icon {
+    color: #dc3545;
 }
 
-.notification-popup.alert-warning .btn-close {
-    color: #000000 !important;
+.notification-warning .notification-icon {
+    color: #ffc107;
 }
 
-.notification-popup.alert-info .btn-close {
-    color: #ffffff !important;
+.notification-info .notification-icon {
+    color: #17a2b8;
 }
 
-.notification-popup .btn-close:hover {
-    opacity: 1 !important;
-    transform: scale(1.1);
-    background: rgba(0, 0, 0, 0.6) !important;
-    border-color: rgba(255, 255, 255, 1) !important;
+.notification-title {
+    font-weight: 600;
+    font-size: 15px;
+    flex-grow: 1;
+    color: #333;
 }
 
-.notification-popup .btn-close:hover::before {
-    text-shadow: 0 0 3px rgba(0,0,0,1);
+.notification-body {
+    font-size: 13px;
+    line-height: 1.4;
+    color: #666;
+    word-wrap: break-word; /* Tránh text overflow */
+    overflow-wrap: break-word;
 }
 
-.notification-popup .bi {
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)) !important;
-    font-weight: 900 !important;
+.notification-close {
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 0;
+    margin-left: 10px;
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+    color: #999;
 }
 
-.notification-popup.alert-success .bi {
-    color: #ffffff !important;
+.notification-close:hover {
+    opacity: 1;
+    color: #333;
 }
 
-.notification-popup.alert-danger .bi {
-    color: #ffffff !important;
+/* Animation cho notification */
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
 }
 
-.notification-popup.alert-warning .bi {
-    color: #000000 !important;
-}
-
-.notification-popup.alert-info .bi {
-    color: #ffffff !important;
+@keyframes slideOutRight {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(100%);
+    }
 }
 
 /* ========================================
@@ -671,5 +695,107 @@ body, html {
     /* Header hamburger luôn hiển thị trên mobile */
     .sidebar-toggle {
         display: block !important;
+    }
+    
+    /* Notification responsive trên mobile */
+    .notification-container {
+        width: calc(100vw - 40px); /* Full width minus padding */
+        max-width: 350px;
+        min-width: 280px;
+        right: 20px;
+        left: 20px;
+    }
+    
+    .notification-item {
+        min-height: 50px; /* Smaller minimum height on mobile */
+    }
+    
+    .notification-content {
+        padding: 12px 16px; /* Smaller padding on mobile */
+    }
+}
+
+
+/* ========================================
+   OTP VERIFICATION STYLES
+   ======================================== */
+
+/* OTP Modal Styles */
+#otpVerificationModal .modal-content {
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+#otpVerificationModal .modal-header {
+    border-radius: 12px 12px 0 0;
+    background: linear-gradient(135deg, #007bff, #0056b3);
+}
+
+#otpVerificationModal .otp-icon {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+#otpVerificationModal .otp-input {
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: 0.5rem;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+#otpVerificationModal .otp-input:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    transform: scale(1.02);
+}
+
+#otpVerificationModal .otp-input.is-valid {
+    border-color: #28a745;
+    background-color: rgba(40, 167, 69, 0.1);
+}
+
+#otpVerificationModal .otp-input.is-invalid {
+    border-color: #dc3545;
+    background-color: rgba(220, 53, 69, 0.1);
+}
+
+#otpVerificationModal #otpTimer {
+    font-family: 'Courier New', monospace;
+    font-size: 1.1rem;
+}
+
+#otpVerificationModal .btn-outline-secondary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* OTP Form Animation */
+#otpVerificationModal .modal-body {
+    animation: slideInUp 0.3s ease-out;
+}
+
+#otpVerificationModal .modal-footer {
+    border-top: 1px solid #e9ecef;
+    padding: 1rem 1.5rem;
+    background-color: #f8f9fa;
+    display: flex;
+    justify-content: center;
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }

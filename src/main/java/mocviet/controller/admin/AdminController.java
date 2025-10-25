@@ -20,7 +20,7 @@ public class AdminController {
         model.addAttribute("pageTitle", "Dashboard Admin");
         model.addAttribute("activeMenu", "dashboard");
         
-        // Check if it's an AJAX request
+        // Kiem tra co phai la AJAX request
         if ("XMLHttpRequest".equals(request.getHeader("X-Requested-With"))) {
             return "admin/dashboard/admin_index ::content";
         }
