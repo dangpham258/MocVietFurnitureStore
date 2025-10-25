@@ -14,6 +14,8 @@
 body, html {
     height: 100%;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
 }
 
 /* ========================================
@@ -25,6 +27,8 @@ body, html {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    margin: 0;
+    padding: 0;
 }
 
 /* Layout chính (sidebar + content) */
@@ -158,6 +162,8 @@ body, html {
     flex-direction: column;
     min-height: 100vh;
     transition: margin-left 0.3s ease !important; /* ANIMATION MƯỢT MÀ */
+    margin: 0;
+    padding: 0;
 }
 
 /* CONTENT AREA MỞ KHI SIDEBAR KHÔNG COLLAPSED */
@@ -172,9 +178,10 @@ body, html {
 
 /* Nội dung chính - Phong cách tối giản */
 .main-content {
-    background-color: #f8f9fa; /* Sáng hơn sidebar để tạo tương phản */
+    background-color: #f8f9fa; /* Xám nhạt - sáng hơn nhưng tối hơn header */
     flex: 1;
     padding: 1.5rem;
+    margin: 0;
 }
 
 /* ========================================
@@ -210,21 +217,23 @@ body, html {
     background: white;
     border-top: 1px solid #dee2e6;
     box-shadow: 0 -1px 2px rgba(0,0,0,0.05);
-    margin-top: auto;
-    padding: 0.25rem 0;
+    padding: 0.3rem 0 0.05rem 0;
     height: auto;
-    max-height: 2rem;
+    min-height: 0.5rem;
+    max-height: 0.5rem;
+    margin: 0;
+    flex-shrink: 0;
 }
 
 /* Container của footer */
 .admin-footer .container-fluid {
-    padding: 0.125rem 1rem;
+    padding: 0.1rem 1rem;
 }
 
 /* Text trong footer */
 .admin-footer small {
-    font-size: 0.65rem;
-    line-height: 1.1;
+    font-size: 0.75rem;
+    line-height: 1.2;
     margin: 0;
 }
 
@@ -235,7 +244,7 @@ body, html {
 
 /* Column trong footer */
 .admin-footer .col-md-6 {
-    padding: 0.125rem 0.5rem;
+    padding: 0.1rem 0.5rem;
 }
 
 /* ========================================
@@ -362,8 +371,8 @@ body, html {
 
 /* Breadcrumb admin */
 .admin-breadcrumb {
-    background-color: #f8f9fa;
-    border-bottom: 1px solid #dee2e6;
+    background-color: #f8f9fa; /* Xám nhạt - sáng hơn nhưng tối hơn header */
+    border-bottom: 1px solid #e9ecef;
     padding: 0.75rem 1rem;
 }
 
@@ -505,5 +514,281 @@ body, html {
     
     .content-area {
         margin-left: 0;
+    }
+}
+
+/* Fix chiều cao tab content */
+.tab-content {
+    min-height: 400px; /* Chiều cao tối thiểu cho tab content */
+}
+
+.tab-pane {
+    min-height: 400px; /* Đảm bảo mỗi tab có chiều cao tối thiểu */
+}
+
+/* Đảm bảo form trong tab có chiều cao nhất quán */
+.tab-pane .card {
+    min-height: 350px;
+}
+
+.tab-pane .card-body {
+    min-height: 300px;
+}
+
+/* Smooth transition khi chuyển tab */
+.tab-pane {
+    transition: opacity 0.15s linear;
+}
+
+.tab-pane.fade {
+    opacity: 0;
+}
+
+.tab-pane.fade.show {
+    opacity: 1;
+}
+
+/* Đảm bảo layout không bị nhảy */
+.profile-forms-container {
+    height: auto;
+    min-height: 500px;
+}
+
+/* Đảm bảo tab content có chiều cao cố định */
+#profileTabsContent {
+    min-height: 450px;
+}
+
+/* Đảm bảo các tab có chiều cao bằng nhau */
+#profile, #password, #activity {
+    min-height: 400px;
+}
+
+/* Smooth animation cho tab switching */
+.tab-content {
+    position: relative;
+}
+
+.tab-pane {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+}
+
+.tab-pane.active {
+    position: relative;
+    opacity: 1;
+}
+
+/* ========================================
+   FORM VALIDATION STYLES
+   ======================================== */
+
+.form-control.is-invalid,
+.form-select.is-invalid {
+    border-color: #dc3545 !important;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+}
+
+.invalid-feedback {
+    display: block;
+    width: 100%;
+    margin-top: 0.25rem;
+    font-size: 0.875rem;
+    color: #dc3545;
+    font-weight: 500;
+}
+
+.form-control.is-valid,
+.form-select.is-valid {
+    border-color: #198754 !important;
+    box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.25) !important;
+}
+
+.valid-feedback {
+    display: block;
+    width: 100%;
+    margin-top: 0.25rem;
+    font-size: 0.875rem;
+    color: #198754;
+    font-weight: 500;
+}
+
+/* ========================================
+   NOTIFICATION ANIMATIONS
+   ======================================== */
+
+.notification-popup {
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 1) !important;
+    border-left: 4px solid;
+    border: 1px solid rgba(0,0,0,0.15);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+    color: #000000 !important;
+    font-weight: 900 !important;
+    font-size: 1rem !important;
+}
+
+.notification-popup.alert-success {
+    border-left-color: #198754;
+    color: #ffffff !important;
+    background: #198754 !important;
+    border-left: 4px solid #146c43;
+    font-weight: 700 !important;
+}
+
+.notification-popup.alert-danger {
+    border-left-color: #dc3545;
+    color: #ffffff !important;
+    background: #dc3545 !important;
+    border-left: 4px solid #b02a37;
+    font-weight: 700 !important;
+}
+
+.notification-popup.alert-warning {
+    border-left-color: #fd7e14;
+    color: #ffffff !important;
+    background: #fd7e14 !important;
+    border-left: 4px solid #e8590c;
+    font-weight: 700 !important;
+}
+
+.notification-popup.alert-info {
+    border-left-color: #0dcaf0;
+    color: #ffffff !important;
+    background: #0dcaf0 !important;
+    border-left: 4px solid #0aa2c0;
+    font-weight: 700 !important;
+}
+
+.notification-popup .btn-close {
+    background: rgba(0, 0, 0, 0.4) !important;
+    border: 1px solid rgba(255, 255, 255, 0.9) !important;
+    font-size: 0.7rem !important;
+    opacity: 1 !important;
+    font-weight: 900 !important;
+    transition: all 0.2s ease;
+    border-radius: 2px;
+    width: 4px;
+    height: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff !important;
+    position: relative;
+}
+
+.notification-popup .btn-close::before {
+    content: "×";
+    font-size: 0.8rem;
+    font-weight: 900;
+    color: #ffffff;
+    text-shadow: 0 0 1px rgba(0,0,0,0.8);
+    line-height: 1;
+}
+
+.notification-popup.alert-success .btn-close {
+    color: #ffffff !important;
+}
+
+.notification-popup.alert-danger .btn-close {
+    color: #ffffff !important;
+}
+
+.notification-popup.alert-warning .btn-close {
+    color: #000000 !important;
+}
+
+.notification-popup.alert-info .btn-close {
+    color: #ffffff !important;
+}
+
+.notification-popup .btn-close:hover {
+    opacity: 1 !important;
+    transform: scale(1.1);
+    background: rgba(0, 0, 0, 0.6) !important;
+    border-color: rgba(255, 255, 255, 1) !important;
+}
+
+.notification-popup .btn-close:hover::before {
+    text-shadow: 0 0 3px rgba(0,0,0,1);
+}
+
+.notification-popup .bi {
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)) !important;
+    font-weight: 900 !important;
+}
+
+.notification-popup.alert-success .bi {
+    color: #ffffff !important;
+}
+
+.notification-popup.alert-danger .bi {
+    color: #ffffff !important;
+}
+
+.notification-popup.alert-warning .bi {
+    color: #000000 !important;
+}
+
+.notification-popup.alert-info .bi {
+    color: #ffffff !important;
+}
+
+/* Dark mode support - DISABLED FOR NOTIFICATIONS */
+@media (prefers-color-scheme: dark) {
+    .notification-popup.alert-success {
+        background: #28a745 !important;
+        color: #ffffff !important;
+    }
+    
+    .notification-popup.alert-danger {
+        background: #dc3545 !important;
+        color: #ffffff !important;
+    }
+    
+    .notification-popup.alert-warning {
+        background: #ffc107 !important;
+        color: #000000 !important;
+    }
+    
+    .notification-popup.alert-info {
+        background: #17a2b8 !important;
+        color: #ffffff !important;
+    }
+    
+    .notification-popup.alert-success .btn-close {
+        color: #ffffff !important;
+    }
+    
+    .notification-popup.alert-danger .btn-close {
+        color: #ffffff !important;
+    }
+    
+    .notification-popup.alert-warning .btn-close {
+        color: #000000 !important;
+    }
+    
+    .notification-popup.alert-info .btn-close {
+        color: #ffffff !important;
+    }
+    
+    .notification-popup.alert-success .bi {
+        color: #ffffff !important;
+    }
+    
+    .notification-popup.alert-danger .bi {
+        color: #ffffff !important;
+    }
+    
+    .notification-popup.alert-warning .bi {
+        color: #000000 !important;
+    }
+    
+    .notification-popup.alert-info .bi {
+        color: #ffffff !important;
     }
 }

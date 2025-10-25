@@ -19,7 +19,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString(exclude = {"user", "address", "coupon", "orderItems", "statusHistories", "orderDelivery"})
-public class Order {
+public class Orders {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -52,6 +52,16 @@ public class Order {
     @Column(name = "shipping_fee", nullable = false, precision = 12, scale = 0)
     private BigDecimal shippingFee = BigDecimal.ZERO;
     
+    @Enumerated(EnumType.STRING)
+    @Column(name = "return_status", length = 20)
+    private ReturnStatus returnStatus;
+    
+    @Column(name = "return_reason", length = 500)
+    private String returnReason;
+    
+    @Column(name = "return_note", length = 500)
+    private String returnNote;
+    
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
     
@@ -79,6 +89,10 @@ public class Order {
         UNPAID, PAID, REFUNDED
     }
     
+    public enum ReturnStatus {
+        REQUESTED, APPROVED, REJECTED, PROCESSED
+    }
+    
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
@@ -95,7 +109,7 @@ public class Order {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Order order = (Order) o;
+        Orders order = (Orders) o;
         return Objects.equals(id, order.id);
     }
     

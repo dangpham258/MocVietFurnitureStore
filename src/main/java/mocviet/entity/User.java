@@ -31,7 +31,7 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id", nullable = false)
     private Role role;
     
@@ -73,7 +73,7 @@ public class User implements UserDetails {
     private Cart cart;
     
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<Order> orders;
+    private List<Orders> orders;
     
     @OneToMany(mappedBy = "changedBy", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<OrderStatusHistory> orderStatusHistories;

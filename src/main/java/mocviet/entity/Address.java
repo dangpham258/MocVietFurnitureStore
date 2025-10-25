@@ -50,7 +50,7 @@ public class Address {
     private LocalDateTime createdAt;
     
     @OneToMany(mappedBy = "address", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<Order> orders;
+    private List<Orders> orders;
     
     @PrePersist
     protected void onCreate() {

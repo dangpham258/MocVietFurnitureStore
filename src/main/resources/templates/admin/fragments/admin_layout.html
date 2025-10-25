@@ -31,11 +31,11 @@
                     <!-- Page content goes here -->
                 </main>
                 
-            <!-- Footer -->
+            <!-- Footer Admin (nhỏ phía trên) -->
             <footer class="admin-footer">
                 <div class="container-fluid">
                     <div class="row align-items-center">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <small class="text-muted">
                                 © 2025 Mộc Việt Admin Panel. 
                                 <span id="current-time">Hôm nay</span>
@@ -60,7 +60,13 @@
                                 </script>
                             </small>
                         </div>
-                        <div class="col-md-6 text-end">
+                        <div class="col-md-4 text-center">
+                            <small class="text-muted">
+                                <i class="bi bi-code-slash me-1"></i>
+                                Developer: <strong>Huỳnh Ngọc Thắng</strong> - MSSV: <strong>23110327</strong>
+                            </small>
+                        </div>
+                        <div class="col-md-4 text-end">
                             <small class="text-muted">
                                 <i class="bi bi-shield-check text-success me-1" style="font-size: 0.5rem;"></i>
                                 Hệ thống bảo mật
@@ -69,10 +75,13 @@
                                     Online
                                 </span>
                             </small>
-            </div>
+                        </div>
                     </div>
                 </div>
             </footer>
+            
+            <!-- Footer của trang web -->
+            <div th:replace="~{fragments/footer :: footer}"></div>
         </div>
     </div>
     
