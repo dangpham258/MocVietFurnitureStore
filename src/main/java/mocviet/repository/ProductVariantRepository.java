@@ -38,4 +38,6 @@ public interface ProductVariantRepository extends JpaRepository<ProductVariant, 
      */
     @Query("SELECT pv.stockQty FROM ProductVariant pv WHERE pv.id = :variantId")
     Integer getStockQtyById(@Param("variantId") Integer variantId);
+    
+    List<ProductVariant> findByProductIdAndIsActiveTrue(Integer productId);
 }
