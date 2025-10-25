@@ -4,27 +4,290 @@
 // File này chứa tất cả JavaScript cho admin panel
 // Bao gồm: sidebar toggle, form validation, search, modal, etc.
 
-    console.log('Admin JS loaded successfully!');
-    
+console.log('Admin JS loaded successfully!');
 
 // ========================================
 // KHỞI TẠO CÁC TÍNH NĂNG ADMIN
 // ========================================
+
+// Khởi tạo sidebar ngay lập tức TRƯỚC KHI DOM LOAD
+(function() {
+    // ĐỌC LOCALSTORAGE NGAY LẬP TỨC
+    const sidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+    
+    // TẠO STYLE TAG ĐỂ ÁP DỤNG NGAY LẬP TỨC
+    const style = document.createElement('style');
+    style.id = 'sidebar-style'; // THÊM ID ĐỂ CÓ THỂ UPDATE
+    style.textContent = `
+        .admin-sidebar {
+            transition: none !important;
+        }
+        .content-area {
+            transition: none !important;
+        }
+        ${sidebarCollapsed ? `
+            .admin-sidebar {
+                left: -250px !important;
+            }
+            .content-area {
+                margin-left: 0 !important;
+            }
+            .sidebar-toggle {
+                display: block !important;
+            }
+        ` : `
+            .admin-sidebar {
+                left: 0px !important;
+            }
+            .content-area {
+                margin-left: 250px !important;
+            }
+            .sidebar-toggle {
+                display: none !important;
+            }
+        `}
+        
+        /* MOBILE: FORCE ĐÓNG MẶC ĐỊNH */
+        @media (max-width: 991px) {
+            .admin-sidebar {
+                left: -250px !important;
+            }
+            .content-area {
+                margin-left: 0 !important;
+            }
+            .sidebar-toggle {
+                display: block !important;
+            }
+        }
+    `;
+    
+    // THÊM STYLE VÀO HEAD NGAY LẬP TỨC
+    document.head.appendChild(style);
+    
+    // KHÔNG XÓA STYLE TAG NỮA - ĐỂ NÓ LUÔN ÁP DỤNG
+})();
+
+// Hàm update header và breadcrumb
+function updateHeaderAndBreadcrumb(url) {
+    // Update header title based on URL
+    const headerTitle = document.querySelector('.admin-header h4');
+    const headerDescription = document.querySelector('.admin-header small');
+    
+    if (headerTitle && headerDescription) {
+        switch(url) {
+            case '/admin':
+            case '/admin/':
+            case '/admin/dashboard':
+            case '/admin/dashboard/':
+            case '/admin/dashboard/home':
+                headerTitle.textContent = 'Dashboard Admin';
+                headerDescription.textContent = 'Tổng quan hệ thống Mộc Việt';
+                break;
+            case '/admin/users':
+                headerTitle.textContent = 'Quản lý Users';
+                headerDescription.textContent = 'Quản lý tài khoản hệ thống';
+                break;
+            case '/admin/colors':
+                headerTitle.textContent = 'Quản lý màu sắc';
+                headerDescription.textContent = 'Quản lý màu sắc sản phẩm';
+                break;
+            case '/admin/categories':
+                headerTitle.textContent = 'Quản lý danh mục';
+                headerDescription.textContent = 'Quản lý danh mục sản phẩm';
+                break;
+            case '/admin/coupons':
+                headerTitle.textContent = 'Quản lý mã giảm giá';
+                headerDescription.textContent = 'Quản lý mã giảm giá và khuyến mãi';
+                break;
+            case '/admin/shipping':
+                headerTitle.textContent = 'Quản lý phí vận chuyển';
+                headerDescription.textContent = 'Quản lý phí vận chuyển';
+                break;
+            case '/admin/delivery-teams':
+                headerTitle.textContent = 'Quản lý đội giao hàng';
+                headerDescription.textContent = 'Quản lý đội giao hàng';
+                break;
+            case '/admin/banners':
+                headerTitle.textContent = 'Quản lý banner';
+                headerDescription.textContent = 'Quản lý banner quảng cáo';
+                break;
+            case '/admin/pages':
+                headerTitle.textContent = 'Quản lý trang tĩnh';
+                headerDescription.textContent = 'Quản lý trang tĩnh';
+                break;
+            case '/admin/showrooms':
+                headerTitle.textContent = 'Quản lý showroom';
+                headerDescription.textContent = 'Quản lý showroom';
+                break;
+            case '/admin/social-links':
+                headerTitle.textContent = 'Quản lý liên kết MXH';
+                headerDescription.textContent = 'Quản lý liên kết mạng xã hội';
+                break;
+            case '/admin/reports':
+                headerTitle.textContent = 'Báo cáo & Thống kê';
+                headerDescription.textContent = 'Báo cáo và thống kê hệ thống';
+                break;
+            case '/admin/notifications':
+                headerTitle.textContent = 'Thông báo';
+                headerDescription.textContent = 'Quản lý và theo dõi thông báo hệ thống';
+                break;
+            case '/admin/profile':
+                headerTitle.textContent = 'Thông tin cá nhân';
+                headerDescription.textContent = 'Cập nhật thông tin cá nhân và cài đặt tài khoản';
+                break;
+            default:
+                headerTitle.textContent = 'Admin Panel';
+                headerDescription.textContent = 'Quản trị hệ thống Mộc Việt';
+        }
+    }
+    
+    // Update breadcrumb
+    const breadcrumbActive = document.querySelector('.admin-breadcrumb .breadcrumb-item.active');
+    if (breadcrumbActive) {
+        breadcrumbActive.textContent = headerTitle ? headerTitle.textContent : 'Admin Panel';
+    }
+}
+
+// Hàm update active menu
+function updateActiveMenu(url) {
+    const navLinks = document.querySelectorAll('.admin-sidebar .nav-link');
+    navLinks.forEach(link => {
+        link.classList.remove('active');
+        const href = link.getAttribute('href');
+        
+        // Logic chính xác: chỉ match exact
+        if (href) {
+            // Exact match only
+            if (url === href) {
+                link.classList.add('active');
+            }
+            // Special case: Dashboard (/admin) should match dashboard URLs
+            else if (href === '/admin' && (url === '/admin' || url === '/admin/' || url === '/admin/dashboard' || url === '/admin/dashboard/' || url === '/admin/dashboard/home')) {
+                link.classList.add('active');
+            }
+        }
+    });
+}
+
+// Hàm update style tag khi toggle sidebar
+function updateSidebarStyle(isCollapsed) {
+    const existingStyle = document.querySelector('#sidebar-style');
+    if (existingStyle) {
+        existingStyle.textContent = `
+            .admin-sidebar {
+                transition: none !important;
+            }
+            .content-area {
+                transition: none !important;
+            }
+            ${isCollapsed ? `
+                .admin-sidebar {
+                    left: -250px !important;
+                }
+                .content-area {
+                    margin-left: 0 !important;
+                }
+                .sidebar-toggle {
+                    display: block !important;
+                }
+            ` : `
+                .admin-sidebar {
+                    left: 0px !important;
+                }
+                .content-area {
+                    margin-left: 250px !important;
+                }
+                .sidebar-toggle {
+                    display: none !important;
+                }
+            `}
+            
+            /* MOBILE: FORCE ĐÓNG MẶC ĐỊNH */
+            @media (max-width: 991px) {
+                .admin-sidebar {
+                    left: -250px !important;
+                }
+                .content-area {
+                    margin-left: 0 !important;
+                }
+                .sidebar-toggle {
+                    display: block !important;
+                }
+            }
+        `;
+    }
+}
+
+// Khởi tạo sidebar ngay lập tức khi DOM load
 document.addEventListener('DOMContentLoaded', function() {
+    // CẬP NHẬT HEADER NGAY LẬP TỨC - KHÔNG CHỜ
+    const currentUrl = window.location.pathname;
+    updateHeaderAndBreadcrumb(currentUrl);
+    updateActiveMenu(currentUrl);
+    
+    // CHỜ MỘT CHÚT ĐỂ ĐẢM BẢO MỌI THỨ LOAD ỔN ĐỊNH
+    setTimeout(() => {
+        // Khởi tạo sidebar trước khi các tính năng khác
+        initializeSidebar();
+        
+        // Khởi tạo các tính năng khác
+        initializeBootstrapComponents();
+    }, 150); // CHỜ 150MS ĐỂ TRÁNH GIỰT
+});
+
+// Hàm khởi tạo sidebar
+function initializeSidebar() {
+    const sidebar = document.querySelector('.admin-sidebar');
+    const sidebarToggle = document.querySelector('.sidebar-toggle');
+    
+    if (!sidebar) return;
+    
+    // TẮT TRANSITION NGAY LẬP TỨC ĐỂ TRÁNH FLASH
+    sidebar.classList.add('no-transition');
+    
+    if (window.innerWidth <= 991) {
+        // Mobile: Đóng mặc định
+        sidebar.classList.remove('show', 'open', 'collapsed');
+        if (sidebarToggle) {
+            sidebarToggle.style.display = 'block';
+        }
+    } else {
+        // Desktop: Kiểm tra localStorage và áp dụng ngay
+        const sidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+        
+        if (sidebarCollapsed) {
+            // Đóng sidebar - THÊM CLASS COLLAPSED NGAY LẬP TỨC
+            sidebar.classList.add('collapsed');
+            sidebar.classList.remove('open');
+        } else {
+            // Mở sidebar - ĐẢM BẢO KHÔNG CÓ CLASS COLLAPSED
+            sidebar.classList.remove('collapsed');
+            sidebar.classList.add('open');
+        }
+    }
+    
+    // BẬT LẠI TRANSITION SAU KHI ĐÃ SET TRẠNG THÁI
+    setTimeout(() => {
+        sidebar.classList.remove('no-transition');
+    }, 100);
+}
+
+// Hàm khởi tạo Bootstrap components
+function initializeBootstrapComponents() {
     
     // ========================================
     // 1. KHỞI TẠO BOOTSTRAP COMPONENTS
     // ========================================
     
     // Khởi tạo tooltips (chú thích khi hover)
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
         return new bootstrap.Tooltip(tooltipTriggerEl);
     });
 
     // Khởi tạo popovers (thông tin popup)
-    var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
-    var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+    const popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+    const popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
         return new bootstrap.Popover(popoverTriggerEl);
     });
 
@@ -79,16 +342,36 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Hàm toggle sidebar (mở/đóng)
     function toggleSidebar() {
+        const contentArea = document.querySelector('.content-area');
+        
+        // THÊM CLASS USER-INTERACTING ĐỂ CÓ TRANSITION MƯỢT MÀ
+        sidebar.classList.add('user-interacting');
+        if (contentArea) {
+            contentArea.classList.add('user-interacting');
+        }
+        
         if (window.innerWidth <= 991) {
             // Mobile: sử dụng class 'show'
             sidebar.classList.toggle('show');
+            
+            // Ẩn/hiện hamburger khi sidebar mở/đóng trên mobile
+            const isOpen = sidebar.classList.contains('show');
+            if (sidebarToggle) {
+                sidebarToggle.style.display = isOpen ? 'none' : 'block';
+            }
         } else {
-            // Desktop: sử dụng class 'collapsed'
-            sidebar.classList.add('user-interacting'); // BẬT TRANSITION
+            // Desktop: sử dụng class 'collapsed' và 'open'
             sidebar.classList.toggle('collapsed');
+            sidebar.classList.toggle('open');
+            
             // Lưu trạng thái sidebar vào localStorage
             const isCollapsed = sidebar.classList.contains('collapsed');
-            localStorage.setItem('sidebarCollapsed', isCollapsed);
+            localStorage.setItem('sidebarCollapsed', isCollapsed); // true = đóng, false = mở
+            
+            // UPDATE STYLE TAG KHI TOGGLE
+            setTimeout(() => {
+                updateSidebarStyle(isCollapsed);
+            }, 50); // CHỜ 50MS ĐỂ TRÁNH GIỰT KHI TOGGLE
         }
     }
     
@@ -136,32 +419,37 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-        // Xử lý khi thay đổi kích thước màn hình
-        window.addEventListener('resize', function() {
+    // Xử lý khi thay đổi kích thước màn hình
+    window.addEventListener('resize', function() {
+        // CHỜ MỘT CHÚT ĐỂ TRÁNH GIỰT KHI RESIZE
+        setTimeout(() => {
             const sidebar = document.querySelector('.admin-sidebar');
+            
             if (sidebar) {
                 if (window.innerWidth <= 991) {
                     // Chuyển sang mobile: DÙNG CLASS `show` - sidebar đóng mặc định
-                    sidebar.classList.remove('show', 'collapsed'); // ĐẢM BẢO ĐÓNG
+                    sidebar.classList.remove('show', 'open', 'collapsed'); // ĐẢM BẢO ĐÓNG
                     if (sidebarToggle) {
-                        sidebarToggle.style.display = 'block';
+                        sidebarToggle.style.display = 'block'; // Hiện hamburger trên mobile
                     }
                 } else {
                     // Chuyển sang desktop: khôi phục trạng thái từ localStorage
                     sidebar.classList.remove('show');
-                    sidebar.style.left = ''; // RESET INLINE STYLE
                     if (sidebarToggle) {
                         sidebarToggle.style.display = '';
                     }
                     // Khôi phục trạng thái sidebar từ localStorage
                     const sidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
                     if (sidebarCollapsed) {
-                        sidebar.classList.add('collapsed');
+                        sidebar.classList.add('collapsed'); // Đóng
+                        sidebar.classList.remove('open');
                     } else {
-                        sidebar.classList.remove('collapsed');
+                        sidebar.classList.remove('collapsed'); // Mở
+                        sidebar.classList.add('open');
                     }
                 }
             }
+            }, 100); // CHỜ 100MS ĐỂ TRÁNH GIỰT KHI RESIZE
         });
 
     // ========================================
@@ -592,66 +880,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // ========================================
-    // 11. TRẠNG THÁI LOADING (REMOVED - CONFLICT WITH AJAX HANDLER)
-    // ========================================
-    
-    // REMOVED: Duplicate form submit listener that was conflicting with AJAX handler
-    // The AJAX handler in section 7 already handles loading states properly
 
     // ========================================
-    // 12. KHỞI TẠO TRẠNG THÁI BAN ĐẦU
-    // ========================================
-    
-    // Thiết lập trạng thái ban đầu của sidebar
-    if (sidebar) {
-        // FORCE SIDEBAR ĐÓNG NGAY TỪ ĐẦU ĐỂ TRÁNH ANIMATION
-        sidebar.style.left = '-250px';
-        sidebar.style.transition = 'none';
-        
-        if (window.innerWidth <= 991) {
-            // Mobile: DÙNG CLASS `show` - sidebar đóng mặc định
-            sidebar.classList.remove('show', 'collapsed'); // ĐẢM BẢO ĐÓNG
-            if (sidebarToggle) {
-                sidebarToggle.style.display = 'block'; // Hiện hamburger header
-            }
-        } else {
-            // Desktop: MẶC ĐỊNH SIDEBAR MỞ (không collapsed)
-            // Chỉ đóng nếu localStorage có giá trị 'true'
-            const sidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
-            
-            if (sidebarCollapsed) {
-                sidebar.classList.add('collapsed');
-            } else {
-                sidebar.classList.remove('collapsed');
-            }
-            // Mặc định: không có class collapsed = sidebar mở
-            // CSS sẽ tự động điều khiển hamburger visibility
-        }
-        
-        // THÊM CLASS INITIALIZED CHO CONTENT AREA TRƯỚC
-        const contentArea = document.querySelector('.content-area');
-        if (contentArea) {
-            contentArea.classList.add('content-initialized');
-        }
-        
-        // THÊM CLASS INITIALIZED ĐỂ CSS HOẠT ĐỘNG
-        sidebar.classList.add('sidebar-initialized');
-        
-        // ĐỢI 1 FRAME ĐỂ CSS ÁP DỤNG HOÀN TOÀN
-        requestAnimationFrame(() => {
-            sidebar.style.left = '';
-            sidebar.style.transition = '';
-            
-            // BẬT TRANSITION CHO CONTENT AREA SAU KHI SETUP XONG
-            if (contentArea) {
-                contentArea.style.transition = 'margin-left 0.3s ease';
-            }
-        });
-    }
-
-    // ========================================
-    // 13. AJAX NAVIGATION - KHÔNG RELOAD SIDEBAR
+    // 11. AJAX NAVIGATION - KHÔNG RELOAD SIDEBAR
     // ========================================
     
     // Hàm load content bằng AJAX
@@ -699,10 +930,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     document.title = newTitle.textContent;
                 }
                 
-                // Update active menu
+                // Update active menu (luôn update)
                 updateActiveMenu(url);
                 
-                // Update header and breadcrumb
+                // Update header and breadcrumb (luôn update)
                 updateHeaderAndBreadcrumb(url);
                 
                 // Re-initialize components
@@ -725,118 +956,16 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Hàm update header và breadcrumb
-    function updateHeaderAndBreadcrumb(url) {
-        // Update header title based on URL
-        const headerTitle = document.querySelector('.admin-header h4');
-        const headerDescription = document.querySelector('.admin-header small');
-        
-        if (headerTitle && headerDescription) {
-            switch(url) {
-                case '/admin':
-                case '/admin/':
-                case '/admin/dashboard':
-                case '/admin/dashboard/':
-                case '/admin/dashboard/home':
-                    headerTitle.textContent = 'Dashboard Admin';
-                    headerDescription.textContent = 'Tổng quan hệ thống Mộc Việt';
-                    break;
-                case '/admin/users':
-                    headerTitle.textContent = 'Quản lý Users';
-                    headerDescription.textContent = 'Quản lý tài khoản hệ thống';
-                    break;
-                case '/admin/colors':
-                    headerTitle.textContent = 'Quản lý màu sắc';
-                    headerDescription.textContent = 'Quản lý màu sắc sản phẩm';
-                    break;
-                case '/admin/categories':
-                    headerTitle.textContent = 'Quản lý danh mục';
-                    headerDescription.textContent = 'Quản lý danh mục sản phẩm';
-                    break;
-                case '/admin/coupons':
-                    headerTitle.textContent = 'Quản lý mã giảm giá';
-                    headerDescription.textContent = 'Quản lý mã giảm giá và khuyến mãi';
-                    break;
-                case '/admin/shipping':
-                    headerTitle.textContent = 'Quản lý phí vận chuyển';
-                    headerDescription.textContent = 'Quản lý phí vận chuyển';
-                    break;
-                case '/admin/delivery-teams':
-                    headerTitle.textContent = 'Quản lý đội giao hàng';
-                    headerDescription.textContent = 'Quản lý đội giao hàng';
-                    break;
-                case '/admin/banners':
-                    headerTitle.textContent = 'Quản lý banner';
-                    headerDescription.textContent = 'Quản lý banner quảng cáo';
-                    break;
-                case '/admin/pages':
-                    headerTitle.textContent = 'Quản lý trang tĩnh';
-                    headerDescription.textContent = 'Quản lý trang tĩnh';
-                    break;
-                case '/admin/showrooms':
-                    headerTitle.textContent = 'Quản lý showroom';
-                    headerDescription.textContent = 'Quản lý showroom';
-                    break;
-                case '/admin/social-links':
-                    headerTitle.textContent = 'Quản lý liên kết MXH';
-                    headerDescription.textContent = 'Quản lý liên kết mạng xã hội';
-                    break;
-                case '/admin/reports':
-                    headerTitle.textContent = 'Báo cáo & Thống kê';
-                    headerDescription.textContent = 'Báo cáo và thống kê hệ thống';
-                    break;
-                case '/admin/notifications':
-                    headerTitle.textContent = 'Thông báo';
-                    headerDescription.textContent = 'Quản lý và theo dõi thông báo hệ thống';
-                    break;
-                case '/admin/profile':
-                    headerTitle.textContent = 'Thông tin cá nhân';
-                    headerDescription.textContent = 'Cập nhật thông tin cá nhân và cài đặt tài khoản';
-                    break;
-                default:
-                    headerTitle.textContent = 'Admin Panel';
-                    headerDescription.textContent = 'Quản trị hệ thống Mộc Việt';
-            }
-        }
-        
-        // Update breadcrumb
-        const breadcrumbActive = document.querySelector('.admin-breadcrumb .breadcrumb-item.active');
-        if (breadcrumbActive) {
-            breadcrumbActive.textContent = headerTitle ? headerTitle.textContent : 'Admin Panel';
-        }
-    }
-    
-    // Hàm update active menu
-    function updateActiveMenu(url) {
-        const navLinks = document.querySelectorAll('.admin-sidebar .nav-link');
-        navLinks.forEach(link => {
-            link.classList.remove('active');
-            const href = link.getAttribute('href');
-            
-            // Logic chính xác: chỉ match exact
-            if (href) {
-                // Exact match only
-                if (url === href) {
-                    link.classList.add('active');
-                }
-                // Special case: Dashboard (/admin) should match dashboard URLs
-                else if (href === '/admin' && (url === '/admin' || url === '/admin/' || url === '/admin/dashboard' || url === '/admin/dashboard/' || url === '/admin/dashboard/home')) {
-                    link.classList.add('active');
-                }
-            }
-        });
-    }
-    
     // Hàm khởi tạo components cho trang mới
     function initializePageComponents() {
         // Re-initialize tooltips
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl);
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+            new bootstrap.Tooltip(tooltipTriggerEl);
         });
         
         // Re-initialize modals
-        var modalTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="modal"]'));
+        const modalTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="modal"]'));
         modalTriggerList.forEach(function(modalTriggerEl) {
             new bootstrap.Modal(modalTriggerEl);
         });
@@ -899,12 +1028,16 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Handle browser back/forward buttons
     window.addEventListener('popstate', function(event) {
-        const url = window.location.pathname;
-        loadPageContent(url);
+        // Chỉ load khi thực sự là back/forward, không phải reload
+        if (event.state !== null) {
+            const url = window.location.pathname;
+            loadPageContent(url);
+        }
     });
     
     // PERSIST SIDEBAR STATE ACROSS NAVIGATION
     window.addEventListener('beforeunload', function() {
+        const sidebar = document.querySelector('.admin-sidebar');
         if (sidebar) {
             const isCollapsed = sidebar.classList.contains('collapsed');
             localStorage.setItem('sidebarCollapsed', isCollapsed);
@@ -912,4 +1045,4 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     console.log('Admin panel initialized successfully!');
-});
+}

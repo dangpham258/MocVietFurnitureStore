@@ -1,6 +1,4 @@
-/* ========================================
-   CSS ADMIN PANEL - MỘC VIỆT FURNITURE STORE
-   ======================================== */
+/* CSS ADMIN PANEL - MỘC VIỆT FURNITURE STORE */
 
 /* ========================================
    1. RESET & BASE STYLES - Thiết lập cơ bản
@@ -41,6 +39,13 @@ body, html {
    3. SIDEBAR - Thanh điều hướng bên trái
    ======================================== */
 
+/* CSS Variables cho sidebar */
+:root {
+    --sidebar-width: 250px;
+    --sidebar-closed: -250px;
+    --sidebar-open: 0px;
+}
+
 /* Sidebar cố định - Phong cách hiện đại tối giản */
 .admin-sidebar {
     background: #e9ecef; /* Xám đậm hơn để dễ nhìn */
@@ -49,26 +54,16 @@ body, html {
     height: 100vh;
     position: fixed;
     top: 0;
-    left: -250px !important; /* FORCE ĐÓNG NGAY TỪ ĐẦU - OVERRIDE TẤT CẢ */
+    left: var(--sidebar-closed); /* MẶC ĐỊNH ĐÓNG CHO TẤT CẢ */
     z-index: 1000;
     overflow-y: auto;
-    width: 250px; /* Fixed width thay vì percentage */
-    min-width: 250px;
-    transition: none !important; /* TẮT TRANSITION HOÀN TOÀN */
+    width: var(--sidebar-width); /* Fixed width thay vì percentage */
+    min-width: var(--sidebar-width);
+    transition: none; /* TẮT TRANSITION MẶC ĐỊNH ĐỂ TRÁNH FLASH */
     box-shadow: 2px 0 8px rgba(0,0,0,0.15); /* Bóng đậm hơn */
 }
 
-/* FORCE SIDEBAR ĐÓNG NGAY TỪ ĐẦU - OVERRIDE TẤT CẢ CLASS */
-.admin-sidebar.collapsed,
-.admin-sidebar:not(.sidebar-initialized) {
-    left: -250px !important;
-    transition: none !important;
-}
-
-/* Sidebar mở CHỈ KHI đã initialized VÀ không collapsed */
-.admin-sidebar.sidebar-initialized:not(.collapsed) {
-    left: 0 !important;
-}
+/* DESKTOP: CHỈ DÙNG JAVASCRIPT STYLE TAG */
 
 /* TẮT TRANSITION HOÀN TOÀN */
 .admin-sidebar.no-transition {
@@ -161,19 +156,15 @@ body, html {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    transition: margin-left 0.3s ease !important; /* ANIMATION MƯỢT MÀ */
+    transition: none; /* TẮT TRANSITION MẶC ĐỊNH ĐỂ TRÁNH FLASH */
     margin: 0;
     padding: 0;
+    margin-left: 0; /* MẶC ĐỊNH ĐÓNG CHO TẤT CẢ */
 }
 
-/* CONTENT AREA MỞ KHI SIDEBAR KHÔNG COLLAPSED */
-.admin-sidebar:not(.collapsed) ~ .content-area {
-    margin-left: 250px !important;
-}
-
-/* CONTENT AREA ĐÓNG KHI SIDEBAR COLLAPSED */
-.admin-sidebar.collapsed ~ .content-area {
-    margin-left: 0 !important;
+/* BẬT TRANSITION CHỈ KHI USER TƯƠNG TÁC */
+.content-area.user-interacting {
+    transition: margin-left 0.3s ease !important;
 }
 
 /* Nội dung chính - Phong cách tối giản */
@@ -411,111 +402,42 @@ body, html {
 }
 
 /* ========================================
-   14. RESPONSIVE - Giao diện đáp ứng
+   14. FORM VALIDATION STYLES
    ======================================== */
 
-/* Desktop nhỏ (1024px - 1200px) */
-@media (max-width: 1200px) and (min-width: 769px) {
-    .admin-sidebar {
-        width: 200px;
-        min-width: 200px;
-    }
-    
-    .content-area {
-        margin-left: 200px;
-    }
+.form-control.is-invalid,
+.form-select.is-invalid {
+    border-color: #dc3545 !important;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
 }
 
-/* Tablet (769px - 1024px) */
-@media (max-width: 1024px) and (min-width: 769px) {
-    .admin-sidebar {
-        width: 180px;
-        min-width: 180px;
-    }
-    
-    .content-area {
-        margin-left: 180px;
-    }
+.invalid-feedback {
+    display: block;
+    width: 100%;
+    margin-top: 0.25rem;
+    font-size: 0.875rem;
+    color: #dc3545;
+    font-weight: 500;
 }
 
-/* Desktop hamburger visibility control */
-@media (min-width: 992px) {
-    .admin-sidebar:not(.collapsed) ~ .content-area .sidebar-toggle {
-        display: none !important;
-    }
+.form-control.is-valid,
+.form-select.is-valid {
+    border-color: #198754 !important;
+    box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.25) !important;
 }
 
-/* Mobile và tablet - FORCE ĐÓNG SIDEBAR KHI RESIZE */
-@media (max-width: 991px) {
-    /* FORCE SIDEBAR ĐÓNG KHI TAB RESIZE NHỎ */
-    .admin-sidebar {
-        left: -250px !important; /* FORCE ĐÓNG */
-        transition: left 0.3s ease !important; /* THÊM TRANSITION */
-    }
-    
-    /* FORCE SIDEBAR ĐÓNG - OVERRIDE TẤT CẢ CLASS */
-    .admin-sidebar.collapsed,
-    .admin-sidebar:not(.collapsed),
-    .admin-sidebar.sidebar-initialized:not(.collapsed),
-    .admin-sidebar.sidebar-initialized {
-        left: -250px !important; /* FORCE ĐÓNG */
-        transition: left 0.3s ease !important; /* THÊM TRANSITION */
-    }
-    
-    /* Sidebar mở khi có class show - OVERRIDE TẤT CẢ */
-    .admin-sidebar.show {
-        left: 0 !important; /* CHỈ MỞ KHI CÓ CLASS SHOW */
-        transition: left 0.3s ease !important; /* THÊM TRANSITION */
-    }
-    
-    /* OVERRIDE CSS DESKTOP CHO CLASS SHOW */
-    .admin-sidebar.show.collapsed,
-    .admin-sidebar.show:not(.collapsed),
-    .admin-sidebar.show.sidebar-initialized:not(.collapsed),
-    .admin-sidebar.show.sidebar-initialized {
-        left: 0 !important; /* FORCE MỞ KHI CÓ CLASS SHOW */
-        transition: left 0.3s ease !important; /* THÊM TRANSITION */
-    }
-    
-    /* FORCE CONTENT AREA VỀ 0PX KHI RESIZE */
-    .content-area {
-        margin-left: 0 !important; /* FORCE VỀ 0PX */
-        transition: margin-left 0.3s ease !important; /* ANIMATION MƯỢT MÀ */
-    }
-    
-    /* FORCE CONTENT AREA VỀ 0PX - OVERRIDE TẤT CẢ CLASS */
-    .admin-sidebar.collapsed ~ .content-area,
-    .admin-sidebar:not(.collapsed) ~ .content-area,
-    .admin-sidebar.sidebar-initialized:not(.collapsed) ~ .content-area,
-    .admin-sidebar.sidebar-initialized ~ .content-area {
-        margin-left: 0 !important; /* FORCE VỀ 0PX */
-        transition: margin-left 0.3s ease !important; /* ANIMATION MƯỢT MÀ */
-    }
-    
-    /* Content area mở khi sidebar có class show */
-    .admin-sidebar.show ~ .content-area {
-        margin-left: 250px !important; /* MỞ KHI SIDEBAR MỞ */
-        transition: margin-left 0.3s ease !important; /* ANIMATION MƯỢT MÀ */
-    }
-    
-    /* Header hamburger luôn hiển thị trên mobile */
-    .sidebar-toggle {
-        display: block !important;
-    }
+.valid-feedback {
+    display: block;
+    width: 100%;
+    margin-top: 0.25rem;
+    font-size: 0.875rem;
+    color: #198754;
+    font-weight: 500;
 }
 
-/* Desktop nhỏ - KHÔNG OVERRIDE MOBILE */
-@media (max-width: 767.98px) and (min-width: 768px) {
-    .admin-sidebar {
-        width: 100%;
-        position: relative;
-        height: auto;
-    }
-    
-    .content-area {
-        margin-left: 0;
-    }
-}
+/* ========================================
+   15. TAB STYLES - Tab navigation
+   ======================================== */
 
 /* Fix chiều cao tab content */
 .tab-content {
@@ -584,41 +506,7 @@ body, html {
 }
 
 /* ========================================
-   FORM VALIDATION STYLES
-   ======================================== */
-
-.form-control.is-invalid,
-.form-select.is-invalid {
-    border-color: #dc3545 !important;
-    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
-}
-
-.invalid-feedback {
-    display: block;
-    width: 100%;
-    margin-top: 0.25rem;
-    font-size: 0.875rem;
-    color: #dc3545;
-    font-weight: 500;
-}
-
-.form-control.is-valid,
-.form-select.is-valid {
-    border-color: #198754 !important;
-    box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.25) !important;
-}
-
-.valid-feedback {
-    display: block;
-    width: 100%;
-    margin-top: 0.25rem;
-    font-size: 0.875rem;
-    color: #198754;
-    font-weight: 500;
-}
-
-/* ========================================
-   NOTIFICATION ANIMATIONS
+   16. NOTIFICATION ANIMATIONS
    ======================================== */
 
 .notification-popup {
@@ -738,57 +626,50 @@ body, html {
     color: #ffffff !important;
 }
 
-/* Dark mode support - DISABLED FOR NOTIFICATIONS */
-@media (prefers-color-scheme: dark) {
-    .notification-popup.alert-success {
-        background: #28a745 !important;
-        color: #ffffff !important;
+/* ========================================
+   17. RESPONSIVE - Giao diện đáp ứng
+   ======================================== */
+
+/* Mobile và tablet - Sidebar đóng mặc định */
+@media (max-width: 991px) {
+    /* Mobile: Sidebar đóng mặc định */
+    .admin-sidebar {
+        left: var(--sidebar-closed) !important; /* FORCE ĐÓNG */
+        background: #e9ecef !important; /* Đảm bảo màu nền trên mobile */
     }
     
-    .notification-popup.alert-danger {
-        background: #dc3545 !important;
-        color: #ffffff !important;
+    /* Mobile: Content area đóng mặc định */
+    .content-area {
+        margin-left: 0 !important; /* FORCE VỀ 0PX */
     }
     
-    .notification-popup.alert-warning {
-        background: #ffc107 !important;
-        color: #000000 !important;
+    /* Mobile: Sidebar mở khi có class show */
+    .admin-sidebar.show {
+        left: var(--sidebar-open) !important; /* CHỈ MỞ KHI CÓ CLASS SHOW */
     }
     
-    .notification-popup.alert-info {
-        background: #17a2b8 !important;
-        color: #ffffff !important;
+    /* Mobile: Content area mở khi sidebar có class show */
+    .admin-sidebar.show ~ .content-area {
+        margin-left: var(--sidebar-width) !important; /* MỞ KHI SIDEBAR MỞ */
     }
     
-    .notification-popup.alert-success .btn-close {
-        color: #ffffff !important;
+    /* Mobile: Ẩn hamburger khi sidebar mở */
+    .admin-sidebar.show ~ .content-area .sidebar-toggle {
+        display: none !important;
     }
     
-    .notification-popup.alert-danger .btn-close {
-        color: #ffffff !important;
+    /* Mobile: Sidebar đóng khi có class collapsed */
+    .admin-sidebar.collapsed {
+        left: var(--sidebar-closed) !important;
     }
     
-    .notification-popup.alert-warning .btn-close {
-        color: #000000 !important;
+    /* Mobile: Content area đóng khi sidebar có class collapsed */
+    .admin-sidebar.collapsed ~ .content-area {
+        margin-left: 0 !important;
     }
     
-    .notification-popup.alert-info .btn-close {
-        color: #ffffff !important;
-    }
-    
-    .notification-popup.alert-success .bi {
-        color: #ffffff !important;
-    }
-    
-    .notification-popup.alert-danger .bi {
-        color: #ffffff !important;
-    }
-    
-    .notification-popup.alert-warning .bi {
-        color: #000000 !important;
-    }
-    
-    .notification-popup.alert-info .bi {
-        color: #ffffff !important;
+    /* Header hamburger luôn hiển thị trên mobile */
+    .sidebar-toggle {
+        display: block !important;
     }
 }

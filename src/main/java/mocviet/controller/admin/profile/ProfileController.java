@@ -40,7 +40,7 @@ public class ProfileController {
         profileUpdateRequest.setGender(userProfile.getGender());
         profileUpdateRequest.setDob(userProfile.getDob());
         
-        // Format DOB for HTML5 date input (yyyy-MM-dd)
+        // Format DOB cho HTML5 date input (yyyy-MM-dd)
         if (userProfile.getDob() != null) {
             model.addAttribute("formattedDob", userProfile.getDob().toString());
         } else {
@@ -50,7 +50,7 @@ public class ProfileController {
         model.addAttribute("profileUpdateRequest", profileUpdateRequest);
         model.addAttribute("passwordChangeRequest", new PasswordChangeRequest());
         
-        // Check if it's an AJAX request
+        // Kiem tra co phai la AJAX request
         if ("XMLHttpRequest".equals(request.getHeader("X-Requested-With"))) {
             return "admin/profile/admin_profile ::content";
         }
