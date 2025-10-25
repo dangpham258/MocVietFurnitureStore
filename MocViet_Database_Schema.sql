@@ -4,8 +4,8 @@
    
    THỐNG KÊ:
    - 34 Bảng (Tables)
-   - 6 Stored Procedures (SP)
-   - 15 Triggers
+   - 11 Stored Procedures (SP)
+   - 23 Triggers
 
    
    CẤU TRÚC:
@@ -113,6 +113,18 @@ IF EXISTS (SELECT * FROM sys.triggers WHERE name = 'TR_Article_NotifyNew')
     DROP TRIGGER dbo.TR_Article_NotifyNew;
 GO
 
+IF EXISTS (SELECT * FROM sys.triggers WHERE name = 'TR_Orders_NotifyReturnRequest')
+    DROP TRIGGER dbo.TR_Orders_NotifyReturnRequest;
+GO
+
+IF EXISTS (SELECT * FROM sys.triggers WHERE name = 'TR_Orders_NotifyCustomerReturnRejected')
+    DROP TRIGGER dbo.TR_Orders_NotifyCustomerReturnRejected;
+GO
+
+IF EXISTS (SELECT * FROM sys.triggers WHERE name = 'TR_Orders_NotifyCustomerReturnApproved')
+    DROP TRIGGER dbo.TR_Orders_NotifyCustomerReturnApproved;
+GO
+
 -- Drop Stored Procedures
 IF EXISTS (SELECT * FROM sys.procedures WHERE name = 'sp_CreateOrder')
     DROP PROCEDURE dbo.sp_CreateOrder;
@@ -136,6 +148,26 @@ GO
 
 IF EXISTS (SELECT * FROM sys.procedures WHERE name = 'sp_MarkDelivered')
     DROP PROCEDURE dbo.sp_MarkDelivered;
+GO
+
+IF EXISTS (SELECT * FROM sys.procedures WHERE name = 'sp_ApproveReturn')
+    DROP PROCEDURE dbo.sp_ApproveReturn;
+GO
+
+IF EXISTS (SELECT * FROM sys.procedures WHERE name = 'sp_RejectReturn')
+    DROP PROCEDURE dbo.sp_RejectReturn;
+GO
+
+IF EXISTS (SELECT * FROM sys.procedures WHERE name = 'sp_RequestReturn')
+    DROP PROCEDURE dbo.sp_RequestReturn;
+GO
+
+IF EXISTS (SELECT * FROM sys.procedures WHERE name = 'sp_HandlePaymentWebhook')
+    DROP PROCEDURE dbo.sp_HandlePaymentWebhook;
+GO
+
+IF EXISTS (SELECT * FROM sys.procedures WHERE name = 'sp_AutoCancelUnpaidOnline')
+    DROP PROCEDURE dbo.sp_AutoCancelUnpaidOnline;
 GO
 
 -- Drop User Defined Types
@@ -402,7 +434,7 @@ CREATE TABLE dbo.ProductVariant (
 ALTER TABLE dbo.ProductVariant ADD sale_price AS (
   CAST(
     ROUND(
-      CASE WHEN discount_percent IS NULL OR discount_percent = 0
+      CASE WHEN discount_percent = 0
            THEN price
            ELSE price * (100 - discount_percent) / 100.0
       END, -3  -- làm tròn bậc nghìn
@@ -488,6 +520,9 @@ CREATE TABLE dbo.Orders (
     payment_status NVARCHAR(20) NULL CHECK (payment_status IN (N'UNPAID', N'PAID', N'REFUNDED')), -- UNPAID/PAID/REFUNDED
     coupon_code    NVARCHAR(50) NULL,                      -- Coupon áp dụng
     shipping_fee   DECIMAL(12,0) NOT NULL DEFAULT 0,       -- Phí vận chuyển tính theo miền
+    return_status  NVARCHAR(20) NULL CHECK (return_status IN (N'REQUESTED', N'APPROVED', N'REJECTED', N'PROCESSED')), -- Trạng thái yêu cầu trả hàng
+    return_reason  NVARCHAR(500) NULL,                     -- Lý do trả hàng từ customer
+    return_note    NVARCHAR(500) NULL,                     -- Ghi chú từ manager
     created_at     DATETIME NOT NULL DEFAULT GETDATE(),    -- Tạo lúc
     updated_at     DATETIME NOT NULL DEFAULT GETDATE(),    -- Cập nhật
     CONSTRAINT FK_Orders_User    FOREIGN KEY (user_id)    REFERENCES dbo.Users(id)   ON DELETE NO ACTION,
@@ -535,7 +570,7 @@ CREATE TABLE dbo.Review (
     CONSTRAINT FK_Review_Product   FOREIGN KEY (product_id)    REFERENCES dbo.Product(id)     ON DELETE CASCADE,
     CONSTRAINT FK_Review_User      FOREIGN KEY (user_id)       REFERENCES dbo.Users(id)       ON DELETE CASCADE,
     CONSTRAINT FK_Review_OrderItem FOREIGN KEY (order_item_id) REFERENCES dbo.OrderItems(id)  ON DELETE CASCADE,
-    CONSTRAINT FK_Review_Manager   FOREIGN KEY (manager_id)    REFERENCES dbo.Users(id)       ON DELETE NO ACTION,
+    CONSTRAINT FK_Review_Manager   FOREIGN KEY (manager_id)    REFERENCES dbo.Users(id)       ON DELETE NO ACTION
 );
 
 -- Bảng ShippingZone: Ba miền giao hàng
@@ -814,6 +849,8 @@ CREATE INDEX IX_Users_RoleActive ON dbo.Users(role_id) INCLUDE(is_active, full_n
 CREATE INDEX IX_Roles_Name ON dbo.Roles(name) INCLUDE(id);
 CREATE INDEX IX_Product_CategoryActiveSold ON dbo.Product(category_id) INCLUDE(is_active, sold_qty, avg_rating, created_at);
 CREATE INDEX IX_PV_ByProduct_ForDetail ON dbo.ProductVariant(product_id) INCLUDE(color_id, type_name, sale_price, stock_qty) WHERE is_active=1;
+CREATE INDEX IX_UserNotification_Dedupe ON dbo.UserNotification(user_id, title, created_at DESC);
+CREATE INDEX IX_Orders_Return_Status ON dbo.Orders(return_status, [status]) INCLUDE(user_id, payment_status, created_at);
 
 
 
@@ -837,6 +874,7 @@ CREATE OR ALTER PROCEDURE dbo.sp_CreateOrder
   @user_id      INT,
   @address_id   INT = NULL,
   @coupon_code  NVARCHAR(50) = NULL,
+  @payment_method NVARCHAR(20) = N'COD',  -- COD | VNPAY | MOMO
   @items        dbo.TVP_OrderItem READONLY
 AS
 BEGIN
@@ -852,6 +890,9 @@ BEGIN
 
   IF NOT EXISTS (SELECT 1 FROM dbo.Address WHERE id = @address_id AND user_id = @user_id)
   BEGIN RAISERROR (N'Địa chỉ không thuộc về customer.',16,1); ROLLBACK TRAN; RETURN; END
+
+  IF @payment_method NOT IN (N'COD', N'VNPAY', N'MOMO')
+  BEGIN RAISERROR (N'payment_method không hợp lệ. Chỉ chấp nhận COD, VNPAY, MOMO.',16,1); ROLLBACK TRAN; RETURN; END
 
   IF NOT EXISTS (SELECT 1 FROM @items)
   BEGIN RAISERROR (N'Giỏ hàng trống.',16,1); ROLLBACK TRAN; RETURN; END
@@ -883,14 +924,15 @@ BEGIN
   BEGIN RAISERROR (N'Một hoặc nhiều biến thể không ở trạng thái active.',16,1); ROLLBACK TRAN; RETURN; END
 
   -- 4) Tính subtotal (VND nguyên)
-  DECLARE @subtotal DECIMAL(18,0) =
-    (SELECT SUM(CONVERT(DECIMAL(18,0), sale_price) * qty) FROM @temp_items);
+  DECLARE @subtotal DECIMAL(19,0) =
+    (SELECT SUM(CONVERT(DECIMAL(19,0), sale_price) * CONVERT(DECIMAL(19,0), qty))
+    FROM @temp_items);
 
   IF @subtotal IS NULL OR @subtotal < 0
   BEGIN RAISERROR (N'Lỗi tính tiền giỏ hàng.',16,1); ROLLBACK TRAN; RETURN; END
 
   -- 5) Validate coupon (nếu có) và tính discount
-  DECLARE @discount_amount DECIMAL(18,0) = 0;
+  DECLARE @discount_amount DECIMAL(19,0) = 0;
 
   IF @coupon_code IS NOT NULL
   BEGIN
@@ -910,13 +952,13 @@ BEGIN
     END
 
     -- Làm tròn về VND nguyên (đổi 0 -> -3 nếu muốn 1.000đ)
-    SET @discount_amount = CONVERT(DECIMAL(18,0),
+    SET @discount_amount = CONVERT(DECIMAL(19,0),
   ROUND(@subtotal * (@coupon_percent / 100.0), -3)  -- bậc nghìn
 );
 
   END
 
-  DECLARE @total_after_coupon DECIMAL(18,0) = @subtotal - @discount_amount;
+  DECLARE @total_after_coupon DECIMAL(19,0) = @subtotal - @discount_amount;
   IF @total_after_coupon < 0 SET @total_after_coupon = 0;
 
   -- 5.1) Validate tỉnh/thành phải được map vào zone
@@ -939,7 +981,7 @@ BEGIN
   JOIN dbo.ShippingFee sf ON sf.zone_id = pz.zone_id
   WHERE a.id = @address_id;
 
-  DECLARE @grand_total DECIMAL(18,0) = @total_after_coupon + @shipping_fee;
+  DECLARE @grand_total DECIMAL(19,0) = @total_after_coupon + @shipping_fee;
 
   -- 6) Tạo đơn
   INSERT dbo.Orders(user_id, address_id, [status], payment_method, payment_status, coupon_code, shipping_fee)
@@ -969,6 +1011,13 @@ BEGIN
   INSERT dbo.OrderStatusHistory(order_id, [status], note, changed_by)
   VALUES (@order_id, N'PENDING', N'Tạo đơn hàng', NULL);
 
+  -- 8) Cập nhật payment_method và payment_status
+  UPDATE o
+     SET payment_method = @payment_method,
+         payment_status = N'UNPAID'
+  FROM dbo.Orders o
+  WHERE o.id = @order_id;
+
   COMMIT TRAN;
 
   SELECT @order_id AS order_id,
@@ -977,6 +1026,49 @@ BEGIN
          @total_after_coupon AS total_after_coupon,
          @shipping_fee AS shipping_fee,
          @grand_total AS grand_total;
+END
+GO
+
+
+-- Stored Procedure: Xử lý webhook thanh toán (VNPAY/MoMo)
+CREATE OR ALTER PROCEDURE dbo.sp_HandlePaymentWebhook
+  @order_id INT,
+  @payment_method NVARCHAR(20), -- 'VNPAY' | 'MOMO'
+  @is_success BIT,
+  @gateway_txn_code NVARCHAR(100) = NULL -- nếu muốn log vào OrderStatusHistory
+AS
+BEGIN
+  SET NOCOUNT ON;
+
+  IF @is_success = 1
+  BEGIN
+    -- Cập nhật payment_status cho đơn PENDING hoặc CONFIRMED
+  UPDATE dbo.Orders 
+        SET payment_method  = @payment_method,
+            payment_status  = N'PAID',
+            updated_at      = GETDATE()
+      WHERE id = @order_id AND status IN (N'PENDING', N'CONFIRMED');
+
+    -- Log thành công
+    INSERT INTO dbo.OrderStatusHistory(order_id, [status], note)
+    VALUES(@order_id, N'PENDING', CONCAT(N'Payment PAID via ', @payment_method, N' (webhook). Txn=', ISNULL(@gateway_txn_code,N'')));
+
+    -- Cảnh báo nếu đơn không match điều kiện (đã CANCELLED hoặc DELIVERED)
+  IF @@ROWCOUNT = 0
+  BEGIN
+      DECLARE @current_status NVARCHAR(20);
+      SELECT @current_status = status FROM dbo.Orders WHERE id = @order_id;
+      
+      INSERT INTO dbo.OrderStatusHistory(order_id, [status], note)
+      VALUES(@order_id, @current_status, CONCAT(N'WARNING: Payment webhook received but order status is ', @current_status, N'. Payment not updated.'));
+    END
+  END
+  ELSE
+  BEGIN
+    -- thất bại: giữ UNPAID, có thể ghi log
+    INSERT INTO dbo.OrderStatusHistory(order_id, [status], note)
+    VALUES(@order_id, N'PENDING', CONCAT(@payment_method, N' payment failed.'));
+  END
 END
 GO
 
@@ -995,71 +1087,49 @@ BEGIN
   BEGIN TRAN;
 
   -- Chỉ hủy khi PENDING (đảm bảo chưa giao/không double restock)
-  UPDATE dbo.Orders 
-    SET [status] = N'CANCELLED'
-  WHERE id = @order_id AND [status] = N'PENDING';
-
-  IF @@ROWCOUNT = 0
+  IF NOT EXISTS (SELECT 1 FROM dbo.Orders WHERE id = @order_id AND [status] = N'PENDING')
   BEGIN
-    RAISERROR (N'Chỉ hủy đơn ở trạng thái PENDING.',16,1); 
+    RAISERROR(N'Chỉ hủy được đơn PENDING', 16, 1);
     ROLLBACK TRAN; RETURN; 
   END
 
-  -- Bù tồn theo OrderItems
-  UPDATE pv
-     SET pv.stock_qty = pv.stock_qty + oi.qty
-  FROM dbo.ProductVariant pv WITH (UPDLOCK, ROWLOCK)
-  JOIN dbo.OrderItems oi ON oi.variant_id = pv.id
+  DECLARE @pm NVARCHAR(20), @ps NVARCHAR(20);
+  SELECT @pm = payment_method, @ps = payment_status FROM dbo.Orders WHERE id = @order_id;
+
+  -- Nếu online đã PAID -> thực hiện refund ngay rồi set REFUNDED
+  IF @pm IN (N'VNPAY', N'MOMO') AND @ps = N'PAID'
+  BEGIN
+    -- TODO: gọi API refund đồng bộ tại đây (qua service layer). Ở DB chỉ log:
+    INSERT INTO dbo.OrderStatusHistory(order_id, [status], note)
+    VALUES(@order_id, N'PENDING', CONCAT(@pm, N' refund executed on cancel.'));
+
+    UPDATE dbo.Orders
+       SET payment_status = N'REFUNDED',
+           updated_at = GETDATE()
+     WHERE id = @order_id;
+  END
+
+  -- Cộng tồn lại các variant
+  UPDATE v
+     SET v.stock_qty = v.stock_qty + oi.qty
+  FROM dbo.OrderItems oi
+  JOIN dbo.ProductVariant v ON v.id = oi.variant_id
   WHERE oi.order_id = @order_id;
 
-  -- Log
-  INSERT dbo.OrderStatusHistory(order_id, [status], note, changed_by)
-  VALUES (@order_id, N'CANCELLED', ISNULL(@reason,N'Hủy đơn & bù tồn'), @actor_user_id);
+  -- Hủy đơn
+  UPDATE dbo.Orders
+     SET [status] = N'CANCELLED',
+         updated_at = GETDATE()
+   WHERE id = @order_id;
+
+  INSERT INTO dbo.OrderStatusHistory(order_id, [status], note)
+  VALUES(@order_id, N'CANCELLED', ISNULL(@reason,N'Cancel by user/manager'));
 
   COMMIT TRAN;
 END
 GO
 
 
--- Stored Procedure: Xử lý trả hàng và bù lại tồn kho
-CREATE OR ALTER PROCEDURE dbo.sp_ReturnOrder
-  @order_id INT,
-  @actor_user_id INT = NULL,
-  @reason NVARCHAR(500) = NULL
-AS
-BEGIN
-  SET NOCOUNT ON;
-  SET XACT_ABORT ON;
-  SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
-
-  BEGIN TRAN;
-
-  -- Chỉ return khi đang DELIVERED và chưa RETURNED
-  UPDATE dbo.Orders 
-    SET [status] = N'RETURNED',
-        payment_status = N'REFUNDED'
-  WHERE id = @order_id AND [status] = N'DELIVERED';
-
-  IF @@ROWCOUNT = 0
-  BEGIN
-    RAISERROR (N'Chỉ xử lý trả hàng khi đơn đang ở trạng thái DELIVERED.',16,1); 
-    ROLLBACK TRAN; RETURN; 
-  END
-
-  -- Bù tồn
-  UPDATE pv
-     SET pv.stock_qty = pv.stock_qty + oi.qty
-  FROM dbo.ProductVariant pv WITH (UPDLOCK, ROWLOCK)
-  JOIN dbo.OrderItems oi ON oi.variant_id = pv.id
-  WHERE oi.order_id = @order_id;
-
-  -- Log
-  INSERT dbo.OrderStatusHistory(order_id, [status], note, changed_by)
-  VALUES (@order_id, N'RETURNED', ISNULL(@reason,N'Trà hàng & bù tồn'), @actor_user_id);
-
-  COMMIT TRAN;
-END
-GO
 
 
 
@@ -1236,9 +1306,300 @@ BEGIN
   INSERT dbo.OrderStatusHistory(order_id, [status], note, changed_by)
   VALUES (@order_id, N'DELIVERED', ISNULL(@note, N'Giao thành công'), @actor_user_id);
 
+  -- Xử lý COD: nếu payment_method = COD và payment_status = UNPAID thì set PAID
+  IF EXISTS (SELECT 1 FROM dbo.Orders WHERE id = @order_id AND payment_method = N'COD' AND payment_status = N'UNPAID')
+  BEGIN
+    UPDATE dbo.Orders
+       SET payment_status = N'PAID',
+           updated_at = GETDATE()
+     WHERE id = @order_id;
+    INSERT INTO dbo.OrderStatusHistory(order_id, [status], note)
+    VALUES(@order_id, N'DELIVERED', N'COD collected, set payment_status = PAID.');
+  END
+
   COMMIT TRAN;
 END
 GO
+
+
+-- Stored Procedure: Auto-cancel đơn online chưa thanh toán (job)
+CREATE OR ALTER PROCEDURE dbo.sp_AutoCancelUnpaidOnline
+  @expire_minutes INT = 15
+AS
+BEGIN
+  SET NOCOUNT ON;
+  SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+
+  ;WITH cte AS (
+    SELECT id
+    FROM dbo.Orders
+    WHERE [status] = N'PENDING'
+      AND payment_method IN (N'VNPAY', N'MOMO')
+      AND payment_status = N'UNPAID'
+      AND created_at < DATEADD(MINUTE, -@expire_minutes, GETDATE())
+  )
+  SELECT * INTO #to_cancel FROM cte;
+
+  DECLARE @oid INT;
+  DECLARE c CURSOR LOCAL FAST_FORWARD FOR SELECT id FROM #to_cancel;
+  OPEN c; FETCH NEXT FROM c INTO @oid;
+  WHILE @@FETCH_STATUS = 0
+  BEGIN
+    -- Re-validate điều kiện trước khi hủy để tránh race condition
+    IF EXISTS (
+      SELECT 1 FROM dbo.Orders 
+      WHERE id = @oid 
+        AND [status] = N'PENDING'
+        AND payment_method IN (N'VNPAY', N'MOMO')
+        AND payment_status = N'UNPAID'
+        AND created_at < DATEADD(MINUTE, -@expire_minutes, GETDATE())
+    )
+    BEGIN
+      -- hoàn kho
+      UPDATE v
+         SET v.stock_qty = v.stock_qty + oi.qty
+      FROM dbo.OrderItems oi
+      JOIN dbo.ProductVariant v ON v.id = oi.variant_id
+      WHERE oi.order_id = @oid;
+
+      -- hủy
+      UPDATE dbo.Orders
+         SET [status] = N'CANCELLED',
+             updated_at = GETDATE()
+       WHERE id = @oid;
+
+      INSERT INTO dbo.OrderStatusHistory(order_id, [status], note)
+      VALUES(@oid, N'CANCELLED', N'Auto-cancel unpaid online after timeout.');
+    END
+
+    FETCH NEXT FROM c INTO @oid;
+  END
+  CLOSE c; DEALLOCATE c;
+
+  DROP TABLE #to_cancel;
+END
+GO
+
+
+-- =========================================================
+-- CÁC STORED PROCEDURES CHO QUY TRÌNH TRẢ HÀNG
+-- =========================================================
+
+-- Stored Procedure: Khách hàng gửi yêu cầu trả hàng
+CREATE OR ALTER PROCEDURE dbo.sp_RequestReturn
+  @order_id INT,
+  @customer_id INT,                 -- bảo vệ: chỉ chủ đơn mới request
+  @reason NVARCHAR(500) = NULL
+AS
+BEGIN
+  SET NOCOUNT ON; SET XACT_ABORT ON;
+  SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+  BEGIN TRAN;
+
+  -- 1) Đơn phải thuộc về customer, đã DELIVERED, chưa có kết quả trả hàng
+  IF NOT EXISTS (
+    SELECT 1
+    FROM dbo.Orders o
+    WHERE o.id = @order_id
+      AND o.user_id = @customer_id
+      AND o.[status] = N'DELIVERED'
+      AND (o.return_status IS NULL OR o.return_status NOT IN (N'REJECTED', N'PROCESSED'))
+  )
+  BEGIN
+    RAISERROR(N'Đơn không hợp lệ để yêu cầu trả.',16,1); ROLLBACK TRAN; RETURN;
+  END
+
+  -- 2) Không cho gửi lại nếu đang REQUESTED/APPROVED
+  IF EXISTS (
+    SELECT 1 FROM dbo.Orders WHERE id=@order_id AND return_status IN (N'REQUESTED', N'APPROVED')
+  )
+  BEGIN
+    RAISERROR(N'Đơn đã gửi yêu cầu/được duyệt trước đó.',16,1); ROLLBACK TRAN; RETURN;
+  END
+
+  -- 3) Kiểm tra thời hạn 30 ngày sau giao hàng - theo chính sách
+  IF EXISTS (
+    SELECT 1
+    FROM dbo.Orders o
+    OUTER APPLY (
+       SELECT MAX(changed_at) AS delivered_at
+       FROM dbo.OrderStatusHistory
+       WHERE order_id = o.id AND [status] = N'DELIVERED'
+    ) h
+    WHERE o.id = @order_id
+      AND DATEDIFF(DAY, h.delivered_at, GETDATE()) > 30
+  )
+  BEGIN RAISERROR(N'Quá thời hạn yêu cầu trả (30 ngày sau giao).',16,1); ROLLBACK; RETURN; END
+
+  -- 4) Ghi trạng thái + lý do
+  UPDATE dbo.Orders
+    SET return_status = N'REQUESTED',
+        return_reason = LEFT(ISNULL(@reason,N'Không có lý do'), 500),
+        return_note   = NULL  -- để trống cho manager ghi chú sau
+  WHERE id = @order_id;
+
+  -- 5) Log (giữ nguyên status DELIVERED, chỉ log sự kiện)
+  INSERT dbo.OrderStatusHistory(order_id, [status], note, changed_by)
+  VALUES(@order_id, N'DELIVERED', N'YÊU CẦU TRẢ HÀNG: ' + ISNULL(@reason,N''), @customer_id);
+
+  COMMIT TRAN;
+END
+GO
+
+-- Stored Procedure: Duyệt trả hàng, đẩy trạng thái giao nhận sang RETURN_PICKUP
+CREATE OR ALTER PROCEDURE dbo.sp_ApproveReturn
+  @order_id INT,
+  @manager_id INT,
+  @note NVARCHAR(500) = NULL,
+  @delivery_team_id INT = NULL   -- nếu đơn chưa có OrderDelivery thì cần truyền
+AS
+BEGIN
+  SET NOCOUNT ON; SET XACT_ABORT ON;
+  SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+  BEGIN TRAN;
+
+  UPDATE dbo.Orders
+    SET return_status = N'APPROVED',
+        return_note   = CONCAT(ISNULL(return_note,N''), 
+                               CASE WHEN return_note IS NULL THEN N'' ELSE N' | ' END,
+                               N'APPROVED: ', ISNULL(@note,N'')) 
+  WHERE id=@order_id AND return_status=N'REQUESTED' AND [status]=N'DELIVERED';
+
+  IF @@ROWCOUNT=0
+  BEGIN RAISERROR(N'Chỉ phê duyệt đơn REQUESTED và đã DELIVERED.',16,1); ROLLBACK TRAN; RETURN; END;
+
+  DECLARE @od_id INT, @team_id INT;
+  SELECT @od_id=id,@team_id=delivery_team_id FROM dbo.OrderDelivery WITH(UPDLOCK,ROWLOCK) WHERE order_id=@order_id;
+
+  IF @od_id IS NULL
+  BEGIN
+    IF @delivery_team_id IS NULL
+    BEGIN RAISERROR(N'Chưa có OrderDelivery, cần delivery_team_id.',16,1); ROLLBACK TRAN; RETURN; END;
+
+    INSERT dbo.OrderDelivery(order_id, delivery_team_id, [status], note)
+    VALUES(@order_id, @delivery_team_id, N'RETURN_PICKUP', N'Phê duyệt trả hàng - thu hồi');
+    SET @od_id = SCOPE_IDENTITY();
+
+    INSERT dbo.DeliveryHistory(order_delivery_id, [status], note)
+    VALUES(@od_id, N'RETURN_PICKUP', N'Phê duyệt - thu hồi');
+  END
+  ELSE
+  BEGIN
+    -- KHÔNG cho đổi đội giao ở giai đoạn thu hồi
+    IF @delivery_team_id IS NOT NULL AND @delivery_team_id <> @team_id
+    BEGIN
+      RAISERROR(N'Đơn đã gán đội thu hồi, không được đổi đội.',16,1);
+    ROLLBACK TRAN; RETURN;
+  END
+
+    UPDATE dbo.OrderDelivery SET [status]=N'RETURN_PICKUP', note=ISNULL(@note, note) WHERE id=@od_id AND [status]<>N'RETURN_PICKUP';
+    IF @@ROWCOUNT>0
+      INSERT dbo.DeliveryHistory(order_delivery_id, [status], note)
+      VALUES(@od_id, N'RETURN_PICKUP', ISNULL(@note,N'Phê duyệt - thu hồi'));
+  END
+
+  INSERT dbo.OrderStatusHistory(order_id, [status], note, changed_by)
+  VALUES(@order_id, N'DELIVERED', N'RETURN_STATUS=APPROVED: '+ISNULL(@note,N''), @manager_id);
+
+  COMMIT TRAN;
+END
+GO
+
+-- Stored Procedure: Xử lý trả hàng và hoàn tiền tại chỗ
+CREATE OR ALTER PROCEDURE dbo.sp_ReturnOrder
+  @order_id INT,
+  @actor_user_id INT = NULL,
+  @reason NVARCHAR(500) = NULL,
+  @refund_method NVARCHAR(20) = N'COD_CASH'  -- COD_CASH | BANK_TRANSFER | VNPAY | MOMO
+AS
+BEGIN
+  SET NOCOUNT ON; SET XACT_ABORT ON;
+  SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+  BEGIN TRAN;
+
+  -- 0) Yêu cầu đơn đang DELIVERED + APPROVED
+  IF NOT EXISTS (
+    SELECT 1 FROM dbo.Orders 
+    WHERE id=@order_id AND [status]=N'DELIVERED' AND return_status=N'APPROVED'
+  )
+  BEGIN RAISERROR(N'Chỉ xử lý khi đơn APPROVED và đang DELIVERED.',16,1); ROLLBACK TRAN; RETURN; END;
+
+  -- 1) Phải có OrderDelivery ở trạng thái RETURN_PICKUP (đã tới thu hồi)
+  DECLARE @od_id INT, @od_status NVARCHAR(20);
+  SELECT @od_id=id, @od_status=[status] FROM dbo.OrderDelivery WITH (UPDLOCK, ROWLOCK) WHERE order_id=@order_id;
+  IF @od_id IS NULL OR @od_status <> N'RETURN_PICKUP'
+  BEGIN RAISERROR(N'Chỉ xử lý trả khi giao nhận đang RETURN_PICKUP (đã tới thu hồi).',16,1); ROLLBACK TRAN; RETURN; END;
+
+  -- 2) Cập nhật đơn: trả hàng & HOÀN TIỀN NGAY
+  UPDATE dbo.Orders
+     SET [status]       = N'RETURNED',
+         return_status  = N'PROCESSED',
+         return_note    = CONCAT(ISNULL(return_note,N''), 
+                                 CASE WHEN return_note IS NULL THEN N'' ELSE N' | ' END,
+                                 N'PROCESSED: ', ISNULL(@reason,N''), N' | REFUND_METHOD=', @refund_method, N' (DONE)'),
+         payment_status = N'REFUNDED'
+   WHERE id=@order_id;
+
+  -- 3) Bù tồn
+  UPDATE pv
+     SET pv.stock_qty = pv.stock_qty + oi.qty
+  FROM dbo.ProductVariant pv WITH(UPDLOCK,ROWLOCK)
+  JOIN dbo.OrderItems oi ON oi.variant_id = pv.id
+  WHERE oi.order_id = @order_id;
+
+  -- 4) Đóng giao nhận
+  UPDATE dbo.OrderDelivery SET [status]=N'DONE', note=ISNULL(@reason, note) WHERE id=@od_id;
+  INSERT dbo.DeliveryHistory(order_delivery_id, [status], note)
+  VALUES(@od_id, N'DONE', ISNULL(@reason, N'Hoàn tất trả & thu hồi'));
+
+  -- 5) Log
+  INSERT dbo.OrderStatusHistory(order_id, [status], note, changed_by)
+  VALUES(@order_id, N'RETURNED', ISNULL(@reason,N'Xử lý trả hàng & bù tồn'), @actor_user_id);
+
+  -- 6) Thông báo cho khách (chỉ một dòng, không còn nhánh pending)
+  INSERT dbo.UserNotification(user_id, title, message, is_read)
+  SELECT o.user_id,
+         N'Đơn hàng đã được trả',
+         N'Đơn hàng #' + CAST(o.id AS NVARCHAR(20)) + N' đã trả hàng & hoàn tiền xong (' + @refund_method + N').',
+         0
+  FROM dbo.Orders o
+  WHERE o.id = @order_id;
+
+  COMMIT TRAN;
+END
+GO
+
+-- Stored Procedure: Từ chối yêu cầu trả hàng
+CREATE OR ALTER PROCEDURE dbo.sp_RejectReturn
+  @order_id INT,
+  @manager_id INT,
+  @note NVARCHAR(500) = NULL
+AS
+BEGIN
+  SET NOCOUNT ON; SET XACT_ABORT ON;
+  SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+  BEGIN TRAN;
+
+  UPDATE dbo.Orders
+    SET return_status = N'REJECTED',
+        return_note   = CONCAT(ISNULL(return_note,N''), 
+                               CASE WHEN return_note IS NULL THEN N'' ELSE N' | ' END,
+                               N'REJECTED: ', ISNULL(@note,N''))
+  WHERE id=@order_id AND return_status=N'REQUESTED';
+
+  IF @@ROWCOUNT=0
+  BEGIN RAISERROR(N'Chỉ từ chối đơn ở trạng thái REQUESTED.',16,1); ROLLBACK TRAN; RETURN; END;
+
+  INSERT dbo.OrderStatusHistory(order_id, [status], note, changed_by)
+  VALUES(@order_id, N'DELIVERED', N'RETURN_STATUS=REJECTED: '+ISNULL(@note,N''), @manager_id);
+
+  COMMIT TRAN;
+END
+GO
+
+
+
+
 
 
 
@@ -1542,7 +1903,6 @@ BEGIN
       WHEN N'DISPATCHED' THEN N'Đơn hàng đã xuất kho'
       WHEN N'DELIVERED' THEN N'Đơn hàng đã giao thành công'
       WHEN N'CANCELLED' THEN N'Đơn hàng đã bị hủy'
-      WHEN N'RETURNED' THEN N'Đơn hàng đã được trả'
       ELSE N'Cập nhật trạng thái đơn hàng'
     END,
     CASE i.[status]
@@ -1550,14 +1910,13 @@ BEGIN
       WHEN N'DISPATCHED' THEN N'Đơn hàng #' + CAST(i.id AS NVARCHAR(20)) + N' đã xuất kho và đang trên đường giao.'
       WHEN N'DELIVERED' THEN N'Đơn hàng #' + CAST(i.id AS NVARCHAR(20)) + N' đã giao thành công. Cảm ơn bạn!'
       WHEN N'CANCELLED' THEN N'Đơn hàng #' + CAST(i.id AS NVARCHAR(20)) + N' đã bị hủy.'
-      WHEN N'RETURNED' THEN N'Đơn hàng #' + CAST(i.id AS NVARCHAR(20)) + N' đã được xử lý trả hàng.'
       ELSE N'Trạng thái đơn hàng #' + CAST(i.id AS NVARCHAR(20)) + N' đã được cập nhật.'
     END,
     0 -- chưa đọc
   FROM inserted i
   JOIN deleted d ON i.id = d.id
   WHERE i.[status] <> d.[status]  -- chỉ khi status thực sự thay đổi
-    AND i.[status] IN (N'CONFIRMED', N'DISPATCHED', N'DELIVERED', N'CANCELLED', N'RETURNED'); -- chỉ các trạng thái quan trọng
+    AND i.[status] IN (N'CONFIRMED', N'DISPATCHED', N'DELIVERED', N'CANCELLED'); -- ĐÃ BỎ N'RETURNED'
 END;
 GO
 
@@ -1640,6 +1999,57 @@ BEGIN
   JOIN dbo.Product p ON p.id = i.product_id
   WHERE i.manager_response IS NOT NULL 
     AND d.manager_response IS NULL;  -- từ NULL thành có response
+END;
+GO
+
+
+-- Trigger: Thông báo cho customer khi yêu cầu trả hàng bị từ chối
+GO
+CREATE OR ALTER TRIGGER dbo.TR_Orders_NotifyCustomerReturnRejected
+ON dbo.Orders
+AFTER UPDATE
+AS
+BEGIN
+  SET NOCOUNT ON;
+  
+  -- Chỉ xử lý khi return_status thay đổi thành REJECTED
+  IF NOT UPDATE(return_status) RETURN;
+  
+  -- Thông báo cho customer khi yêu cầu trả hàng bị từ chối
+  INSERT INTO dbo.UserNotification(user_id, title, message, is_read)
+  SELECT 
+    i.user_id,
+    N'Yêu cầu trả hàng bị từ chối',
+    N'Yêu cầu trả hàng cho đơn hàng #' + CAST(i.id AS NVARCHAR(20)) + N' đã bị từ chối. Lý do: ' + ISNULL(i.return_note, N'Không đủ điều kiện trả hàng') + N'.',
+    0
+  FROM inserted i
+  JOIN deleted d ON i.id = d.id
+  WHERE i.return_status = N'REJECTED' 
+    AND (d.return_status IS NULL OR d.return_status <> N'REJECTED');  -- chỉ khi mới REJECTED
+END;
+GO
+
+
+-- Trigger: Thông báo cho customer khi yêu cầu trả hàng được duyệt
+CREATE OR ALTER TRIGGER dbo.TR_Orders_NotifyCustomerReturnApproved
+ON dbo.Orders
+AFTER UPDATE
+AS
+BEGIN
+  SET NOCOUNT ON;
+  IF NOT UPDATE(return_status) RETURN;
+  
+  INSERT INTO dbo.UserNotification(user_id, title, message, is_read)
+  SELECT 
+    i.user_id,
+    N'Yêu cầu trả hàng được duyệt',
+    N'Đơn hàng #' + CAST(i.id AS NVARCHAR(20)) + N' đã được duyệt trả. Đội giao sẽ liên hệ để thu hồi sản phẩm.',
+    0
+  FROM inserted i
+  JOIN deleted d ON d.id = i.id
+  WHERE i.return_status = N'APPROVED'
+    AND (d.return_status IS NULL OR d.return_status <> N'APPROVED')
+    AND i.[status] = N'DELIVERED';
 END;
 GO
 
@@ -1787,6 +2197,36 @@ BEGIN
 END;
 GO
 
+-- Trigger: Thông báo khi customer yêu cầu trả hàng cho manager
+GO
+CREATE OR ALTER TRIGGER dbo.TR_Orders_NotifyReturnRequest
+ON dbo.Orders
+AFTER UPDATE
+AS
+BEGIN
+  SET NOCOUNT ON;
+  
+  -- Chỉ xử lý khi return_status thay đổi thành REQUESTED
+  IF NOT UPDATE(return_status) RETURN;
+  
+  -- Thông báo cho manager khi customer yêu cầu trả hàng
+  INSERT INTO dbo.UserNotification(user_id, title, message, is_read)
+  SELECT 
+    u.id,
+    N'Yêu cầu trả hàng',
+    N'Khách hàng "' + u_customer.full_name + N'" yêu cầu trả đơn hàng #' + CAST(i.id AS NVARCHAR(20)) + N'. Lý do: ' + ISNULL(i.return_reason, N'Không có lý do') + N'. Vui lòng xử lý.',
+    0
+  FROM inserted i
+  JOIN deleted d ON i.id = d.id
+  JOIN dbo.Users u_customer ON u_customer.id = i.user_id
+  CROSS JOIN dbo.Users u
+  WHERE i.return_status = N'REQUESTED' 
+    AND (d.return_status IS NULL OR d.return_status <> N'REQUESTED')  -- chỉ khi mới REQUESTED
+    AND u.role_id IN (SELECT id FROM dbo.Roles WHERE name = N'MANAGER')
+    AND u.is_active = 1;
+END;
+GO
+
 
 
 
@@ -1848,7 +2288,7 @@ BEGIN
         AND n.created_at >= DATEADD(MINUTE,-10,GETDATE())
     );
 
-  -- B) RETURN_PICKUP
+  -- B) RETURN_PICKUP (THÊM dedupe 10')
   INSERT dbo.UserNotification(user_id, title, message, is_read)
   SELECT dt.user_id,
          N'Yêu cầu thu hồi',
@@ -1858,7 +2298,14 @@ BEGIN
   JOIN dbo.DeliveryTeam dt ON dt.id = i.delivery_team_id
   JOIN deleted d ON d.id = i.id
   WHERE i.status = N'RETURN_PICKUP' 
-    AND d.status <> N'RETURN_PICKUP';
+    AND d.status <> N'RETURN_PICKUP'
+    AND NOT EXISTS (
+      SELECT 1 FROM dbo.UserNotification n
+      WHERE n.user_id = dt.user_id
+        AND n.title   = N'Yêu cầu thu hồi'
+        AND n.message LIKE N'%Đơn #' + CAST(i.order_id AS NVARCHAR(20)) + N'%'
+        AND n.created_at >= DATEADD(MINUTE,-10,GETDATE())
+    );
 
   -- C) DONE
   INSERT dbo.UserNotification(user_id, title, message, is_read)

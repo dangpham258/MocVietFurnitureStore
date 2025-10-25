@@ -8,39 +8,40 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "OTP")
+@Table(name = "Message")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class OTP {
+public class Message {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
-    
-    @Column(name = "code", nullable = false, length = 10)
-    private String code;
+    @JoinColumn(name = "conversation_id", nullable = false)
+    private Conversation conversation;
     
     @Enumerated(EnumType.STRING)
-    @Column(name = "purpose", nullable = false, length = 30)
-    private Purpose purpose;
+    @Column(name = "sender_type", nullable = false, length = 20)
+    private SenderType senderType;
     
-    public enum Purpose {
-        REGISTER, RESET_PASSWORD
-    }
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "sender_id")
+    private User sender;
     
-    @Column(name = "is_used", nullable = false)
-    private Boolean isUsed = false;
+    @Column(name = "content", columnDefinition = "TEXT")
+    private String content;
     
-    @Column(name = "expires_at", nullable = false)
-    private LocalDateTime expiresAt;
+    @Column(name = "attachment_url", length = 255)
+    private String attachmentUrl;
     
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
+    
+    public enum SenderType {
+        GUEST, CUSTOMER, MANAGER
+    }
     
     @PrePersist
     protected void onCreate() {

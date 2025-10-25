@@ -8,11 +8,12 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "OTP")
+@Table(name = "Wishlist", 
+       uniqueConstraints = @UniqueConstraint(name = "UQ_Wishlist", columnNames = {"user_id", "product_id"}))
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class OTP {
+public class Wishlist {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,22 +23,9 @@ public class OTP {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
     
-    @Column(name = "code", nullable = false, length = 10)
-    private String code;
-    
-    @Enumerated(EnumType.STRING)
-    @Column(name = "purpose", nullable = false, length = 30)
-    private Purpose purpose;
-    
-    public enum Purpose {
-        REGISTER, RESET_PASSWORD
-    }
-    
-    @Column(name = "is_used", nullable = false)
-    private Boolean isUsed = false;
-    
-    @Column(name = "expires_at", nullable = false)
-    private LocalDateTime expiresAt;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id", nullable = false)
+    private Product product;
     
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
