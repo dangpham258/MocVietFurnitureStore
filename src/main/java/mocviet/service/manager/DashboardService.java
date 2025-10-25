@@ -1,0 +1,220 @@
+package mocviet.service.manager;
+
+import lombok.RequiredArgsConstructor;
+import mocviet.entity.Orders;
+import mocviet.entity.Product;
+import mocviet.entity.ProductVariant;
+import mocviet.entity.Review;
+import mocviet.entity.OrderDelivery;
+import mocviet.repository.OrdersRepository;
+import mocviet.repository.ProductRepository;
+import mocviet.repository.ProductVariantRepository;
+import mocviet.repository.ReviewRepository;
+import mocviet.repository.OrderDeliveryRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class DashboardService {
+    
+    private final OrdersRepository ordersRepository;
+    private final ProductRepository productRepository;
+    private final ProductVariantRepository productVariantRepository;
+    private final ReviewRepository reviewRepository;
+    private final OrderDeliveryRepository orderDeliveryRepository;
+    
+    @Transactional(readOnly = true)
+    public DashboardStats getDashboardStats() {
+        DashboardStats stats = new DashboardStats();
+        
+        // Đếm đơn hàng mới (trong 7 ngày qua)
+        LocalDateTime sevenDaysAgo = LocalDateTime.now().minus(7, ChronoUnit.DAYS);
+        long newOrders = ordersRepository.countByCreatedAtAfter(sevenDaysAgo);
+        stats.setNewOrders((int) newOrders);
+        
+        // Đếm tổng sản phẩm
+        long totalProducts = productRepository.count();
+        stats.setTotalProducts((int) totalProducts);
+        
+        // Đếm sản phẩm tồn kho thấp (giả sử < 10)
+        List<ProductVariant> lowStockVariants = productVariantRepository.findByStockQtyLessThanAndIsActive(10, true);
+        stats.setLowStockProducts(lowStockVariants.size());
+        
+        // Đếm đánh giá mới (trong 7 ngày qua)
+        long newReviews = reviewRepository.countByCreatedAtAfter(sevenDaysAgo);
+        stats.setNewReviews((int) newReviews);
+        
+        // Đếm đơn hàng cần phân công
+        long pendingAssignment = ordersRepository.countByStatusAndOrderDeliveryIsNull(Orders.OrderStatus.CONFIRMED);
+        stats.setPendingAssignment((int) pendingAssignment);
+        
+        // Đếm đơn hàng đang giao
+        long inDelivery = orderDeliveryRepository.countByStatus(OrderDelivery.DeliveryStatus.IN_TRANSIT);
+        stats.setInDelivery((int) inDelivery);
+        
+        // Tính tổng doanh thu tháng này
+        LocalDateTime startOfMonth = LocalDateTime.now().withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0);
+        List<Orders> monthlyOrders = ordersRepository.findByCreatedAtAfterAndStatus(startOfMonth, Orders.OrderStatus.DELIVERED);
+        BigDecimal monthlyRevenue = monthlyOrders.stream()
+                .map(this::calculateOrderTotal)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        stats.setMonthlyRevenue(monthlyRevenue);
+        
+        return stats;
+    }
+    
+    @Transactional(readOnly = true)
+    public List<RecentOrderDTO> getRecentOrders(int limit) {
+        return ordersRepository.findTop10ByOrderByCreatedAtDesc()
+                .stream()
+                .limit(limit)
+                .map(this::mapToRecentOrderDTO)
+                .toList();
+    }
+    
+    @Transactional(readOnly = true)
+    public List<NotificationDTO> getNotifications() {
+        // Tạo thông báo dựa trên dữ liệu thực
+        List<NotificationDTO> notifications = new java.util.ArrayList<>();
+        
+        // Thông báo đơn hàng mới
+        long newOrdersToday = ordersRepository.countByCreatedAtAfter(LocalDateTime.now().withHour(0).withMinute(0).withSecond(0));
+        if (newOrdersToday > 0) {
+            notifications.add(new NotificationDTO(
+                "Đơn hàng mới hôm nay",
+                "Có " + newOrdersToday + " đơn hàng mới cần xử lý",
+                "info"
+            ));
+        }
+        
+        // Thông báo cần phân công
+        long pendingAssignment = ordersRepository.countByStatusAndOrderDeliveryIsNull(Orders.OrderStatus.CONFIRMED);
+        if (pendingAssignment > 0) {
+            notifications.add(new NotificationDTO(
+                "Cần phân công đội giao hàng",
+                "Có " + pendingAssignment + " đơn hàng chờ phân công",
+                "warning"
+            ));
+        }
+        
+        // Thông báo tồn kho thấp
+        List<ProductVariant> lowStockVariants = productVariantRepository.findByStockQtyLessThanAndIsActive(10, true);
+        if (!lowStockVariants.isEmpty()) {
+            notifications.add(new NotificationDTO(
+                "Tồn kho thấp",
+                "Có " + lowStockVariants.size() + " biến thể sản phẩm sắp hết hàng",
+                "danger"
+            ));
+        }
+        
+        return notifications;
+    }
+    
+    private BigDecimal calculateOrderTotal(Orders order) {
+        if (order.getOrderItems() == null || order.getOrderItems().isEmpty()) {
+            return order.getShippingFee() != null ? order.getShippingFee() : BigDecimal.ZERO;
+        }
+        
+        BigDecimal itemsTotal = order.getOrderItems().stream()
+                .map(item -> item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQty())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        
+        BigDecimal shippingFee = order.getShippingFee() != null ? order.getShippingFee() : BigDecimal.ZERO;
+        return itemsTotal.add(shippingFee);
+    }
+    
+    private RecentOrderDTO mapToRecentOrderDTO(Orders order) {
+        RecentOrderDTO dto = new RecentOrderDTO();
+        dto.setId(order.getId());
+        dto.setCustomerName(order.getUser().getFullName());
+        dto.setStatus(order.getStatus().name());
+        dto.setCreatedAt(order.getCreatedAt());
+        dto.setTotalAmount(calculateOrderTotal(order));
+        return dto;
+    }
+    
+    // DTO classes
+    public static class DashboardStats {
+        private int newOrders;
+        private int totalProducts;
+        private int lowStockProducts;
+        private int newReviews;
+        private int pendingAssignment;
+        private int inDelivery;
+        private BigDecimal monthlyRevenue;
+        
+        // Getters and setters
+        public int getNewOrders() { return newOrders; }
+        public void setNewOrders(int newOrders) { this.newOrders = newOrders; }
+        
+        public int getTotalProducts() { return totalProducts; }
+        public void setTotalProducts(int totalProducts) { this.totalProducts = totalProducts; }
+        
+        public int getLowStockProducts() { return lowStockProducts; }
+        public void setLowStockProducts(int lowStockProducts) { this.lowStockProducts = lowStockProducts; }
+        
+        public int getNewReviews() { return newReviews; }
+        public void setNewReviews(int newReviews) { this.newReviews = newReviews; }
+        
+        public int getPendingAssignment() { return pendingAssignment; }
+        public void setPendingAssignment(int pendingAssignment) { this.pendingAssignment = pendingAssignment; }
+        
+        public int getInDelivery() { return inDelivery; }
+        public void setInDelivery(int inDelivery) { this.inDelivery = inDelivery; }
+        
+        public BigDecimal getMonthlyRevenue() { return monthlyRevenue; }
+        public void setMonthlyRevenue(BigDecimal monthlyRevenue) { this.monthlyRevenue = monthlyRevenue; }
+    }
+    
+    public static class RecentOrderDTO {
+        private Integer id;
+        private String customerName;
+        private String status;
+        private LocalDateTime createdAt;
+        private BigDecimal totalAmount;
+        
+        // Getters and setters
+        public Integer getId() { return id; }
+        public void setId(Integer id) { this.id = id; }
+        
+        public String getCustomerName() { return customerName; }
+        public void setCustomerName(String customerName) { this.customerName = customerName; }
+        
+        public String getStatus() { return status; }
+        public void setStatus(String status) { this.status = status; }
+        
+        public LocalDateTime getCreatedAt() { return createdAt; }
+        public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+        
+        public BigDecimal getTotalAmount() { return totalAmount; }
+        public void setTotalAmount(BigDecimal totalAmount) { this.totalAmount = totalAmount; }
+    }
+    
+    public static class NotificationDTO {
+        private String title;
+        private String message;
+        private String type;
+        
+        public NotificationDTO(String title, String message, String type) {
+            this.title = title;
+            this.message = message;
+            this.type = type;
+        }
+        
+        // Getters and setters
+        public String getTitle() { return title; }
+        public void setTitle(String title) { this.title = title; }
+        
+        public String getMessage() { return message; }
+        public void setMessage(String message) { this.message = message; }
+        
+        public String getType() { return type; }
+        public void setType(String type) { this.type = type; }
+    }
+}

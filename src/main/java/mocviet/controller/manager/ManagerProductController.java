@@ -26,7 +26,7 @@ import java.util.Optional;
 @RequestMapping("/manager/products")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('MANAGER')")
-public class ProductController {
+public class ManagerProductController {
     
     private final ProductService productService;
     private final ImageService imageService;
@@ -44,6 +44,11 @@ public class ProductController {
             @RequestParam(required = false) Integer categoryId,
             Model model) {
         
+        // Reset page về 0 khi có keyword mới
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            page = 0;
+        }
+        
         // Map database column names to entity field names
         String entityFieldName = mapSortFieldToEntity(sortBy);
         Sort sort = sortDir.equalsIgnoreCase("desc") ? 
@@ -52,7 +57,8 @@ public class ProductController {
         
         Page<Product> products;
         if (keyword != null && !keyword.trim().isEmpty()) {
-            products = productService.searchProducts(keyword, pageable);
+            // Tìm kiếm kết hợp với danh mục nếu có
+            products = productService.searchProductsWithCategory(keyword, categoryId, pageable);
         } else if (categoryId != null) {
             products = productService.getProductsByCategory(categoryId, pageable);
         } else {

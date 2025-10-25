@@ -14,17 +14,24 @@
             </div>
         </div>
         
+        <!-- Error Alert -->
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <span th:text="${error}">Error message</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
         <!-- Stats Cards -->
-        <div class="row mb-4">
+        <div class="row mb-4" th:if="${stats}">
             <div class="col-xl-3 col-md-6 mb-4">
                 <div class="card border-left-primary shadow h-100 py-2">
                     <div class="card-body">
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
                                 <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                    Đơn hàng mới
+                                    Đơn hàng mới (7 ngày)
                                 </div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800">24</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800" th:text="${stats.newOrders}">0</div>
                             </div>
                             <div class="col-auto">
                                 <i class="fas fa-shopping-cart fa-2x text-gray-300"></i>
@@ -40,30 +47,12 @@
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
                                 <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                    Sản phẩm
+                                    Tổng sản phẩm
                                 </div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800">156</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800" th:text="${stats.totalProducts}">0</div>
                             </div>
                             <div class="col-auto">
                                 <i class="fas fa-box fa-2x text-gray-300"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card border-left-info shadow h-100 py-2">
-                    <div class="card-body">
-                        <div class="row no-gutters align-items-center">
-                            <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
-                                    Tồn kho thấp
-                                </div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800">8</div>
-                            </div>
-                            <div class="col-auto">
-                                <i class="fas fa-exclamation-triangle fa-2x text-gray-300"></i>
                             </div>
                         </div>
                     </div>
@@ -76,12 +65,88 @@
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
                                 <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                    Đánh giá mới
+                                    Tồn kho thấp
                                 </div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800">12</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800" th:text="${stats.lowStockProducts}">0</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-exclamation-triangle fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-info shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                    Cần phân công
+                                </div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800" th:text="${stats.pendingAssignment}">0</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-truck fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Additional Stats Row -->
+        <div class="row mb-4" th:if="${stats}">
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-success shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                    Đang giao hàng
+                                </div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800" th:text="${stats.inDelivery}">0</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-shipping-fast fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-info shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                    Đánh giá mới (7 ngày)
+                                </div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800" th:text="${stats.newReviews}">0</div>
                             </div>
                             <div class="col-auto">
                                 <i class="fas fa-star fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-xl-6 col-md-12 mb-4">
+                <div class="card border-left-primary shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                    Doanh thu tháng này
+                                </div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800" 
+                                     th:text="${#numbers.formatCurrency(stats.monthlyRevenue)}">0 ₫</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
                             </div>
                         </div>
                     </div>
@@ -93,11 +158,14 @@
         <div class="row">
             <div class="col-lg-8">
                 <div class="card shadow mb-4">
-                    <div class="card-header py-3">
+                    <div class="card-header py-3 d-flex justify-content-between align-items-center">
                         <h6 class="m-0 font-weight-bold text-primary">Đơn hàng gần đây</h6>
+                        <a href="/manager/delivery/recent" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-eye me-1"></i>Xem tất cả
+                        </a>
                     </div>
                     <div class="card-body">
-                        <div class="table-responsive">
+                        <div class="table-responsive" th:if="${recentOrders != null and !recentOrders.empty}">
                             <table class="table table-bordered" width="100%" cellspacing="0">
                                 <thead>
                                     <tr>
@@ -105,30 +173,28 @@
                                         <th>Khách hàng</th>
                                         <th>Trạng thái</th>
                                         <th>Ngày tạo</th>
-                                        <th>Thao tác</th>
+                                         <th>Tổng tiền</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td>#001</td>
-                                        <td>Nguyễn Văn A</td>
-                                        <td><span class="badge bg-warning">Chờ xác nhận</span></td>
-                                        <td>2024-01-15</td>
+                                    <tr th:each="order : ${recentOrders}">
+                                        <td th:text="'#' + ${order.id}">#001</td>
+                                        <td th:text="${order.customerName}">Nguyễn Văn A</td>
                                         <td>
-                                            <a href="#" class="btn btn-sm btn-primary">Xem</a>
+                                            <span class="badge" 
+                                                  th:classappend="${order.status == 'CONFIRMED'} ? 'bg-warning' : 
+                                                               (${order.status == 'DELIVERED'} ? 'bg-success' : 'bg-info')"
+                                                  th:text="${order.status}">Chờ xác nhận</span>
                                         </td>
-                                    </tr>
-                                    <tr>
-                                        <td>#002</td>
-                                        <td>Trần Thị B</td>
-                                        <td><span class="badge bg-success">Đã xác nhận</span></td>
-                                        <td>2024-01-14</td>
-                                        <td>
-                                            <a href="#" class="btn btn-sm btn-primary">Xem</a>
-                                        </td>
+                                         <td th:text="${#temporals.format(order.createdAt, 'dd/MM/yyyy HH:mm')}">2024-01-15</td>
+                                         <td th:text="${#numbers.formatCurrency(order.totalAmount)}">1,500,000 ₫</td>
                                     </tr>
                                 </tbody>
                             </table>
+                        </div>
+                        <div th:if="${recentOrders == null or recentOrders.empty}" class="text-center py-4">
+                            <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">Không có đơn hàng gần đây</p>
                         </div>
                     </div>
                 </div>
@@ -140,28 +206,23 @@
                         <h6 class="m-0 font-weight-bold text-primary">Thông báo</h6>
                     </div>
                     <div class="card-body">
-                        <div class="list-group list-group-flush">
-                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div class="list-group list-group-flush" th:if="${notifications != null and !notifications.empty}">
+                            <div class="list-group-item d-flex justify-content-between align-items-center" 
+                                 th:each="notification : ${notifications}">
                                 <div>
-                                    <div class="fw-bold">Đơn hàng mới</div>
-                                    <small class="text-muted">Đơn #003 từ khách hàng Nguyễn Văn C</small>
+                                    <div class="fw-bold" th:text="${notification.title}">Thông báo</div>
+                                    <small class="text-muted" th:text="${notification.message}">Nội dung thông báo</small>
                                 </div>
-                                <span class="badge bg-primary rounded-pill">Mới</span>
+                                <span class="badge rounded-pill" 
+                                      th:classappend="${notification.type == 'info'} ? 'bg-primary' : 
+                                                     (${notification.type == 'warning'} ? 'bg-warning' : 'bg-danger')"
+                                      th:text="${notification.type == 'info'} ? 'Mới' : 
+                                               (${notification.type == 'warning'} ? 'Cảnh báo' : 'Nguy hiểm')">Mới</span>
                             </div>
-                            <div class="list-group-item d-flex justify-content-between align-items-center">
-                                <div>
-                                    <div class="fw-bold">Tồn kho thấp</div>
-                                    <small class="text-muted">Sofa 3 chỗ ngồi chỉ còn 2 sản phẩm</small>
-                                </div>
-                                <span class="badge bg-warning rounded-pill">Cảnh báo</span>
-                            </div>
-                            <div class="list-group-item d-flex justify-content-between align-items-center">
-                                <div>
-                                    <div class="fw-bold">Đánh giá mới</div>
-                                    <small class="text-muted">5 sao cho bàn ăn gỗ sồi</small>
-                                </div>
-                                <span class="badge bg-success rounded-pill">Tích cực</span>
-                            </div>
+                        </div>
+                        <div th:if="${notifications == null or notifications.empty}" class="text-center py-4">
+                            <i class="fas fa-bell-slash fa-2x text-muted mb-3"></i>
+                            <p class="text-muted">Không có thông báo mới</p>
                         </div>
                     </div>
                 </div>
@@ -169,5 +230,204 @@
         </div>
     </div>
 </div>
+
+<!-- JavaScript -->
+<script>
+    function viewOrderDetails(orderId) {
+        if (!orderId || orderId === 'null' || orderId === '') {
+            alert('Lỗi: Mã đơn hàng không hợp lệ');
+            return;
+        }
+        
+        // Hiển thị loading
+        showLoading();
+        
+        // Gọi API để lấy chi tiết đơn hàng
+        fetch(`/manager/delivery/api/order/${orderId}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Không thể tải chi tiết đơn hàng');
+                }
+                return response.json();
+            })
+            .then(data => {
+                showOrderDetailsModal(data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Lỗi: ' + error.message);
+            })
+            .finally(() => {
+                hideLoading();
+            });
+    }
+    
+    function showLoading() {
+        // Tạo loading overlay
+        const loading = document.createElement('div');
+        loading.id = 'loading-overlay';
+        loading.className = 'position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center';
+        loading.style.backgroundColor = 'rgba(0,0,0,0.5)';
+        loading.style.zIndex = '9999';
+        loading.innerHTML = `
+            <div class="spinner-border text-light" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        `;
+        document.body.appendChild(loading);
+    }
+    
+    function hideLoading() {
+        const loading = document.getElementById('loading-overlay');
+        if (loading) {
+            loading.remove();
+        }
+    }
+    
+        function showOrderDetailsModal(order) {
+            console.log('Order data:', order);
+            console.log('Order status:', order.orderStatus);
+            console.log('Status type:', typeof order.orderStatus);
+            console.log('Is CONFIRMED?', order.orderStatus === 'CONFIRMED');
+            console.log('Is DISPATCHED?', order.orderStatus === 'DISPATCHED');
+            console.log('Is DELIVERED?', order.orderStatus === 'DELIVERED');
+            
+            // Tạo buttons dựa trên trạng thái
+            let actionButtons = '';
+            console.log('Creating buttons for status:', order.orderStatus);
+            
+            // Chỉ hiển thị nút khi đơn hàng có thể phân công
+            if (order.orderStatus === 'CONFIRMED') {
+                actionButtons = '<a href="/manager/delivery/assign/' + order.id + '" class="btn btn-primary"><i class="fas fa-truck me-1"></i>Phân công đội giao</a>';
+                console.log('Created CONFIRMED button');
+            } else if (order.orderStatus === 'DISPATCHED') {
+                actionButtons = '<a href="/manager/delivery/change/' + order.id + '" class="btn btn-warning"><i class="fas fa-exchange-alt me-1"></i>Đổi đội giao</a>';
+                console.log('Created DISPATCHED button');
+            } else if (order.orderStatus === 'DELIVERED' || order.orderStatus === 'CANCELLED' || order.orderStatus === 'RETURNED') {
+                // Ẩn nút cho các trạng thái đã hoàn thành hoặc bị hủy
+                actionButtons = '<div class="alert alert-info mb-0"><i class="fas fa-info-circle me-2"></i>Đơn hàng này không thể phân công đội giao</div>';
+                console.log('No button created for completed/cancelled status:', order.orderStatus);
+            } else {
+                // Các trạng thái khác cũng không hiển thị nút
+                actionButtons = '<div class="alert alert-warning mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Trạng thái đơn hàng không cho phép phân công</div>';
+                console.log('No button created for status:', order.orderStatus);
+            }
+            
+            console.log('Final actionButtons:', actionButtons);
+            
+            // Tạo modal HTML với design đẹp hơn
+            const modalHtml = `
+                <div class="modal fade" id="orderDetailsModal" tabindex="-1">
+                    <div class="modal-dialog modal-xl">
+                        <div class="modal-content">
+                            <div class="modal-header bg-primary text-white">
+                                <h5 class="modal-title">
+                                    <i class="fas fa-receipt me-2"></i>Chi tiết đơn hàng #${order.id}
+                                </h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="card border-0 shadow-sm">
+                                            <div class="card-header bg-light">
+                                                <h6 class="mb-0">
+                                                    <i class="fas fa-user me-2"></i>Thông tin khách hàng
+                                                </h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="row mb-2">
+                                                    <div class="col-4"><strong>Tên:</strong></div>
+                                                    <div class="col-8">${order.customerName || 'N/A'}</div>
+                                                </div>
+                                                <div class="row mb-2">
+                                                    <div class="col-4"><strong>SĐT:</strong></div>
+                                                    <div class="col-8">${order.customerPhone || 'N/A'}</div>
+                                                </div>
+                                                <div class="row mb-2">
+                                                    <div class="col-4"><strong>Địa chỉ:</strong></div>
+                                                    <div class="col-8">${order.deliveryAddress || 'N/A'}</div>
+                                                </div>
+                                                <div class="row mb-2">
+                                                    <div class="col-4"><strong>Thành phố:</strong></div>
+                                                    <div class="col-8">${order.city || 'N/A'}</div>
+                                                </div>
+                                                <div class="row mb-2">
+                                                    <div class="col-4"><strong>Quận/Huyện:</strong></div>
+                                                    <div class="col-8">${order.district || 'N/A'}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="card border-0 shadow-sm">
+                                            <div class="card-header bg-light">
+                                                <h6 class="mb-0">
+                                                    <i class="fas fa-shopping-cart me-2"></i>Thông tin đơn hàng
+                                                </h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="row mb-2">
+                                                    <div class="col-4"><strong>Ngày đặt:</strong></div>
+                                                    <div class="col-8">${new Date(order.createdAt).toLocaleString('vi-VN')}</div>
+                                                </div>
+                                                <div class="row mb-2">
+                                                    <div class="col-4"><strong>Tổng tiền:</strong></div>
+                                                    <div class="col-8">
+                                                        <span class="text-success fw-bold fs-5">
+                                                            ${new Intl.NumberFormat('vi-VN', {style: 'currency', currency: 'VND'}).format(order.orderTotal || 0)}
+                                                        </span>
+                                                    </div>
+                                </div>
+                                                <div class="row mb-2">
+                                                    <div class="col-4"><strong>Thanh toán:</strong></div>
+                                                    <div class="col-8">${order.paymentMethod || 'N/A'}</div>
+                            </div>
+                                                <div class="row mb-2">
+                                                    <div class="col-4"><strong>Trạng thái:</strong></div>
+                                                    <div class="col-8">
+                                                        <span class="badge bg-warning">${order.orderStatus || 'N/A'}</span>
+                                </div>
+                            </div>
+                                                <div class="row mb-2">
+                                                    <div class="col-4"><strong>Số sản phẩm:</strong></div>
+                                                    <div class="col-8">${order.itemCount || 0}</div>
+                                </div>
+                                                <div class="row mb-2">
+                                                    <div class="col-4"><strong>Khu vực:</strong></div>
+                                                    <div class="col-8">
+                                                        <span class="badge bg-info">${order.zoneName || 'N/A'}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                                    </div>
+                                </div>
+                            </div>
+                             <div class="modal-footer">
+                                 ${actionButtons}
+                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                     <i class="fas fa-times me-1"></i>Đóng
+                                 </button>
+            </div>
+        </div>
+    </div>
+</div>
+            `;
+        
+        // Xóa modal cũ nếu có
+        const existingModal = document.getElementById('orderDetailsModal');
+        if (existingModal) {
+            existingModal.remove();
+        }
+        
+        // Thêm modal mới
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        
+        // Hiển thị modal
+        const modal = new bootstrap.Modal(document.getElementById('orderDetailsModal'));
+        modal.show();
+    }
+</script>
 </body>
 </html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+<!-- Manager Navbar Fragment -->
+<nav th:fragment="navbar" class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
+    <div class="container-fluid">
+        <!-- Toggle Sidebar -->
+        <button class="btn btn-link text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu">
+            <i class="fas fa-bars"></i>
+        </button>
+        
+        <!-- Brand -->
+        <a class="navbar-brand fw-bold" href="/manager">
+            <i class="fas fa-store me-2"></i>Manager Dashboard
+        </a>
+        
+        <!-- Right Menu -->
+        <div class="d-flex align-items-center">
+            <!-- Notifications -->
+            <div class="dropdown me-3">
+                <button class="btn btn-link text-dark" type="button" data-bs-toggle="dropdown">
+                    <i class="fas fa-bell"></i>
+                    <span class="badge bg-danger rounded-pill">3</span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><h6 class="dropdown-header">Thông báo mới</h6></li>
+                    <li><a class="dropdown-item" href="#">
+                        <i class="fas fa-shopping-cart me-2"></i>
+                        Có 5 đơn hàng mới cần xử lý
+                    </a></li>
+                    <li><a class="dropdown-item" href="#">
+                        <i class="fas fa-truck me-2"></i>
+                        3 đơn hàng cần phân công giao hàng
+                    </a></li>
+                    <li><a class="dropdown-item" href="#">
+                        <i class="fas fa-star me-2"></i>
+                        Có 2 đánh giá mới cần phản hồi
+                    </a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-center" href="#">Xem tất cả</a></li>
+                </ul>
+            </div>
+            
+            <!-- User Menu -->
+            <div class="dropdown">
+                <button class="btn btn-link text-dark dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                    <i class="fas fa-user-circle me-2"></i>
+                    <span sec:authentication="name">Manager</span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" th:href="@{/manager/profile}">
+                        <i class="fas fa-user me-2"></i>Thông tin tài khoản
+                    </a></li>
+                    <li><a class="dropdown-item" th:href="@{/manager/change-password}">
+                        <i class="fas fa-key me-2"></i>Đổi mật khẩu
+                    </a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" th:href="@{/logout}">
+                        <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
+                    </a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</nav>
+</body>
+</html>

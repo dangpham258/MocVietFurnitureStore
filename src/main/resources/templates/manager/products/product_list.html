@@ -188,5 +188,40 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const keywordInput = document.getElementById('keyword');
+    const categorySelect = document.getElementById('categoryId');
+    const sortBySelect = document.getElementById('sortBy');
+    const sortDirSelect = document.getElementById('sortDir');
+    const form = document.querySelector('form');
+    
+    let searchTimeout;
+    
+    // Realtime search cho keyword
+    keywordInput.addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(function() {
+            console.log('Submitting search for:', keywordInput.value);
+            form.submit();
+        }, 300); // Delay 300ms sau khi người dùng ngừng gõ
+    });
+    
+    // Realtime search cho category
+    categorySelect.addEventListener('change', function() {
+        form.submit();
+    });
+    
+    // Realtime search cho sort
+    sortBySelect.addEventListener('change', function() {
+        form.submit();
+    });
+    
+    sortDirSelect.addEventListener('change', function() {
+        form.submit();
+    });
+});
+</script>
 </body>
 </html>

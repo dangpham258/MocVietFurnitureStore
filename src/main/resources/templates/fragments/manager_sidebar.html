@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+<!-- Manager Sidebar Fragment -->
+<nav th:fragment="sidebar" class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+    <div class="position-sticky pt-3">
+        <div class="text-center mb-4">
+            <h5 class="text-white">
+                <i class="fas fa-store me-2"></i>Manager Panel
+            </h5>
+        </div>
+        
+        <ul class="nav flex-column">
+            <!-- Dashboard -->
+            <li class="nav-item">
+                <a class="nav-link text-white" 
+                   th:classappend="${activeMenu == 'dashboard'} ? 'active'" 
+                   th:href="@{/manager}">
+                    <i class="fas fa-tachometer-alt me-2"></i>
+                    Dashboard
+                </a>
+            </li>
+            
+            <!-- Products -->
+            <li class="nav-item">
+                <a class="nav-link text-white" 
+                   th:classappend="${activeMenu == 'products'} ? 'active'" 
+                   th:href="@{/manager/products}">
+                    <i class="fas fa-box me-2"></i>
+                    Sản phẩm
+                </a>
+            </li>
+            
+            <!-- Orders -->
+            <li class="nav-item">
+                <a class="nav-link text-white" 
+                   th:classappend="${activeMenu == 'orders'} ? 'active'" 
+                   th:href="@{/manager/orders}">
+                    <i class="fas fa-shopping-cart me-2"></i>
+                    Đơn hàng
+                </a>
+            </li>
+            
+            <!-- Delivery Assignment -->
+            <li class="nav-item">
+                <a class="nav-link text-white" 
+                   th:classappend="${activeMenu == 'delivery'} ? 'active'" 
+                   th:href="@{/manager/delivery/pending}">
+                    <i class="fas fa-truck me-2"></i>
+                    Phân công giao hàng
+                </a>
+            </li>
+            
+            <!-- Articles -->
+            <li class="nav-item">
+                <a class="nav-link text-white" 
+                   th:classappend="${activeMenu == 'articles'} ? 'active'" 
+                   th:href="@{/manager/articles}">
+                    <i class="fas fa-newspaper me-2"></i>
+                    Tin tức
+                </a>
+            </li>
+            
+            <!-- Account -->
+            <li class="nav-item">
+                <a class="nav-link text-white" 
+                   th:classappend="${activeMenu == 'account'} ? 'active'" 
+                   th:href="@{/manager/profile}">
+                    <i class="fas fa-user me-2"></i>
+                    Tài khoản
+                </a>
+            </li>
+        </ul>
+        
+        <!-- Divider -->
+        <hr class="text-white-50">
+        
+        <!-- Quick Actions -->
+        <div class="px-3">
+            <h6 class="text-white-50 text-uppercase fw-bold mb-3">Quick Actions</h6>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link text-white-50" th:href="@{/manager/delivery/pending}">
+                        <i class="fas fa-clock me-2"></i>
+                        Đơn cần phân công
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white-50" th:href="@{/manager/delivery/teams}">
+                        <i class="fas fa-users me-2"></i>
+                        Đội giao hàng
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white-50" th:href="@{/manager/delivery/zones}">
+                        <i class="fas fa-map me-2"></i>
+                        Khu vực giao hàng
+                    </a>
+                </li>
+            </ul>
+        </div>
+        
+        <!-- Logout -->
+        <div class="mt-auto pt-3">
+            <hr class="text-white-50">
+            <a class="nav-link text-white-50" th:href="@{/logout}">
+                <i class="fas fa-sign-out-alt me-2"></i>
+                Đăng xuất
+            </a>
+        </div>
+    </div>
+</nav>
+</body>
+</html>

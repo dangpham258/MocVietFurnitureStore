@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{manager/fragments/manager_layout}">
+<head>
+    <title>Đơn hàng cần phân công - Mộc Việt</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <!-- Page Header -->
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h2">Đơn hàng cần phân công</h1>
+            <div class="btn-toolbar mb-2 mb-md-0">
+                <div class="btn-group me-2">
+                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="refreshPage()">
+                        <i class="fas fa-sync-alt me-1"></i>Làm mới
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                        <form method="get" action="/manager/delivery/pending">
+                            <div class="row g-3">
+                                <div class="col-md-3">
+                                    <label for="zoneFilter" class="form-label">Khu vực</label>
+                                    <select class="form-select" id="zoneFilter" name="zoneId">
+                                        <option value="">Tất cả khu vực</option>
+                                        <option th:each="zone : ${zones}" 
+                                                th:value="${zone.id}" 
+                                                th:text="${zone.name}"
+                                                th:selected="${zone.id == selectedZoneId}"></option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="searchTerm" class="form-label">Tìm kiếm</label>
+                                    <input type="text" class="form-control" id="searchTerm" name="search" 
+                                           th:value="${searchTerm}" placeholder="Mã đơn hàng, tên khách hàng...">
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="sortBy" class="form-label">Sắp xếp</label>
+                                    <select class="form-select" id="sortBy" name="sortBy">
+                                        <option value="createdAt" th:selected="${sortBy == 'createdAt'}">Ngày đặt hàng</option>
+                                        <option value="orderTotal" th:selected="${sortBy == 'orderTotal'}">Tổng tiền</option>
+                                        <option value="customerName" th:selected="${sortBy == 'customerName'}">Tên khách hàng</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">&nbsp;</label>
+                                    <div class="d-grid gap-2">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-search me-1"></i>Lọc
+                                        </button>
+                                        <a href="/manager/delivery/recent" class="btn btn-outline-info">
+                                            <i class="fas fa-clock me-1"></i>Tất cả đơn hàng
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Orders List -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-list me-2"></i>Danh sách đơn hàng cần phân công
+                            <span class="badge bg-primary ms-2" th:text="${orders.numberOfElements}">0</span>
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div th:if="${orders.empty}" class="text-center py-5">
+                            <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">Không có đơn hàng nào cần phân công</h5>
+                            <p class="text-muted">Tất cả đơn hàng đã được phân công đội giao hàng.</p>
+                        </div>
+                        
+                        <div th:if="${!orders.empty}" class="row">
+                            <div th:each="order : ${orders.content}" class="col-md-6 col-lg-4 mb-4">
+                                <div class="card h-100 order-card">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h6 class="mb-0" th:text="'Đơn #' + ${order.id}">Đơn #12345</h6>
+                                        <span class="badge bg-warning">Chờ phân công</span>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-2">
+                                            <strong>Khách hàng:</strong>
+                                            <span th:text="${order.customerName}">Nguyễn Văn A</span>
+                                        </div>
+                                        <div class="mb-2">
+                                            <strong>Ngày đặt:</strong>
+                                            <span th:text="${#temporals.format(order.createdAt, 'dd/MM/yyyy HH:mm')}">25/10/2024 14:30</span>
+                                        </div>
+                                        <div class="mb-2">
+                                            <strong>Tổng tiền:</strong>
+                                            <span class="text-success fw-bold" th:text="${#numbers.formatCurrency(order.orderTotal)}">1,500,000 ₫</span>
+                                        </div>
+                                        <div class="mb-2">
+                                            <strong>Địa chỉ giao:</strong>
+                                            <small class="text-muted" th:text="${order.deliveryAddress}">123 Đường ABC, Quận 1, TP.HCM</small>
+                                        </div>
+                                        <div class="mb-3">
+                                            <strong>Khu vực:</strong>
+                                            <span class="badge bg-info" th:text="${order.zoneName}">Nội thành</span>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer">
+                                        <div class="d-grid gap-2">
+                                            <a th:href="@{/manager/delivery/assign/{orderId}(orderId=${order.id})}" 
+                                               class="btn btn-primary btn-sm"
+                                               th:if="${order.orderStatus == 'CONFIRMED' and order.id != null}">
+                                                <i class="fas fa-truck me-1"></i>Phân công đội giao
+                                            </a>
+                                            <a th:href="@{/manager/delivery/change/{orderId}(orderId=${order.id})}" 
+                                               class="btn btn-warning btn-sm"
+                                               th:if="${order.orderStatus == 'DISPATCHED' and order.id != null}">
+                                                <i class="fas fa-exchange-alt me-1"></i>Đổi đội giao
+                                            </a>
+                                            <button type="button" class="btn btn-outline-info btn-sm" 
+                                                    th:onclick="'viewOrderDetails(' + ${order.id} + ')'"
+                                                    th:if="${order.id != null}">
+                                                <i class="fas fa-eye me-1"></i>Xem chi tiết
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        <div th:if="${!orders.empty}" class="row mt-4">
+            <div class="col-12">
+                <nav aria-label="Orders pagination">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                            <a class="page-link" th:href="@{/manager/delivery/pending(page=${currentPage - 1}, zoneId=${selectedZoneId}, search=${searchTerm}, sortBy=${sortBy})}">Trước</a>
+                        </li>
+                        <li class="page-item" th:each="page : ${#numbers.sequence(0, totalPages - 1)}" 
+                            th:classappend="${page == currentPage} ? 'active'">
+                            <a class="page-link" th:href="@{/manager/delivery/pending(page=${page}, zoneId=${selectedZoneId}, search=${searchTerm}, sortBy=${sortBy})}" 
+                               th:text="${page + 1}">1</a>
+                        </li>
+                        <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                            <a class="page-link" th:href="@{/manager/delivery/pending(page=${currentPage + 1}, zoneId=${selectedZoneId}, search=${searchTerm}, sortBy=${sortBy})}">Sau</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script th:src="@{/js/delivery-assignment.js}"></script>
+    <script>
+        function refreshPage() {
+            // Làm mới trang với các tham số hiện tại
+            const urlParams = new URLSearchParams(window.location.search);
+            window.location.href = '/manager/delivery/pending?' + urlParams.toString();
+        }
+        
+        function viewOrderDetails(orderId) {
+            if (!orderId || orderId === 'null' || orderId === '') {
+                alert('Lỗi: Mã đơn hàng không hợp lệ');
+                return;
+            }
+            
+            // Hiển thị loading
+            showLoading();
+            
+            // Gọi API để lấy chi tiết đơn hàng
+            fetch(`/manager/delivery/api/order/${orderId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Không thể tải chi tiết đơn hàng');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    showOrderDetailsModal(data);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Lỗi: ' + error.message);
+                })
+                .finally(() => {
+                    hideLoading();
+                });
+        }
+        
+        function showLoading() {
+            // Tạo loading overlay
+            const loading = document.createElement('div');
+            loading.id = 'loading-overlay';
+            loading.className = 'position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center';
+            loading.style.backgroundColor = 'rgba(0,0,0,0.5)';
+            loading.style.zIndex = '9999';
+            loading.innerHTML = `
+                <div class="spinner-border text-light" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            `;
+            document.body.appendChild(loading);
+        }
+        
+        function hideLoading() {
+            const loading = document.getElementById('loading-overlay');
+            if (loading) {
+                loading.remove();
+            }
+        }
+        
+        function showOrderDetailsModal(order) {
+            console.log('Order data:', order);
+            console.log('Order status:', order.orderStatus);
+            
+            // Tạo buttons dựa trên trạng thái
+            let actionButtons = '';
+            
+            // Chỉ hiển thị nút khi đơn hàng có thể phân công
+            if (order.orderStatus === 'CONFIRMED') {
+                actionButtons = '<a href="/manager/delivery/assign/' + order.id + '" class="btn btn-primary"><i class="fas fa-truck me-1"></i>Phân công đội giao</a>';
+            } else if (order.orderStatus === 'DISPATCHED') {
+                actionButtons = '<a href="/manager/delivery/change/' + order.id + '" class="btn btn-warning"><i class="fas fa-exchange-alt me-1"></i>Đổi đội giao</a>';
+            } else if (order.orderStatus === 'DELIVERED' || order.orderStatus === 'CANCELLED' || order.orderStatus === 'RETURNED') {
+                // Ẩn nút cho các trạng thái đã hoàn thành hoặc bị hủy
+                actionButtons = '<div class="alert alert-info mb-0"><i class="fas fa-info-circle me-2"></i>Đơn hàng này không thể phân công đội giao</div>';
+            } else {
+                // Các trạng thái khác cũng không hiển thị nút
+                actionButtons = '<div class="alert alert-warning mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Trạng thái đơn hàng không cho phép phân công</div>';
+            }
+            
+            // Tạo modal HTML với design đẹp hơn
+            const modalHtml = `
+                <div class="modal fade" id="orderDetailsModal" tabindex="-1">
+                    <div class="modal-dialog modal-xl">
+                        <div class="modal-content">
+                            <div class="modal-header bg-primary text-white">
+                                <h5 class="modal-title">
+                                    <i class="fas fa-receipt me-2"></i>Chi tiết đơn hàng #${order.id}
+                                </h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="card border-0 shadow-sm">
+                                            <div class="card-header bg-light">
+                                                <h6 class="mb-0">
+                                                    <i class="fas fa-user me-2"></i>Thông tin khách hàng
+                                                </h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="row mb-2">
+                                                    <div class="col-4"><strong>Tên:</strong></div>
+                                                    <div class="col-8">${order.customerName || 'N/A'}</div>
+                                                </div>
+                                                <div class="row mb-2">
+                                                    <div class="col-4"><strong>SĐT:</strong></div>
+                                                    <div class="col-8">${order.customerPhone || 'N/A'}</div>
+                                                </div>
+                                                <div class="row mb-2">
+                                                    <div class="col-4"><strong>Địa chỉ:</strong></div>
+                                                    <div class="col-8">${order.deliveryAddress || 'N/A'}</div>
+                                                </div>
+                                                <div class="row mb-2">
+                                                    <div class="col-4"><strong>Thành phố:</strong></div>
+                                                    <div class="col-8">${order.city || 'N/A'}</div>
+                                                </div>
+                                                <div class="row mb-2">
+                                                    <div class="col-4"><strong>Quận/Huyện:</strong></div>
+                                                    <div class="col-8">${order.district || 'N/A'}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="card border-0 shadow-sm">
+                                            <div class="card-header bg-light">
+                                                <h6 class="mb-0">
+                                                    <i class="fas fa-shopping-cart me-2"></i>Thông tin đơn hàng
+                                                </h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="row mb-2">
+                                                    <div class="col-4"><strong>Ngày đặt:</strong></div>
+                                                    <div class="col-8">${new Date(order.createdAt).toLocaleString('vi-VN')}</div>
+                                                </div>
+                                                <div class="row mb-2">
+                                                    <div class="col-4"><strong>Tổng tiền:</strong></div>
+                                                    <div class="col-8">
+                                                        <span class="text-success fw-bold fs-5">
+                                                            ${new Intl.NumberFormat('vi-VN', {style: 'currency', currency: 'VND'}).format(order.orderTotal || 0)}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div class="row mb-2">
+                                                    <div class="col-4"><strong>Thanh toán:</strong></div>
+                                                    <div class="col-8">${order.paymentMethod || 'N/A'}</div>
+                                                </div>
+                                                <div class="row mb-2">
+                                                    <div class="col-4"><strong>Trạng thái:</strong></div>
+                                                    <div class="col-8">
+                                                        <span class="badge bg-warning">${order.orderStatus || 'N/A'}</span>
+                                                    </div>
+                                                </div>
+                                                <div class="row mb-2">
+                                                    <div class="col-4"><strong>Số sản phẩm:</strong></div>
+                                                    <div class="col-8">${order.itemCount || 0}</div>
+                                                </div>
+                                                <div class="row mb-2">
+                                                    <div class="col-4"><strong>Khu vực:</strong></div>
+                                                    <div class="col-8">
+                                                        <span class="badge bg-info">${order.zoneName || 'N/A'}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                ${actionButtons}
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                    <i class="fas fa-times me-1"></i>Đóng
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Xóa modal cũ nếu có
+            const existingModal = document.getElementById('orderDetailsModal');
+            if (existingModal) {
+                existingModal.remove();
+            }
+            
+            // Thêm modal mới
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            
+            // Hiển thị modal
+            const modal = new bootstrap.Modal(document.getElementById('orderDetailsModal'));
+            modal.show();
+        }
+    </script>
+</body>
+</html>

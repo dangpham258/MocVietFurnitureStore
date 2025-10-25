@@ -1,33 +1,59 @@
 # Manager Dashboard - Mộc Việt
 
 ## Tổng quan
-Module quản lý tài khoản Manager cho hệ thống bán hàng nội thất Mộc Việt.
+Module quản lý tài khoản Manager và phân công đội giao hàng cho hệ thống bán hàng nội thất Mộc Việt.
 
 ## Cấu trúc thư mục
 
 ```
 src/main/java/mocviet/
 ├── controller/manager/
-│   └── ManagerController.java          # Controller chính cho manager
+│   ├── ManagerController.java          # Controller chính cho manager
+│   └── DeliveryAssignmentController.java    # Controller phân công đội giao hàng
 ├── dto/manager/
 │   ├── UpdateProfileRequest.java       # DTO cho cập nhật profile
-│   └── ChangePasswordRequest.java      # DTO cho đổi mật khẩu
-└── service/manager/
-    └── ManagerAccountService.java      # Service xử lý logic quản lý tài khoản
+│   ├── ChangePasswordRequest.java      # DTO cho đổi mật khẩu
+│   ├── AssignDeliveryTeamRequest.java       # DTO phân công đội giao hàng
+│   ├── ChangeDeliveryTeamRequest.java       # DTO thay đổi đội giao hàng
+│   ├── DeliveryTeamDTO.java                 # DTO thông tin đội giao hàng
+│   ├── OrderDeliveryDTO.java                # DTO thông tin giao hàng
+│   ├── PendingOrderDTO.java                 # DTO đơn hàng cần phân công
+│   └── ZoneDTO.java                         # DTO thông tin khu vực
+├── service/manager/
+│   ├── ManagerAccountService.java      # Service xử lý logic quản lý tài khoản
+│   └── DeliveryAssignmentService.java       # Service xử lý logic phân công
+└── repository/
+    ├── OrdersRepository.java                # Repository đơn hàng
+    ├── OrderDeliveryRepository.java         # Repository giao hàng
+    ├── DeliveryTeamRepository.java          # Repository đội giao hàng
+    ├── DeliveryTeamZoneRepository.java      # Repository đội-khu vực
+    ├── ProvinceZoneRepository.java          # Repository tỉnh-khu vực
+    ├── ShippingZoneRepository.java          # Repository khu vực
+    ├── DeliveryHistoryRepository.java       # Repository lịch sử giao hàng
+    └── OrderStatusHistoryRepository.java    # Repository lịch sử trạng thái
 
 src/main/resources/
 ├── templates/manager/
 │   ├── fragments/
-│   │   └── manager_layout.html         # Layout chung cho manager
+│   │   ├── manager_layout.html         # Layout chung cho manager
+│   │   ├── manager_sidebar.html        # Sidebar cho manager
+│   │   └── manager_navbar.html         # Navbar cho manager
 │   ├── dashboard/
 │   │   └── manager_index.html          # Dashboard chính
-│   └── account/
-│       ├── profile.html                # Trang quản lý tài khoản
-│       └── change-password.html        # Trang đổi mật khẩu
+│   ├── account/
+│   │   ├── profile.html                # Trang quản lý tài khoản
+│   │   └── change-password.html        # Trang đổi mật khẩu
+│   └── delivery/
+│       ├── pending_orders.html        # Danh sách đơn cần phân công
+│       ├── assign_team.html           # Phân công đội giao hàng
+│       ├── change_team.html           # Thay đổi đội giao hàng
+│       ├── teams.html                 # Quản lý đội giao hàng
+│       └── zones.html                 # Quản lý khu vực giao hàng
 ├── static/css/
-│   └── manager.css                     # CSS cho giao diện manager
+│   └── manager.css                     # CSS cho giao diện manager (đã cập nhật)
 └── static/js/
-    └── manager.js                      # JavaScript cho manager
+    ├── manager.js                      # JavaScript cho manager
+    └── delivery-assignment.js         # JavaScript cho phân công đội giao hàng
 ```
 
 ## Chức năng đã implement
@@ -54,6 +80,32 @@ src/main/resources/
   - Xác nhận mật khẩu phải khớp
   - Mật khẩu mới phải khác mật khẩu cũ
 
+### 4. Phân công đội giao hàng (`/manager/delivery/*`)
+- **Xem danh sách đơn hàng cần phân công** (`/manager/delivery/pending`)
+  - Hiển thị đơn hàng CONFIRMED chưa được phân công
+  - Lọc theo khu vực, tìm kiếm, sắp xếp
+  - Phân trang và auto-refresh
+
+- **Phân công đội giao hàng** (`/manager/delivery/assign/{orderId}`)
+  - Tự động gợi ý đội giao phù hợp theo khu vực
+  - Load balancing (ưu tiên đội ít đơn đang xử lý)
+  - Validation đầy đủ theo đặc tả
+  - Ghi chú đặc biệt và thông tin liên hệ
+
+- **Thay đổi đội giao hàng** (`/manager/delivery/change/{orderId}`)
+  - Chỉ cho phép khi chưa bắt đầu giao hàng
+  - Lý do thay đổi bắt buộc
+  - Thông báo cho đội giao cũ và mới
+
+- **Quản lý đội giao hàng** (`/manager/delivery/teams`)
+  - Xem thông tin tất cả đội giao hàng
+  - Số lượng đơn đang xử lý
+  - Khu vực phụ trách
+
+- **Quản lý khu vực giao hàng** (`/manager/delivery/zones`)
+  - Thông tin các khu vực giao hàng
+  - Phí vận chuyển và tỉnh/thành phụ trách
+
 ## Bảo mật
 
 ### 1. Authentication & Authorization
@@ -78,6 +130,15 @@ src/main/resources/
 | POST | `/manager/profile/update` | Cập nhật thông tin | MANAGER |
 | GET | `/manager/change-password` | Trang đổi mật khẩu | MANAGER |
 | POST | `/manager/change-password` | Đổi mật khẩu | MANAGER |
+| GET | `/manager/delivery/pending` | Danh sách đơn cần phân công | MANAGER |
+| GET | `/manager/delivery/assign/{orderId}` | Form phân công đội giao | MANAGER |
+| POST | `/manager/delivery/assign` | Xử lý phân công đội giao | MANAGER |
+| GET | `/manager/delivery/change/{orderId}` | Form thay đổi đội giao | MANAGER |
+| POST | `/manager/delivery/change` | Xử lý thay đổi đội giao | MANAGER |
+| GET | `/manager/delivery/teams` | Quản lý đội giao hàng | MANAGER |
+| GET | `/manager/delivery/zones` | Quản lý khu vực giao hàng | MANAGER |
+| GET | `/manager/delivery/api/teams/{orderId}` | Lấy danh sách đội giao phù hợp | MANAGER |
+| GET | `/manager/delivery/api/zone/{orderId}` | Lấy khu vực của đơn hàng | MANAGER |
 
 ## Công nghệ sử dụng
 
@@ -110,6 +171,11 @@ URL: http://localhost:8080/manager/profile
 URL: http://localhost:8080/manager/change-password
 ```
 
+### 5. Phân công đội giao hàng
+```
+URL: http://localhost:8080/manager/delivery/pending
+```
+
 ## Validation Rules
 
 ### UpdateProfileRequest
@@ -123,6 +189,20 @@ URL: http://localhost:8080/manager/change-password
 - **currentPassword:** Không được để trống
 - **newPassword:** Tối thiểu 8 ký tự, có chữ hoa, chữ thường, số
 - **confirmPassword:** Phải khớp với newPassword
+
+### Phân công đội giao hàng
+- **Đơn hàng phải ở trạng thái CONFIRMED**
+- **Đơn hàng chưa được phân công**
+- **Đội giao hàng phải hoạt động**
+- **Đội giao hàng phải phụ trách khu vực của địa chỉ giao hàng**
+- **Địa chỉ giao hàng phải được map vào khu vực**
+
+### Thay đổi đội giao hàng
+- **Đơn hàng đã được phân công**
+- **Đơn hàng chưa bắt đầu giao hàng (status = RECEIVED)**
+- **Đội giao hàng mới phải hoạt động**
+- **Đội giao hàng mới phải phụ trách khu vực**
+- **Lý do thay đổi là bắt buộc**
 
 ## Error Handling
 
@@ -138,17 +218,57 @@ URL: http://localhost:8080/manager/change-password
 - 403 Forbidden cho user không có quyền
 - 401 Unauthorized cho user chưa đăng nhập
 
+## Database Integration
+
+### Entities sử dụng
+- `Orders` - Đơn hàng
+- `OrderDelivery` - Phân công giao hàng
+- `DeliveryTeam` - Đội giao hàng
+- `DeliveryTeamZone` - Đội giao hàng - Khu vực
+- `ProvinceZone` - Tỉnh - Khu vực
+- `ShippingZone` - Khu vực giao hàng
+- `DeliveryHistory` - Lịch sử giao hàng
+- `OrderStatusHistory` - Lịch sử trạng thái đơn hàng
+
+### Stored Procedures sử dụng
+- `sp_MarkDispatched` - Đánh dấu đơn đã xuất kho
+- Triggers tự động gửi thông báo cho đội giao hàng
+
+## Tính năng đặc biệt
+
+### Auto Zone Detection
+- Tự động xác định khu vực từ địa chỉ giao hàng
+- Validation khu vực có đội giao hàng
+
+### Load Balancing
+- Ưu tiên đội giao hàng ít đơn đang xử lý nhất
+- Hiển thị số lượng đơn đang xử lý
+
+### Smart Suggestions
+- Gợi ý đội giao hàng phù hợp nhất
+- Sắp xếp theo workload
+
+### Real-time Notifications
+- Thông báo ngay cho đội giao hàng khi được phân công
+- Thông báo khi thay đổi đội giao hàng
+
+### Change Tracking
+- Theo dõi lịch sử thay đổi đội giao hàng
+- Ghi log đầy đủ mọi thao tác
+
 ## Logging & Audit
 
 ### 1. Activity Logging
 - Ghi log mọi thay đổi thông tin cá nhân
 - Ghi log đổi mật khẩu
+- Ghi log phân công đội giao hàng
 - Sử dụng Spring AOP (có thể implement thêm)
 
 ### 2. Security Logging
 - Log failed login attempts
 - Log password change attempts
 - Log profile update attempts
+- Log delivery assignment changes
 
 ## Performance
 
@@ -222,15 +342,32 @@ spring.jpa.show-sql=true
 - Password history
 - Account lockout
 - Email notifications
+- Bulk assignment (phân công hàng loạt)
+- Auto-assignment mode
+- Advanced filtering
+- Team performance analytics
+- Delivery route optimization
+- Mobile app integration
 
 ### 2. UI/UX
 - Dark mode
 - Mobile optimization
 - Accessibility improvements
 - Real-time notifications
+- Advanced filtering
+- Export functionality
+- Real-time updates với WebSocket
 
 ### 3. Security
 - OAuth2 integration
 - SSO support
 - Advanced audit logging
 - Security headers
+- API versioning
+- GraphQL support
+
+### 4. API Improvements
+- RESTful API đầy đủ
+- WebSocket cho real-time updates
+- GraphQL support
+- API versioning

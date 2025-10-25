@@ -239,7 +239,40 @@ public class ProductService {
     
     @Transactional(readOnly = true)
     public Page<Product> searchProducts(String keyword, Pageable pageable) {
-        return productRepository.searchProducts(keyword, pageable);
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return getProducts(pageable);
+        }
+        
+        String kw = keyword.trim();
+        System.out.println("Searching for keyword: " + kw);
+        
+        Page<Product> results = productRepository.searchProducts(kw, pageable);
+        System.out.println("Found " + results.getTotalElements() + " products");
+        
+        return results;
+    }
+    
+    @Transactional(readOnly = true)
+    public Page<Product> searchProductsWithCategory(String keyword, Integer categoryId, Pageable pageable) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            if (categoryId != null) {
+                return getProductsByCategory(categoryId, pageable);
+            }
+            return getProducts(pageable);
+        }
+        
+        String kw = keyword.trim();
+        System.out.println("Searching for keyword: " + kw + " in category: " + categoryId);
+        
+        Page<Product> results;
+        if (categoryId != null) {
+            results = productRepository.searchProductsInCategory(kw, categoryId, pageable);
+        } else {
+            results = productRepository.searchProducts(kw, pageable);
+        }
+        
+        System.out.println("Found " + results.getTotalElements() + " products");
+        return results;
     }
     
     @Transactional(readOnly = true)

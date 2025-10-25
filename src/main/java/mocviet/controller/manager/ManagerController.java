@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import mocviet.dto.manager.ChangePasswordRequest;
 import mocviet.dto.manager.UpdateProfileRequest;
 import mocviet.service.manager.ManagerAccountService;
+import mocviet.service.manager.DashboardService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -20,14 +21,37 @@ import jakarta.validation.Valid;
 public class ManagerController {
     
     private final ManagerAccountService managerAccountService;
+    private final DashboardService dashboardService;
     
     @GetMapping({"", "/"})
     @PreAuthorize("hasRole('MANAGER')")
     public String dashboard(Model model, Authentication authentication) {
-        model.addAttribute("pageTitle", "Dashboard Manager");
-        model.addAttribute("activeMenu", "dashboard");
-        model.addAttribute("username", authentication.getName());
-        return "manager/dashboard/manager_index";
+        try {
+            // Lấy thống kê dashboard
+            DashboardService.DashboardStats stats = dashboardService.getDashboardStats();
+            model.addAttribute("stats", stats);
+            
+            // Lấy đơn hàng gần đây
+            var recentOrders = dashboardService.getRecentOrders(5);
+            model.addAttribute("recentOrders", recentOrders);
+            
+            // Lấy thông báo
+            var notifications = dashboardService.getNotifications();
+            model.addAttribute("notifications", notifications);
+            
+            model.addAttribute("pageTitle", "Dashboard Manager");
+            model.addAttribute("activeMenu", "dashboard");
+            model.addAttribute("username", authentication.getName());
+            
+            return "manager/dashboard/manager_index";
+        } catch (Exception e) {
+            // Nếu có lỗi, hiển thị dashboard với dữ liệu mặc định
+            model.addAttribute("error", "Không thể tải dữ liệu dashboard: " + e.getMessage());
+            model.addAttribute("pageTitle", "Dashboard Manager");
+            model.addAttribute("activeMenu", "dashboard");
+            model.addAttribute("username", authentication.getName());
+            return "manager/dashboard/manager_index";
+        }
     }
     
     @GetMapping("/profile")

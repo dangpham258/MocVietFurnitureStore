@@ -40,4 +40,9 @@ public interface CartItemRepository extends JpaRepository<CartItem, Integer> {
      * Lấy danh sách CartItem theo danh sách ID
      */
     List<CartItem> findAllById(Iterable<Integer> ids);
+    
+    /**
+     * Kiểm tra variant có tồn tại trong giỏ hàng không
+     */
+    boolean existsByVariantId(Integer variantId);
 }

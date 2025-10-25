@@ -492,6 +492,292 @@ body {
     }
 }
 
+/* Delivery Assignment Specific Styles */
+.delivery-assignment-card {
+    transition: all 0.3s ease;
+    border: 1px solid #e0e0e0;
+    background: #ffffff;
+    border-radius: 8px;
+}
+
+.delivery-assignment-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.delivery-team-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    background: #ffffff;
+}
+
+.delivery-team-card:hover {
+    border-color: #666666;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.delivery-team-card.selected {
+    border-color: #333333;
+    background-color: #f8f9fa;
+    box-shadow: 0 2px 8px rgba(51, 51, 51, 0.2);
+}
+
+.zone-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    background: #ffffff;
+}
+
+.zone-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.zone-card.has-teams {
+    border-left: 4px solid #28a745;
+}
+
+.zone-card.no-teams {
+    border-left: 4px solid #dc3545;
+}
+
+.delivery-status-badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+}
+
+.delivery-status-received {
+    background-color: #e3f2fd;
+    color: #1976d2;
+}
+
+.delivery-status-in-transit {
+    background-color: #fff3e0;
+    color: #f57c00;
+}
+
+.delivery-status-done {
+    background-color: #e8f5e8;
+    color: #388e3c;
+}
+
+.delivery-status-return-pickup {
+    background-color: #fce4ec;
+    color: #c2185b;
+}
+
+.order-priority-high {
+    border-left: 4px solid #dc3545;
+}
+
+.order-priority-medium {
+    border-left: 4px solid #ffc107;
+}
+
+.order-priority-low {
+    border-left: 4px solid #28a745;
+}
+
+.team-workload-indicator {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 0.5rem;
+}
+
+.team-workload-low {
+    background-color: #28a745;
+}
+
+.team-workload-medium {
+    background-color: #ffc107;
+}
+
+.team-workload-high {
+    background-color: #dc3545;
+}
+
+.zone-coverage-indicator {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 0.25rem;
+}
+
+.zone-coverage-active {
+    background-color: #28a745;
+}
+
+.zone-coverage-inactive {
+    background-color: #6c757d;
+}
+
+.delivery-assignment-form {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 1.5rem;
+    border: 1px solid #e0e0e0;
+}
+
+.team-selection-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.team-card {
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 1rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    background: #ffffff;
+}
+
+.team-card:hover {
+    border-color: #666666;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.team-card.selected {
+    border-color: #333333;
+    background-color: #f8f9fa;
+    box-shadow: 0 2px 8px rgba(51, 51, 51, 0.2);
+}
+
+.team-card input[type="radio"] {
+    margin-right: 0.5rem;
+}
+
+.order-details-summary {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 1rem;
+    border: 1px solid #e0e0e0;
+}
+
+.order-details-summary .detail-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    padding: 0.25rem 0;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.order-details-summary .detail-row:last-child {
+    border-bottom: none;
+    font-weight: 600;
+    color: #333333;
+}
+
+.assignment-steps {
+    display: flex;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.assignment-step {
+    display: flex;
+    align-items: center;
+    margin-right: 2rem;
+}
+
+.assignment-step-number {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: #e0e0e0;
+    color: #666666;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    margin-right: 0.5rem;
+}
+
+.assignment-step.active .assignment-step-number {
+    background-color: #333333;
+    color: #ffffff;
+}
+
+.assignment-step.completed .assignment-step-number {
+    background-color: #28a745;
+    color: #ffffff;
+}
+
+.assignment-step-line {
+    width: 2rem;
+    height: 2px;
+    background-color: #e0e0e0;
+    margin-right: 2rem;
+}
+
+.assignment-step.completed + .assignment-step .assignment-step-line {
+    background-color: #28a745;
+}
+
+/* Loading states */
+.delivery-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    color: #666666;
+}
+
+.delivery-loading .spinner-border {
+    margin-right: 0.5rem;
+}
+
+/* Empty states */
+.delivery-empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #666666;
+}
+
+.delivery-empty-state i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.delivery-empty-state h5 {
+    margin-bottom: 0.5rem;
+    color: #333333;
+}
+
+.delivery-empty-state p {
+    margin-bottom: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .team-selection-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .assignment-steps {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .assignment-step {
+        margin-right: 0;
+        margin-bottom: 1rem;
+    }
+    
+    .assignment-step-line {
+        display: none;
+    }
+}
+
 /* Dark mode support */
 @media (prefers-color-scheme: dark) {
     body {
@@ -518,5 +804,30 @@ body {
         background-color: #2c2c2c;
         border-color: #404040;
         color: #ffffff;
+    }
+    
+    .delivery-assignment-card {
+        background-color: #2c2c2c;
+        border-color: #404040;
+    }
+    
+    .delivery-team-card {
+        background-color: #2c2c2c;
+        border-color: #404040;
+    }
+    
+    .zone-card {
+        background-color: #2c2c2c;
+        border-color: #404040;
+    }
+    
+    .team-card {
+        background-color: #2c2c2c;
+        border-color: #404040;
+    }
+    
+    .order-details-summary {
+        background-color: #404040;
+        border-color: #555555;
     }
 }

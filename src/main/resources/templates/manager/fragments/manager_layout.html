@@ -32,6 +32,9 @@
                             <a class="nav-link text-white" th:classappend="${activeMenu == 'orders'} ? 'active'" href="/manager/orders">
                                 <i class="fas fa-shopping-cart me-2"></i>Đơn hàng
                             </a>
+                            <a class="nav-link text-white" th:classappend="${activeMenu == 'delivery'} ? 'active'" href="/manager/delivery/pending">
+                                <i class="fas fa-truck me-2"></i>Phân công giao hàng
+                            </a>
                             <a class="nav-link text-white" th:classappend="${activeMenu == 'articles'} ? 'active'" href="/manager/articles">
                                 <i class="fas fa-newspaper me-2"></i>Tin tức
                             </a>
