@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "OrderDelivery")
@@ -20,7 +21,7 @@ public class OrderDelivery {
     
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", nullable = false, unique = true)
-    private Order order;
+    private Orders order;
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "delivery_team_id", nullable = false)
@@ -38,6 +39,9 @@ public class OrderDelivery {
     
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
+    
+    @OneToMany(mappedBy = "orderDelivery", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<DeliveryHistory> deliveryHistories;
     
     public enum DeliveryStatus {
         RECEIVED, IN_TRANSIT, DONE, RETURN_PICKUP

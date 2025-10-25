@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Entity
 @Table(name = "Color")
 @Data
@@ -27,4 +29,10 @@ public class Color {
     
     @Column(name = "is_active", nullable = false)
     private Boolean isActive = true;
+    
+    @OneToMany(mappedBy = "color", fetch = FetchType.LAZY)
+    private List<ProductVariant> variants;
+    
+    @OneToMany(mappedBy = "color", fetch = FetchType.LAZY)
+    private List<ProductImage> images;
 }

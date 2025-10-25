@@ -25,8 +25,13 @@ public class OTP {
     @Column(name = "code", nullable = false, length = 10)
     private String code;
     
+    @Enumerated(EnumType.STRING)
     @Column(name = "purpose", nullable = false, length = 30)
-    private String purpose;
+    private Purpose purpose;
+    
+    public enum Purpose {
+        REGISTER, RESET_PASSWORD
+    }
     
     @Column(name = "is_used", nullable = false)
     private Boolean isUsed = false;

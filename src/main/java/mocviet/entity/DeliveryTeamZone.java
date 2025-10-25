@@ -6,7 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "DeliveryTeamZone")
+@Table(name = "DeliveryTeamZone", 
+       uniqueConstraints = @UniqueConstraint(name = "UQ_DTZ", columnNames = {"delivery_team_id", "zone_id"}))
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

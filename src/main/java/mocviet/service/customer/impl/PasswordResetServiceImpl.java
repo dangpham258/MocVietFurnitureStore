@@ -29,7 +29,7 @@ public class PasswordResetServiceImpl implements IPasswordResetService {
     private final JavaMailSender mailSender;
     private final PasswordEncoder passwordEncoder;
     
-    private static final String PURPOSE_RESET_PASSWORD = "RESET_PASSWORD";
+    private static final OTP.Purpose PURPOSE_RESET_PASSWORD = OTP.Purpose.RESET_PASSWORD;
     private static final int OTP_EXPIRY_MINUTES = 5; // OTP hết hạn sau 5 phút
     private static final int OTP_LENGTH = 6;
     

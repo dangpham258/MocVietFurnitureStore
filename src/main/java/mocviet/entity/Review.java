@@ -1,6 +1,8 @@
 package mocviet.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -31,6 +33,8 @@ public class Review {
     private OrderItem orderItem;
     
     @Column(name = "rating", nullable = false)
+    @Min(value = 1, message = "Rating must be at least 1")
+    @Max(value = 5, message = "Rating must be at most 5")
     private Integer rating;
     
     @Column(name = "content", length = 1000)

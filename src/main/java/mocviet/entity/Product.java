@@ -58,6 +58,21 @@ public class Product {
     @OneToMany(mappedBy = "product", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<ProductImage> images;
     
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<ProductVariant> variants;
+    
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Review> reviews;
+    
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Wishlist> wishlists;
+    
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Viewed> viewedBy;
+    
+    @OneToMany(mappedBy = "linkedProduct", fetch = FetchType.LAZY)
+    private List<Article> linkedArticles;
+    
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();

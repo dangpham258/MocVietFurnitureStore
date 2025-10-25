@@ -8,6 +8,7 @@ import mocviet.dto.ProfileUpdateRequest;
 import mocviet.entity.Address;
 import mocviet.entity.User;
 import mocviet.service.customer.IProfileService;
+import mocviet.service.customer.ICustomerService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -25,6 +26,7 @@ import java.util.Map;
 public class ProfileController {
     
     private final IProfileService profileService;
+    private final ICustomerService customerService;
     
     @GetMapping
     public String profilePage(Model model) {
@@ -44,6 +46,7 @@ public class ProfileController {
         model.addAttribute("profileUpdateRequest", profileUpdateRequest);
         model.addAttribute("passwordChangeRequest", new PasswordChangeRequest());
         model.addAttribute("addressRequest", new AddressRequest());
+        model.addAttribute("provinces", customerService.getAllProvinces());
         
         return "customer/profile";
     }

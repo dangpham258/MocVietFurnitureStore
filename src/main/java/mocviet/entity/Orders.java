@@ -2,18 +2,24 @@ package mocviet.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "Orders")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Order {
+@ToString(exclude = {"user", "address", "coupon", "orderItems", "statusHistories", "orderDelivery"})
+public class Orders {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -46,11 +52,30 @@ public class Order {
     @Column(name = "shipping_fee", nullable = false, precision = 12, scale = 0)
     private BigDecimal shippingFee = BigDecimal.ZERO;
     
+    @Enumerated(EnumType.STRING)
+    @Column(name = "return_status", length = 20)
+    private ReturnStatus returnStatus;
+    
+    @Column(name = "return_reason", length = 500)
+    private String returnReason;
+    
+    @Column(name = "return_note", length = 500)
+    private String returnNote;
+    
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
     
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
+    
+    @OneToMany(mappedBy = "order", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<OrderItem> orderItems;
+    
+    @OneToMany(mappedBy = "order", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<OrderStatusHistory> statusHistories;
+    
+    @OneToOne(mappedBy = "order", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private OrderDelivery orderDelivery;
     
     public enum OrderStatus {
         PENDING, CONFIRMED, DISPATCHED, DELIVERED, CANCELLED, RETURNED
@@ -64,6 +89,10 @@ public class Order {
         UNPAID, PAID, REFUNDED
     }
     
+    public enum ReturnStatus {
+        REQUESTED, APPROVED, REJECTED, PROCESSED
+    }
+    
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
@@ -73,5 +102,19 @@ public class Order {
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
+    }
+    
+    // Custom hashCode and equals to avoid circular references
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Orders order = (Orders) o;
+        return Objects.equals(id, order.id);
+    }
+    
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

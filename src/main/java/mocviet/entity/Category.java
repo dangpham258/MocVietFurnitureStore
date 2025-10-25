@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "Category")
@@ -41,6 +42,18 @@ public class Category {
     public enum CategoryType {
         CATEGORY, COLLECTION
     }
+    
+    // Quan hệ phân cấp: Category cha có nhiều Category con
+    @OneToMany(mappedBy = "parent", fetch = FetchType.LAZY)
+    private List<Category> children;
+    
+    // Quan hệ với Product: Category có nhiều Product thuộc về
+    @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
+    private List<Product> products;
+    
+    // Quan hệ với Product: Collection có nhiều Product thuộc về
+    @OneToMany(mappedBy = "collection", fetch = FetchType.LAZY)
+    private List<Product> collectionProducts;
     
     @PrePersist
     protected void onCreate() {

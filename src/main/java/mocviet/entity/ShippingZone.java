@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Entity
 @Table(name = "ShippingZone")
 @Data
@@ -21,4 +23,13 @@ public class ShippingZone {
     
     @Column(name = "slug", nullable = false, unique = true, length = 50)
     private String slug;
+    
+    @OneToOne(mappedBy = "zone", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private ShippingFee shippingFee;
+    
+    @OneToMany(mappedBy = "zone", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<ProvinceZone> provinceZones;
+    
+    @OneToMany(mappedBy = "zone", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<DeliveryTeamZone> deliveryTeamZones;
 }

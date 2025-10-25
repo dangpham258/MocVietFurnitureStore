@@ -20,11 +20,11 @@ public class OrderStatusHistory {
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", nullable = false)
-    private Order order;
+    private Orders order;
     
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
-    private Order.OrderStatus status;
+    private Orders.OrderStatus status;
     
     @Column(name = "note", length = 500)
     private String note;

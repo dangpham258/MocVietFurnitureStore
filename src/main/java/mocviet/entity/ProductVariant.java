@@ -1,14 +1,19 @@
 package mocviet.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Entity
-@Table(name = "ProductVariant")
+@Table(name = "ProductVariant", 
+       uniqueConstraints = @UniqueConstraint(name = "UQ_PV_Combo", columnNames = {"product_id", "color_id", "type_name"}))
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -33,39 +38,36 @@ public class ProductVariant {
     private String sku;
     
     @Column(name = "price", nullable = false, precision = 15, scale = 0)
+    @DecimalMin(value = "0.0", message = "Price must be non-negative")
     private BigDecimal price;
     
     @Column(name = "discount_percent", nullable = false)
+    @Min(value = 0, message = "Discount percent must be at least 0")
+    @Max(value = 100, message = "Discount percent must be at most 100")
     private Integer discountPercent = 0;
     
     @Column(name = "stock_qty", nullable = false)
+    @Min(value = 0, message = "Stock quantity must be non-negative")
     private Integer stockQty = 0;
     
+    @Enumerated(EnumType.STRING)
     @Column(name = "promotion_type", length = 20)
-    private String promotionType;
+    private PromotionType promotionType;
+    
+    public enum PromotionType {
+        SALE, OUTLET
+    }
     
     @Column(name = "is_active", nullable = false)
     private Boolean isActive = true;
     
-    // Computed column for sale_price
-    @Column(name = "sale_price", precision = 15, scale = 0)
+    // Computed column for sale_price (calculated by database)
+    @Column(name = "sale_price", precision = 15, scale = 0, insertable = false, updatable = false)
     private BigDecimal salePrice;
     
-    @PostLoad
-    @PostPersist
-    @PostUpdate
-    private void calculateSalePrice() {
-        if (price != null && discountPercent != null) {
-            if (discountPercent == 0) {
-                salePrice = price;
-            } else {
-                BigDecimal discountAmount = price.multiply(BigDecimal.valueOf(discountPercent))
-                        .divide(BigDecimal.valueOf(100));
-                salePrice = price.subtract(discountAmount);
-                // Làm tròn về bậc nghìn
-                salePrice = salePrice.divide(BigDecimal.valueOf(1000), 0, BigDecimal.ROUND_HALF_UP)
-                        .multiply(BigDecimal.valueOf(1000));
-            }
-        }
-    }
+    @OneToMany(mappedBy = "variant", fetch = FetchType.LAZY)
+    private List<CartItem> cartItems;
+    
+    @OneToMany(mappedBy = "variant", fetch = FetchType.LAZY)
+    private List<OrderItem> orderItems;
 }

@@ -8,7 +8,8 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "Wishlist")
+@Table(name = "Wishlist", 
+       uniqueConstraints = @UniqueConstraint(name = "UQ_Wishlist", columnNames = {"user_id", "product_id"}))
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
