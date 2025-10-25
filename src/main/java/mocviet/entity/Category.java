@@ -26,7 +26,7 @@ public class Category {
     @Column(name = "name", nullable = false, length = 120)
     private String name;
     
-    @Column(name = "slug", nullable = false, length = 160, unique = true)
+    @Column(name = "slug", nullable = false, unique = true, length = 160)
     private String slug;
     
     @Enumerated(EnumType.STRING)
@@ -39,21 +39,24 @@ public class Category {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
     
-    @PrePersist
-    protected void onCreate() {
-        createdAt = LocalDateTime.now();
-    }
-    
     public enum CategoryType {
         CATEGORY, COLLECTION
     }
     
-    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    // Quan hệ phân cấp: Category cha có nhiều Category con
+    @OneToMany(mappedBy = "parent", fetch = FetchType.LAZY)
     private List<Category> children;
     
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    // Quan hệ với Product: Category có nhiều Product thuộc về
+    @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
     private List<Product> products;
     
-    @OneToMany(mappedBy = "collection", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    // Quan hệ với Product: Collection có nhiều Product thuộc về
+    @OneToMany(mappedBy = "collection", fetch = FetchType.LAZY)
     private List<Product> collectionProducts;
+    
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+    }
 }

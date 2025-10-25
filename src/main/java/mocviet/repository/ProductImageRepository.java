@@ -11,19 +11,19 @@ import java.util.List;
 @Repository
 public interface ProductImageRepository extends JpaRepository<ProductImage, Integer> {
     
-    @Query("SELECT pi FROM ProductImage pi WHERE pi.product.id = :productId")
-    List<ProductImage> findByProductId(@Param("productId") Integer productId);
+    /**
+     * Tìm ProductImage theo product ID
+     */
+    List<ProductImage> findByProductId(Integer productId);
     
-    @Query("SELECT pi FROM ProductImage pi LEFT JOIN FETCH pi.color WHERE pi.product.id = :productId")
-    List<ProductImage> findByProductIdWithColor(@Param("productId") Integer productId);
+    /**
+     * Tìm ProductImage theo product ID và color ID
+     */
+    List<ProductImage> findByProductIdAndColorId(Integer productId, Integer colorId);
     
-    @Query("SELECT pi FROM ProductImage pi WHERE pi.product.id = :productId AND pi.color.id = :colorId")
-    List<ProductImage> findByProductAndColor(@Param("productId") Integer productId, @Param("colorId") Integer colorId);
-    
-    @Query("SELECT pi FROM ProductImage pi WHERE pi.color.id = :colorId")
-    List<ProductImage> findByColorId(@Param("colorId") Integer colorId);
-    
-    void deleteByProductId(Integer productId);
-    
-    void deleteByProductIdAndColorId(Integer productId, Integer colorId);
+    /**
+     * Lấy ảnh đầu tiên của sản phẩm theo màu
+     */
+    @Query("SELECT pi FROM ProductImage pi WHERE pi.product.id = :productId AND pi.color.id = :colorId ORDER BY pi.id ASC")
+    List<ProductImage> findFirstByProductIdAndColorId(@Param("productId") Integer productId, @Param("colorId") Integer colorId);
 }

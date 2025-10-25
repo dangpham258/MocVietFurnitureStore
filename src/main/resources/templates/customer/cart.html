@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giỏ hàng - Mộc Việt</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link th:href="@{/css/customer.css}" rel="stylesheet">
+    <style>
+        .cart-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .cart-header {
+            background: linear-gradient(135deg, #8B4513, #A0522D);
+            color: white;
+            padding: 30px 0;
+            margin-bottom: 30px;
+            border-radius: 10px;
+        }
+        
+        .cart-item {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .cart-item:hover {
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+        
+        .product-image {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        
+        .product-info h5 {
+            color: #8B4513;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .product-variant {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+        
+        .price-info {
+            color: #8B4513;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+        
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .quantity-input {
+            width: 60px;
+            text-align: center;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 5px;
+        }
+        
+        .btn-quantity {
+            width: 30px;
+            height: 30px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-quantity:hover {
+            background: #8B4513;
+            color: white;
+            border-color: #8B4513;
+        }
+        
+        .stock-error {
+            color: #dc3545;
+            font-size: 0.85em;
+            margin-top: 5px;
+        }
+        
+        .out-of-stock {
+            opacity: 0.6;
+            background: #f8f9fa;
+        }
+        
+        .cart-summary {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 25px;
+            position: sticky;
+            top: 20px;
+        }
+        
+        .summary-title {
+            color: #8B4513;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #8B4513;
+        }
+        
+        .total-amount {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #8B4513;
+        }
+        
+        .btn-checkout {
+            background: linear-gradient(135deg, #8B4513, #A0522D);
+            border: none;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-weight: 600;
+            width: 100%;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-checkout:hover {
+            background: linear-gradient(135deg, #A0522D, #8B4513);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(139, 69, 19, 0.3);
+        }
+        
+        .btn-continue-shopping {
+            color: #8B4513;
+            text-decoration: none;
+            font-size: 0.9em;
+            text-align: center;
+            display: block;
+        }
+        
+        .btn-continue-shopping:hover {
+            color: #A0522D;
+            text-decoration: underline;
+        }
+        
+        .empty-cart {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+        
+        .empty-cart i {
+            font-size: 4em;
+            color: #ddd;
+            margin-bottom: 20px;
+        }
+        
+        .form-check-input:checked {
+            background-color: #8B4513;
+            border-color: #8B4513;
+        }
+        
+        .btn-remove {
+            color: #dc3545;
+            background: none;
+            border: none;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-remove:hover {
+            color: #c82333;
+            transform: scale(1.1);
+        }
+        
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        
+        .alert-custom {
+            border-radius: 10px;
+            border: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div th:replace="fragments/header :: header"></div>
+
+    <div class="cart-container">
+        <!-- Cart Header -->
+        <div class="cart-header text-center">
+            <h2><i class="fas fa-shopping-cart me-2"></i>Giỏ hàng của bạn</h2>
+            <p class="mb-0">Quản lý và thanh toán các sản phẩm đã chọn</p>
+        </div>
+
+        <!-- Alert Messages -->
+        <div id="alertContainer"></div>
+
+        <!-- Cart Content -->
+        <div th:if="${cartItems != null and !cartItems.empty}" class="row">
+            <!-- Cart Items -->
+            <div class="col-lg-8">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4>Sản phẩm trong giỏ hàng</h4>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="selectAll" checked>
+                        <label class="form-check-label" for="selectAll">
+                            Chọn tất cả
+                        </label>
+                    </div>
+                </div>
+
+                <div id="cartItemsContainer">
+                    <div th:each="item : ${cartItems}" th:id="'cart-item-' + ${item.id}" 
+                         th:classappend="${stockErrors.containsKey(item.id)} ? 'out-of-stock' : ''"
+                         class="cart-item">
+                        <div class="row align-items-center">
+                            <!-- Checkbox -->
+                            <div class="col-1">
+                                <div class="form-check">
+                                    <input class="form-check-input item-checkbox" 
+                                           type="checkbox" 
+                                           th:id="'item-' + ${item.id}"
+                                           th:checked="${!stockErrors.containsKey(item.id)}"
+                                           th:disabled="${stockErrors.containsKey(item.id)}">
+                                </div>
+                            </div>
+
+                            <!-- Product Image -->
+                            <div class="col-2">
+                                <img th:src="'/images/products/placeholder.jpg'"
+                                     th:alt="${item.variant.product.name}"
+                                     class="product-image">
+                            </div>
+
+                            <!-- Product Info -->
+                            <div class="col-4">
+                                <h5 th:text="${item.variant.product.name}">Tên sản phẩm</h5>
+                                <div class="product-variant">
+                                    <span th:text="${item.variant.color.name}">Màu sắc</span> - 
+                                    <span th:text="${item.variant.typeName}">Loại</span>
+                                </div>
+                                <div class="price-info">
+                                    <span th:text="${#numbers.formatDecimal(item.variant.salePrice, 0, 'COMMA', 0, 'POINT')} + ' ₫'">0 ₫</span>
+                                </div>
+                                <div th:if="${stockErrors.containsKey(item.id)}" 
+                                     class="stock-error" 
+                                     th:text="${stockErrors.get(item.id)}">
+                                    Lỗi tồn kho
+                                </div>
+                            </div>
+
+                            <!-- Quantity Controls -->
+                            <div class="col-3">
+                                <div class="quantity-controls">
+                                    <button class="btn-quantity" th:onclick="'decreaseQuantity(' + ${item.id} + ')'">
+                                        <i class="fas fa-minus"></i>
+                                    </button>
+                                    <input type="number" 
+                                           class="quantity-input" 
+                                           th:id="'qty-' + ${item.id}"
+                                           th:value="${item.qty}"
+                                           min="1"
+                                           th:max="${item.variant.stockQty}"
+                                           th:disabled="${stockErrors.containsKey(item.id)}"
+                                           th:onchange="'updateQuantity(' + ${item.id} + ', this.value)'">
+                                    <button class="btn-quantity" th:onclick="'increaseQuantity(' + ${item.id} + ')'">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Total Price & Remove -->
+                            <div class="col-2 text-end">
+                                <div class="price-info mb-2">
+                                    <span th:id="'total-' + ${item.id}" 
+                                          th:text="${#numbers.formatDecimal(item.variant.salePrice * item.qty, 0, 'COMMA', 0, 'POINT')} + ' ₫'">
+                                        0 ₫
+                                    </span>
+                                </div>
+                                <button class="btn-remove" th:onclick="'removeItem(' + ${item.id} + ')'">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cart Summary -->
+            <div class="col-lg-4">
+                <div class="cart-summary">
+                    <h5 class="summary-title">Tóm tắt đơn hàng</h5>
+                    
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Tạm tính:</span>
+                        <span id="subtotal">0 ₫</span>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Phí vận chuyển:</span>
+                        <span>Chưa tính</span>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="d-flex justify-content-between mb-3">
+                        <strong>Tổng cộng:</strong>
+                        <strong class="total-amount" id="grandTotal">0 ₫</strong>
+                    </div>
+                    
+                    <button class="btn btn-checkout" id="checkoutBtn" onclick="proceedToCheckout()">
+                        <i class="fas fa-credit-card me-2"></i>Thanh toán
+                    </button>
+                    
+                    <a href="/web/products" class="btn-continue-shopping">
+                        <i class="fas fa-arrow-left me-1"></i>Tiếp tục mua sắm
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty Cart -->
+        <div th:if="${cartItems == null or cartItems.empty}" class="empty-cart">
+            <i class="fas fa-shopping-cart"></i>
+            <h4>Giỏ hàng trống</h4>
+            <p>Bạn chưa có sản phẩm nào trong giỏ hàng</p>
+            <a href="/web/products" class="btn btn-primary">
+                <i class="fas fa-shopping-bag me-2"></i>Bắt đầu mua sắm
+            </a>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div th:replace="fragments/footer :: footer"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:src="@{/js/customer.js}"></script>
+</body>
+</html>

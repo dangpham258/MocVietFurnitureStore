@@ -23,7 +23,26 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
                                       Authentication authentication) throws IOException, ServletException {
         
         User user = (User) authentication.getPrincipal();
-        String role = user.getRole().getName();
+        String role = "CUSTOMER"; // Default role
+        
+        if (user.getRole() != null && user.getRole().getName() != null) {
+            role = user.getRole().getName();
+        }
+        
+        // Check if remember me is checked
+        String rememberMe = request.getParameter("remember-me");
+        
+        if ("on".equals(rememberMe)) {
+            // Generate JWT token
+            String jwt = tokenProvider.generateToken(authentication);
+            
+            // Set JWT as cookie
+            Cookie cookie = new Cookie("JWT_TOKEN", jwt);
+            cookie.setHttpOnly(true);
+            cookie.setPath("/");
+            cookie.setMaxAge(24 * 60 * 60); // 24 hours
+            response.addCookie(cookie);
+        }
         
         // Always generate JWT token for session management
         String jwt = tokenProvider.generateToken(authentication);

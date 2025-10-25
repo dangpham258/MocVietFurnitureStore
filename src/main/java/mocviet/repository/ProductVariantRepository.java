@@ -12,26 +12,32 @@ import java.util.Optional;
 @Repository
 public interface ProductVariantRepository extends JpaRepository<ProductVariant, Integer> {
     
+    /**
+     * Tìm ProductVariant theo product ID và color ID
+     */
+    List<ProductVariant> findByProductIdAndColorId(Integer productId, Integer colorId);
+    
+    /**
+     * Tìm ProductVariant theo product ID
+     */
+    List<ProductVariant> findByProductId(Integer productId);
+    
+    /**
+     * Tìm ProductVariant theo SKU
+     */
     Optional<ProductVariant> findBySku(String sku);
     
-    Boolean existsBySku(String sku);
+    /**
+     * Lấy danh sách ProductVariant đang active theo product ID
+     */
+    @Query("SELECT pv FROM ProductVariant pv WHERE pv.product.id = :productId AND pv.isActive = true")
+    List<ProductVariant> findActiveByProductId(@Param("productId") Integer productId);
     
-    Boolean existsBySkuAndIdNot(String sku, Integer id);
+    /**
+     * Kiểm tra tồn kho của ProductVariant
+     */
+    @Query("SELECT pv.stockQty FROM ProductVariant pv WHERE pv.id = :variantId")
+    Integer getStockQtyById(@Param("variantId") Integer variantId);
     
-    @Query("SELECT pv FROM ProductVariant pv WHERE pv.product.id = :productId AND pv.color.id = :colorId AND pv.typeName = :typeName")
-    Optional<ProductVariant> findByProductAndColorAndType(@Param("productId") Integer productId, 
-                                                          @Param("colorId") Integer colorId, 
-                                                          @Param("typeName") String typeName);
-    
-    @Query("SELECT pv FROM ProductVariant pv WHERE pv.product.id = :productId")
-    List<ProductVariant> findByProductId(@Param("productId") Integer productId);
-    
-    @Query("SELECT pv FROM ProductVariant pv LEFT JOIN FETCH pv.color WHERE pv.product.id = :productId")
-    List<ProductVariant> findByProductIdWithColor(@Param("productId") Integer productId);
-    
-    @Query("SELECT pv FROM ProductVariant pv WHERE pv.stockQty <= :threshold AND pv.isActive = true")
-    List<ProductVariant> findLowStockVariants(@Param("threshold") Integer threshold);
-    
-    @Query("SELECT pv FROM ProductVariant pv WHERE pv.stockQty = 0 AND pv.isActive = true")
-    List<ProductVariant> findOutOfStockVariants();
+    List<ProductVariant> findByProductIdAndIsActiveTrue(Integer productId);
 }

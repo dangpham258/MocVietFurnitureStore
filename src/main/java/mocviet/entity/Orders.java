@@ -52,6 +52,16 @@ public class Orders {
     @Column(name = "shipping_fee", nullable = false, precision = 12, scale = 0)
     private BigDecimal shippingFee = BigDecimal.ZERO;
     
+    @Enumerated(EnumType.STRING)
+    @Column(name = "return_status", length = 20)
+    private ReturnStatus returnStatus;
+    
+    @Column(name = "return_reason", length = 500)
+    private String returnReason;
+    
+    @Column(name = "return_note", length = 500)
+    private String returnNote;
+    
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
     
@@ -66,6 +76,22 @@ public class Orders {
     
     @OneToOne(mappedBy = "order", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private OrderDelivery orderDelivery;
+    
+    public enum OrderStatus {
+        PENDING, CONFIRMED, DISPATCHED, DELIVERED, CANCELLED, RETURNED
+    }
+    
+    public enum PaymentMethod {
+        COD, VNPAY, MOMO
+    }
+    
+    public enum PaymentStatus {
+        UNPAID, PAID, REFUNDED
+    }
+    
+    public enum ReturnStatus {
+        REQUESTED, APPROVED, REJECTED, PROCESSED
+    }
     
     @PrePersist
     protected void onCreate() {
@@ -90,17 +116,5 @@ public class Orders {
     @Override
     public int hashCode() {
         return Objects.hash(id);
-    }
-    
-    public enum OrderStatus {
-        PENDING, CONFIRMED, DISPATCHED, DELIVERED, CANCELLED, RETURNED
-    }
-    
-    public enum PaymentMethod {
-        COD, VNPAY, MOMO
-    }
-    
-    public enum PaymentStatus {
-        UNPAID, PAID, REFUNDED
     }
 }

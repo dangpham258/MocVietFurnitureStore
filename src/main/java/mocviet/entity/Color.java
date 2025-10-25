@@ -18,10 +18,10 @@ public class Color {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     
-    @Column(name = "name", nullable = false, length = 80, unique = true)
+    @Column(name = "name", nullable = false, unique = true, length = 80)
     private String name;
     
-    @Column(name = "slug", nullable = false, length = 100, unique = true)
+    @Column(name = "slug", nullable = false, unique = true, length = 100)
     private String slug;
     
     @Column(name = "hex", length = 7)
@@ -30,7 +30,7 @@ public class Color {
     @Column(name = "is_active", nullable = false)
     private Boolean isActive = true;
     
-    @OneToMany(mappedBy = "color", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "color", fetch = FetchType.LAZY)
     private List<ProductVariant> variants;
     
     @OneToMany(mappedBy = "color", fetch = FetchType.LAZY)

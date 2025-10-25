@@ -56,6 +56,7 @@ public class SecurityConfig {
                     "/auth/**",
                     "/login",
                     "/register",
+                    "/password-reset/**",
                     "/css/**",
                     "/js/**",
                     "/images/**",
@@ -76,6 +77,7 @@ public class SecurityConfig {
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
             .formLogin(form -> form
                 .loginPage("/login")
+                .loginProcessingUrl("/login")
                 .successHandler(customSuccessHandler)
                 .permitAll()
             )

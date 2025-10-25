@@ -77,7 +77,7 @@ public class AuthController {
     }
     
     // ===== POST ACTIONS =====
-    
+    /*
     @PostMapping("/login")
     public String login(@Valid @ModelAttribute("loginRequest") LoginRequest request,
                        BindingResult result,
@@ -110,6 +110,7 @@ public class AuthController {
             return "auth/login";
         }
     }
+    */
     
     @PostMapping("/register")
     public String register(@Valid @ModelAttribute("registerRequest") RegisterRequest request,
