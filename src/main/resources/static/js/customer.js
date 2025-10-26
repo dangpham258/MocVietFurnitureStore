@@ -142,7 +142,7 @@ class CustomerCart {
     }
 
     getSelectedItemIds() {
-        const selectedCheckboxes = document.querySelectorAll('.item-checkbox:checked');
+        const selectedCheckboxes = document.querySelectorAll('.item-checkbox:checked:not(:disabled)');
         return Array.from(selectedCheckboxes).map(checkbox => {
             return parseInt(checkbox.id.replace('item-', ''));
         });
@@ -510,7 +510,7 @@ window.proceedToCheckout = function() {
         selectedItemIds = customerApp.cartManager.getSelectedItemIds();
     } else {
         // Fallback
-        const selectedCheckboxes = document.querySelectorAll('.item-checkbox:checked');
+        const selectedCheckboxes = document.querySelectorAll('.item-checkbox:checked:not(:disabled)');
         selectedItemIds = Array.from(selectedCheckboxes).map(checkbox => {
             return parseInt(checkbox.id.replace('item-', ''));
         });
@@ -536,11 +536,9 @@ window.proceedToCheckout = function() {
         return;
     }
 
-    // Store selected items in sessionStorage for checkout page
-    sessionStorage.setItem('selectedCartItems', JSON.stringify(selectedItemIds));
-    
-    // Redirect to checkout page
-    window.location.href = '/customer/checkout';
+    // Build URL with selected items
+    const selectedIdsParam = selectedItemIds.join(',');
+    window.location.href = `/customer/checkout?selectedItemIds=${selectedIdsParam}`;
 };
 
 window.updateStockErrors = function(stockErrors) {

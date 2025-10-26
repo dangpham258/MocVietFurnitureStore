@@ -49,6 +49,17 @@ public class CartServiceImpl implements ICartService {
     }
     
     @Override
+    @Transactional(readOnly = true)
+    public List<CartItem> getCurrentUserCartItemsWithImages() {
+        Cart cart = getCurrentUserCart();
+        if (cart == null) {
+            return List.of();
+        }
+        
+        return cartItemRepository.findByCartIdWithProductImages(cart.getId());
+    }
+    
+    @Override
     @Transactional
     public boolean addToCart(Integer variantId, Integer quantity) {
         try {

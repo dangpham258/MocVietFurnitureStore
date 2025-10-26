@@ -82,4 +82,10 @@ public interface OrderRepository extends JpaRepository<Orders, Integer> {
      * Tìm đơn hàng có thể mua lại (CANCELLED hoặc RETURNED)
      */
     List<Orders> findByUserIdAndStatusInOrderByCreatedAtDesc(Integer userId, List<Orders.OrderStatus> statuses);
+    
+    /**
+     * Kiểm tra user đã từng dùng coupon này chưa
+     */
+    @Query("SELECT COUNT(o) > 0 FROM Orders o WHERE o.user.id = :userId AND o.coupon.code = :couponCode")
+    boolean hasUserUsedCoupon(@Param("userId") Integer userId, @Param("couponCode") String couponCode);
 }

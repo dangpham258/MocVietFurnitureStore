@@ -1,5 +1,7 @@
 package mocviet.service.customer;
 
+import mocviet.dto.CreateOrderRequest;
+import mocviet.dto.CreateOrderResponse;
 import mocviet.entity.Orders;
 import mocviet.entity.OrderItem;
 import org.springframework.data.domain.Page;
@@ -89,4 +91,9 @@ public interface IOrderService {
      * Tính tổng tiền đơn hàng (từ OrderItems)
      */
     Map<String, Object> calculateOrderTotal(Integer orderId);
+    
+    /**
+     * Tạo đơn hàng mới từ giỏ hàng
+     */
+    CreateOrderResponse createOrder(CreateOrderRequest request);
 }

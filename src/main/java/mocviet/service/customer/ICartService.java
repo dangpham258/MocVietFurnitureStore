@@ -21,6 +21,12 @@ public interface ICartService {
     List<CartItem> getCurrentUserCartItems();
     
     /**
+     * Lấy danh sách sản phẩm trong giỏ hàng với ProductImages (eager fetch)
+     * @return List CartItem với thông tin đầy đủ bao gồm cả ProductImages
+     */
+    List<CartItem> getCurrentUserCartItemsWithImages();
+    
+    /**
      * Thêm sản phẩm vào giỏ hàng
      * @param variantId ID của ProductVariant
      * @param quantity Số lượng

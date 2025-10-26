@@ -1,6 +1,8 @@
 package mocviet.service.customer.impl;
 
 import lombok.RequiredArgsConstructor;
+import mocviet.dto.CreateOrderRequest;
+import mocviet.dto.CreateOrderResponse;
 import mocviet.dto.OrderDetailDTO;
 import mocviet.dto.OrderItemDTO;
 import mocviet.dto.StatusHistoryDTO;
@@ -29,6 +31,10 @@ public class OrderServiceImpl implements IOrderService {
     private final CartItemRepository cartItemRepository;
     private final ProductVariantRepository productVariantRepository;
     private final ProductRepository productRepository;
+    private final CouponRepository couponRepository;
+    private final AddressRepository addressRepository;
+    private final ShippingFeeRepository shippingFeeRepository;
+    private final ProvinceZoneRepository provinceZoneRepository;
     private final UserDetailsServiceImpl userDetailsService;
     
     @Override
@@ -553,5 +559,144 @@ public class OrderServiceImpl implements IOrderService {
                          order.getStatus() == Orders.OrderStatus.RETURNED);
         
         return dto;
+    }
+    
+    @Override
+    @Transactional
+    public CreateOrderResponse createOrder(CreateOrderRequest request) {
+        User currentUser = userDetailsService.getCurrentUser();
+        if (currentUser == null) {
+            throw new RuntimeException("Người dùng chưa đăng nhập");
+        }
+        
+        // Validate address
+        Address address = addressRepository.findByIdAndUserId(request.getAddressId(), currentUser.getId())
+            .orElseThrow(() -> new RuntimeException("Địa chỉ không tồn tại hoặc không thuộc về người dùng"));
+        
+        // Validate payment method
+        if (!request.getPaymentMethod().matches("^(COD|VNPAY|MOMO)$")) {
+            throw new RuntimeException("Phương thức thanh toán không hợp lệ");
+        }
+        
+        // Group và validate items
+        Map<Integer, Integer> itemQuantityMap = new HashMap<>();
+        Map<Integer, ProductVariant> variantMap = new HashMap<>();
+        
+        for (CreateOrderRequest.OrderItemRequest item : request.getItems()) {
+            ProductVariant variant = productVariantRepository.findById(item.getVariantId())
+                .orElseThrow(() -> new RuntimeException("Sản phẩm không tồn tại: " + item.getVariantId()));
+            
+            if (!variant.getIsActive()) {
+                throw new RuntimeException("Sản phẩm không còn hoạt động: " + item.getVariantId());
+            }
+            
+            // Cộng tổng số lượng nếu trùng variant
+            itemQuantityMap.put(variant.getId(), 
+                itemQuantityMap.getOrDefault(variant.getId(), 0) + item.getQty());
+            variantMap.put(variant.getId(), variant);
+        }
+        
+        // Validate stock
+        for (Map.Entry<Integer, Integer> entry : itemQuantityMap.entrySet()) {
+            ProductVariant variant = variantMap.get(entry.getKey());
+            if (variant.getStockQty() < entry.getValue()) {
+                throw new RuntimeException("Tồn kho không đủ cho sản phẩm: " + variant.getSku());
+            }
+        }
+        
+        // Calculate subtotal
+        BigDecimal subtotal = BigDecimal.ZERO;
+        for (Map.Entry<Integer, Integer> entry : itemQuantityMap.entrySet()) {
+            ProductVariant variant = variantMap.get(entry.getKey());
+            BigDecimal itemTotal = variant.getSalePrice().multiply(BigDecimal.valueOf(entry.getValue()));
+            subtotal = subtotal.add(itemTotal);
+        }
+        
+        // Validate and apply coupon
+        BigDecimal discountAmount = BigDecimal.ZERO;
+        Coupon coupon = null;
+        if (request.getCouponCode() != null && !request.getCouponCode().isEmpty()) {
+            coupon = couponRepository.findValidCoupon(
+                request.getCouponCode(), 
+                LocalDateTime.now(), 
+                subtotal
+            ).orElse(null);
+            
+            if (coupon != null) {
+                // Tính discount theo bậc nghìn
+                BigDecimal percent = coupon.getDiscountPercent().divide(BigDecimal.valueOf(100));
+                discountAmount = subtotal.multiply(percent).setScale(0, java.math.RoundingMode.HALF_UP);
+                discountAmount = discountAmount.setScale(-3, java.math.RoundingMode.HALF_UP); // Làm tròn bậc nghìn
+            }
+        }
+        
+        BigDecimal totalAfterCoupon = subtotal.subtract(discountAmount);
+        if (totalAfterCoupon.compareTo(BigDecimal.ZERO) < 0) {
+            totalAfterCoupon = BigDecimal.ZERO;
+        }
+        
+        // Get shipping fee
+        Integer zoneId = provinceZoneRepository.findZoneIdByProvinceName(address.getCity())
+            .orElseThrow(() -> new RuntimeException("Tỉnh/thành chưa được map vào miền giao hàng"));
+        
+        ShippingFee shippingFee = shippingFeeRepository.findByZoneId(zoneId)
+            .orElseThrow(() -> new RuntimeException("Không tìm thấy phí vận chuyển cho khu vực này"));
+        
+        BigDecimal shipping = shippingFee.getBaseFee();
+        BigDecimal grandTotal = totalAfterCoupon.add(shipping);
+        
+        // Create order
+        Orders order = new Orders();
+        order.setUser(currentUser);
+        order.setAddress(address);
+        order.setStatus(Orders.OrderStatus.PENDING);
+        order.setPaymentMethod(Orders.PaymentMethod.valueOf(request.getPaymentMethod()));
+        order.setPaymentStatus(Orders.PaymentStatus.UNPAID);
+        order.setCoupon(coupon);
+        order.setShippingFee(shipping);
+        order.setCreatedAt(LocalDateTime.now());
+        order.setUpdatedAt(LocalDateTime.now());
+        
+        Orders savedOrder = orderRepository.save(order);
+        
+        // Update stock and create order items
+        List<OrderItem> orderItems = new ArrayList<>();
+        for (Map.Entry<Integer, Integer> entry : itemQuantityMap.entrySet()) {
+            ProductVariant variant = variantMap.get(entry.getKey());
+            int qty = entry.getValue();
+            
+            // Trừ tồn kho
+            variant.setStockQty(variant.getStockQty() - qty);
+            productVariantRepository.save(variant);
+            
+            // Tạo order item
+            OrderItem orderItem = new OrderItem();
+            orderItem.setOrder(savedOrder);
+            orderItem.setVariant(variant);
+            orderItem.setQty(qty);
+            orderItem.setUnitPrice(variant.getSalePrice());
+            orderItems.add(orderItem);
+        }
+        orderItemRepository.saveAll(orderItems);
+        
+        // Create status history
+        OrderStatusHistory history = new OrderStatusHistory();
+        history.setOrder(savedOrder);
+        history.setStatus(Orders.OrderStatus.PENDING.name());
+        history.setNote("Tạo đơn hàng");
+        history.setChangedAt(LocalDateTime.now());
+        orderStatusHistoryRepository.save(history);
+        
+        return CreateOrderResponse.builder()
+            .orderId(savedOrder.getId())
+            .status(savedOrder.getStatus().name())
+            .paymentStatus(savedOrder.getPaymentStatus().name())
+            .subtotalSnapshot(subtotal)
+            .discountAmount(discountAmount)
+            .totalAfterCoupon(totalAfterCoupon)
+            .shippingFee(shipping)
+            .grandTotal(grandTotal)
+            .message("Đơn hàng đã được tạo thành công")
+            .build();
     }
 }

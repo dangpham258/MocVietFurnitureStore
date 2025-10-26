@@ -20,7 +20,13 @@
         </div>
 
         <!-- Alert Messages -->
-        <div id="alertContainer"></div>
+        <div id="alertContainer">
+            <div th:if="${errorMessage != null}" class="alert alert-warning alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <span th:text="${errorMessage}">Error message</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </div>
 
         <!-- Cart Content -->
         <div th:if="${cartItems != null and !cartItems.empty}" class="row">
@@ -170,6 +176,17 @@
         if (typeof CustomerApp !== 'undefined' && typeof customerApp === 'undefined') {
             customerApp = new CustomerApp();
         }
+        
+        // Ensure checkboxes sync with selectAll on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const selectAllCheckbox = document.getElementById('selectAll');
+            if (selectAllCheckbox && selectAllCheckbox.checked) {
+                // If selectAll is checked, sync all item checkboxes
+                document.querySelectorAll('.item-checkbox:not(:disabled)').forEach(checkbox => {
+                    checkbox.checked = true;
+                });
+            }
+        });
     </script>
 </body>
 </html>

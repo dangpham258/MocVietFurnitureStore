@@ -20,13 +20,32 @@ public class CartController {
     private final ICartService cartService;
     
     @GetMapping
-    public String cartPage(Model model) {
+    public String cartPage(@RequestParam(required = false) String error, Model model) {
         List<CartItem> cartItems = cartService.getCurrentUserCartItems();
         Map<Integer, String> stockErrors = cartService.validateStockAvailability(cartItems);
+        
+        // Parse error message
+        String errorMessage = null;
+        if (error != null) {
+            switch (error) {
+                case "empty":
+                    errorMessage = "Giỏ hàng trống";
+                    break;
+                case "not_selected":
+                    errorMessage = "Vui lòng chọn sản phẩm cần thanh toán";
+                    break;
+                case "not_found":
+                    errorMessage = "Không tìm thấy sản phẩm được chọn hoặc sản phẩm đã bị xóa";
+                    break;
+                default:
+                    errorMessage = "Có lỗi xảy ra";
+            }
+        }
         
         model.addAttribute("cartItems", cartItems);
         model.addAttribute("stockErrors", stockErrors);
         model.addAttribute("cartItemCount", cartService.getCartItemCount());
+        model.addAttribute("errorMessage", errorMessage);
         
         return "customer/cart";
     }
