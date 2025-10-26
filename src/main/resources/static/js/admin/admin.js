@@ -779,6 +779,13 @@ function initializeBootstrapComponents() {
                 classRef: 'ShippingManagement',
                 instanceName: 'shippingManagement',
                 initFunction: 'initializeShippingManagement'
+            },
+            {
+                urlPattern: '/admin/delivery-teams',
+                scriptPath: '/js/admin/delivery-teams.js',
+                classRef: 'DeliveryTeamsManagement',
+                instanceName: 'deliveryTeamsManagement',
+                initFunction: 'initializeDeliveryTeamsManagement'
             }
         ];
         

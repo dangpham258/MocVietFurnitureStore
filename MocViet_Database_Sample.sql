@@ -75,15 +75,15 @@ INSERT INTO dbo.Users(role_id, full_name, username, email, password_hash, gender
 
 SELECT id, N'Phạm Giao nhận',N'delivery',N'delivery@mocviet.vn',N'$2a$12$XP/thldHL.FqZUQmozamNeGXlijdtS7.E5aVolRvLToDjEMXgCkfC',N'Nam',N'0900000006' FROM dbo.Roles WHERE name=N'DELIVERY';
 INSERT INTO dbo.Users(role_id, full_name, username, email, password_hash, gender, phone)
-SELECT id, N'Đội Giao Khu Vực Bắc',N'delivery_north',N'delivery_north@mocviet.local',N'$2a$12$XP/thldHL.FqZUQmozamNeGXlijdtS7.E5aVolRvLToDjEMXgCkfC',N'Nam',N'0911001100' FROM dbo.Roles WHERE name=N'DELIVERY';
+SELECT id, N'Phan Thành Tài',N'delivery_north',N'delivery_north@mocviet.local',N'$2a$12$XP/thldHL.FqZUQmozamNeGXlijdtS7.E5aVolRvLToDjEMXgCkfC',N'Nam',N'0911001100' FROM dbo.Roles WHERE name=N'DELIVERY';
 INSERT INTO dbo.Users(role_id, full_name, username, email, password_hash, gender, phone)
-SELECT id, N'Đội Giao Khu Vực Bắc 2',N'delivery_north2',N'delivery_north2@mocviet.local',N'$2a$12$XP/thldHL.FqZUQmozamNeGXlijdtS7.E5aVolRvLToDjEMXgCkfC',N'Nam',N'0911001200' FROM dbo.Roles WHERE name=N'DELIVERY';
+SELECT id, N'Đỗ Duy Khánh',N'delivery_north2',N'delivery_north2@mocviet.local',N'$2a$12$XP/thldHL.FqZUQmozamNeGXlijdtS7.E5aVolRvLToDjEMXgCkfC',N'Nam',N'0911001200' FROM dbo.Roles WHERE name=N'DELIVERY';
 INSERT INTO dbo.Users(role_id, full_name, username, email, password_hash, gender, phone)
-SELECT id, N'Đội Giao Khu Vực Trung',N'delivery_central',N'delivery_central@mocviet.local',N'$2a$12$XP/thldHL.FqZUQmozamNeGXlijdtS7.E5aVolRvLToDjEMXgCkfC',N'Nam',N'0911002200' FROM dbo.Roles WHERE name=N'DELIVERY';
+SELECT id, N'Nguyễn Văn Khánh',N'delivery_central',N'delivery_central@mocviet.local',N'$2a$12$XP/thldHL.FqZUQmozamNeGXlijdtS7.E5aVolRvLToDjEMXgCkfC',N'Nam',N'0911002200' FROM dbo.Roles WHERE name=N'DELIVERY';
 INSERT INTO dbo.Users(role_id, full_name, username, email, password_hash, gender, phone)
-SELECT id, N'Đội Giao Khu Vực Nam',N'delivery_south',N'delivery_south@mocviet.local',N'$2a$12$XP/thldHL.FqZUQmozamNeGXlijdtS7.E5aVolRvLToDjEMXgCkfC',N'Nam',N'0911003300' FROM dbo.Roles WHERE name=N'DELIVERY';
+SELECT id, N'Lê Văn Nam',N'delivery_south',N'delivery_south@mocviet.local',N'$2a$12$XP/thldHL.FqZUQmozamNeGXlijdtS7.E5aVolRvLToDjEMXgCkfC',N'Nam',N'0911003300' FROM dbo.Roles WHERE name=N'DELIVERY';
 INSERT INTO dbo.Users(role_id, full_name, username, email, password_hash, gender, phone)
-SELECT id, N'Đội Giao Khu Vực Nam 2',N'delivery_south2',N'delivery_south2@mocviet.local',N'$2a$12$XP/thldHL.FqZUQmozamNeGXlijdtS7.E5aVolRvLToDjEMXgCkfC',N'Nam',N'0911003400' FROM dbo.Roles WHERE name=N'DELIVERY';
+SELECT id, N'Trần Văn Nam',N'delivery_south2',N'delivery_south2@mocviet.local',N'$2a$12$XP/thldHL.FqZUQmozamNeGXlijdtS7.E5aVolRvLToDjEMXgCkfC',N'Nam',N'0911003400' FROM dbo.Roles WHERE name=N'DELIVERY';
 INSERT INTO dbo.Users(role_id, full_name, username, email, password_hash, gender, phone)
 
 SELECT id, N'Trần Khách A',  N'cust_a',  N'cust_a@mocviet.vn',  N'$2a$12$XP/thldHL.FqZUQmozamNeGXlijdtS7.E5aVolRvLToDjEMXgCkfC',       N'Nữ', N'0900000007' FROM dbo.Roles WHERE name=N'CUSTOMER';

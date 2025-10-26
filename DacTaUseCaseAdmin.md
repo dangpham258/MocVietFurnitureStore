@@ -103,3 +103,19 @@ Alternative 2a. Nếu một miền chưa có tỉnh/thành nào 3a. Hiển thị
 Exception 8a. Phí vận chuyển âm 9a. Hiển thị thông báo "Phí vận chuyển không được âm" 10a. Yêu cầu nhập lại 14a. Tỉnh/thành đã được map vào miền khác 15a. Hiển thị thông báo "Tỉnh/thành đã được map vào miền khác" 16a. Giữ modal mở để sửa 20a. Lỗi hệ thống 21a. Hiển thị thông báo "Có lỗi xảy ra" 22a. Cho phép thử lại
 
 Bảng 3-6. Use case Quản lý phí vận chuyển
+
+---
+
+## UC_007 - Quản lý đội giao hàng (Manage delivery teams)
+
+Use case ID UC*007
+Name Manage delivery teams
+Goal Quản lý đội giao hàng, phân công khu vực phục vụ cho từng đội (Tạo, xem, sửa, bật/tắt đội, quản lý khu vực phục vụ)
+Actors Quản trị viên (Admin)
+Pre-conditions Đã đăng nhập vào hệ thống với vai trò ADMIN
+Post-conditions - Nếu thành công, thông tin đội giao hàng được cập nhật hoặc khu vực phục vụ được thay đổi - Nếu thất bại, hiển thị thông báo lỗi
+Main Flow 1. Vào trang quản lý đội giao hàng (/admin/delivery-teams) 2. Hệ thống hiển thị danh sách các đội với thông tin: Tên đội, SĐT, User phụ trách (tên và email), Số khu vực phục vụ, Trạng thái (Đang hoạt động/Đã tạm dừng) 3. Hệ thống hiển thị thống kê: Tổng đội, Đang hoạt động, Tổng khu vực phục vụ 4. Các đội được hiển thị dưới dạng card grid (3 cột), mỗi card hiển thị: Header với tên đội và badge trạng thái, Thông tin: SĐT, User phụ trách (tên + email), Số khu vực, Preview 3 zones đầu tiên với badge "+N" nếu có nhiều hơn, Footer với 3 nút: "Zones" (quản lý khu vực), "Sửa" (bút chì), "Bật/Tắt" (toggle) 5. Click nút "Tạo đội mới" để tạo đội mới 6. Modal hiển thị form nhập: Tên đội (bắt buộc), Số điện thoại (tùy chọn), User phụ trách * (chỉ hiển thị users có role DELIVERY và chưa được gán vào đội khác), Checkbox "Kích hoạt ngay" 7. Nhập đầy đủ thông tin bắt buộc và click "Tạo đội" 8. Hệ thống kiểm tra user phải có vai trò DELIVERY 9. Hệ thống kiểm tra user chưa được gán vào đội khác (user*id unique) 10. Nếu hợp lệ, tạo đội mới và hiển thị thông báo thành công 11. Cập nhật danh sách đội và đóng modal 12. Click nút "Sửa" (biểu tượng bút chì) trên một đội để cập nhật 13. Modal hiển thị form cập nhật: Tên đội (bắt buộc), Số điện thoại, User phụ trách * (hiển thị tất cả users có role DELIVERY), Checkbox "Đang hoạt động" 14. Sửa đổi thông tin và click "Cập nhật" 15. Hệ thống kiểm tra user phải có vai trò DELIVERY (nếu thay đổi user) 16. Hệ thống kiểm tra user mới chưa được gán vào đội khác (nếu thay đổi user) 17. Nếu hợp lệ, cập nhật đội và hiển thị thông báo thành công 18. Cập nhật danh sách đội và đóng modal 19. Click nút "Bật/Tắt" (toggle) trên một đội để thay đổi trạng thái 20. Hệ thống cập nhật trạng thái (active/inactive) 21. Hiển thị thông báo thành công 22. Cập nhật danh sách đội 23. Click nút "Zones" trên một đội để quản lý khu vực phục vụ 24. Modal hiển thị: Tên đội, Dropdown chọn zone để thêm kèm nút "Thêm", Danh sách zones hiện tại (dạng grid với nút X để xóa từng zone) 25. Chọn zone từ dropdown và click "Thêm" 26. Hệ thống kiểm tra đội chưa phục vụ zone này 27. Nếu hợp lệ, thêm zone cho đội và hiển thị thông báo thành công 28. Reload modal để hiển thị zone mới 29. Click nút X trên một zone để xóa 30. Hệ thống xác nhận và xóa zone khỏi đội 31. Hiển thị thông báo thành công 32. Reload modal để cập nhật danh sách zones
+Alternative 4a. Nếu một đội chưa có khu vực nào 5a. Hiển thị "Chưa có khu vực" với biểu tượng inbox 6a. Nút "Thêm" vẫn hoạt động
+Exception 9a. User không có vai trò DELIVERY 10a. Hiển thị thông báo "User phải có vai trò DELIVERY" 11a. Yêu cầu chọn user khác 9b. User đã được gán vào đội khác 10b. Hiển thị thông báo "User đã được gán vào đội khác" 11b. Yêu cầu chọn user khác 26a. Đội đã phục vụ zone này 27a. Hiển thị thông báo "Đội đã phục vụ khu vực này" 28a. Giữ modal mở 31a. Lỗi hệ thống 32a. Hiển thị thông báo "Có lỗi xảy ra" 33a. Cho phép thử lại
+
+Bảng 3-7. Use case Quản lý đội giao hàng

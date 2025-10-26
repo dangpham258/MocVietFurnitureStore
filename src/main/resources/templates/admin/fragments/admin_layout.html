@@ -109,5 +109,8 @@
     <!-- Shipping Management JS - Chỉ load ở trang shipping -->
     <script th:if="${activeMenu == 'shipping'}" 
             th:src="@{/js/admin/shipping.js(v=${jsVersion ?: 'HuynhNgocThang'})}"></script>
+    <!-- Delivery Teams Management JS - Chỉ load ở trang delivery-teams -->
+    <script th:if="${activeMenu == 'delivery-teams'}" 
+            th:src="@{/js/admin/delivery-teams.js(v=${jsVersion ?: 'HuynhNgocThang'})}"></script>
 </body>
 </html>

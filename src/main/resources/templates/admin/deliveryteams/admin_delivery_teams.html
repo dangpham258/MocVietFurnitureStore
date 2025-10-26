@@ -2,496 +2,241 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{admin/fragments/admin_layout}">
 <head>
-    <title>Quản lý đội giao hàng - Admin Panel</title>
+    <title>Quản lý Đội Giao Hàng - Admin Panel</title>
 </head>
 <body>
 <div layout:fragment="content" th:fragment="content" class="main-content">
-    <!-- Page Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h2 class="mb-1">Quản lý đội giao hàng</h2>
-            <p class="text-muted mb-0">Quản lý nhân viên và đội ngũ giao hàng</p>
-        </div>
-        <div>
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addDeliveryModal">
-                <i class="bi bi-plus-circle me-1"></i>Thêm nhân viên
+    
+    <div class="container-fluid p-4">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="mb-1">
+                    <i class="bi bi-people me-2 text-primary"></i>Quản lý Đội Giao Hàng
+                </h3>
+                <p class="text-muted small mb-0">Tạo và quản lý đội giao hàng, phân công theo khu vực</p>
+            </div>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTeamModal">
+                <i class="bi bi-plus-circle me-1"></i>Tạo đội mới
             </button>
         </div>
-    </div>
 
-    <!-- Stats Cards -->
-    <div class="row mb-4">
-        <div class="col-md-3 mb-3">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-shrink-0">
-                            <div class="bg-primary bg-opacity-10 rounded-circle p-3">
-                                <i class="bi bi-person-workspace text-primary fs-4"></i>
+        <!-- Stats Cards -->
+        <div class="row mb-4">
+            <div class="col-md-4 mb-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <div class="bg-primary bg-opacity-10 rounded-circle p-3">
+                                    <i class="bi bi-people-fill text-primary fs-4"></i>
+                                </div>
                             </div>
-                        </div>
-                        <div class="flex-grow-1 ms-3">
-                            <h5 class="card-title mb-0">25</h5>
-                            <small class="text-muted">Tổng nhân viên</small>
+                            <div class="flex-grow-1 ms-3">
+                                <h5 class="card-title mb-0" id="totalTeams">0</h5>
+                                <small class="text-muted">Tổng đội</small>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="col-md-3 mb-3">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-shrink-0">
-                            <div class="bg-success bg-opacity-10 rounded-circle p-3">
-                                <i class="bi bi-check-circle text-success fs-4"></i>
+            <div class="col-md-4 mb-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <div class="bg-success bg-opacity-10 rounded-circle p-3">
+                                    <i class="bi bi-check-circle-fill text-success fs-4"></i>
+                                </div>
                             </div>
-                        </div>
-                        <div class="flex-grow-1 ms-3">
-                            <h5 class="card-title mb-0">20</h5>
-                            <small class="text-muted">Đang làm việc</small>
+                            <div class="flex-grow-1 ms-3">
+                                <h5 class="card-title mb-0" id="activeTeams">0</h5>
+                                <small class="text-muted">Đang hoạt động</small>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="col-md-3 mb-3">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-shrink-0">
-                            <div class="bg-warning bg-opacity-10 rounded-circle p-3">
-                                <i class="bi bi-clock text-warning fs-4"></i>
+            <div class="col-md-4 mb-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <div class="bg-info bg-opacity-10 rounded-circle p-3">
+                                    <i class="bi bi-geo-alt-fill text-info fs-4"></i>
+                                </div>
                             </div>
-                        </div>
-                        <div class="flex-grow-1 ms-3">
-                            <h5 class="card-title mb-0">3</h5>
-                            <small class="text-muted">Nghỉ phép</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3 mb-3">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-shrink-0">
-                            <div class="bg-info bg-opacity-10 rounded-circle p-3">
-                                <i class="bi bi-truck text-info fs-4"></i>
-                            </div>
-                        </div>
-                        <div class="flex-grow-1 ms-3">
-                            <h5 class="card-title mb-0">45</h5>
-                            <small class="text-muted">Đơn giao hôm nay</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Filters -->
-    <div class="card border-0 shadow-sm mb-4">
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-3">
-                    <label class="form-label">Tìm kiếm</label>
-                    <input type="text" class="form-control search-input" placeholder="Tìm theo tên, SĐT..." data-target="#deliveryTable">
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label">Trạng thái</label>
-                    <select class="form-select">
-                        <option value="">Tất cả</option>
-                        <option value="active">Đang làm việc</option>
-                        <option value="offline">Nghỉ phép</option>
-                        <option value="inactive">Tạm dừng</option>
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label">Khu vực</label>
-                    <select class="form-select">
-                        <option value="">Tất cả</option>
-                        <option value="hn">Hà Nội</option>
-                        <option value="hcm">TP. HCM</option>
-                        <option value="dn">Đà Nẵng</option>
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label">Sắp xếp</label>
-                    <select class="form-select">
-                        <option value="name">Tên A-Z</option>
-                        <option value="performance">Hiệu suất cao</option>
-                        <option value="rating">Đánh giá tốt</option>
-                    </select>
-                </div>
-                <div class="col-md-3 d-flex align-items-end">
-                    <button class="btn btn-outline-primary me-2">
-                        <i class="bi bi-funnel me-1"></i>Lọc
-                    </button>
-                    <button class="btn btn-outline-secondary">
-                        <i class="bi bi-download me-1"></i>Xuất Excel
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Data Table -->
-    <div class="card border-0 shadow-sm">
-        <div class="card-header bg-white">
-            <h5 class="card-title mb-0">
-                <i class="bi bi-person-workspace me-2"></i>
-                Danh sách nhân viên giao hàng
-            </h5>
-        </div>
-        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-hover data-table" id="deliveryTable">
-                                    <thead>
-                                        <tr>
-                                            <th data-sort="name">Tên nhân viên</th>
-                                            <th>Số điện thoại</th>
-                                            <th>Khu vực</th>
-                                            <th>Trạng thái</th>
-                                            <th>Đơn giao hôm nay</th>
-                                            <th>Đánh giá TB</th>
-                                            <th>Ngày vào làm</th>
-                                            <th>Thao tác</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>
-                                                <div class="d-flex align-items-center">
-                                                    <img src="https://via.placeholder.com/40" class="rounded-circle me-2" width="40" height="40">
-                                                    <div>
-                                                        <div class="fw-bold">Nguyễn Văn A</div>
-                                                        <small class="text-muted">ID: DEL001</small>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>0901234567</td>
-                                            <td><span class="badge bg-primary">Hà Nội</span></td>
-                                            <td><span class="badge bg-success">Đang làm việc</span></td>
-                                            <td>
-                                                <span class="badge bg-info">8 đơn</span>
-                                            </td>
-                                            <td>
-                                                <div class="d-flex align-items-center">
-                                                    <span class="text-warning me-1">★★★★★</span>
-                                                    <small>4.8</small>
-                                                </div>
-                                            </td>
-                                            <td>2024-01-15</td>
-                                            <td>
-                                                <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#editDeliveryModal">
-                                                    <i class="bi bi-pencil"></i>
-                                                </button>
-                                                <button class="btn btn-sm btn-outline-info me-1" data-bs-toggle="modal" data-bs-target="#viewDeliveryModal">
-                                                    <i class="bi bi-eye"></i>
-                                                </button>
-                                                <button class="btn btn-sm btn-outline-danger btn-delete">
-                                                    <i class="bi bi-trash"></i>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div class="d-flex align-items-center">
-                                                    <img src="https://via.placeholder.com/40" class="rounded-circle me-2" width="40" height="40">
-                                                    <div>
-                                                        <div class="fw-bold">Trần Thị B</div>
-                                                        <small class="text-muted">ID: DEL002</small>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>0901234568</td>
-                                            <td><span class="badge bg-success">TP. HCM</span></td>
-                                            <td><span class="badge bg-success">Đang làm việc</span></td>
-                                            <td>
-                                                <span class="badge bg-info">12 đơn</span>
-                                            </td>
-                                            <td>
-                                                <div class="d-flex align-items-center">
-                                                    <span class="text-warning me-1">★★★★☆</span>
-                                                    <small>4.5</small>
-                                                </div>
-                                            </td>
-                                            <td>2024-01-20</td>
-                                            <td>
-                                                <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#editDeliveryModal">
-                                                    <i class="bi bi-pencil"></i>
-                                                </button>
-                                                <button class="btn btn-sm btn-outline-info me-1" data-bs-toggle="modal" data-bs-target="#viewDeliveryModal">
-                                                    <i class="bi bi-eye"></i>
-                                                </button>
-                                                <button class="btn btn-sm btn-outline-danger btn-delete">
-                                                    <i class="bi bi-trash"></i>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div class="d-flex align-items-center">
-                                                    <img src="https://via.placeholder.com/40" class="rounded-circle me-2" width="40" height="40">
-                                                    <div>
-                                                        <div class="fw-bold">Lê Văn C</div>
-                                                        <small class="text-muted">ID: DEL003</small>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>0901234569</td>
-                                            <td><span class="badge bg-warning">Đà Nẵng</span></td>
-                                            <td><span class="badge bg-warning">Nghỉ phép</span></td>
-                                            <td>
-                                                <span class="badge bg-secondary">0 đơn</span>
-                                            </td>
-                                            <td>
-                                                <div class="d-flex align-items-center">
-                                                    <span class="text-warning me-1">★★★★★</span>
-                                                    <small>4.9</small>
-                                                </div>
-                                            </td>
-                                            <td>2024-02-01</td>
-                                            <td>
-                                                <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#editDeliveryModal">
-                                                    <i class="bi bi-pencil"></i>
-                                                </button>
-                                                <button class="btn btn-sm btn-outline-info me-1" data-bs-toggle="modal" data-bs-target="#viewDeliveryModal">
-                                                    <i class="bi bi-eye"></i>
-                                                </button>
-                                                <button class="btn btn-sm btn-outline-danger btn-delete">
-                                                    <i class="bi bi-trash"></i>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                            <div class="flex-grow-1 ms-3">
+                                <h5 class="card-title mb-0" id="totalZones">0</h5>
+                                <small class="text-muted">Tổng khu vực phục vụ</small>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Add Delivery Modal -->
-    <div class="modal fade" id="addDeliveryModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Thêm nhân viên giao hàng</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        <!-- Teams Grid -->
+        <div class="row" id="teamsContainer">
+            <div class="text-center py-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Đang tải...</span>
                 </div>
-                <div class="modal-body">
-                    <form class="needs-validation" novalidate>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">Họ và tên *</label>
-                                    <input type="text" class="form-control" required>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">Số điện thoại *</label>
-                                    <input type="tel" class="form-control" required>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">Email</label>
-                                    <input type="email" class="form-control">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">Ngày sinh</label>
-                                    <input type="date" class="form-control">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">Khu vực làm việc *</label>
-                                    <select class="form-select" required>
-                                        <option value="">Chọn khu vực</option>
-                                        <option value="hn">Hà Nội</option>
-                                        <option value="hcm">TP. Hồ Chí Minh</option>
-                                        <option value="dn">Đà Nẵng</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">Ngày vào làm *</label>
-                                    <input type="date" class="form-control" required>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Địa chỉ</label>
-                            <textarea class="form-control" rows="3"></textarea>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Ghi chú</label>
-                            <textarea class="form-control" rows="2"></textarea>
-                        </div>
-                        <div class="mb-3">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" checked>
-                                <label class="form-check-label">Kích hoạt ngay</label>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="button" class="btn btn-admin-primary btn-submit">Thêm nhân viên</button>
-                </div>
+                <p class="text-muted mt-3 mb-0">Đang tải danh sách đội giao hàng...</p>
             </div>
         </div>
     </div>
-
-    <!-- Edit Delivery Modal -->
-    <div class="modal fade" id="editDeliveryModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Chỉnh sửa nhân viên giao hàng</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form class="needs-validation" novalidate>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">Họ và tên *</label>
-                                    <input type="text" class="form-control" value="Nguyễn Văn A" required>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">Số điện thoại *</label>
-                                    <input type="tel" class="form-control" value="0901234567" required>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">Email</label>
-                                    <input type="email" class="form-control" value="nguyenvana@email.com">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">Ngày sinh</label>
-                                    <input type="date" class="form-control" value="1990-05-15">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">Khu vực làm việc *</label>
-                                    <select class="form-select" required>
-                                        <option value="hn" selected>Hà Nội</option>
-                                        <option value="hcm">TP. Hồ Chí Minh</option>
-                                        <option value="dn">Đà Nẵng</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">Ngày vào làm *</label>
-                                    <input type="date" class="form-control" value="2024-01-15" required>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Địa chỉ</label>
-                            <textarea class="form-control" rows="3">123 Đường ABC, Quận XYZ, Hà Nội</textarea>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Trạng thái</label>
-                            <select class="form-select">
-                                <option value="active" selected>Đang làm việc</option>
-                                <option value="offline">Nghỉ phép</option>
-                                <option value="inactive">Tạm dừng</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Ghi chú</label>
-                            <textarea class="form-control" rows="2">Nhân viên giao hàng có kinh nghiệm</textarea>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="button" class="btn btn-admin-primary btn-submit">Cập nhật</button>
-                </div>
+    
+    <!-- Add Team Modal -->
+<div class="modal fade" id="addTeamModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">
+                    <i class="bi bi-plus-circle me-2"></i>Tạo đội giao hàng mới
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-        </div>
-    </div>
-
-    <!-- View Delivery Modal -->
-    <div class="modal fade" id="viewDeliveryModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Chi tiết nhân viên giao hàng</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
+            <div class="modal-body p-4">
+                <form id="addTeamForm">
                     <div class="row">
-                        <div class="col-md-4 text-center">
-                            <img src="https://via.placeholder.com/120" class="rounded-circle mb-3" width="120" height="120">
-                            <h5>Nguyễn Văn A</h5>
-                            <p class="text-muted">ID: DEL001</p>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Tên đội *</label>
+                            <input type="text" class="form-control" id="addTeamName" 
+                                   placeholder="VD: Đội giao hàng Hà Nội" required>
                         </div>
-                        <div class="col-md-8">
-                            <div class="row mb-3">
-                                <div class="col-4"><strong>Số điện thoại:</strong></div>
-                                <div class="col-8">0901234567</div>
-                            </div>
-                            <div class="row mb-3">
-                                <div class="col-4"><strong>Email:</strong></div>
-                                <div class="col-8">nguyenvana@email.com</div>
-                            </div>
-                            <div class="row mb-3">
-                                <div class="col-4"><strong>Khu vực:</strong></div>
-                                <div class="col-8"><span class="badge bg-primary">Hà Nội</span></div>
-                            </div>
-                            <div class="row mb-3">
-                                <div class="col-4"><strong>Trạng thái:</strong></div>
-                                <div class="col-8"><span class="badge bg-success">Đang làm việc</span></div>
-                            </div>
-                            <div class="row mb-3">
-                                <div class="col-4"><strong>Đánh giá TB:</strong></div>
-                                <div class="col-8">
-                                    <span class="text-warning">★★★★★</span> 4.8/5
-                                </div>
-                            </div>
-                            <div class="row mb-3">
-                                <div class="col-4"><strong>Đơn giao hôm nay:</strong></div>
-                                <div class="col-8"><span class="badge bg-info">8 đơn</span></div>
-                            </div>
-                            <div class="row mb-3">
-                                <div class="col-4"><strong>Ngày vào làm:</strong></div>
-                                <div class="col-8">15/01/2024</div>
-                            </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Số điện thoại</label>
+                            <input type="text" class="form-control" id="addTeamPhone" 
+                                   placeholder="VD: 0901234567">
                         </div>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">User phụ trách *</label>
+                        <select class="form-select" id="addTeamUserId" required>
+                            <option value="">Chọn user phụ trách</option>
+                        </select>
+                        <small class="text-muted">Chỉ hiển thị users có vai trò DELIVERY và chưa được gán vào đội khác</small>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="addTeamActive" checked>
+                            <label class="form-check-label" for="addTeamActive">
+                                Kích hoạt ngay
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle me-1"></i>Hủy
+                </button>
+                <button type="button" class="btn btn-success" onclick="createTeam()">
+                    <i class="bi bi-check-circle me-1"></i>Tạo đội
+                </button>
+            </div>
         </div>
     </div>
 </div>
+
+    <!-- Edit Team Modal -->
+<div class="modal fade" id="editTeamModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    <i class="bi bi-pencil-square me-2"></i>Cập nhật đội giao hàng
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <form id="editTeamForm">
+                    <input type="hidden" id="editTeamId">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Tên đội *</label>
+                            <input type="text" class="form-control" id="editTeamName" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Số điện thoại</label>
+                            <input type="text" class="form-control" id="editTeamPhone">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">User phụ trách *</label>
+                        <select class="form-select" id="editTeamUserId" required>
+                            <option value="">Chọn user phụ trách</option>
+                        </select>
+                        <small class="text-muted">Chỉ hiển thị users có vai trò DELIVERY</small>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="editTeamActive">
+                            <label class="form-check-label" for="editTeamActive">
+                                Đang hoạt động
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle me-1"></i>Hủy
+                </button>
+                <button type="button" class="btn btn-primary" onclick="updateTeam()">
+                    <i class="bi bi-check-circle me-1"></i>Cập nhật
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- Manage Zones Modal -->
+<div class="modal fade" id="manageZonesModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title">
+                    <i class="bi bi-geo-alt-fill me-2"></i>Quản lý khu vực phục vụ
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="mb-3">
+                    <strong>Đội:</strong> <span id="manageZonesTeamName"></span>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Thêm khu vực phục vụ</label>
+                    <div class="input-group">
+                        <select class="form-select" id="addZoneSelect">
+                            <option value="">Chọn khu vực</option>
+                        </select>
+                        <button class="btn btn-success" type="button" onclick="addZoneToTeam()">
+                            <i class="bi bi-plus-circle me-1"></i>Thêm
+                        </button>
+                    </div>
+                </div>
+                <hr>
+                <div class="mb-2">
+                    <strong>Khu vực hiện tại:</strong>
+                </div>
+                <div id="currentZonesList" class="row g-2">
+                    <!-- Zones will be populated here -->
+                </div>
+                <input type="hidden" id="manageZonesTeamId">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle me-1"></i>Đóng
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+</div>
+
 </body>
 </html>
+
