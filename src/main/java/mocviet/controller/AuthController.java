@@ -17,6 +17,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Controller
 @RequiredArgsConstructor
 public class AuthController {
@@ -145,6 +148,30 @@ public class AuthController {
     public MessageResponse logoutApi(HttpServletResponse response) {
         authService.logout(response);
         return MessageResponse.success("Đăng xuất thành công!");
+    }
+    
+    @GetMapping("/api/auth/status")
+    @ResponseBody
+    public Map<String, Object> checkAuthStatus() {
+        Map<String, Object> response = new HashMap<>();
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        
+        if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
+            response.put("authenticated", true);
+            if (auth.getPrincipal() instanceof User) {
+                User user = (User) auth.getPrincipal();
+                response.put("user", Map.of(
+                    "id", user.getId(),
+                    "username", user.getUsername(),
+                    "fullName", user.getFullName(),
+                    "role", user.getRole().getName()
+                ));
+            }
+        } else {
+            response.put("authenticated", false);
+        }
+        
+        return response;
     }
 }
 

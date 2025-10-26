@@ -85,9 +85,9 @@
                 </div>
                 
                 <div class="d-grid gap-2">
-                    <a id="btnAddToCart" th:href="@{/login}" class="btn btn-dark btn-lg disabled">
+                    <button id="btnAddToCart" type="button" class="btn btn-dark btn-lg disabled">
                         Đăng nhập để thêm vào giỏ
-                    </a>
+                    </button>
                 </div>
                 
                 <div class="mt-4">
@@ -114,6 +114,7 @@
         const btnAddToCart = document.getElementById('btnAddToCart');
         
         let selectedVariant = null;
+        let isAuthenticated = false;
 
         // Định dạng tiền tệ
         const formatter = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' });
@@ -161,9 +162,8 @@
                     btnMinus.disabled = false;
                     btnPlus.disabled = false;
                     btnAddToCart.classList.remove('disabled');
-                    btnAddToCart.textContent = 'Thêm vào giỏ hàng';
-                    // Vì là Guest, vẫn giữ link login
-                    // btnAddToCart.href = `/cart/add?variantId=${selectedVariant.variantId}&qty=1`;
+                    // Hiển thị text nút phù hợp với trạng thái đăng nhập
+                    btnAddToCart.textContent = isAuthenticated ? 'Thêm vào giỏ hàng' : 'Đăng nhập để thêm vào giỏ';
                 } else {
                     resetToOutOfStock();
                 }
@@ -234,9 +234,75 @@
             if (qty > max) quantityInput.value = max;
             if (qty < 1) quantityInput.value = 1;
         });
+        
+        // Xử lý nút "Thêm vào giỏ hàng"
+        btnAddToCart.addEventListener('click', async () => {
+            if (!selectedVariant) {
+                alert('Vui lòng chọn màu sắc và loại sản phẩm');
+                return;
+            }
+            
+            // Nếu chưa đăng nhập, chuyển về trang login
+            if (!isAuthenticated) {
+                window.location.href = '/login?redirect=' + encodeURIComponent(window.location.href);
+                return;
+            }
+            
+            const quantity = parseInt(quantityInput.value);
+            
+            // Kiểm tra đăng nhập trước khi thêm vào giỏ
+            try {
+                // Gọi API addToCart
+                const response = await fetch('/api/cart/add', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `variantId=${selectedVariant.variantId}&quantity=${quantity}`
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert(data.message || 'Đã thêm sản phẩm vào giỏ hàng');
+                    // Cập nhật số lượng trong giỏ hàng (nếu có header manager)
+                    if (window.customerApp && window.customerApp.headerManager) {
+                        window.customerApp.headerManager.updateCartCount(data.cartItemCount);
+                    }
+                } else {
+                    alert(data.message || 'Không thể thêm sản phẩm vào giỏ hàng');
+                }
+            } catch (error) {
+                console.error('Error adding to cart:', error);
+                alert('Có lỗi xảy ra. Vui lòng thử lại sau');
+            }
+        });
 
+        // Kiểm tra trạng thái đăng nhập
+        async function checkAuthStatus() {
+            try {
+                const response = await fetch('/api/auth/status');
+                const data = await response.json();
+                isAuthenticated = data.authenticated === true;
+                
+                // Cập nhật text nút dựa trên trạng thái đăng nhập
+                if (!isAuthenticated) {
+                    const btnText = btnAddToCart.textContent;
+                    if (btnText === 'Thêm vào giỏ hàng' || btnText === 'Đăng nhập để thêm vào giỏ') {
+                        btnAddToCart.textContent = 'Đăng nhập để thêm vào giỏ';
+                    }
+                }
+            } catch (error) {
+                console.error('Error checking auth status:', error);
+                isAuthenticated = false;
+            }
+        }
+        
         // Khởi chạy: Chọn màu đầu tiên (nếu có)
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Kiểm tra trạng thái đăng nhập
+            await checkAuthStatus();
+            
             const firstColorInput = document.querySelector('input[name="colorId"]');
             if (firstColorInput) {
                 firstColorInput.checked = true;

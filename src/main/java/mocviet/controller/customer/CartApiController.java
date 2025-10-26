@@ -1,6 +1,7 @@
 package mocviet.controller.customer;
 
 import lombok.RequiredArgsConstructor;
+import mocviet.entity.CartItem;
 import mocviet.service.customer.ICartService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -23,14 +24,21 @@ public class CartApiController {
         Map<String, Object> response = new HashMap<>();
         
         try {
-            boolean success = cartService.addToCart(variantId, quantity);
-            if (success) {
-                response.put("success", true);
-                response.put("message", "Đã thêm sản phẩm vào giỏ hàng");
-                response.put("cartItemCount", cartService.getCartItemCount());
-            } else {
+            // Kiểm tra sản phẩm đã có trong giỏ hàng chưa
+            CartItem existingItem = cartService.findCartItemByVariantId(variantId);
+            if (existingItem != null) {
                 response.put("success", false);
-                response.put("message", "Không thể thêm sản phẩm vào giỏ hàng. Vui lòng kiểm tra lại tồn kho.");
+                response.put("message", "Sản phẩm này đã có trong giỏ hàng của bạn");
+            } else {
+                boolean success = cartService.addToCart(variantId, quantity);
+                if (success) {
+                    response.put("success", true);
+                    response.put("message", "Đã thêm sản phẩm vào giỏ hàng");
+                    response.put("cartItemCount", cartService.getCartItemCount());
+                } else {
+                    response.put("success", false);
+                    response.put("message", "Không thể thêm sản phẩm vào giỏ hàng. Vui lòng kiểm tra lại tồn kho.");
+                }
             }
         } catch (Exception e) {
             response.put("success", false);
