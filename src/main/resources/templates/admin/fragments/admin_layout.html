@@ -103,5 +103,11 @@
     <!-- Categories Management JS - Chỉ load ở trang categories -->
     <script th:if="${activeMenu == 'categories'}" 
             th:src="@{/js/admin/categories.js(v=${jsVersion ?: 'HuynhNgocThang'})}"></script>
+    <!-- Coupons Management JS - Chỉ load ở trang coupons -->
+    <script th:if="${activeMenu == 'coupons'}" 
+            th:src="@{/js/admin/coupons.js(v=${jsVersion ?: 'HuynhNgocThang'})}"></script>
+    <!-- Shipping Management JS - Chỉ load ở trang shipping -->
+    <script th:if="${activeMenu == 'shipping'}" 
+            th:src="@{/js/admin/shipping.js(v=${jsVersion ?: 'HuynhNgocThang'})}"></script>
 </body>
 </html>

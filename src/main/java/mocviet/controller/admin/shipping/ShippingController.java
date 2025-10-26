@@ -1,14 +1,12 @@
 package mocviet.controller.admin.shipping;
 
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import jakarta.servlet.http.HttpServletRequest;
-
-import lombok.RequiredArgsConstructor;
 
 @Controller
 @RequestMapping("/admin/shipping")
@@ -17,7 +15,7 @@ public class ShippingController {
     
     @GetMapping({"", "/"})
     @PreAuthorize("hasRole('ADMIN')")
-    public String shipping(Model model, HttpServletRequest request) {
+    public String shippingPage(Model model, HttpServletRequest request) {
         model.addAttribute("pageTitle", "Quản lý phí vận chuyển");
         model.addAttribute("activeMenu", "shipping");
         

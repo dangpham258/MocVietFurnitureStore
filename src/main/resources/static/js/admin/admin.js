@@ -743,95 +743,116 @@ function initializeBootstrapComponents() {
         // Initialize page-specific components based on current URL
         const currentUrl = window.location.pathname;
         
-        // Initialize Users Management
-        if (currentUrl.includes('/admin/users')) {
-            // Check if users.js is already loaded
-            if (typeof window.initializeUsersManagement === 'function') {
-                window.initializeUsersManagement();
-            } else if (typeof UsersManagement !== 'undefined') {
-                if (window.usersManagement) {
-                    delete window.usersManagement;
-                }
-                try {
-                    window.usersManagement = new UsersManagement();
-                } catch (error) {
-                    console.error('Error initializing UsersManagement:', error);
-                }
-            } else {
-                // Script not loaded, load it dynamically
-                const script = document.createElement('script');
-                script.src = '/js/admin/users.js?v=HuynhNgocThang';
-                script.onload = function() {
-                    if (typeof window.initializeUsersManagement === 'function') {
-                        window.initializeUsersManagement();
-                    }
-                };
-                script.onerror = function() {
-                    console.error('Failed to load users.js');
-                };
-                document.body.appendChild(script);
+        // Define module configurations
+        const modules = [
+            {
+                urlPattern: '/admin/users',
+                scriptPath: '/js/admin/users.js',
+                classRef: 'UsersManagement',
+                instanceName: 'usersManagement',
+                initFunction: 'initializeUsersManagement'
+            },
+            {
+                urlPattern: '/admin/colors',
+                scriptPath: '/js/admin/colors.js',
+                classRef: 'ColorsManagement',
+                instanceName: 'colorsManagement',
+                initFunction: 'initializeColorsManagement'
+            },
+            {
+                urlPattern: '/admin/categories',
+                scriptPath: '/js/admin/categories.js',
+                classRef: 'CategoriesManagement',
+                instanceName: 'categoriesManagement',
+                initFunction: 'initializeCategoriesManagement'
+            },
+            {
+                urlPattern: '/admin/coupons',
+                scriptPath: '/js/admin/coupons.js',
+                classRef: 'CouponsManagement',
+                instanceName: 'couponsManagement',
+                initFunction: 'initializeCouponsManagement'
+            },
+            {
+                urlPattern: '/admin/shipping',
+                scriptPath: '/js/admin/shipping.js',
+                classRef: 'ShippingManagement',
+                instanceName: 'shippingManagement',
+                initFunction: 'initializeShippingManagement'
             }
+        ];
+        
+        // Initialize modules that match current URL
+        modules.forEach(module => {
+            if (currentUrl.includes(module.urlPattern)) {
+                initModule(module);
+            }
+        });
+    }
+    
+    /**
+     * Initialize a module dynamically
+     * @param {Object} module - Module configuration
+     */
+    function initModule(module) {
+        const { scriptPath, classRef, instanceName, initFunction } = module;
+        
+        // Check if init function exists
+        if (typeof window[initFunction] === 'function') {
+            window[initFunction]();
+            return;
         }
         
-        // Initialize Colors Management
-        if (currentUrl.includes('/admin/colors')) {
-            // Check if colors.js is already loaded
-            if (typeof window.initializeColorsManagement === 'function') {
-                window.initializeColorsManagement();
-            } else if (typeof ColorsManagement !== 'undefined') {
-                if (window.colorsManagement) {
-                    delete window.colorsManagement;
-                }
-                try {
-                    window.colorsManagement = new ColorsManagement();
-                } catch (error) {
-                    console.error('Error initializing ColorsManagement:', error);
-                }
-            } else {
-                // Script not loaded, load it dynamically
-                const script = document.createElement('script');
-                script.src = '/js/admin/colors.js?v=HuynhNgocThang';
-                script.onload = function() {
-                    if (typeof window.initializeColorsManagement === 'function') {
-                        window.initializeColorsManagement();
-                    }
-                };
-                script.onerror = function() {
-                    console.error('Failed to load colors.js');
-                };
-                document.body.appendChild(script);
+        // Check if class exists
+        if (typeof window[classRef] !== 'undefined') {
+            if (window[instanceName]) {
+                delete window[instanceName];
             }
+            try {
+                window[instanceName] = new window[classRef]();
+            } catch (error) {
+                console.error(`Error initializing ${classRef}:`, error);
+            }
+            return;
         }
         
-        // Initialize Categories Management
-        if (currentUrl.includes('/admin/categories')) {
-            // Check if categories.js is already loaded
-            if (typeof window.initializeCategoriesManagement === 'function') {
-                window.initializeCategoriesManagement();
-            } else if (typeof CategoriesManagement !== 'undefined') {
-                if (window.categoriesManagement) {
-                    delete window.categoriesManagement;
+        // Load script dynamically if not loaded
+        loadScript(scriptPath, () => {
+            if (typeof window[initFunction] === 'function') {
+                window[initFunction]();
+            } else if (typeof window[classRef] !== 'undefined') {
+                if (window[instanceName]) {
+                    delete window[instanceName];
                 }
                 try {
-                    window.categoriesManagement = new CategoriesManagement();
+                    window[instanceName] = new window[classRef]();
                 } catch (error) {
-                    console.error('Error initializing CategoriesManagement:', error);
+                    console.error(`Error initializing ${classRef}:`, error);
                 }
-            } else {
-                // Script not loaded, load it dynamically
-                const script = document.createElement('script');
-                script.src = '/js/admin/categories.js?v=HuynhNgocThang';
-                script.onload = function() {
-                    if (typeof window.initializeCategoriesManagement === 'function') {
-                        window.initializeCategoriesManagement();
-                    }
-                };
-                script.onerror = function() {
-                    console.error('Failed to load categories.js');
-                };
-                document.body.appendChild(script);
             }
+        });
+    }
+    
+    /**
+     * Load script dynamically
+     * @param {string} src - Script source path
+     * @param {Function} callback - Callback after load
+     */
+    function loadScript(src, callback) {
+        // Check if script is already loaded
+        const existingScript = document.querySelector(`script[src="${src}"]`);
+        if (existingScript) {
+            if (callback) callback();
+            return;
         }
+        
+        const script = document.createElement('script');
+        script.src = src + '?v=' + Date.now();
+        script.onload = callback;
+        script.onerror = () => {
+            console.error(`Failed to load ${src}`);
+        };
+        document.body.appendChild(script);
     }
     
     // Intercept sidebar navigation clicks
@@ -848,21 +869,18 @@ function initializeBootstrapComponents() {
             // Prevent default navigation
             event.preventDefault();
             
+            // Update URL first
+            history.pushState({ url: href }, '', href);
+            
             // Load content via AJAX
             loadPageContent(href);
-            
-            // Update URL without reload
-            history.pushState(null, '', href);
         });
     });
     
     // Handle browser back/forward buttons
     window.addEventListener('popstate', function(event) {
-        // Chỉ load khi thực sự là back/forward, không phải reload
-        if (event.state !== null) {
         const url = window.location.pathname;
         loadPageContent(url);
-        }
     });
     
     // PERSIST SIDEBAR STATE ACROSS NAVIGATION
@@ -874,5 +892,9 @@ function initializeBootstrapComponents() {
         }
     });
 
+    // Initialize page-specific components on initial load (non-AJAX)
+    // This ensures modules are initialized when page is loaded directly (F5/reload)
+    initializePageComponents();
+    
     console.log('Admin panel initialized successfully!');
 }
