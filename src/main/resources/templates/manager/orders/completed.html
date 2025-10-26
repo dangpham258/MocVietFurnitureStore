@@ -149,7 +149,7 @@
                                     <small class="payment-status" th:text="${order.paymentStatusDisplay}"></small>
                                 </div>
                                 <div class="col-md-2 text-end">
-                                    <strong class="text-success" th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT')} + 'đ'"></strong>
+                                    <strong class="text-success" th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT')} + '₫'"></strong>
                                 </div>
                             </div>
                         </div>

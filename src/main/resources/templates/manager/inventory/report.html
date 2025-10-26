@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{manager/fragments/manager_layout}">
+
+<head>
+    <title th:text="${pageTitle}">Báo cáo tồn kho</title>
+    <style>
+        .summary-stats {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+        }
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        .filter-card {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .report-table {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .report-table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+            padding: 15px;
+        }
+        .report-table td {
+            padding: 12px 15px;
+            vertical-align: middle;
+        }
+        .color-indicator {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid #dee2e6;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+        .export-section {
+            text-align: right;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+
+<body>
+    <div layout:fragment="content">
+        <div class="container-fluid">
+            <!-- Page Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="h3 mb-0">
+                    <i class="fas fa-chart-bar text-primary me-2"></i>
+                    Báo cáo tồn kho
+                </h2>
+                <div>
+                    <a th:href="@{/manager/inventory/alerts}" class="btn btn-outline-warning me-2">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Cảnh báo
+                    </a>
+                    <button class="btn btn-success" onclick="exportReport()">
+                        <i class="fas fa-file-excel me-2"></i>Xuất Excel
+                    </button>
+                </div>
+            </div>
+
+            <!-- Summary Statistics -->
+            <div class="summary-stats">
+                <div class="row">
+                    <div class="col-md-3 stat-item border-end border-white border-opacity-25">
+                        <div class="stat-value" th:text="${summary.totalProducts}">0</div>
+                        <div class="stat-label">Tổng số biến thể</div>
+                    </div>
+                    <div class="col-md-3 stat-item border-end border-white border-opacity-25">
+                        <div class="stat-value" th:text="${summary.inStockProducts}">0</div>
+                        <div class="stat-label">Còn hàng</div>
+                        <small th:text="'(' + ${#numbers.formatDecimal(summary.inStockPercentage, 1, 1)} + '%)'"></small>
+                    </div>
+                    <div class="col-md-3 stat-item border-end border-white border-opacity-25">
+                        <div class="stat-value" th:text="${summary.lowStockProducts}">0</div>
+                        <div class="stat-label">Tồn kho thấp</div>
+                        <small th:text="'(' + ${#numbers.formatDecimal(summary.lowStockPercentage, 1, 1)} + '%)'"></small>
+                    </div>
+                    <div class="col-md-3 stat-item">
+                        <div class="stat-value" th:text="${#numbers.formatDecimal(summary.totalStockValue, 0, 'COMMA', 0, 'POINT')} + '₫'">0₫</div>
+                        <div class="stat-label">Giá trị tồn kho</div>
+                        <small>(VNĐ)</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filter Section -->
+            <div class="filter-card">
+                <form th:action="@{/manager/inventory/report}" method="get" id="filterForm">
+                    <div class="row g-3 align-items-end">
+                        <!-- Stock Level Filter -->
+                        <div class="col-md-2">
+                            <label class="form-label fw-bold">Mức tồn kho</label>
+                            <select name="stockLevel" class="form-select" onchange="document.getElementById('filterForm').submit()">
+                                <option value="">Tất cả</option>
+                                <option value="OUT_OF_STOCK" th:selected="${stockLevel == 'OUT_OF_STOCK'}">Hết hàng</option>
+                                <option value="LOW_STOCK" th:selected="${stockLevel == 'LOW_STOCK'}">Tồn kho thấp (1-5)</option>
+                                <option value="MEDIUM_STOCK" th:selected="${stockLevel == 'MEDIUM_STOCK'}">Tồn kho vừa (6-20)</option>
+                                <option value="GOOD_STOCK" th:selected="${stockLevel == 'GOOD_STOCK'}">Tồn kho tốt (>20)</option>
+                            </select>
+                        </div>
+
+                        <!-- Category Filter (placeholder - cần implement nếu muốn) -->
+                        <div class="col-md-2">
+                            <label class="form-label fw-bold">Danh mục</label>
+                            <select name="categoryId" class="form-select" onchange="document.getElementById('filterForm').submit()">
+                                <option value="">Tất cả</option>
+                                <!-- Sẽ load từ backend -->
+                            </select>
+                        </div>
+
+                        <!-- Search -->
+                        <div class="col-md-5">
+                            <label class="form-label fw-bold">Tìm kiếm</label>
+                            <div class="input-group">
+                                <input type="text" name="keyword" class="form-control" 
+                                       placeholder="Tên sản phẩm, SKU, màu sắc, loại..." th:value="${keyword}"
+                                       maxlength="100" pattern="[a-zA-Z0-9\s\u00C0-\u1EF9]*">
+                                <button class="btn btn-primary" type="submit">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Reset -->
+                        <div class="col-md-3">
+                            <a th:href="@{/manager/inventory/report}" class="btn btn-outline-secondary w-100">
+                                <i class="fas fa-redo me-2"></i>Xóa bộ lọc
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Export Section -->
+            <div class="export-section">
+                <span class="text-muted me-3">Tổng: <strong th:text="${totalElements}">0</strong> sản phẩm</span>
+            </div>
+
+            <!-- Report Table -->
+            <div class="report-table">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th style="width: 5%">#</th>
+                            <th style="width: 25%">Sản phẩm</th>
+                            <th style="width: 10%">SKU</th>
+                            <th style="width: 12%">Màu sắc - Loại</th>
+                            <th style="width: 12%" class="text-end">Giá bán</th>
+                            <th style="width: 8%" class="text-center">Tồn kho</th>
+                            <th style="width: 13%" class="text-end">Giá trị tồn</th>
+                            <th style="width: 10%" class="text-center">Trạng thái</th>
+                            <th style="width: 5%" class="text-center">Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Empty State -->
+                        <tr th:if="${report.isEmpty()}">
+                            <td colspan="9" class="text-center py-5">
+                                <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                                <p class="text-muted">Không có dữ liệu</p>
+                            </td>
+                        </tr>
+
+                        <!-- Data Rows -->
+                        <tr th:each="item, iterStat : ${report.content}">
+                            <td th:text="${iterStat.count + (currentPage * size)}">1</td>
+                            <td>
+                                <div class="fw-bold" th:text="${item.productName}">Tên sản phẩm</div>
+                                <small class="text-muted" th:text="${item.categoryName}">Danh mục</small>
+                            </td>
+                            <td><code th:text="${item.sku}">SKU123</code></td>
+                            <td>
+                                <div>
+                                    <span class="color-indicator" th:style="'background-color: ' + ${item.colorHex}"></span>
+                                    <span th:text="${item.colorName}">Màu</span>
+                                </div>
+                                <small class="text-muted" th:text="${item.typeName}">Type</small>
+                            </td>
+                            <td class="text-end">
+                                <span th:text="${#numbers.formatDecimal(item.salePrice, 0, 'COMMA', 0, 'POINT')} + '₫'">0₫</span>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge fs-6" th:classappend="${item.stockStatusClass}"
+                                      th:text="${item.stockQty}">0</span>
+                            </td>
+                            <td class="text-end">
+                                <strong th:text="${#numbers.formatDecimal(item.stockValue, 0, 'COMMA', 0, 'POINT')} + '₫'">0₫</strong>
+                            </td>
+                            <td class="text-center">
+                                <span th:text="${item.stockStatus}" 
+                                      th:classappend="${item.stockStatusClass}">Trạng thái</span>
+                            </td>
+                            <td class="text-center">
+                                <a th:href="@{/manager/inventory/update/{id}(id=${item.variantId})}" 
+                                   class="btn btn-sm btn-outline-primary" title="Cập nhật tồn kho">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- Pagination -->
+                <div class="p-3 border-top" th:if="${totalPages > 1}">
+                    <nav>
+                        <ul class="pagination justify-content-center mb-0">
+                            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                                <a class="page-link" 
+                                   th:href="@{/manager/inventory/report(page=${currentPage - 1}, size=${size}, sortBy=${sortBy}, sortDir=${sortDir}, categoryId=${categoryId}, stockLevel=${stockLevel}, keyword=${keyword})}">
+                                    Trước
+                                </a>
+                            </li>
+
+                            <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}" 
+                                th:classappend="${i == currentPage} ? 'active'">
+                                <a class="page-link" 
+                                   th:href="@{/manager/inventory/report(page=${i}, size=${size}, sortBy=${sortBy}, sortDir=${sortDir}, categoryId=${categoryId}, stockLevel=${stockLevel}, keyword=${keyword})}"
+                                   th:text="${i + 1}">1</a>
+                            </li>
+
+                            <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                                <a class="page-link" 
+                                   th:href="@{/manager/inventory/report(page=${currentPage + 1}, size=${size}, sortBy=${sortBy}, sortDir=${sortDir}, categoryId=${categoryId}, stockLevel=${stockLevel}, keyword=${keyword})}">
+                                    Sau
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+
+        <!-- Export Script -->
+        <script>
+            function exportReport() {
+                // TODO: Implement export to Excel functionality
+                alert('Chức năng xuất Excel đang được phát triển');
+            }
+            
+            // Reset page về 0 khi có filter mới
+            document.addEventListener('DOMContentLoaded', function() {
+                const filterForm = document.getElementById('filterForm');
+                const stockLevelSelect = document.querySelector('select[name="stockLevel"]');
+                const categorySelect = document.querySelector('select[name="categoryId"]');
+                const keywordInput = document.querySelector('input[name="keyword"]');
+                const searchButton = document.querySelector('button[type="submit"]');
+                
+                // Reset page khi thay đổi filter
+                function resetPage() {
+                    const pageInput = document.createElement('input');
+                    pageInput.type = 'hidden';
+                    pageInput.name = 'page';
+                    pageInput.value = '0';
+                    filterForm.appendChild(pageInput);
+                }
+                
+                if (stockLevelSelect) {
+                    stockLevelSelect.addEventListener('change', resetPage);
+                }
+                
+                if (categorySelect) {
+                    categorySelect.addEventListener('change', resetPage);
+                }
+                
+                if (searchButton) {
+                    searchButton.addEventListener('click', resetPage);
+                }
+                
+                if (keywordInput) {
+                    keywordInput.addEventListener('keypress', function(e) {
+                        if (e.key === 'Enter') {
+                            resetPage();
+                        }
+                    });
+                }
+            });
+        </script>
+    </div>
+</body>
+</html>
+

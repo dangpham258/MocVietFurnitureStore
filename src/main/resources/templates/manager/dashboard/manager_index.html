@@ -60,21 +60,23 @@
             </div>
             
             <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card border-left-warning shadow h-100 py-2">
-                    <div class="card-body">
-                        <div class="row no-gutters align-items-center">
-                            <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                    Tồn kho thấp
+                <a href="/manager/inventory/alerts" class="text-decoration-none">
+                    <div class="card border-left-warning shadow h-100 py-2 hover-shadow">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                        Tồn kho thấp
+                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800" th:text="${stats.lowStockProducts}">0</div>
                                 </div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800" th:text="${stats.lowStockProducts}">0</div>
-                            </div>
-                            <div class="col-auto">
-                                <i class="fas fa-exclamation-triangle fa-2x text-gray-300"></i>
+                                <div class="col-auto">
+                                    <i class="fas fa-exclamation-triangle fa-2x text-gray-300"></i>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                </a>
             </div>
             
             <div class="col-xl-3 col-md-6 mb-4">
@@ -143,7 +145,7 @@
                                     Doanh thu tháng này
                                 </div>
                                 <div class="h5 mb-0 font-weight-bold text-gray-800" 
-                                     th:text="${#numbers.formatCurrency(stats.monthlyRevenue)}">0 ₫</div>
+                                     th:text="${#numbers.formatDecimal(stats.monthlyRevenue, 0, 'COMMA', 0, 'POINT')} + '₫'">0₫</div>
                             </div>
                             <div class="col-auto">
                                 <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
@@ -187,7 +189,7 @@
                                                   th:text="${order.status}">Chờ xác nhận</span>
                                         </td>
                                          <td th:text="${#temporals.format(order.createdAt, 'dd/MM/yyyy HH:mm')}">2024-01-15</td>
-                                         <td th:text="${#numbers.formatCurrency(order.totalAmount)}">1,500,000 ₫</td>
+                                         <td th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT')} + '₫'">1,500,000₫</td>
                                     </tr>
                                 </tbody>
                             </table>

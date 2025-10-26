@@ -22,21 +22,57 @@
                         <h5 class="text-white mb-4">
                             <i class="fas fa-store me-2"></i>Manager Panel
                         </h5>
-                        <nav class="nav flex-column">
-                            <a class="nav-link text-white" th:classappend="${activeMenu == 'dashboard'} ? 'active'" href="/manager">
-                                <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                        <nav class="nav flex-column sidebar-nav">
+                            <a class="nav-link sidebar-item" th:classappend="${activeMenu == 'dashboard'} ? 'active'" href="/manager">
+                                <i class="fas fa-tachometer-alt sidebar-icon"></i>
+                                <span class="sidebar-text">Dashboard</span>
                             </a>
-                            <a class="nav-link text-white" th:classappend="${activeMenu == 'products'} ? 'active'" href="/manager/products">
-                                <i class="fas fa-box me-2"></i>Sản phẩm
+                            <a class="nav-link sidebar-item" th:classappend="${activeMenu == 'products'} ? 'active'" href="/manager/products">
+                                <i class="fas fa-box sidebar-icon"></i>
+                                <span class="sidebar-text">Sản phẩm</span>
                             </a>
-                            <a class="nav-link text-white" th:classappend="${activeMenu == 'orders'} ? 'active'" href="/manager/orders">
-                                <i class="fas fa-shopping-cart me-2"></i>Đơn hàng
+                            <a class="nav-link sidebar-item" th:classappend="${activeMenu == 'orders'} ? 'active'" href="/manager/orders">
+                                <i class="fas fa-shopping-cart sidebar-icon"></i>
+                                <span class="sidebar-text">Đơn hàng</span>
                             </a>
-                            <a class="nav-link text-white" th:classappend="${activeMenu == 'delivery'} ? 'active'" href="/manager/delivery/pending">
-                                <i class="fas fa-truck me-2"></i>Phân công giao hàng
+                            <a class="nav-link sidebar-item" th:classappend="${activeMenu == 'delivery'} ? 'active'" href="/manager/delivery/pending">
+                                <i class="fas fa-truck sidebar-icon"></i>
+                                <span class="sidebar-text">Phân công giao hàng</span>
                             </a>
-                            <a class="nav-link text-white" th:classappend="${activeMenu == 'articles'} ? 'active'" href="/manager/articles">
-                                <i class="fas fa-newspaper me-2"></i>Tin tức
+                            
+                            <!-- Inventory Management Menu -->
+                            <div class="nav-item sidebar-item-container" th:classappend="${activeMenu == 'inventory'} ? 'active'">
+                                <a class="nav-link sidebar-item sidebar-parent" href="#" 
+                                   role="button" aria-expanded="false" aria-controls="inventorySubmenu">
+                                    <i class="fas fa-warehouse sidebar-icon"></i>
+                                    <span class="sidebar-text">Quản lý tồn kho</span>
+                                    <i class="fas fa-angle-down sidebar-arrow"></i>
+                                </a>
+                                <div class="sidebar-submenu" id="inventorySubmenu" th:classappend="${activeMenu == 'inventory'} ? 'show'">
+                                    <div class="nav flex-column">
+                                        <a class="nav-link sidebar-item sidebar-subitem" href="/manager/inventory/alerts">
+                                            <i class="fas fa-bell sidebar-icon"></i>
+                                            <span class="sidebar-text">Cảnh báo tồn kho</span>
+                                        </a>
+                                        <a class="nav-link sidebar-item sidebar-subitem" href="/manager/inventory/report">
+                                            <i class="fas fa-chart-bar sidebar-icon"></i>
+                                            <span class="sidebar-text">Báo cáo tồn kho</span>
+                                        </a>
+                                        <a class="nav-link sidebar-item sidebar-subitem" href="/manager/inventory/low-stock">
+                                            <i class="fas fa-exclamation-triangle sidebar-icon"></i>
+                                            <span class="sidebar-text">Tồn kho thấp</span>
+                                        </a>
+                                        <a class="nav-link sidebar-item sidebar-subitem" href="/manager/inventory/hidden-products">
+                                            <i class="fas fa-eye-slash sidebar-icon"></i>
+                                            <span class="sidebar-text">Sản phẩm đã ẩn</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <a class="nav-link sidebar-item" th:classappend="${activeMenu == 'articles'} ? 'active'" href="/manager/articles">
+                                <i class="fas fa-newspaper sidebar-icon"></i>
+                                <span class="sidebar-text">Tin tức</span>
                             </a>
                         </nav>
                     </div>
@@ -44,7 +80,7 @@
             </div>
             
             <!-- Main Content -->
-            <div class="col-md-9 col-lg-10 px-0">
+            <div class="col-md-9 col-lg-10 px-0 main-content">
                 <!-- Header -->
                 <div class="bg-white shadow-sm p-3">
                     <div class="d-flex justify-content-between align-items-center">
@@ -95,5 +131,260 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Custom JS -->
     <script th:src="@{/js/manager.js}"></script>
+    
+    <!-- Sidebar Enhancement Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Handle submenu state persistence
+            let submenuToggle = document.querySelector('.sidebar-parent[aria-controls="inventorySubmenu"]');
+            const submenu = document.getElementById('inventorySubmenu');
+            
+            // Fallback selectors
+            if (!submenuToggle) {
+                submenuToggle = document.querySelector('a[aria-controls="inventorySubmenu"]');
+            }
+            if (!submenuToggle) {
+                submenuToggle = document.querySelector('.sidebar-parent');
+            }
+            
+            if (submenuToggle && submenu) {
+                
+                // Check if we're on an inventory page
+                const isInventoryPage = window.location.pathname.includes('/manager/inventory/');
+                
+                if (isInventoryPage) {
+                    // Show submenu and mark as expanded
+                    submenu.classList.add('show');
+                    submenuToggle.setAttribute('aria-expanded', 'true');
+                    submenuToggle.classList.add('expanded');
+                } else {
+                    // Ensure submenu is closed when not on inventory page
+                    submenu.classList.remove('show');
+                    submenuToggle.setAttribute('aria-expanded', 'false');
+                    submenuToggle.classList.remove('expanded');
+                }
+                
+                // Handle submenu toggle - Override Bootstrap behavior
+                submenuToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const isExpanded = submenu.classList.contains('show');
+                    
+                    if (isExpanded) {
+                        // Close submenu
+                        submenu.classList.remove('show');
+                        submenuToggle.setAttribute('aria-expanded', 'false');
+                        submenuToggle.classList.remove('expanded');
+                    } else {
+                        // Open submenu
+                        submenu.classList.add('show');
+                        submenuToggle.setAttribute('aria-expanded', 'true');
+                        submenuToggle.classList.add('expanded');
+                    }
+                });
+            }
+            
+            // Handle submenu item clicks for smooth navigation
+            const submenuItems = document.querySelectorAll('.sidebar-subitem');
+            submenuItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const href = this.getAttribute('href');
+                    
+                    // Add loading state with visual feedback
+                    this.classList.add('loading');
+                    
+                    // Add ripple effect
+                    const ripple = document.createElement('div');
+                    ripple.style.cssText = `
+                        position: absolute;
+                        border-radius: 50%;
+                        background: rgba(16, 185, 129, 0.3);
+                        transform: scale(0);
+                        animation: ripple 0.6s linear;
+                        pointer-events: none;
+                        left: 50%;
+                        top: 50%;
+                        width: 20px;
+                        height: 20px;
+                        margin-left: -10px;
+                        margin-top: -10px;
+                    `;
+                    this.appendChild(ripple);
+                    
+                    // Navigate after a short delay for smooth transition
+                    setTimeout(() => {
+                        window.location.href = href;
+                    }, 200);
+                });
+            });
+            
+            // Add active class to current submenu item
+            const currentPath = window.location.pathname;
+            submenuItems.forEach(item => {
+                if (item.getAttribute('href') === currentPath) {
+                    item.classList.add('active');
+                }
+            });
+        });
+    </script>
+
+    <!-- Hide Product Confirmation Modal -->
+    <div class="modal fade" id="hideProductModal" tabindex="-1" aria-labelledby="hideProductModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title" id="hideProductModalLabel">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Xác nhận ẩn sản phẩm
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-warning" role="alert">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Bạn có chắc chắn muốn ẩn sản phẩm này tạm thời?
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="productName" class="form-label fw-bold">Tên sản phẩm:</label>
+                        <input type="text" class="form-control" id="productName" readonly>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="hideReason" class="form-label fw-bold">
+                            Lý do ẩn <span class="text-danger">*</span>
+                        </label>
+                        <textarea class="form-control" id="hideReason" rows="3" 
+                                  placeholder="Nhập lý do ẩn sản phẩm (bắt buộc)..."
+                                  required></textarea>
+                        <div class="form-text">Lý do này sẽ được lưu lại để tham khảo sau này.</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Hủy
+                    </button>
+                    <button type="button" class="btn btn-warning" id="confirmHideBtn">
+                        <i class="fas fa-eye-slash me-2"></i>Xác nhận ẩn
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!-- Show Product Confirmation Modal -->
+<div class="modal fade" id="showProductModal" tabindex="-1" aria-labelledby="showProductModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="showProductModalLabel">
+                    <i class="fas fa-eye me-2"></i>Xác nhận hiện sản phẩm
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-success" role="alert">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Bạn có chắc chắn muốn hiện sản phẩm này trở lại?
+                </div>
+                
+                <div class="mb-3">
+                    <label for="showProductName" class="form-label fw-bold">Tên sản phẩm:</label>
+                    <input type="text" class="form-control" id="showProductName" readonly>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>Hủy
+                </button>
+                <button type="button" class="btn btn-success" id="confirmShowBtn">
+                    <i class="fas fa-eye me-2"></i>Xác nhận hiện
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Global JavaScript for modals -->
+    <script>
+        let currentProductId = null;
+        
+        // Show hide product modal - Define globally
+        function showHideProductModal(button) {
+            currentProductId = button.getAttribute('data-product-id');
+            const productName = button.getAttribute('data-product-name');
+            
+            document.getElementById('productName').value = productName;
+            document.getElementById('hideReason').value = '';
+            
+            const modal = new bootstrap.Modal(document.getElementById('hideProductModal'));
+            modal.show();
+        }
+        
+        // Show show product modal - Define globally
+        function showShowProductModal(button) {
+            currentProductId = button.getAttribute('data-product-id');
+            const productName = button.getAttribute('data-product-name');
+            
+            document.getElementById('showProductName').value = productName;
+            
+            const modal = new bootstrap.Modal(document.getElementById('showProductModal'));
+            modal.show();
+        }
+        
+        // Handle hide product confirmation
+        document.addEventListener('DOMContentLoaded', function() {
+            const confirmHideBtn = document.getElementById('confirmHideBtn');
+            if (confirmHideBtn) {
+                confirmHideBtn.addEventListener('click', function() {
+                    const reason = document.getElementById('hideReason').value.trim();
+                    
+                    if (!reason) {
+                        alert('Vui lòng nhập lý do ẩn sản phẩm!');
+                        document.getElementById('hideReason').focus();
+                        return;
+                    }
+                    
+                    if (reason.length < 10) {
+                        alert('Lý do ẩn phải có ít nhất 10 ký tự!');
+                        document.getElementById('hideReason').focus();
+                        return;
+                    }
+                    
+                    // Submit form
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = '/manager/inventory/hide/' + currentProductId;
+                    
+                    const reasonInput = document.createElement('input');
+                    reasonInput.type = 'hidden';
+                    reasonInput.name = 'reason';
+                    reasonInput.value = reason;
+                    form.appendChild(reasonInput);
+                    
+                    document.body.appendChild(form);
+                    form.submit();
+                });
+            }
+            
+            // Handle show product confirmation
+            const confirmShowBtn = document.getElementById('confirmShowBtn');
+            if (confirmShowBtn) {
+                confirmShowBtn.addEventListener('click', function() {
+                    // Submit form
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = '/manager/inventory/show/' + currentProductId;
+                    
+                    document.body.appendChild(form);
+                    form.submit();
+                });
+            }
+        });
+    </script>
 </body>
 </html>

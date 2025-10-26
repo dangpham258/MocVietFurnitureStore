@@ -100,7 +100,7 @@
                                         </div>
                                         <div class="mb-2">
                                             <strong>Tổng tiền:</strong>
-                                            <span class="text-success fw-bold" th:text="${#numbers.formatCurrency(order.orderTotal)}">1,500,000 ₫</span>
+                                            <span class="text-success fw-bold" th:text="${#numbers.formatDecimal(order.orderTotal, 0, 'COMMA', 0, 'POINT')} + '₫'">1,500,000₫</span>
                                         </div>
                                         <div class="mb-2">
                                             <strong>Địa chỉ giao:</strong>

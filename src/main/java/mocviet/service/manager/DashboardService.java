@@ -2,9 +2,7 @@ package mocviet.service.manager;
 
 import lombok.RequiredArgsConstructor;
 import mocviet.entity.Orders;
-import mocviet.entity.Product;
 import mocviet.entity.ProductVariant;
-import mocviet.entity.Review;
 import mocviet.entity.OrderDelivery;
 import mocviet.repository.OrdersRepository;
 import mocviet.repository.ProductRepository;
@@ -42,8 +40,9 @@ public class DashboardService {
         long totalProducts = productRepository.count();
         stats.setTotalProducts((int) totalProducts);
         
-        // Đếm sản phẩm tồn kho thấp (giả sử < 10)
-        List<ProductVariant> lowStockVariants = productVariantRepository.findByStockQtyLessThanAndIsActive(10, true);
+        // Đếm sản phẩm tồn kho thấp (1-5) và hết hàng (0)
+        // LessThan(6) tương đương LessThanEqual(5)
+        List<ProductVariant> lowStockVariants = productVariantRepository.findByStockQtyLessThanAndIsActive(6, true);
         stats.setLowStockProducts(lowStockVariants.size());
         
         // Đếm đánh giá mới (trong 7 ngày qua)
@@ -103,12 +102,25 @@ public class DashboardService {
             ));
         }
         
-        // Thông báo tồn kho thấp
-        List<ProductVariant> lowStockVariants = productVariantRepository.findByStockQtyLessThanAndIsActive(10, true);
-        if (!lowStockVariants.isEmpty()) {
+        // Thông báo tồn kho thấp và hết hàng
+        // LessThan(6) tương đương LessThanEqual(5)
+        List<ProductVariant> criticalStockVariants = productVariantRepository.findByStockQtyLessThanAndIsActive(6, true);
+        if (!criticalStockVariants.isEmpty()) {
+            long outOfStock = criticalStockVariants.stream().filter(v -> v.getStockQty() == 0).count();
+            long lowStock = criticalStockVariants.stream().filter(v -> v.getStockQty() > 0 && v.getStockQty() <= 5).count();
+            
+            String message;
+            if (outOfStock > 0 && lowStock > 0) {
+                message = "Có " + outOfStock + " sản phẩm hết hàng và " + lowStock + " sản phẩm tồn kho thấp";
+            } else if (outOfStock > 0) {
+                message = "Có " + outOfStock + " sản phẩm đã hết hàng, cần nhập kho gấp";
+            } else {
+                message = "Có " + lowStock + " sản phẩm tồn kho thấp (1-5 sản phẩm)";
+            }
+            
             notifications.add(new NotificationDTO(
-                "Tồn kho thấp",
-                "Có " + lowStockVariants.size() + " biến thể sản phẩm sắp hết hàng",
+                "⚠️ Cảnh báo tồn kho",
+                message,
                 "danger"
             ));
         }

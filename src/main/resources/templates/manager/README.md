@@ -1,19 +1,24 @@
 # Manager Dashboard - Mộc Việt
 
 ## Tổng quan
-Module quản lý tài khoản Manager, phân công đội giao hàng và quản lý đơn hàng cho hệ thống bán hàng nội thất Mộc Việt.
+Module quản lý dành cho Manager, bao gồm:
+- Quản lý tài khoản cá nhân
+- Phân công đội giao hàng
+- Quản lý đơn hàng (xác nhận, hủy, trả hàng)
+- **Quản lý tồn kho** (cảnh báo, cập nhật, báo cáo)
 
 ## Cấu trúc thư mục
 
 ```
 src/main/java/mocviet/
 ├── controller/manager/
-│   ├── ManagerController.java          # Controller chính cho manager
+│   ├── ManagerController.java               # Controller chính cho manager
 │   ├── DeliveryAssignmentController.java    # Controller phân công đội giao hàng
-│   └── OrderManagementController.java       # Controller quản lý đơn hàng
+│   ├── OrderManagementController.java       # Controller quản lý đơn hàng
+│   └── InventoryManagementController.java   # Controller quản lý tồn kho
 ├── dto/manager/
-│   ├── UpdateProfileRequest.java       # DTO cho cập nhật profile
-│   ├── ChangePasswordRequest.java      # DTO cho đổi mật khẩu
+│   ├── UpdateProfileRequest.java            # DTO cho cập nhật profile
+│   ├── ChangePasswordRequest.java           # DTO cho đổi mật khẩu
 │   ├── AssignDeliveryTeamRequest.java       # DTO phân công đội giao hàng
 │   ├── ChangeDeliveryTeamRequest.java       # DTO thay đổi đội giao hàng
 │   ├── DeliveryTeamDTO.java                 # DTO thông tin đội giao hàng
@@ -23,12 +28,18 @@ src/main/java/mocviet/
 │   ├── OrderManagementDTO.java              # DTO chi tiết đơn hàng
 │   ├── OrderListDTO.java                    # DTO danh sách đơn hàng
 │   ├── ReturnRequestDTO.java                # DTO yêu cầu trả hàng
-│   └── OrderActionRequest.java              # DTO request actions
+│   ├── OrderActionRequest.java              # DTO request actions
+│   ├── StockAlertDTO.java                   # DTO cảnh báo tồn kho
+│   ├── StockReportDTO.java                  # DTO báo cáo tồn kho
+│   ├── StockSummaryDTO.java                 # DTO tổng quan tồn kho
+│   ├── UpdateStockRequest.java              # DTO cập nhật tồn kho
+│   └── LowStockProductDTO.java              # DTO sản phẩm tồn kho thấp
 ├── service/manager/
-│   ├── ManagerAccountService.java      # Service xử lý logic quản lý tài khoản
+│   ├── ManagerAccountService.java           # Service xử lý logic quản lý tài khoản
 │   ├── DeliveryAssignmentService.java       # Service xử lý logic phân công
 │   ├── OrderManagementService.java          # Service quản lý đơn hàng
-│   └── OrderStoredProcedureService.java     # Service tích hợp stored procedures
+│   ├── OrderStoredProcedureService.java     # Service tích hợp stored procedures
+│   └── InventoryManagementService.java      # Service quản lý tồn kho
 └── repository/
     ├── OrdersRepository.java                # Repository đơn hàng
     ├── OrderDeliveryRepository.java         # Repository giao hàng
@@ -37,7 +48,9 @@ src/main/java/mocviet/
     ├── ProvinceZoneRepository.java          # Repository tỉnh-khu vực
     ├── ShippingZoneRepository.java          # Repository khu vực
     ├── DeliveryHistoryRepository.java       # Repository lịch sử giao hàng
-    └── OrderStatusHistoryRepository.java    # Repository lịch sử trạng thái
+    ├── OrderStatusHistoryRepository.java    # Repository lịch sử trạng thái
+    ├── ProductVariantRepository.java        # Repository biến thể sản phẩm
+    └── ProductRepository.java               # Repository sản phẩm
 
 src/main/resources/
 ├── templates/manager/
@@ -56,13 +69,18 @@ src/main/resources/
 │   │   ├── change_team.html           # Thay đổi đội giao hàng
 │   │   ├── teams.html                 # Quản lý đội giao hàng
 │   │   └── zones.html                 # Quản lý khu vực giao hàng
-│   └── orders/
-│       ├── pending.html               # Danh sách đơn chờ xác nhận
-│       ├── pending-detail.html        # Chi tiết đơn chờ xác nhận
-│       ├── completed.html             # Danh sách đơn hoàn thành
-│       ├── completed-detail.html      # Chi tiết đơn hoàn thành
-│       ├── returns.html               # Danh sách yêu cầu trả hàng
-│       └── return-detail.html         # Chi tiết yêu cầu trả hàng
+│   ├── orders/
+│   │   ├── pending.html               # Danh sách đơn chờ xác nhận
+│   │   ├── pending-detail.html        # Chi tiết đơn chờ xác nhận
+│   │   ├── completed.html             # Danh sách đơn hoàn thành
+│   │   ├── completed-detail.html      # Chi tiết đơn hoàn thành
+│   │   ├── returns.html               # Danh sách yêu cầu trả hàng
+│   │   └── return-detail.html         # Chi tiết yêu cầu trả hàng
+│   └── inventory/
+│       ├── alerts.html                # Cảnh báo tồn kho
+│       ├── update-stock.html          # Cập nhật tồn kho
+│       ├── report.html                # Báo cáo tồn kho
+│       └── low-stock.html             # Quản lý sản phẩm tồn kho thấp
 ├── static/css/
 │   └── manager.css                     # CSS cho giao diện manager (đã cập nhật)
 └── static/js/
@@ -151,6 +169,79 @@ src/main/resources/
   - Sử dụng stored procedure `sp_RejectReturn`
   - Thông báo lý do từ chối cho khách hàng
 
+### 6. Quản lý tồn kho (`/manager/inventory/*`)
+
+#### 6.1. UC-MGR-INV-ViewStockAlerts - Xem cảnh báo tồn kho
+**Route:** `/manager/inventory/alerts`
+
+- **Dashboard tổng quan:**
+  - Tổng số sản phẩm (variants)
+  - Số sản phẩm hết hàng (stock_qty = 0)
+  - Số sản phẩm tồn kho thấp (1-5)
+  - Tổng giá trị tồn kho
+
+- **Danh sách cảnh báo:**
+  - Sắp xếp theo mức độ ưu tiên (hết hàng → tồn kho thấp)
+  - Lọc theo loại cảnh báo (Hết hàng / Tồn kho thấp)
+  - Tìm kiếm theo tên sản phẩm hoặc SKU
+  - Hiển thị thông tin màu sắc và loại của từng variant
+
+#### 6.2. UC-MGR-INV-UpdateStock - Cập nhật số lượng tồn kho
+**Route:** `/manager/inventory/update/{variantId}`
+
+- **Chức năng:**
+  - Form cập nhật số lượng tồn kho
+  - Preview real-time khi thay đổi số lượng
+  - Xem trước thay đổi (tồn kho cũ → mới)
+  - Nhập ghi chú lý do cập nhật (tùy chọn)
+  - Validation: số lượng >= 0, sản phẩm active
+  - Ghi log mọi thay đổi tồn kho
+
+- **Trigger tự động:**
+  - `TR_ProductVariant_StockAlerts` tự động tạo thông báo khi:
+    - Tồn kho thấp (1-5) và đang giảm
+    - Hết hàng (0)
+    - Có hàng trở lại (từ 0 lên > 0)
+
+#### 6.3. UC-MGR-INV-ViewStockReport - Xem báo cáo tồn kho
+**Route:** `/manager/inventory/report`
+
+- **Báo cáo tổng quan:**
+  - Biểu đồ thống kê tồn kho
+  - Danh sách chi tiết tất cả sản phẩm và biến thể
+  - Tính giá trị tồn kho (stock_qty × sale_price)
+
+- **Lọc và tìm kiếm:**
+  - Lọc theo mức tồn kho (Hết hàng / Thấp / Vừa / Tốt)
+  - Lọc theo danh mục sản phẩm
+  - Tìm kiếm theo tên sản phẩm/SKU
+  - Xuất Excel (đang phát triển)
+
+#### 6.4. UC-MGR-INV-ManageLowStock - Quản lý sản phẩm tồn kho thấp
+**Route:** `/manager/inventory/low-stock`
+
+- **Danh sách ưu tiên:**
+  - Sản phẩm có tồn kho <= 5
+  - Sắp xếp theo mức độ ưu tiên xử lý
+  - Priority system (1-10):
+    - Priority 1 (Đỏ) - Hết hàng (stock_qty = 0)
+    - Priority 2 (Cam) - Dự kiến hết trong 3 ngày
+    - Priority 3 (Vàng) - Dự kiến hết trong 7 ngày
+    - Priority 10 (Xám) - Tồn kho ổn định
+
+- **Thống kê & Dự báo:**
+  - Số lượng đã bán trong 30 ngày qua
+  - Trung bình bán mỗi ngày
+  - Dự báo số ngày còn lại trước khi hết hàng
+  - Công thức: `stock_qty / avg_daily_sales`
+
+- **Hành động:**
+  - Cập nhật tồn kho nhanh
+  - Ẩn/Hiện sản phẩm tạm thời
+  - Xem sản phẩm trên website
+  - Tạo đơn nhập hàng (đang phát triển)
+  - Xem lịch sử thay đổi (đang phát triển)
+
 ## Bảo mật
 
 ### 1. Authentication & Authorization
@@ -198,6 +289,14 @@ src/main/resources/
 | POST | `/manager/orders/returns/{id}/reject` | Từ chối yêu cầu trả hàng | MANAGER |
 | GET | `/manager/orders/api/{id}` | Lấy chi tiết đơn hàng (JSON) | MANAGER |
 | GET | `/manager/orders/api/returns/{id}` | Lấy chi tiết yêu cầu trả hàng (JSON) | MANAGER |
+| GET | `/manager/inventory/alerts` | Trang cảnh báo tồn kho | MANAGER |
+| GET | `/manager/inventory/update/{id}` | Form cập nhật tồn kho | MANAGER |
+| POST | `/manager/inventory/update` | Submit cập nhật tồn kho | MANAGER |
+| POST | `/manager/inventory/quick-update` | API AJAX cập nhật nhanh | MANAGER |
+| GET | `/manager/inventory/report` | Trang báo cáo tồn kho | MANAGER |
+| GET | `/manager/inventory/low-stock` | Trang quản lý tồn kho thấp | MANAGER |
+| POST | `/manager/inventory/hide/{id}` | Ẩn sản phẩm | MANAGER |
+| POST | `/manager/inventory/show/{id}` | Hiện sản phẩm | MANAGER |
 
 ## Công nghệ sử dụng
 
@@ -240,6 +339,13 @@ URL: http://localhost:8080/manager/delivery/pending
 URL: http://localhost:8080/manager/orders/pending
 ```
 
+### 7. Quản lý tồn kho
+```
+URL: http://localhost:8080/manager/inventory/alerts
+URL: http://localhost:8080/manager/inventory/report
+URL: http://localhost:8080/manager/inventory/low-stock
+```
+
 ## Validation Rules
 
 ### UpdateProfileRequest
@@ -276,6 +382,15 @@ URL: http://localhost:8080/manager/orders/pending
 - **Đội giao:** Phải có đội giao phù hợp để thu hồi
 - **Lý do:** Bắt buộc nhập lý do khi hủy đơn hoặc từ chối trả hàng
 
+### Quản lý tồn kho
+- **Số lượng tồn kho:** Phải >= 0, kiểm tra constraint CHECK (stock_qty >= 0)
+- **Sản phẩm hoạt động:** Chỉ cập nhật sản phẩm có is_active = 1
+- **Quyền hạn:** Chỉ role MANAGER mới được quản lý tồn kho
+- **Trigger cảnh báo:** Tự động tạo thông báo khi tồn kho thấp (1-5) hoặc hết hàng (0)
+- **Dedupe thông báo:** Chống spam thông báo trong 12 giờ
+- **Audit Trail:** Ghi log mọi thay đổi tồn kho
+- **Ẩn sản phẩm:** Sản phẩm ẩn không hiển thị trên website nhưng không ảnh hưởng đơn đã tạo
+
 ## Error Handling
 
 ### 1. Validation Errors
@@ -301,8 +416,13 @@ URL: http://localhost:8080/manager/orders/pending
 - `ShippingZone` - Khu vực giao hàng
 - `DeliveryHistory` - Lịch sử giao hàng
 - `OrderStatusHistory` - Lịch sử trạng thái đơn hàng
+- `ProductVariant` - Biến thể sản phẩm (lưu tồn kho)
+- `Product` - Thông tin sản phẩm
+- `Color` - Màu sắc sản phẩm
+- `Category` - Danh mục sản phẩm
+- `OrderItems` - Dùng để tính số lượng đã bán
 
-### Stored Procedures sử dụng
+### Stored Procedures & Triggers
 - `sp_MarkDispatched` - Đánh dấu đơn đã xuất kho
 - `sp_ConfirmOrder` - Xác nhận đơn hàng
 - `sp_CancelOrder` - Hủy đơn hàng và hoàn kho
@@ -313,7 +433,9 @@ URL: http://localhost:8080/manager/orders/pending
 - `sp_MarkDelivered` - Đánh dấu đơn đã giao thành công
 - `sp_HandlePaymentWebhook` - Xử lý webhook thanh toán
 - `sp_AutoCancelUnpaidOnline` - Tự động hủy đơn online chưa thanh toán
-- Triggers tự động gửi thông báo cho đội giao hàng
+- `TR_ProductVariant_StockAlerts` - Tự động tạo cảnh báo tồn kho
+- `TR_OrderDelivery_NotifyDeliveryTeam` - Thông báo cho đội giao hàng
+- `TR_ProductVariant_NotifyWishlistBackInStock` - Thông báo khách hàng khi có hàng trở lại
 
 ## Tính năng đặc biệt
 
@@ -353,6 +475,28 @@ URL: http://localhost:8080/manager/orders/pending
 - Thông báo đơn hàng quá thời hạn trả hàng
 - Hiển thị trạng thái thanh toán rõ ràng
 
+### Inventory Management Features
+- **Dự báo hết hàng:**
+  - Tính dựa trên lịch sử bán 30 ngày qua
+  - Ước tính số ngày còn lại: `stock_qty / avg_daily_sales`
+  - Cảnh báo ưu tiên nếu dự kiến hết trong 3-7 ngày
+
+- **Priority System:**
+  - Priority 1 (Đỏ) - Hết hàng (stock_qty = 0)
+  - Priority 2 (Cam) - Dự kiến hết trong 3 ngày
+  - Priority 3 (Vàng) - Dự kiến hết trong 7 ngày
+  - Priority 10 (Xám) - Tồn kho ổn định
+
+- **Real-time Preview:**
+  - Form cập nhật tồn kho có preview real-time
+  - Hiển thị thay đổi: Cũ → Mới
+  - JavaScript update ngay lập tức
+
+- **Auto Stock Alerts:**
+  - Trigger tự động tạo thông báo khi tồn kho thay đổi
+  - Dedupe 12 giờ để tránh spam
+  - Thông báo Manager, Admin và khách hàng (wishlist)
+
 ## Logging & Audit
 
 ### 1. Activity Logging
@@ -361,6 +505,8 @@ URL: http://localhost:8080/manager/orders/pending
 - Ghi log phân công đội giao hàng
 - Ghi log xác nhận/hủy đơn hàng
 - Ghi log duyệt/từ chối trả hàng
+- **Ghi log cập nhật tồn kho** (manager_id, variant_id, old_qty, new_qty, note)
+- **Ghi log ẩn/hiện sản phẩm** (manager_id, variant_id, action, reason)
 - Sử dụng Spring AOP (có thể implement thêm)
 
 ### 2. Security Logging
@@ -370,6 +516,8 @@ URL: http://localhost:8080/manager/orders/pending
 - Log delivery assignment changes
 - Log order management actions
 - Log return request processing
+- **Log stock update actions** (thời gian, user, sản phẩm, thay đổi)
+- **Log product visibility changes** (thời gian, user, sản phẩm, lý do)
 
 ## Performance
 
@@ -432,6 +580,9 @@ spring.session.timeout=30m
 - **"Đơn hàng online chưa thanh toán"** - Cần kiểm tra trạng thái thanh toán
 - **"Quá thời hạn trả hàng (30 ngày)"** - Yêu cầu trả hàng đã hết hạn
 - **"Không có đội giao phù hợp"** - Cần tạo đội giao hàng trước
+- **"Số lượng tồn kho phải >= 0"** - Validation tồn kho không hợp lệ
+- **"Không thể cập nhật tồn kho cho sản phẩm đã vô hiệu hóa"** - Sản phẩm không active
+- **"Không tìm thấy biến thể sản phẩm"** - Variant ID không tồn tại
 
 ### 2. Debug Mode
 ```properties
@@ -459,6 +610,14 @@ spring.jpa.show-sql=true
 - Team performance analytics
 - Delivery route optimization
 - Mobile app integration
+- **Xuất báo cáo Excel/PDF cho tồn kho**
+- **Tạo đơn nhập hàng tự động**
+- **Lịch sử thay đổi tồn kho chi tiết**
+- **Biểu đồ xu hướng tồn kho**
+- **Cảnh báo email khi tồn kho thấp**
+- **Tích hợp với hệ thống ERP/WMS**
+- **Bulk update tồn kho (upload Excel)**
+- **Stock forecasting với ML**
 
 ### 2. UI/UX
 - Dark mode
