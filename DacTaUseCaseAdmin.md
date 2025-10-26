@@ -55,3 +55,19 @@ Alternative 13a. Bấm nút "Reset" để reset bộ lọc 14a. Xóa tất cả 
 Exception 9a. Tên màu hoặc Slug đã tồn tại 10a. Hiển thị thông báo "Tên màu đã tồn tại" hoặc "Slug đã tồn tại" 11a. Giữ modal mở để sửa 18a. Cố gắng thay đổi slug khi màu đã có ảnh sản phẩm 19a. Hiển thị thông báo "Không thể thay đổi slug khi màu sắc đã có ảnh sản phẩm" 20a. Slug field tự động bị vô hiệu hóa khi open modal edit 21a. Lỗi hệ thống 22a. Hiển thị thông báo "Có lỗi xảy ra" 23a. Cho phép thử lại
 
 Bảng 3-3. Use case Quản lý màu sắc
+
+---
+
+## UC_004 - Quản lý danh mục (Manage categories)
+
+Use case ID UC_004
+Name Manage categories
+Goal Quản lý danh mục sản phẩm và bộ sưu tập trong hệ thống (Xem danh sách, tìm kiếm, thêm/sửa danh mục, bật/tắt hiển thị danh mục)
+Actors Quản trị viên (Admin)
+Pre-conditions Đã đăng nhập vào hệ thống với vai trò ADMIN
+Post-conditions - Nếu thành công, danh sách danh mục được hiển thị hoặc thao tác quản lý được thực hiện - Nếu thất bại, hiển thị thông báo lỗi
+Main Flow 1. Vào trang quản lý danh mục (/admin/categories) 2. Hệ thống hiển thị 2 tab: "Danh mục sản phẩm" (hiển thị cây danh mục) và "Bộ sưu tập" (hiển thị danh sách phẳng) 3. Hệ thống hiển thị thống kê dựa trên bộ lọc: Tổng danh mục, Đang kích hoạt, Danh mục cấp 1, Bộ sưu tập 4. Có thể tìm kiếm theo tên hoặc slug 5. Có thể lọc theo loại (Tất cả, Danh mục, Bộ sưu tập) 6. Có thể lọc theo trạng thái (Tất cả, Đang kích hoạt, Đã vô hiệu hóa) 7. Click "Thêm danh mục" để tạo danh mục mới 8. Modal hiển thị form nhập: Loại (Danh mục/Bộ sưu tập - bắt buộc), Danh mục cha (chỉ hiển thị khi chọn loại "Danh mục", cho phép tạo danh mục cấp 2), Tên danh mục (bắt buộc), Slug (bắt buộc, tự động tạo từ tên), Checkbox "Kích hoạt ngay" 9. Nhập đầy đủ thông tin và click "Thêm danh mục" 10. Hệ thống kiểm tra tên danh mục không trùng 11. Hệ thống kiểm tra slug không trùng 12. Nếu hợp lệ, tạo danh mục mới và hiển thị thông báo thành công 13. Cập nhật danh sách danh mục và đóng modal 14. Click "Sửa" trên một danh mục để cập nhật 15. Modal hiển thị thông tin hiện tại (nếu là danh mục cấp 1, ẩn dropdown "Danh mục cha"; nếu danh mục đã có sản phẩm, Slug bị vô hiệu hóa cho CATEGORY) 16. Sửa đổi thông tin và click "Cập nhật" 17. Hệ thống kiểm tra tên danh mục và slug không trùng (nếu thay đổi) 18. Nếu danh mục là loại CATEGORY và đã có sản phẩm hoặc có danh mục con có sản phẩm, không cho phép thay đổi slug (slug dùng trong đường dẫn ảnh) 19. Nếu danh mục là loại COLLECTION, cho phép thay đổi slug (không dùng trong đường dẫn ảnh) 20. Nếu hợp lệ, cập nhật danh mục và hiển thị thông báo thành công 21. Cập nhật danh sách danh mục và đóng modal 22. Click nút khóa/mở khóa để thay đổi trạng thái hiển thị của danh mục
+Alternative 5a. Bấm nút "Đặt lại" để reset bộ lọc 6a. Xóa tất cả bộ lọc và hiển thị danh sách đầy đủ
+Exception 11a. Tên danh mục hoặc Slug đã tồn tại 12a. Hiển thị thông báo "Tên danh mục đã tồn tại" hoặc "Slug đã tồn tại" 13a. Giữ modal mở để sửa 18a. Cố gắng thay đổi slug của danh mục CATEGORY khi đã có sản phẩm hoặc có danh mục con có sản phẩm 19a. Hiển thị thông báo "Không thể thay đổi slug khi danh mục đã có sản phẩm" hoặc "Không thể thay đổi slug khi có danh mục con đã có sản phẩm" 20a. Slug field tự động bị vô hiệu hóa trong modal edit nếu là CATEGORY có sản phẩm 21a. Lỗi hệ thống 22a. Hiển thị thông báo "Có lỗi xảy ra" 23a. Cho phép thử lại
+
+Bảng 3-4. Use case Quản lý danh mục

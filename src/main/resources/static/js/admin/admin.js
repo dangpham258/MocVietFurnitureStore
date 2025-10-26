@@ -802,6 +802,36 @@ function initializeBootstrapComponents() {
                 document.body.appendChild(script);
             }
         }
+        
+        // Initialize Categories Management
+        if (currentUrl.includes('/admin/categories')) {
+            // Check if categories.js is already loaded
+            if (typeof window.initializeCategoriesManagement === 'function') {
+                window.initializeCategoriesManagement();
+            } else if (typeof CategoriesManagement !== 'undefined') {
+                if (window.categoriesManagement) {
+                    delete window.categoriesManagement;
+                }
+                try {
+                    window.categoriesManagement = new CategoriesManagement();
+                } catch (error) {
+                    console.error('Error initializing CategoriesManagement:', error);
+                }
+            } else {
+                // Script not loaded, load it dynamically
+                const script = document.createElement('script');
+                script.src = '/js/admin/categories.js?v=HuynhNgocThang';
+                script.onload = function() {
+                    if (typeof window.initializeCategoriesManagement === 'function') {
+                        window.initializeCategoriesManagement();
+                    }
+                };
+                script.onerror = function() {
+                    console.error('Failed to load categories.js');
+                };
+                document.body.appendChild(script);
+            }
+        }
     }
     
     // Intercept sidebar navigation clicks

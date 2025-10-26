@@ -100,5 +100,8 @@
     <!-- Colors Management JS - Chỉ load ở trang colors -->
     <script th:if="${activeMenu == 'colors'}" 
             th:src="@{/js/admin/colors.js(v=${jsVersion ?: 'HuynhNgocThang'})}"></script>
+    <!-- Categories Management JS - Chỉ load ở trang categories -->
+    <script th:if="${activeMenu == 'categories'}" 
+            th:src="@{/js/admin/categories.js(v=${jsVersion ?: 'HuynhNgocThang'})}"></script>
 </body>
 </html>

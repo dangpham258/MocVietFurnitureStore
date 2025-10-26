@@ -202,31 +202,31 @@
                         <div class="tab-content" id="userFormTabsContent">
                             <!-- Tab 1: Thông tin cơ bản -->
                             <div class="tab-pane fade show active" id="basic-info" role="tabpanel">
-                                <div class="row">
+                        <div class="row">
                                     <div class="col-md-6 mb-3">
-                                        <label class="form-label">Username *</label>
+                                    <label class="form-label">Username *</label>
                                         <input type="text" class="form-control" id="username" placeholder="VD: user001" required>
-                                    </div>
+                                </div>
                                     <div class="col-md-6 mb-3">
-                                        <label class="form-label">Email *</label>
+                                    <label class="form-label">Email *</label>
                                         <input type="email" class="form-control" id="email" placeholder="user@email.com" required>
-                                    </div>
-                                </div>
-                                <div class="row">
+                            </div>
+                        </div>
+                        <div class="row">
                                     <div class="col-md-6 mb-3">
-                                        <label class="form-label">Họ và tên *</label>
+                                    <label class="form-label">Họ và tên *</label>
                                         <input type="text" class="form-control" id="fullName" placeholder="Nguyễn Văn A" required>
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">Số điện thoại</label>
-                                        <input type="tel" class="form-control" id="phone" placeholder="0901234567">
-                                    </div>
                                 </div>
-                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                    <label class="form-label">Số điện thoại</label>
+                                        <input type="tel" class="form-control" id="phone" placeholder="0901234567">
+                            </div>
+                        </div>
+                        <div class="row">
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">Ngày sinh</label>
                                         <input type="date" class="form-control" id="dob">
-                                    </div>
+                                </div>
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">Giới tính</label>
                                         <select class="form-select" id="gender">
@@ -234,10 +234,10 @@
                                             <option value="Nam">Nam</option>
                                             <option value="Nữ">Nữ</option>
                                             <option value="Khác">Khác</option>
-                                        </select>
-                                    </div>
+                                    </select>
                                 </div>
                             </div>
+                                </div>
                             
                             <!-- Tab 2: Mật khẩu -->
                             <div class="tab-pane fade" id="password-info" role="tabpanel">
@@ -250,7 +250,7 @@
                                         <li>Có ít nhất 1 chữ thường</li>
                                         <li>Có ít nhất 1 chữ số</li>
                                     </ul>
-                                </div>
+                            </div>
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">Mật khẩu *</label>
@@ -259,8 +259,8 @@
                                             <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('password', this)">
                                                 <i class="bi bi-eye"></i>
                                             </button>
-                                        </div>
-                                    </div>
+                            </div>
+                        </div>
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">Xác nhận mật khẩu *</label>
                                         <div class="input-group">
@@ -268,23 +268,23 @@
                                             <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('confirmPassword', this)">
                                                 <i class="bi bi-eye"></i>
                                             </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
+                </div>
+            </div>
+        </div>
+    </div>
+
                             <!-- Tab 3: Vai trò & Trạng thái -->
                             <div class="tab-pane fade" id="role-info" role="tabpanel">
-                                <div class="row">
+                        <div class="row">
                                     <div class="col-md-6 mb-3">
-                                        <label class="form-label">Vai trò *</label>
+                                    <label class="form-label">Vai trò *</label>
                                         <select class="form-select" id="roleId" required>
                                             <option value="">Chọn vai trò</option>
                                             <option value="MANAGER">MANAGER - Quản lý bán hàng</option>
                                             <option value="DELIVERY">DELIVERY - Đội ngũ vận chuyển</option>
-                                        </select>
+                                    </select>
                                         <div class="form-text">Admin có thể tạo tài khoản cho MANAGER và DELIVERY</div>
-                                    </div>
+                                </div>
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">Trạng thái</label>
                                         <div class="mt-3">
@@ -293,15 +293,15 @@
                                                 <label class="form-check-label" for="isActive">
                                                     <strong>Kích hoạt ngay sau khi tạo</strong>
                                                 </label>
-                                            </div>
+                            </div>
                                             <small class="text-muted d-block mt-2">
                                                 <i class="bi bi-info-circle me-1"></i>
                                                 Tài khoản này sẽ được kích hoạt và có thể đăng nhập ngay
                                             </small>
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
+                        </div>
+                        </div>
                         </div>
                     </form>
                 </div>

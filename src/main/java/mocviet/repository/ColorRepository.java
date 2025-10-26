@@ -14,9 +14,11 @@ public interface ColorRepository extends JpaRepository<Color, Integer> {
     Optional<Color> findByName(String name);
     Optional<Color> findBySlug(String slug);
     
+    @Override
     @EntityGraph(attributePaths = {"images"})
     List<Color> findAll();
     
+    @Override
     @EntityGraph(attributePaths = {"images"})
     Optional<Color> findById(Integer id);
 }
