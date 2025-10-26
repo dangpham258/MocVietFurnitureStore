@@ -72,7 +72,7 @@ class NotificationSystem {
         }, 300000);
         
         const notification = this.createNotification(message, type);
-        this.addNotification(notification);
+        this.addNotification(notification, duration);
         
         // Auto remove sau duration
         setTimeout(() => {
@@ -90,7 +90,7 @@ class NotificationSystem {
      */
     forceShow(message, type = 'info', duration = this.defaultDuration) {
         const notification = this.createNotification(message, type);
-        this.addNotification(notification);
+        this.addNotification(notification, duration);
         
         // Auto remove sau duration
         setTimeout(() => {
@@ -133,6 +133,9 @@ class NotificationSystem {
                 <div class="notification-body">
                     ${message}
                 </div>
+                <div class="notification-progress">
+                    <div class="notification-progress-bar"></div>
+                </div>
             </div>
         `;
 
@@ -140,14 +143,15 @@ class NotificationSystem {
         notification.style.cssText = `
             background: ${this.getBackgroundColor(type)};
             border: 1px solid ${this.getBorderColor(type)};
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
             margin-bottom: 10px;
             opacity: 0;
             transform: translateX(100%);
             transition: all 0.3s ease;
             pointer-events: auto;
             max-width: 350px;
+            overflow: hidden;
         `;
 
         return notification;
@@ -156,7 +160,7 @@ class NotificationSystem {
     /**
      * Thêm notification vào container
      */
-    addNotification(notification) {
+    addNotification(notification, duration = this.defaultDuration) {
         const container = document.getElementById('notification-container');
         container.appendChild(notification);
 
@@ -166,6 +170,9 @@ class NotificationSystem {
             notification.style.transform = 'translateX(0)';
         }, 10);
 
+        // Start progress bar animation với duration từ parameter
+        this.startProgressBar(notification, duration);
+
         this.notifications.push(notification);
 
         // Giới hạn số lượng notifications
@@ -173,6 +180,24 @@ class NotificationSystem {
             const oldNotification = this.notifications.shift();
             this.removeNotification(oldNotification);
         }
+    }
+
+    /**
+     * Bắt đầu animation thanh thời gian
+     */
+    startProgressBar(notification, duration = this.defaultDuration) {
+        const progressBar = notification.querySelector('.notification-progress-bar');
+        if (!progressBar) return;
+
+        // Reset progress bar
+        progressBar.style.width = '100%';
+        progressBar.style.transition = 'none';
+        
+        // Start animation
+        setTimeout(() => {
+            progressBar.style.transition = `width ${duration}ms linear`;
+            progressBar.style.width = '0%';
+        }, 10);
     }
 
     /**
@@ -205,10 +230,10 @@ class NotificationSystem {
      */
     getBackgroundColor(type) {
         const colors = {
-            'success': '#d1edff',
-            'danger': '#f8d7da',
-            'warning': '#fff3cd',
-            'info': '#d1ecf1'
+            'success': '#f0f9ff',
+            'danger': '#fef2f2',
+            'warning': '#fffbeb',
+            'info': '#f0f9ff'
         };
         return colors[type] || colors['info'];
     }
@@ -218,10 +243,10 @@ class NotificationSystem {
      */
     getBorderColor(type) {
         const colors = {
-            'success': '#0f5132',
-            'danger': '#842029',
-            'warning': '#664d03',
-            'info': '#055160'
+            'success': '#10b981',
+            'danger': '#ef4444',
+            'warning': '#f59e0b',
+            'info': '#3b82f6'
         };
         return colors[type] || colors['info'];
     }

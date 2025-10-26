@@ -478,7 +478,7 @@ function initializeBootstrapComponents() {
         }
         
         // Fallback cho trường hợp notification system chưa load
-        console.log(`📢 Fallback notification [${type.toUpperCase()}]: ${message}`);
+        console.log(`Fallback notification [${type.toUpperCase()}]: ${message}`);
     }
 
     // ========================================
