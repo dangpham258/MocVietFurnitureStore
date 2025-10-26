@@ -38,7 +38,7 @@ class OTPVerification {
         } else if (typeof window.showNotification === 'function') {
             window.showNotification(message, type);
         } else {
-            console.log(`📢 Notification [${type.toUpperCase()}]: ${message}`);
+            console.log(`Notification [${type.toUpperCase()}]: ${message}`);
         }
     }
     
@@ -123,7 +123,7 @@ class OTPVerification {
             
             // Add our event listener with capture=true to ensure it runs first
             newProfileForm.addEventListener('submit', (e) => this.handleProfileSubmit(e), true);
-            console.log('✅ Profile form event listener bound (OTP override)');
+            console.log('Profile form event listener bound (OTP override)');
         }
         
         // Password form submit - Force override
@@ -135,7 +135,7 @@ class OTPVerification {
             
             // Add our event listener with capture=true to ensure it runs first
             newPasswordForm.addEventListener('submit', (e) => this.handlePasswordSubmit(e), true);
-            console.log('✅ Password form event listener bound (OTP override)');
+            console.log('Password form event listener bound (OTP override)');
         }
         
         // OTP form events will be bound when modal is created
@@ -167,12 +167,12 @@ class OTPVerification {
      * Handle profile form submission
      */
     async handleProfileSubmit(event) {
-        console.log('🚀 OTP: Profile form submit intercepted!');
+        console.log('OTP: Profile form submit intercepted!');
         event.preventDefault();
         event.stopPropagation();
         
         if (this.isProcessing) {
-            console.log('⚠️ OTP: Already processing, ignoring');
+            console.log('OTP: Already processing, ignoring');
             return;
         }
         
@@ -180,7 +180,7 @@ class OTPVerification {
         const formData = new FormData(form);
         const data = Object.fromEntries(formData.entries());
         
-        console.log('📝 OTP: Form data:', data);
+        console.log('OTP: Form data:', data);
         
         // Convert date string to proper format if exists
         if (data.dob) {
@@ -196,7 +196,7 @@ class OTPVerification {
             const hasChanges = this.hasChanges(data, this.originalFormData);
             
             if (!hasChanges) {
-                console.log('⚠️ OTP: No changes detected');
+                console.log('OTP: No changes detected');
                 this.showNotification('Thông tin chưa được chỉnh sửa', 'warning');
                 return;
             }
@@ -206,7 +206,7 @@ class OTPVerification {
         this.showNotification('Đang xử lý thông tin...', 'info');
         
         // Bỏ qua HTML5 validation, để backend DTO handle
-        console.log('✅ OTP: Form data collected, sending to backend for validation');
+        console.log('OTP: Form data collected, sending to backend for validation');
         
         // Store form data and show OTP modal
         this.currentForm = form;
@@ -230,7 +230,7 @@ class OTPVerification {
             
             // So sánh giá trị đã được normalize (trim whitespace)
             if (newValue.trim() !== oldValue.trim()) {
-                console.log(`📝 Change detected in ${field}: "${oldValue}" → "${newValue}"`);
+                console.log(`Change detected in ${field}: "${oldValue}" → "${newValue}"`);
                 return true;
             }
         }
@@ -253,17 +253,17 @@ class OTPVerification {
         const formData = new FormData(form);
         const data = Object.fromEntries(formData.entries());
         
-        console.log('📝 OTP: Password form data:', data);
+        console.log('OTP: Password form data:', data);
         
         // Loại bỏ OTP field khi gửi request send-password-otp
         delete data.otpCode;
         
         // Bỏ qua HTML5 validation, để backend DTO handle
-        console.log('✅ OTP: Password form data collected, sending to backend for validation');
+        console.log('OTP: Password form data collected, sending to backend for validation');
         
         // Validate password confirmation (chỉ check cơ bản)
         if (data.newPassword !== data.confirmPassword) {
-            console.log('❌ OTP: Password confirmation mismatch');
+            console.log('OTP: Password confirmation mismatch');
             
             // Highlight confirm password field
             const confirmPasswordField = form.querySelector('input[name="confirmPassword"]');
@@ -276,7 +276,7 @@ class OTPVerification {
             return;
         }
         
-        console.log('✅ OTP: Password form data collected, sending to backend for validation');
+        console.log('OTP: Password form data collected, sending to backend for validation');
         
         // Store form data and show OTP modal
         this.currentForm = form;
@@ -707,7 +707,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Lưu dữ liệu ban đầu
                 window.otpVerificationInstance.originalFormData = data;
-                console.log('✅ Original form data saved:', data);
+                console.log('Original form data saved:', data);
             }
             
             // Force override after initialization

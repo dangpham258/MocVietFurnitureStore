@@ -91,7 +91,14 @@
     <script th:src="@{/js/notification.js(v=${jsVersion ?: 'HuynhNgocThang'})}"></script>
     <!-- Admin JS -->
     <script th:src="@{/js/admin/admin.js(v=${jsVersion ?: 'HuynhNgocThang'})}"></script>
-    <!-- OTP Verification JS -->
-    <script th:src="@{/js/admin/otp-verification.js(v=${jsVersion ?: 'HuynhNgocThang'})}"></script>
+    <!-- OTP Verification JS - Chỉ load ở trang profile -->
+    <script th:if="${activeMenu == 'profile'}" 
+            th:src="@{/js/admin/otp-verification.js(v=${jsVersion ?: 'HuynhNgocThang'})}"></script>
+    <!-- Users Management JS - Chỉ load ở trang users -->
+    <script th:if="${activeMenu == 'users'}" 
+            th:src="@{/js/admin/users.js(v=${jsVersion ?: 'HuynhNgocThang'})}"></script>
+    <!-- Colors Management JS - Chỉ load ở trang colors -->
+    <script th:if="${activeMenu == 'colors'}" 
+            th:src="@{/js/admin/colors.js(v=${jsVersion ?: 'HuynhNgocThang'})}"></script>
 </body>
 </html>

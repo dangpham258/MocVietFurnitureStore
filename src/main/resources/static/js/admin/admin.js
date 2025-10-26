@@ -739,6 +739,69 @@ function initializeBootstrapComponents() {
                 }
             });
         });
+        
+        // Initialize page-specific components based on current URL
+        const currentUrl = window.location.pathname;
+        
+        // Initialize Users Management
+        if (currentUrl.includes('/admin/users')) {
+            // Check if users.js is already loaded
+            if (typeof window.initializeUsersManagement === 'function') {
+                window.initializeUsersManagement();
+            } else if (typeof UsersManagement !== 'undefined') {
+                if (window.usersManagement) {
+                    delete window.usersManagement;
+                }
+                try {
+                    window.usersManagement = new UsersManagement();
+                } catch (error) {
+                    console.error('Error initializing UsersManagement:', error);
+                }
+            } else {
+                // Script not loaded, load it dynamically
+                const script = document.createElement('script');
+                script.src = '/js/admin/users.js?v=HuynhNgocThang';
+                script.onload = function() {
+                    if (typeof window.initializeUsersManagement === 'function') {
+                        window.initializeUsersManagement();
+                    }
+                };
+                script.onerror = function() {
+                    console.error('Failed to load users.js');
+                };
+                document.body.appendChild(script);
+            }
+        }
+        
+        // Initialize Colors Management
+        if (currentUrl.includes('/admin/colors')) {
+            // Check if colors.js is already loaded
+            if (typeof window.initializeColorsManagement === 'function') {
+                window.initializeColorsManagement();
+            } else if (typeof ColorsManagement !== 'undefined') {
+                if (window.colorsManagement) {
+                    delete window.colorsManagement;
+                }
+                try {
+                    window.colorsManagement = new ColorsManagement();
+                } catch (error) {
+                    console.error('Error initializing ColorsManagement:', error);
+                }
+            } else {
+                // Script not loaded, load it dynamically
+                const script = document.createElement('script');
+                script.src = '/js/admin/colors.js?v=HuynhNgocThang';
+                script.onload = function() {
+                    if (typeof window.initializeColorsManagement === 'function') {
+                        window.initializeColorsManagement();
+                    }
+                };
+                script.onerror = function() {
+                    console.error('Failed to load colors.js');
+                };
+                document.body.appendChild(script);
+            }
+        }
     }
     
     // Intercept sidebar navigation clicks

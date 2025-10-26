@@ -19,7 +19,7 @@ class NotificationSystem {
     init() {
         // Tạo container cho notifications
         this.createNotificationContainer();
-        console.log('✅ Notification system initialized');
+        console.log('Notification system initialized');
     }
 
     /**
