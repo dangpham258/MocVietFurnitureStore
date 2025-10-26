@@ -184,20 +184,35 @@
                             <form class="needs-validation" th:action="@{/admin/profile/change-password}" method="post" th:object="${passwordChangeRequest}" novalidate>
                                 <div class="mb-3">
                                     <label class="form-label">Mật khẩu hiện tại *</label>
-                                    <input type="password" class="form-control" th:field="*{currentPassword}" required>
+                                    <div class="input-group">
+                                        <input type="password" class="form-control" name="currentPassword" id="currentPassword" required>
+                                        <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('currentPassword', this)">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </div>
                                     <div class="invalid-feedback" th:if="${#fields.hasErrors('currentPassword')}" th:errors="*{currentPassword}"></div>
                                 </div>
                                 
                                 <div class="mb-3">
                                     <label class="form-label">Mật khẩu mới *</label>
-                                    <input type="password" class="form-control" th:field="*{newPassword}" required minlength="8">
+                                    <div class="input-group">
+                                        <input type="password" class="form-control" name="newPassword" id="newPassword" required minlength="8">
+                                        <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('newPassword', this)">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </div>
                                     <div class="form-text">Mật khẩu phải có ít nhất 8 ký tự</div>
                                     <div class="invalid-feedback" th:if="${#fields.hasErrors('newPassword')}" th:errors="*{newPassword}"></div>
                                 </div>
                                 
                                 <div class="mb-3">
                                     <label class="form-label">Xác nhận mật khẩu mới *</label>
-                                    <input type="password" class="form-control" th:field="*{confirmPassword}" required minlength="8">
+                                    <div class="input-group">
+                                        <input type="password" class="form-control" name="confirmPassword" id="confirmPassword" required minlength="8">
+                                        <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('confirmPassword', this)">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </div>
                                     <div class="invalid-feedback" th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}"></div>
                                 </div>
                                 

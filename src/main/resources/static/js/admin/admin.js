@@ -482,8 +482,29 @@ function initializeBootstrapComponents() {
     }
 
     // ========================================
-    // 7. FORM VALIDATION (NON-PROFILE FORMS ONLY)
+    // 7. FORM VALIDATION & PASSWORD TOGGLE
     // ========================================
+    
+    // Global function for password toggle
+    window.togglePassword = function(inputId, button) {
+        const input = document.getElementById(inputId);
+        const icon = button.querySelector('i');
+        
+        if (!input || !icon) {
+            console.error('Input or icon not found:', inputId);
+            return;
+        }
+        
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.remove('bi-eye');
+            icon.classList.add('bi-eye-slash');
+        } else {
+            input.type = 'password';
+            icon.classList.remove('bi-eye-slash');
+            icon.classList.add('bi-eye');
+        }
+    };
     
     // Chỉ xử lý validation cho các form KHÔNG phải profile
     const forms = document.querySelectorAll('.needs-validation');
@@ -523,7 +544,7 @@ function initializeBootstrapComponents() {
     });
 
     // ========================================
-    // 7. TÍNH NĂNG BẢNG DỮ LIỆU
+    // 8. TÍNH NĂNG BẢNG DỮ LIỆU
     // ========================================
     
     // Cải thiện bảng dữ liệu với sorting
@@ -541,7 +562,7 @@ function initializeBootstrapComponents() {
     });
 
     // ========================================
-    // 8. CẢI THIỆN MODAL
+    // 9. CẢI THIỆN MODAL
     // ========================================
     
     // Tự động focus vào input đầu tiên khi modal mở
@@ -558,7 +579,7 @@ function initializeBootstrapComponents() {
     });
 
     // ========================================
-    // 9. TÍNH NĂNG TÌM KIẾM
+    // 10. TÍNH NĂNG TÌM KIẾM
     // ========================================
     
     // Tìm kiếm trong bảng dữ liệu
@@ -583,7 +604,7 @@ function initializeBootstrapComponents() {
     });
 
     // ========================================
-    // 10. XÁC NHẬN XÓA
+    // 11. XÁC NHẬN XÓA
     // ========================================
     
     // Hiển thị dialog xác nhận trước khi xóa
@@ -598,7 +619,7 @@ function initializeBootstrapComponents() {
 
 
     // ========================================
-    // 11. AJAX NAVIGATION - KHÔNG RELOAD SIDEBAR
+    // 12. AJAX NAVIGATION - KHÔNG RELOAD SIDEBAR
     // ========================================
     
     // Hàm load content bằng AJAX

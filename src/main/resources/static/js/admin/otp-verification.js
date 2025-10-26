@@ -14,6 +14,7 @@ class OTPVerification {
         this.otpModal = null;
         this.currentForm = null;
         this.currentFormData = null;
+        this.originalFormData = null; // Lưu trữ dữ liệu ban đầu để so sánh
         this.otpEndpoint = '';
         this.submitEndpoint = '';
         this.isProcessing = false;
@@ -190,6 +191,20 @@ class OTPVerification {
         // Loại bỏ OTP field khi gửi request send-otp
         delete data.otpCode;
         
+        // Kiểm tra xem có thay đổi gì không
+        if (this.originalFormData) {
+            const hasChanges = this.hasChanges(data, this.originalFormData);
+            
+            if (!hasChanges) {
+                console.log('⚠️ OTP: No changes detected');
+                this.showNotification('Thông tin chưa được chỉnh sửa', 'warning');
+                return;
+            }
+        }
+        
+        // Hiển thị notification đang xử lý
+        this.showNotification('Đang xử lý thông tin...', 'info');
+        
         // Bỏ qua HTML5 validation, để backend DTO handle
         console.log('✅ OTP: Form data collected, sending to backend for validation');
         
@@ -203,12 +218,36 @@ class OTPVerification {
     }
     
     /**
+     * So sánh dữ liệu mới và dữ liệu ban đầu để kiểm tra có thay đổi không
+     */
+    hasChanges(newData, originalData) {
+        // So sánh tất cả các trường trừ username (không thể thay đổi)
+        const fieldsToCompare = ['email', 'fullName', 'phone', 'gender', 'dob'];
+        
+        for (const field of fieldsToCompare) {
+            const newValue = newData[field] || '';
+            const oldValue = originalData[field] || '';
+            
+            // So sánh giá trị đã được normalize (trim whitespace)
+            if (newValue.trim() !== oldValue.trim()) {
+                console.log(`📝 Change detected in ${field}: "${oldValue}" → "${newValue}"`);
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    /**
      * Handle password form submission
      */
     async handlePasswordSubmit(event) {
         event.preventDefault();
         
         if (this.isProcessing) return;
+        
+        // Hiển thị notification đang xử lý
+        this.showNotification('Đang xử lý mật khẩu...', 'info');
         
         const form = event.target;
         const formData = new FormData(form);
@@ -653,6 +692,23 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(() => {
             window.otpVerificationInstance = new OTPVerification();
             console.log('OTP Verification system initialized');
+            
+            // Lưu trữ dữ liệu ban đầu của profile form
+            const profileForm = document.querySelector('form[action*="/admin/profile/update"]');
+            if (profileForm) {
+                const formData = new FormData(profileForm);
+                const data = Object.fromEntries(formData.entries());
+                
+                // Convert date string to proper format if exists
+                if (data.dob) {
+                    const date = new Date(data.dob);
+                    data.dob = date.toISOString().split('T')[0];
+                }
+                
+                // Lưu dữ liệu ban đầu
+                window.otpVerificationInstance.originalFormData = data;
+                console.log('✅ Original form data saved:', data);
+            }
             
             // Force override after initialization
             setTimeout(() => {

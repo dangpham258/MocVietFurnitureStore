@@ -855,3 +855,37 @@ body, html {
         transform: translateY(0);
     }
 }
+
+/* ========================================
+   18. PASSWORD TOGGLE STYLES - Nút ẩn/hiện mật khẩu
+   ======================================== */
+
+.input-group .btn-outline-secondary {
+    border-left: none;
+    border-color: #ced4da;
+    transition: all 0.3s ease;
+}
+
+.input-group .btn-outline-secondary:hover {
+    background-color: #e9ecef;
+    border-color: #ced4da;
+}
+
+.input-group .btn-outline-secondary:focus {
+    box-shadow: none;
+    border-color: #80bdff;
+}
+
+.input-group .btn-outline-secondary i {
+    font-size: 1.1rem;
+}
+
+/* Đảm bảo input không bị border conflict */
+.input-group .form-control:focus {
+    border-right: none;
+}
+
+.input-group .form-control:focus + .btn-outline-secondary {
+    border-left: none;
+    border-color: #80bdff;
+}
