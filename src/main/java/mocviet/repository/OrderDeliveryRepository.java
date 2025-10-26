@@ -1,12 +1,14 @@
 package mocviet.repository;
 
 import mocviet.entity.OrderDelivery;
+import mocviet.entity.Orders;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface OrderDeliveryRepository extends JpaRepository<OrderDelivery, Integer> {
@@ -15,4 +17,6 @@ public interface OrderDeliveryRepository extends JpaRepository<OrderDelivery, In
     int countByDeliveryTeamAndStatusIn(@Param("team") mocviet.entity.DeliveryTeam team, @Param("statuses") List<OrderDelivery.DeliveryStatus> statuses);
     
     long countByStatus(OrderDelivery.DeliveryStatus status);
+    
+    Optional<OrderDelivery> findByOrder(Orders order);
 }

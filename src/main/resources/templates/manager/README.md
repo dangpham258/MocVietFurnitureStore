@@ -1,7 +1,7 @@
 # Manager Dashboard - Mộc Việt
 
 ## Tổng quan
-Module quản lý tài khoản Manager và phân công đội giao hàng cho hệ thống bán hàng nội thất Mộc Việt.
+Module quản lý tài khoản Manager, phân công đội giao hàng và quản lý đơn hàng cho hệ thống bán hàng nội thất Mộc Việt.
 
 ## Cấu trúc thư mục
 
@@ -9,7 +9,8 @@ Module quản lý tài khoản Manager và phân công đội giao hàng cho h�
 src/main/java/mocviet/
 ├── controller/manager/
 │   ├── ManagerController.java          # Controller chính cho manager
-│   └── DeliveryAssignmentController.java    # Controller phân công đội giao hàng
+│   ├── DeliveryAssignmentController.java    # Controller phân công đội giao hàng
+│   └── OrderManagementController.java       # Controller quản lý đơn hàng
 ├── dto/manager/
 │   ├── UpdateProfileRequest.java       # DTO cho cập nhật profile
 │   ├── ChangePasswordRequest.java      # DTO cho đổi mật khẩu
@@ -18,10 +19,16 @@ src/main/java/mocviet/
 │   ├── DeliveryTeamDTO.java                 # DTO thông tin đội giao hàng
 │   ├── OrderDeliveryDTO.java                # DTO thông tin giao hàng
 │   ├── PendingOrderDTO.java                 # DTO đơn hàng cần phân công
-│   └── ZoneDTO.java                         # DTO thông tin khu vực
+│   ├── ZoneDTO.java                         # DTO thông tin khu vực
+│   ├── OrderManagementDTO.java              # DTO chi tiết đơn hàng
+│   ├── OrderListDTO.java                    # DTO danh sách đơn hàng
+│   ├── ReturnRequestDTO.java                # DTO yêu cầu trả hàng
+│   └── OrderActionRequest.java              # DTO request actions
 ├── service/manager/
 │   ├── ManagerAccountService.java      # Service xử lý logic quản lý tài khoản
-│   └── DeliveryAssignmentService.java       # Service xử lý logic phân công
+│   ├── DeliveryAssignmentService.java       # Service xử lý logic phân công
+│   ├── OrderManagementService.java          # Service quản lý đơn hàng
+│   └── OrderStoredProcedureService.java     # Service tích hợp stored procedures
 └── repository/
     ├── OrdersRepository.java                # Repository đơn hàng
     ├── OrderDeliveryRepository.java         # Repository giao hàng
@@ -43,12 +50,19 @@ src/main/resources/
 │   ├── account/
 │   │   ├── profile.html                # Trang quản lý tài khoản
 │   │   └── change-password.html        # Trang đổi mật khẩu
-│   └── delivery/
-│       ├── pending_orders.html        # Danh sách đơn cần phân công
-│       ├── assign_team.html           # Phân công đội giao hàng
-│       ├── change_team.html           # Thay đổi đội giao hàng
-│       ├── teams.html                 # Quản lý đội giao hàng
-│       └── zones.html                 # Quản lý khu vực giao hàng
+│   ├── delivery/
+│   │   ├── pending_orders.html        # Danh sách đơn cần phân công
+│   │   ├── assign_team.html           # Phân công đội giao hàng
+│   │   ├── change_team.html           # Thay đổi đội giao hàng
+│   │   ├── teams.html                 # Quản lý đội giao hàng
+│   │   └── zones.html                 # Quản lý khu vực giao hàng
+│   └── orders/
+│       ├── pending.html               # Danh sách đơn chờ xác nhận
+│       ├── pending-detail.html        # Chi tiết đơn chờ xác nhận
+│       ├── completed.html             # Danh sách đơn hoàn thành
+│       ├── completed-detail.html      # Chi tiết đơn hoàn thành
+│       ├── returns.html               # Danh sách yêu cầu trả hàng
+│       └── return-detail.html         # Chi tiết yêu cầu trả hàng
 ├── static/css/
 │   └── manager.css                     # CSS cho giao diện manager (đã cập nhật)
 └── static/js/
@@ -106,6 +120,37 @@ src/main/resources/
   - Thông tin các khu vực giao hàng
   - Phí vận chuyển và tỉnh/thành phụ trách
 
+### 5. Quản lý đơn hàng (`/manager/orders/*`)
+- **Xác nhận đơn hàng** (UC-MGR-ORD-ConfirmOrder)
+  - Xác nhận đơn hàng PENDING đã thanh toán
+  - Sử dụng stored procedure `sp_ConfirmOrder`
+  - Thông báo cho khách hàng
+  - Ghi log hoạt động
+
+- **Hủy đơn hàng** (UC-MGR-ORD-CancelOrder)
+  - Hủy đơn hàng PENDING
+  - Sử dụng stored procedure `sp_CancelOrder`
+  - Hoàn tiền tự động cho đơn online
+  - Hoàn lại tồn kho
+  - Thông báo cho khách hàng
+
+- **Xem đơn hàng hoàn thành** (UC-MGR-ORD-ViewCompleted)
+  - Danh sách đơn DELIVERED
+  - Filters theo thời gian, keyword
+  - Export Excel
+  - Chi tiết đơn hàng đầy đủ
+
+- **Duyệt yêu cầu trả hàng** (UC-MGR-ORD-ApproveReturn)
+  - Duyệt yêu cầu REQUESTED trong thời hạn 30 ngày
+  - Sử dụng stored procedure `sp_ApproveReturn`
+  - Phân công đội thu hồi
+  - Thông báo cho khách hàng và đội giao
+
+- **Từ chối yêu cầu trả hàng** (UC-MGR-ORD-RejectReturn)
+  - Từ chối yêu cầu REQUESTED
+  - Sử dụng stored procedure `sp_RejectReturn`
+  - Thông báo lý do từ chối cho khách hàng
+
 ## Bảo mật
 
 ### 1. Authentication & Authorization
@@ -139,6 +184,20 @@ src/main/resources/
 | GET | `/manager/delivery/zones` | Quản lý khu vực giao hàng | MANAGER |
 | GET | `/manager/delivery/api/teams/{orderId}` | Lấy danh sách đội giao phù hợp | MANAGER |
 | GET | `/manager/delivery/api/zone/{orderId}` | Lấy khu vực của đơn hàng | MANAGER |
+| GET | `/manager/orders/pending` | Danh sách đơn chờ xác nhận | MANAGER |
+| GET | `/manager/orders/pending/{id}` | Chi tiết đơn chờ xác nhận | MANAGER |
+| POST | `/manager/orders/pending/{id}/confirm` | Xác nhận đơn hàng | MANAGER |
+| POST | `/manager/orders/pending/{id}/cancel` | Hủy đơn hàng | MANAGER |
+| POST | `/manager/orders/pending/bulk-confirm` | Xác nhận hàng loạt | MANAGER |
+| POST | `/manager/orders/pending/bulk-cancel` | Hủy hàng loạt | MANAGER |
+| GET | `/manager/orders/completed` | Danh sách đơn hoàn thành | MANAGER |
+| GET | `/manager/orders/completed/{id}` | Chi tiết đơn hoàn thành | MANAGER |
+| GET | `/manager/orders/returns` | Danh sách yêu cầu trả hàng | MANAGER |
+| GET | `/manager/orders/returns/{id}` | Chi tiết yêu cầu trả hàng | MANAGER |
+| POST | `/manager/orders/returns/{id}/approve` | Duyệt yêu cầu trả hàng | MANAGER |
+| POST | `/manager/orders/returns/{id}/reject` | Từ chối yêu cầu trả hàng | MANAGER |
+| GET | `/manager/orders/api/{id}` | Lấy chi tiết đơn hàng (JSON) | MANAGER |
+| GET | `/manager/orders/api/returns/{id}` | Lấy chi tiết yêu cầu trả hàng (JSON) | MANAGER |
 
 ## Công nghệ sử dụng
 
@@ -176,6 +235,11 @@ URL: http://localhost:8080/manager/change-password
 URL: http://localhost:8080/manager/delivery/pending
 ```
 
+### 6. Quản lý đơn hàng
+```
+URL: http://localhost:8080/manager/orders/pending
+```
+
 ## Validation Rules
 
 ### UpdateProfileRequest
@@ -203,6 +267,14 @@ URL: http://localhost:8080/manager/delivery/pending
 - **Đội giao hàng mới phải hoạt động**
 - **Đội giao hàng mới phải phụ trách khu vực**
 - **Lý do thay đổi là bắt buộc**
+
+### Quản lý đơn hàng
+- **Trạng thái đơn hàng:** Chỉ xác nhận đơn PENDING, chỉ hủy đơn PENDING
+- **Thanh toán:** Đơn online phải đã thanh toán mới xác nhận được
+- **Trả hàng:** Chỉ duyệt/từ chối yêu cầu REQUESTED
+- **Thời hạn trả hàng:** Trong vòng 30 ngày sau giao hàng
+- **Đội giao:** Phải có đội giao phù hợp để thu hồi
+- **Lý do:** Bắt buộc nhập lý do khi hủy đơn hoặc từ chối trả hàng
 
 ## Error Handling
 
@@ -232,6 +304,15 @@ URL: http://localhost:8080/manager/delivery/pending
 
 ### Stored Procedures sử dụng
 - `sp_MarkDispatched` - Đánh dấu đơn đã xuất kho
+- `sp_ConfirmOrder` - Xác nhận đơn hàng
+- `sp_CancelOrder` - Hủy đơn hàng và hoàn kho
+- `sp_ApproveReturn` - Duyệt yêu cầu trả hàng
+- `sp_RejectReturn` - Từ chối yêu cầu trả hàng
+- `sp_RequestReturn` - Khách hàng yêu cầu trả hàng
+- `sp_ReturnOrder` - Xử lý trả hàng và hoàn tiền
+- `sp_MarkDelivered` - Đánh dấu đơn đã giao thành công
+- `sp_HandlePaymentWebhook` - Xử lý webhook thanh toán
+- `sp_AutoCancelUnpaidOnline` - Tự động hủy đơn online chưa thanh toán
 - Triggers tự động gửi thông báo cho đội giao hàng
 
 ## Tính năng đặc biệt
@@ -256,12 +337,30 @@ URL: http://localhost:8080/manager/delivery/pending
 - Theo dõi lịch sử thay đổi đội giao hàng
 - Ghi log đầy đủ mọi thao tác
 
+### Bulk Operations
+- Xác nhận nhiều đơn hàng cùng lúc
+- Hủy nhiều đơn hàng cùng lúc
+- Giao diện checkbox để chọn đơn hàng
+
+### Advanced Filtering
+- Tìm kiếm theo mã đơn hàng, tên khách hàng
+- Lọc theo khoảng thời gian
+- Sắp xếp theo nhiều tiêu chí
+- Phân trang với nhiều tùy chọn
+
+### Smart Notifications
+- Cảnh báo đơn hàng sắp hết hạn trả hàng
+- Thông báo đơn hàng quá thời hạn trả hàng
+- Hiển thị trạng thái thanh toán rõ ràng
+
 ## Logging & Audit
 
 ### 1. Activity Logging
 - Ghi log mọi thay đổi thông tin cá nhân
 - Ghi log đổi mật khẩu
 - Ghi log phân công đội giao hàng
+- Ghi log xác nhận/hủy đơn hàng
+- Ghi log duyệt/từ chối trả hàng
 - Sử dụng Spring AOP (có thể implement thêm)
 
 ### 2. Security Logging
@@ -269,6 +368,8 @@ URL: http://localhost:8080/manager/delivery/pending
 - Log password change attempts
 - Log profile update attempts
 - Log delivery assignment changes
+- Log order management actions
+- Log return request processing
 
 ## Performance
 
@@ -327,6 +428,10 @@ spring.session.timeout=30m
 - **403 Forbidden:** Kiểm tra role của user
 - **Validation errors:** Kiểm tra input format
 - **Database errors:** Kiểm tra connection và constraints
+- **"Chỉ xác nhận được đơn hàng ở trạng thái PENDING"** - Đơn hàng đã được xử lý
+- **"Đơn hàng online chưa thanh toán"** - Cần kiểm tra trạng thái thanh toán
+- **"Quá thời hạn trả hàng (30 ngày)"** - Yêu cầu trả hàng đã hết hạn
+- **"Không có đội giao phù hợp"** - Cần tạo đội giao hàng trước
 
 ### 2. Debug Mode
 ```properties
@@ -334,6 +439,12 @@ spring.session.timeout=30m
 logging.level.mocviet=DEBUG
 spring.jpa.show-sql=true
 ```
+
+### 3. Giải pháp
+- Kiểm tra trạng thái đơn hàng hiện tại
+- Xác nhận thông tin thanh toán
+- Kiểm tra thời gian giao hàng
+- Tạo/cấu hình đội giao hàng
 
 ## Future Enhancements
 

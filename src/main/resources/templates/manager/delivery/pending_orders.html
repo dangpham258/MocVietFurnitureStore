@@ -158,16 +158,14 @@
                 </nav>
             </div>
         </div>
-    </div>
 
-    <!-- JavaScript -->
-    <script th:src="@{/js/delivery-assignment.js}"></script>
-    <script>
-        function refreshPage() {
-            // Làm mới trang với các tham số hiện tại
-            const urlParams = new URLSearchParams(window.location.search);
-            window.location.href = '/manager/delivery/pending?' + urlParams.toString();
-        }
+        <!-- JavaScript -->
+        <script th:inline="javascript">
+            function refreshPage() {
+                // Làm mới trang với các tham số hiện tại
+                const urlParams = new URLSearchParams(window.location.search);
+                window.location.href = '/manager/delivery/pending?' + urlParams.toString();
+            }
         
         function viewOrderDetails(orderId) {
             if (!orderId || orderId === 'null' || orderId === '') {
@@ -353,6 +351,7 @@
             const modal = new bootstrap.Modal(document.getElementById('orderDetailsModal'));
             modal.show();
         }
-    </script>
+        </script>
+    </div>
 </body>
 </html>

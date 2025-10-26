@@ -168,8 +168,7 @@
     </div>
 
     <!-- JavaScript -->
-    <script th:src="@{/js/delivery-assignment.js}"></script>
-    <script>
+    <script th:inline="javascript">
         function refreshPage() {
             // Làm mới trang với các tham số hiện tại
             const urlParams = new URLSearchParams(window.location.search);

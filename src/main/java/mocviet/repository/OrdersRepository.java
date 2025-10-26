@@ -193,4 +193,58 @@ public interface OrdersRepository extends JpaRepository<Orders, Integer> {
         List<Orders> findByCreatedAtAfterAndStatus(LocalDateTime dateTime, Orders.OrderStatus status);
         
         List<Orders> findTop10ByOrderByCreatedAtDesc();
+        
+        // Additional methods for order management
+        Page<Orders> findByStatus(Orders.OrderStatus status, Pageable pageable);
+        
+        Page<Orders> findByReturnStatus(Orders.ReturnStatus returnStatus, Pageable pageable);
+        
+        @Query("SELECT o FROM Orders o WHERE o.status = :status AND " +
+               "(CAST(o.id AS string) LIKE %:keyword% OR o.user.fullName LIKE %:keyword%)")
+        Page<Orders> findByStatusAndKeyword(@Param("status") Orders.OrderStatus status, 
+                                           @Param("keyword") String keyword, 
+                                           Pageable pageable);
+        
+        @Query("SELECT o FROM Orders o WHERE o.status = :status AND o.createdAt BETWEEN :fromDate AND :toDate")
+        Page<Orders> findByStatusAndCreatedAtBetween(@Param("status") Orders.OrderStatus status,
+                                                    @Param("fromDate") LocalDateTime fromDate,
+                                                    @Param("toDate") LocalDateTime toDate,
+                                                    Pageable pageable);
+        
+        // Query cho đơn hàng hoàn thành (DELIVERED và không trong quy trình trả hàng)
+        @Query("SELECT o FROM Orders o WHERE o.status = :status AND " +
+               "(o.returnStatus IS NULL OR o.returnStatus = :rejectedStatus)")
+        Page<Orders> findCompletedOrders(@Param("status") Orders.OrderStatus status,
+                                         @Param("rejectedStatus") Orders.ReturnStatus rejectedStatus,
+                                         Pageable pageable);
+        
+        @Query("SELECT o FROM Orders o WHERE o.status = :status AND " +
+               "(o.returnStatus IS NULL OR o.returnStatus = :rejectedStatus) AND " +
+               "(CAST(o.id AS string) LIKE %:keyword% OR o.user.fullName LIKE %:keyword%)")
+        Page<Orders> findCompletedOrdersWithKeyword(@Param("status") Orders.OrderStatus status,
+                                                    @Param("rejectedStatus") Orders.ReturnStatus rejectedStatus,
+                                                    @Param("keyword") String keyword,
+                                                    Pageable pageable);
+        
+        @Query("SELECT o FROM Orders o WHERE o.status = :status AND " +
+               "(o.returnStatus IS NULL OR o.returnStatus = :rejectedStatus) AND " +
+               "o.createdAt BETWEEN :fromDate AND :toDate")
+        Page<Orders> findCompletedOrdersWithDateRange(@Param("status") Orders.OrderStatus status,
+                                                      @Param("rejectedStatus") Orders.ReturnStatus rejectedStatus,
+                                                      @Param("fromDate") LocalDateTime fromDate,
+                                                      @Param("toDate") LocalDateTime toDate,
+                                                      Pageable pageable);
+        
+        // Query cho đơn hàng đã hoàn trả thành công
+        @Query("SELECT o FROM Orders o WHERE o.status = :status AND o.returnStatus = :returnStatus")
+        Page<Orders> findReturnedOrders(@Param("status") Orders.OrderStatus status,
+                                        @Param("returnStatus") Orders.ReturnStatus returnStatus,
+                                        Pageable pageable);
+        
+        @Query("SELECT o FROM Orders o WHERE o.status = :status AND o.returnStatus = :returnStatus AND " +
+               "(CAST(o.id AS string) LIKE %:keyword% OR o.user.fullName LIKE %:keyword%)")
+        Page<Orders> findReturnedOrdersWithKeyword(@Param("status") Orders.OrderStatus status,
+                                                   @Param("returnStatus") Orders.ReturnStatus returnStatus,
+                                                   @Param("keyword") String keyword,
+                                                   Pageable pageable);
 }

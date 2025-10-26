@@ -7,6 +7,9 @@ document.addEventListener('DOMContentLoaded', function() {
         return new bootstrap.Tooltip(tooltipTriggerEl);
     });
 
+    // Initialize sidebar submenu
+    initializeSidebarSubmenu();
+
     // Auto-hide alerts after 5 seconds
     setTimeout(function() {
         var alerts = document.querySelectorAll('.alert');
@@ -441,6 +444,44 @@ function bulkAction(action) {
 document.addEventListener('DOMContentLoaded', function() {
     initializeProductManagement();
 });
+
+// Sidebar submenu functionality
+function initializeSidebarSubmenu() {
+    const submenuToggles = document.querySelectorAll('[data-bs-toggle="collapse"]');
+    
+    submenuToggles.forEach(toggle => {
+        const target = document.querySelector(toggle.getAttribute('data-bs-target'));
+        const chevron = toggle.querySelector('.fa-chevron-down');
+        
+        if (target && chevron) {
+            // Check if any submenu item is active
+            const activeSubmenuItem = target.querySelector('.nav-link.active');
+            if (activeSubmenuItem) {
+                // Show submenu if active item exists
+                target.classList.add('show');
+                toggle.setAttribute('aria-expanded', 'true');
+                chevron.style.transform = 'rotate(180deg)';
+            }
+            
+            // Handle toggle click
+            toggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const isExpanded = toggle.getAttribute('aria-expanded') === 'true';
+                
+                if (isExpanded) {
+                    target.classList.remove('show');
+                    toggle.setAttribute('aria-expanded', 'false');
+                    chevron.style.transform = 'rotate(0deg)';
+                } else {
+                    target.classList.add('show');
+                    toggle.setAttribute('aria-expanded', 'true');
+                    chevron.style.transform = 'rotate(180deg)';
+                }
+            });
+        }
+    });
+}
 
 // Export functions to global scope
 window.togglePassword = togglePassword;
