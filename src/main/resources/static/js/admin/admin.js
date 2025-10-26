@@ -786,6 +786,13 @@ function initializeBootstrapComponents() {
                 classRef: 'DeliveryTeamsManagement',
                 instanceName: 'deliveryTeamsManagement',
                 initFunction: 'initializeDeliveryTeamsManagement'
+            },
+            {
+                urlPattern: '/admin/social-links',
+                scriptPath: '/js/admin/social-links.js',
+                classRef: 'SocialLinksManagement',
+                instanceName: 'socialLinksManagement',
+                initFunction: 'initializeSocialLinksManagement'
             }
         ];
         

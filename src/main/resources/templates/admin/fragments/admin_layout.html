@@ -112,5 +112,8 @@
     <!-- Delivery Teams Management JS - Chỉ load ở trang delivery-teams -->
     <script th:if="${activeMenu == 'delivery-teams'}" 
             th:src="@{/js/admin/delivery-teams.js(v=${jsVersion ?: 'HuynhNgocThang'})}"></script>
+    <!-- Social Links Management JS - Chỉ load ở trang social-links -->
+    <script th:if="${activeMenu == 'social-links'}" 
+            th:src="@{/js/admin/social-links.js(v=${jsVersion ?: 'HuynhNgocThang'})}"></script>
 </body>
 </html>

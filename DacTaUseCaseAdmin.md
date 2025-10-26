@@ -119,3 +119,19 @@ Alternative 4a. Nếu một đội chưa có khu vực nào 5a. Hiển thị "Ch
 Exception 9a. User không có vai trò DELIVERY 10a. Hiển thị thông báo "User phải có vai trò DELIVERY" 11a. Yêu cầu chọn user khác 9b. User đã được gán vào đội khác 10b. Hiển thị thông báo "User đã được gán vào đội khác" 11b. Yêu cầu chọn user khác 26a. Đội đã phục vụ zone này 27a. Hiển thị thông báo "Đội đã phục vụ khu vực này" 28a. Giữ modal mở 31a. Lỗi hệ thống 32a. Hiển thị thông báo "Có lỗi xảy ra" 33a. Cho phép thử lại
 
 Bảng 3-7. Use case Quản lý đội giao hàng
+
+---
+
+## UC_008 - Quản lý liên kết mạng xã hội (Manage social links)
+
+Use case ID UC_008
+Name Manage social links
+Goal Quản lý liên kết mạng xã hội (Facebook, Zalo, Youtube) - Cập nhật URL và bật/tắt hiển thị
+Actors Quản trị viên (Admin)
+Pre-conditions Đã đăng nhập vào hệ thống với vai trò ADMIN
+Post-conditions - Nếu thành công, liên kết mạng xã hội được cập nhật hoặc trạng thái hiển thị được thay đổi - Nếu thất bại, hiển thị thông báo lỗi
+Main Flow 1. Vào trang quản lý liên kết mạng xã hội (/admin/social-links) 2. Hệ thống hiển thị 3 card tương ứng với 3 nền tảng: Facebook (primary), Zalo (info), Youtube (danger) 3. Mỗi card hiển thị: Header với icon và tên nền tảng + badge trạng thái (Đang hiển thị/Đã ẩn), URL hiện tại, Nút "Cập nhật link" (outline), Nút "Truy cập liên kết" (filled, chỉ hiển thị khi có URL), Footer với thông tin trạng thái 4. Nếu chưa có URL, hiển thị "Chưa cập nhật" và nút "Truy cập liên kết" bị ẩn 5. Click nút "Cập nhật link" trên một card 6. Modal hiển thị form cập nhật: Nền tảng (readonly), URL (bắt buộc, type=url), Checkbox "Hiển thị trên website" (on/off) 7. Nhập URL mới hoặc sửa URL hiện tại, chọn trạng thái hiển thị, click "Cập nhật" 8. Hệ thống kiểm tra URL hợp lệ (format URL) 9. Nếu liên kết đã tồn tại: cập nhật URL và trạng thái cho platform tương ứng 10. Nếu liên kết chưa tồn tại: tạo liên kết mới cho platform tương ứng 11. Hiển thị thông báo "Cập nhật liên kết thành công" 12. Cập nhật card tương ứng (URL, trạng thái, badge) và đóng modal 13. Click nút "Truy cập liên kết" để mở liên kết trong tab mới (chỉ khi có URL) 14. Hiển thị thông báo "Cập nhật liên kết thành công" khi cập nhật thành công
+Alternative 6a. Nếu liên kết đã có ID (đã tồn tại trong DB): gọi API PUT 6b. Nếu liên kết chưa có ID (chưa tồn tại): gọi API POST
+Exception 7a. URL không hợp lệ 8a. Hiển thị thông báo "Vui lòng nhập URL hợp lệ" 9a. Giữ modal mở để sửa 8b. Lỗi hệ thống 9b. Hiển thị thông báo "Có lỗi xảy ra" 10b. Cho phép thử lại 8c. Platform đã tồn tại (khi tạo mới) 9c. Hiển thị thông báo "Platform đã tồn tại" 10c. Giữ modal mở để sửa
+
+Bảng 3-8. Use case Quản lý liên kết mạng xã hội
