@@ -1080,3 +1080,30 @@ body, html {
 #showroomList table {
     margin-bottom: 0;
 }
+
+/* =========================================================
+   PAGES MANAGEMENT STYLES
+   ========================================================= */
+
+/* HTML editor textarea */
+#pageContentTextarea {
+    font-family: 'Courier New', Consolas, monospace;
+    line-height: 1.6;
+}
+
+/* Page preview in view modal */
+#viewContent {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+#viewContent img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Code display for slug */
+code.text-primary {
+    font-size: 0.9em;
+    font-weight: 500;
+}

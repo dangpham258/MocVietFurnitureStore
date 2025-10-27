@@ -2,498 +2,315 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{admin/fragments/admin_layout}">
 <head>
-    <title>Quản lý trang tĩnh - Admin Panel</title>
+    <title>Quản lý Trang Tĩnh - Admin Panel</title>
+    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet">
 </head>
 <body>
 <div layout:fragment="content" th:fragment="content" class="main-content">
-    <!-- Page Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h2 class="mb-1">Quản lý trang tĩnh</h2>
-            <p class="text-muted mb-0">Quản lý các trang tĩnh của website</p>
-        </div>
-        <div>
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addPageModal">
-                <i class="bi bi-plus-circle me-1"></i>Tạo trang mới
+    
+    <div class="container-fluid p-4">
+        <!-- Header Section -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="mb-1">
+                    <i class="bi bi-file-text me-2 text-primary"></i>Quản lý Trang Tĩnh
+                </h3>
+                <p class="text-muted small mb-0">Quản lý các trang chính sách, giới thiệu, hỗ trợ</p>
+            </div>
+            <button class="btn btn-primary btn-lg" onclick="openAddPageModal()">
+                <i class="bi bi-plus-circle me-2"></i>Thêm Trang Tĩnh
             </button>
         </div>
-    </div>
 
-    <!-- Stats Cards -->
-    <div class="row mb-4">
-        <div class="col-md-3 mb-3">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-shrink-0">
-                            <div class="bg-primary bg-opacity-10 rounded-circle p-3">
-                                <i class="bi bi-file-text text-primary fs-4"></i>
+        <!-- Stats Cards -->
+        <div class="row mb-4">
+            <div class="col-12 mb-2">
+                <small class="text-muted">
+                    <i class="bi bi-info-circle me-1"></i>
+                    Thống kê dựa trên bộ lọc hiện tại
+                </small>
+            </div>
+            
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <div class="bg-primary bg-opacity-10 rounded-circle p-3">
+                                    <i class="bi bi-file-text text-primary fs-4"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h5 class="card-title mb-0" id="totalPages">0</h5>
+                                <small class="text-muted">Tổng trang</small>
                             </div>
                         </div>
-                        <div class="flex-grow-1 ms-3">
-                            <h5 class="card-title mb-0">8</h5>
-                            <small class="text-muted">Tổng trang</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <div class="bg-success bg-opacity-10 rounded-circle p-3">
+                                    <i class="bi bi-check-circle text-success fs-4"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h5 class="card-title mb-0" id="activePages">0</h5>
+                                <small class="text-muted">Đang hiển thị</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <div class="bg-secondary bg-opacity-10 rounded-circle p-3">
+                                    <i class="bi bi-eye-slash text-secondary fs-4"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h5 class="card-title mb-0" id="inactivePages">0</h5>
+                                <small class="text-muted">Đã ẩn</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <div class="bg-info bg-opacity-10 rounded-circle p-3">
+                                    <i class="bi bi-clock-history text-info fs-4"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h5 class="card-title mb-0" id="recentUpdates">0</h5>
+                                <small class="text-muted">Cập nhật gần đây</small>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-3 mb-3">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-shrink-0">
-                            <div class="bg-success bg-opacity-10 rounded-circle p-3">
-                                <i class="bi bi-check-circle text-success fs-4"></i>
-                            </div>
-                        </div>
-                        <div class="flex-grow-1 ms-3">
-                            <h5 class="card-title mb-0">6</h5>
-                            <small class="text-muted">Đang hiển thị</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3 mb-3">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-shrink-0">
-                            <div class="bg-warning bg-opacity-10 rounded-circle p-3">
-                                <i class="bi bi-clock text-warning fs-4"></i>
-                            </div>
-                        </div>
-                        <div class="flex-grow-1 ms-3">
-                            <h5 class="card-title mb-0">1</h5>
-                            <small class="text-muted">Chờ duyệt</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3 mb-3">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-shrink-0">
-                            <div class="bg-danger bg-opacity-10 rounded-circle p-3">
-                                <i class="bi bi-x-circle text-danger fs-4"></i>
-                            </div>
-                        </div>
-                        <div class="flex-grow-1 ms-3">
-                            <h5 class="card-title mb-0">1</h5>
-                            <small class="text-muted">Tạm dừng</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
-                    <!-- Filters -->
-                    <div class="card mb-4">
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-3">
-                                    <label class="form-label">Tìm kiếm</label>
-                                    <input type="text" class="form-control search-input" placeholder="Tìm theo tên trang..." data-target="#pagesTable">
-                                </div>
-                                <div class="col-md-2">
-                                    <label class="form-label">Loại trang</label>
-                                    <select class="form-select">
-                                        <option value="">Tất cả</option>
-                                        <option value="about">Giới thiệu</option>
-                                        <option value="policy">Chính sách</option>
-                                        <option value="contact">Liên hệ</option>
-                                        <option value="help">Hỗ trợ</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-2">
-                                    <label class="form-label">Trạng thái</label>
-                                    <select class="form-select">
-                                        <option value="">Tất cả</option>
-                                        <option value="active">Đang hiển thị</option>
-                                        <option value="pending">Chờ duyệt</option>
-                                        <option value="inactive">Tạm dừng</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-2">
-                                    <label class="form-label">Sắp xếp</label>
-                                    <select class="form-select">
-                                        <option value="created">Mới nhất</option>
-                                        <option value="updated">Cập nhật gần</option>
-                                        <option value="name">Tên A-Z</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-3 d-flex align-items-end">
-                                    <button class="btn btn-admin-primary me-2">
-                                        <i class="bi bi-funnel me-1"></i>Lọc
-                                    </button>
-                                    <button class="btn btn-outline-secondary">
-                                        <i class="bi bi-download me-1"></i>Xuất Excel
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+        <!-- Filters Section -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label small fw-bold">Tìm kiếm</label>
+                        <input type="text" class="form-control" id="searchInput" 
+                               placeholder="Tìm kiếm theo tiêu đề, slug...">
                     </div>
-
-    <!-- Data Table -->
-    <div class="card border-0 shadow-sm">
-        <div class="card-header bg-white">
-            <h5 class="card-title mb-0">
-                <i class="bi bi-file-text me-2"></i>
-                Danh sách trang tĩnh
-            </h5>
-        </div>
-        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-hover data-table" id="pagesTable">
-                                    <thead>
-                                        <tr>
-                                            <th data-sort="name">Tên trang</th>
-                                            <th>Slug</th>
-                                            <th>Loại</th>
-                                            <th>Người tạo</th>
-                                            <th>Ngày tạo</th>
-                                            <th>Ngày cập nhật</th>
-                                            <th>Trạng thái</th>
-                                            <th>Thao tác</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>
-                                                <div>
-                                                    <div class="fw-bold">Giới thiệu về Mộc Việt</div>
-                                                    <small class="text-muted">Trang giới thiệu công ty</small>
-                                                </div>
-                                            </td>
-                                            <td><code>/about</code></td>
-                                            <td><span class="badge bg-primary">Giới thiệu</span></td>
-                                            <td>Admin</td>
-                                            <td>2024-01-15</td>
-                                            <td>2024-03-20</td>
-                                            <td><span class="badge bg-success">Đang hiển thị</span></td>
-                                            <td>
-                                                <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#editPageModal">
-                                                    <i class="bi bi-pencil"></i>
-                                                </button>
-                                                <button class="btn btn-sm btn-outline-info me-1" data-bs-toggle="modal" data-bs-target="#viewPageModal">
-                                                    <i class="bi bi-eye"></i>
-                                                </button>
-                                                <button class="btn btn-sm btn-outline-danger btn-delete">
-                                                    <i class="bi bi-trash"></i>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div>
-                                                    <div class="fw-bold">Chính sách bảo mật</div>
-                                                    <small class="text-muted">Chính sách bảo mật thông tin</small>
-                                                </div>
-                                            </td>
-                                            <td><code>/privacy-policy</code></td>
-                                            <td><span class="badge bg-warning">Chính sách</span></td>
-                                            <td>Admin</td>
-                                            <td>2024-01-10</td>
-                                            <td>2024-02-15</td>
-                                            <td><span class="badge bg-success">Đang hiển thị</span></td>
-                                            <td>
-                                                <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#editPageModal">
-                                                    <i class="bi bi-pencil"></i>
-                                                </button>
-                                                <button class="btn btn-sm btn-outline-info me-1" data-bs-toggle="modal" data-bs-target="#viewPageModal">
-                                                    <i class="bi bi-eye"></i>
-                                                </button>
-                                                <button class="btn btn-sm btn-outline-danger btn-delete">
-                                                    <i class="bi bi-trash"></i>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div>
-                                                    <div class="fw-bold">Điều khoản sử dụng</div>
-                                                    <small class="text-muted">Điều khoản và điều kiện sử dụng</small>
-                                                </div>
-                                            </td>
-                                            <td><code>/terms-of-service</code></td>
-                                            <td><span class="badge bg-warning">Chính sách</span></td>
-                                            <td>Admin</td>
-                                            <td>2024-01-12</td>
-                                            <td>2024-01-12</td>
-                                            <td><span class="badge bg-success">Đang hiển thị</span></td>
-                                            <td>
-                                                <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#editPageModal">
-                                                    <i class="bi bi-pencil"></i>
-                                                </button>
-                                                <button class="btn btn-sm btn-outline-info me-1" data-bs-toggle="modal" data-bs-target="#viewPageModal">
-                                                    <i class="bi bi-eye"></i>
-                                                </button>
-                                                <button class="btn btn-sm btn-outline-danger btn-delete">
-                                                    <i class="bi bi-trash"></i>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div>
-                                                    <div class="fw-bold">Liên hệ với chúng tôi</div>
-                                                    <small class="text-muted">Thông tin liên hệ</small>
-                                                </div>
-                                            </td>
-                                            <td><code>/contact</code></td>
-                                            <td><span class="badge bg-info">Liên hệ</span></td>
-                                            <td>Admin</td>
-                                            <td>2024-01-08</td>
-                                            <td>2024-03-10</td>
-                                            <td><span class="badge bg-success">Đang hiển thị</span></td>
-                                            <td>
-                                                <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#editPageModal">
-                                                    <i class="bi bi-pencil"></i>
-                                                </button>
-                                                <button class="btn btn-sm btn-outline-info me-1" data-bs-toggle="modal" data-bs-target="#viewPageModal">
-                                                    <i class="bi bi-eye"></i>
-                                                </button>
-                                                <button class="btn btn-sm btn-outline-danger btn-delete">
-                                                    <i class="bi bi-trash"></i>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div>
-                                                    <div class="fw-bold">Hướng dẫn mua hàng</div>
-                                                    <small class="text-muted">Hướng dẫn chi tiết cách mua hàng</small>
-                                                </div>
-                                            </td>
-                                            <td><code>/shopping-guide</code></td>
-                                            <td><span class="badge bg-success">Hỗ trợ</span></td>
-                                            <td>Admin</td>
-                                            <td>2024-02-01</td>
-                                            <td>2024-02-01</td>
-                                            <td><span class="badge bg-warning">Chờ duyệt</span></td>
-                                            <td>
-                                                <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#editPageModal">
-                                                    <i class="bi bi-pencil"></i>
-                                                </button>
-                                                <button class="btn btn-sm btn-outline-info me-1" data-bs-toggle="modal" data-bs-target="#viewPageModal">
-                                                    <i class="bi bi-eye"></i>
-                                                </button>
-                                                <button class="btn btn-sm btn-outline-danger btn-delete">
-                                                    <i class="bi bi-trash"></i>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
+                    <div class="col-md-3">
+                        <label class="form-label small fw-bold">Trạng thái</label>
+                        <select class="form-select" id="statusFilter">
+                            <option value="">Tất cả</option>
+                            <option value="true">Đang hiển thị</option>
+                            <option value="false">Đã ẩn</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small fw-bold">Sắp xếp</label>
+                        <select class="form-select" id="sortFilter">
+                            <option value="updated_desc">Mới cập nhật</option>
+                            <option value="updated_asc">Cũ nhất</option>
+                            <option value="title_asc">Tiêu đề A-Z</option>
+                            <option value="title_desc">Tiêu đề Z-A</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button class="btn btn-outline-secondary w-100" onclick="resetFilters()">
+                            <i class="bi bi-arrow-clockwise me-1"></i>Đặt lại
+                        </button>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- Pages List -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <div id="loadingSpinner" class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Đang tải...</span>
+                    </div>
+                </div>
+
+                <div id="emptyState" class="text-center py-5 d-none">
+                    <i class="bi bi-file-earmark-x text-muted" style="font-size: 4rem;"></i>
+                    <h5 class="mt-3">Chưa có trang tĩnh nào</h5>
+                    <p class="text-muted">Hãy thêm trang tĩnh đầu tiên của bạn</p>
+                    <button class="btn btn-primary" onclick="openAddPageModal()">
+                        <i class="bi bi-plus-circle me-2"></i>Thêm trang tĩnh
+                    </button>
+                </div>
+
+                <div id="noResults" class="text-center py-5 d-none">
+                    <i class="bi bi-search text-muted" style="font-size: 4rem;"></i>
+                    <h5 class="mt-3">Không có kết quả phù hợp</h5>
+                    <p class="text-muted">Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm</p>
+                    <button class="btn btn-outline-secondary" onclick="resetFilters()">
+                        <i class="bi bi-arrow-clockwise me-2"></i>Đặt lại bộ lọc
+                    </button>
+                </div>
+
+                <div id="pagesContainer"></div>
             </div>
         </div>
     </div>
 
-    <!-- Add Page Modal -->
-    <div class="modal fade" id="addPageModal" tabindex="-1">
-        <div class="modal-dialog modal-xl">
+    <!-- Add/Edit Page Modal - Fullscreen for better UX -->
+    <div class="modal fade" id="addEditPageModal" tabindex="-1" aria-labelledby="addEditPageModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen-lg-down modal-xl">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Tạo trang tĩnh mới</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="modalTitle">
+                        <i class="bi bi-plus-circle me-2"></i>Thêm Trang Tĩnh Mới
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form class="needs-validation" novalidate>
-                        <div class="row">
-                            <div class="col-md-8">
-                                <div class="mb-3">
-                                    <label class="form-label">Tiêu đề trang *</label>
-                                    <input type="text" class="form-control" placeholder="VD: Giới thiệu về Mộc Việt" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Slug URL *</label>
-                                    <input type="text" class="form-control" placeholder="about" required>
-                                    <div class="form-text">URL sẽ là: /about</div>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Mô tả ngắn</label>
-                                    <textarea class="form-control" rows="2" placeholder="Mô tả ngắn về trang"></textarea>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Nội dung trang *</label>
-                                    <textarea class="form-control" rows="15" placeholder="Nhập nội dung trang..." required></textarea>
-                                </div>
+                    <!-- Loading overlay -->
+                    <div id="formLoadingOverlay" class="d-none" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.9); z-index: 1000; display: flex; align-items: center; justify-content: center;">
+                        <div class="text-center">
+                            <div class="spinner-border text-primary mb-2" role="status">
+                                <span class="visually-hidden">Đang tải...</span>
                             </div>
-                            <div class="col-md-4">
-                                <div class="mb-3">
-                                    <label class="form-label">Loại trang *</label>
-                                    <select class="form-select" required>
-                                        <option value="">Chọn loại</option>
-                                        <option value="about">Giới thiệu</option>
-                                        <option value="policy">Chính sách</option>
-                                        <option value="contact">Liên hệ</option>
-                                        <option value="help">Hỗ trợ</option>
-                                    </select>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Meta Title</label>
-                                    <input type="text" class="form-control" placeholder="SEO title">
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Meta Description</label>
-                                    <textarea class="form-control" rows="3" placeholder="SEO description"></textarea>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Keywords</label>
-                                    <input type="text" class="form-control" placeholder="keyword1, keyword2">
-                                </div>
-                                <div class="mb-3">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" checked>
-                                        <label class="form-check-label">Hiển thị ngay</label>
-                                    </div>
-                                </div>
-                                <div class="mb-3">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox">
-                                        <label class="form-check-label">Hiển thị trong menu</label>
-                                    </div>
-                                </div>
+                            <p class="mb-0 text-muted">Đang tải dữ liệu...</p>
+                        </div>
+                    </div>
+                    <form id="pageForm">
+                        <input type="hidden" id="pageId" name="id">
+                        
+                        <!-- Slug -->
+                        <div class="mb-3">
+                            <label for="pageSlug" class="form-label">Slug <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="pageSlug" name="slug" required
+                                   placeholder="chinh-sach-ban-hang">
+                            <div class="form-text">URL friendly (vd: chinh-sach-ban-hang)</div>
+                        </div>
+
+                        <!-- Title -->
+                        <div class="mb-3">
+                            <label for="pageTitle" class="form-label">Tiêu đề <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="pageTitle" name="title" required
+                                   placeholder="Chính sách bán hàng">
+                        </div>
+
+                        <!-- Content (Only for Edit) -->
+                        <div class="mb-3" id="contentSection" style="display: none;">
+                            <label for="pageContent" class="form-label">Nội dung HTML</label>
+                            <textarea id="pageContent" name="content"></textarea>
+                            <div class="form-text">Soạn thảo nội dung với trình biên tập HTML đầy đủ chức năng</div>
+                        </div>
+
+                        <!-- Status -->
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="pageIsActive" name="isActive" checked>
+                                <label class="form-check-label" for="pageIsActive">
+                                    Kích hoạt ngay
+                                </label>
                             </div>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="button" class="btn btn-admin-primary btn-submit">Tạo trang</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="cancelBtn">Hủy</button>
+                    <button type="button" class="btn btn-primary" onclick="savePage()" id="saveBtn">
+                        <span id="saveBtnText">
+                            <i class="bi bi-check-circle me-2"></i>Lưu
+                        </span>
+                        <span id="saveBtnLoading" class="d-none">
+                            <span class="spinner-border spinner-border-sm me-2" role="status"></span>Đang lưu...
+                        </span>
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Edit Page Modal -->
-    <div class="modal fade" id="editPageModal" tabindex="-1">
-        <div class="modal-dialog modal-xl">
+    <!-- View Page Modal - Fullscreen for better preview -->
+    <div class="modal fade" id="viewPageModal" tabindex="-1" aria-labelledby="viewPageModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen-lg-down modal-xl">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Chỉnh sửa trang tĩnh</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title" id="viewPageTitle">Chi tiết Trang Tĩnh</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
-                    <form class="needs-validation" novalidate>
-                        <div class="row">
-                            <div class="col-md-8">
-                                <div class="mb-3">
-                                    <label class="form-label">Tiêu đề trang *</label>
-                                    <input type="text" class="form-control" value="Giới thiệu về Mộc Việt" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Slug URL *</label>
-                                    <input type="text" class="form-control" value="about" required>
-                                    <div class="form-text">URL sẽ là: /about</div>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Mô tả ngắn</label>
-                                    <textarea class="form-control" rows="2">Trang giới thiệu công ty</textarea>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Nội dung trang *</label>
-                                    <textarea class="form-control" rows="15" required>Mộc Việt là công ty chuyên sản xuất và phân phối đồ nội thất gỗ cao cấp...
-
-Chúng tôi cam kết mang đến những sản phẩm chất lượng tốt nhất với giá cả hợp lý...</textarea>
-                                </div>
+                <div class="modal-body position-relative">
+                    <!-- Loading overlay -->
+                    <div id="viewLoadingOverlay" class="d-none" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.9); z-index: 1000; display: flex; align-items: center; justify-content: center;">
+                        <div class="text-center">
+                            <div class="spinner-border text-primary mb-2" role="status">
+                                <span class="visually-hidden">Đang tải...</span>
                             </div>
-                            <div class="col-md-4">
-                                <div class="mb-3">
-                                    <label class="form-label">Loại trang *</label>
-                                    <select class="form-select" required>
-                                        <option value="about" selected>Giới thiệu</option>
-                                        <option value="policy">Chính sách</option>
-                                        <option value="contact">Liên hệ</option>
-                                        <option value="help">Hỗ trợ</option>
-                                    </select>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Meta Title</label>
-                                    <input type="text" class="form-control" value="Giới thiệu Mộc Việt - Đồ nội thất gỗ cao cấp">
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Meta Description</label>
-                                    <textarea class="form-control" rows="3">Mộc Việt chuyên sản xuất đồ nội thất gỗ cao cấp với chất lượng tốt nhất</textarea>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Keywords</label>
-                                    <input type="text" class="form-control" value="nội thất gỗ, đồ gỗ cao cấp, mộc việt">
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Trạng thái</label>
-                                    <select class="form-select">
-                                        <option value="active" selected>Đang hiển thị</option>
-                                        <option value="pending">Chờ duyệt</option>
-                                        <option value="inactive">Tạm dừng</option>
-                                    </select>
-                                </div>
-                                <div class="mb-3">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" checked>
-                                        <label class="form-check-label">Hiển thị trong menu</label>
-                                    </div>
-                                </div>
-                            </div>
+                            <p class="mb-0 text-muted">Đang tải dữ liệu...</p>
                         </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="button" class="btn btn-admin-primary btn-submit">Cập nhật</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- View Page Modal -->
-    <div class="modal fade" id="viewPageModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Xem trước trang</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="row mb-3">
-                        <div class="col-6"><strong>Tiêu đề:</strong></div>
-                        <div class="col-6">Giới thiệu về Mộc Việt</div>
                     </div>
-                    <div class="row mb-3">
-                        <div class="col-6"><strong>Slug:</strong></div>
-                        <div class="col-6"><code>/about</code></div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Slug:</label>
+                        <p id="viewSlug" class="mb-0 text-muted"></p>
                     </div>
-                    <div class="row mb-3">
-                        <div class="col-6"><strong>Loại:</strong></div>
-                        <div class="col-6"><span class="badge bg-primary">Giới thiệu</span></div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Tiêu đề:</label>
+                        <p id="viewTitle" class="mb-0"></p>
                     </div>
-                    <div class="row mb-3">
-                        <div class="col-6"><strong>Trạng thái:</strong></div>
-                        <div class="col-6"><span class="badge bg-success">Đang hiển thị</span></div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Trạng thái:</label>
+                        <span id="viewStatus"></span>
                     </div>
-                    <hr>
-                    <h6>Nội dung:</h6>
-                    <div class="border p-3 rounded" style="max-height: 300px; overflow-y: auto;">
-                        <p><strong>Mộc Việt</strong> là công ty chuyên sản xuất và phân phối đồ nội thất gỗ cao cấp...</p>
-                        <p>Chúng tôi cam kết mang đến những sản phẩm chất lượng tốt nhất với giá cả hợp lý...</p>
-                        <p>Với hơn 10 năm kinh nghiệm trong ngành, Mộc Việt đã trở thành thương hiệu uy tín...</p>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Cập nhật lần cuối:</label>
+                        <p id="viewUpdatedAt" class="mb-0 text-muted"></p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Nội dung:</label>
+                        <div id="viewContent" class="border rounded p-3 bg-light"></div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                    <a href="/about" target="_blank" class="btn btn-primary">
-                        <i class="bi bi-box-arrow-up-right me-1"></i>Xem trang
-                    </a>
+                </div>
+            </div>
         </div>
     </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deletePageModal" tabindex="-1" aria-labelledby="deletePageModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">
+                        <i class="bi bi-exclamation-triangle me-2"></i>Xác nhận xóa
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Bạn có chắc chắn muốn xóa trang tĩnh này?</p>
+                    <p class="text-muted mb-0"><strong id="deletePageTitle"></strong></p>
+                    <input type="hidden" id="deletePageId">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-danger" onclick="confirmDelete()">
+                        <i class="bi bi-trash me-2"></i>Xóa
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
+
 </body>
 </html>

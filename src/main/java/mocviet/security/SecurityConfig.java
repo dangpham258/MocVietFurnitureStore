@@ -51,6 +51,12 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
+                // Role-based routes (must come first before catch-all)
+                .requestMatchers("/admin/**").hasRole("ADMIN")
+                .requestMatchers("/manager/**").hasRole("MANAGER")
+                .requestMatchers("/delivery/**").hasRole("DELIVERY")
+                .requestMatchers("/customer/**", "/profile/**", "/orders/**", "/cart/**", "/wishlist/**").hasRole("CUSTOMER")
+                // Public routes
                 .requestMatchers(
                     "/",
                     "/auth/**",
@@ -61,10 +67,8 @@ public class SecurityConfig {
                     "/images/**",
                     "/api/auth/**"
                 ).permitAll()
-                .requestMatchers("/admin/**").hasRole("ADMIN")
-                .requestMatchers("/manager/**").hasRole("MANAGER")
-                .requestMatchers("/delivery/**").hasRole("DELIVERY")
-                .requestMatchers("/customer/**", "/profile/**", "/orders/**", "/cart/**", "/wishlist/**").hasRole("CUSTOMER")
+                // Static pages - allow all (controller will handle not found)
+                .requestMatchers("/**").permitAll()
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session

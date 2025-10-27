@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <title th:text="${pageTitle} + ' - Mộc Việt'">Trang Tĩnh - Mộc Việt</title>
+    <link th:href="@{/css/static-page.css}" rel="stylesheet">
+</head>
+<body>
+
+<div layout:fragment="content">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="bg-light py-3">
+        <div class="container">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="/" class="text-decoration-none">Trang chủ</a></li>
+                <li class="breadcrumb-item active" aria-current="page" th:text="${page.title}">Trang tĩnh</li>
+            </ol>
+        </div>
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <!-- Page Header -->
+                <header class="mb-4">
+                    <h1 class="display-5 fw-bold mb-3" th:text="${page.title}">Tiêu đề trang</h1>
+                </header>
+
+                <!-- Page Content (HTML from database) -->
+                <article class="content-wrapper">
+                    <div th:utext="${page.content}"></div>
+                </article>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
+

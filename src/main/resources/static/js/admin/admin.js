@@ -807,6 +807,13 @@ function initializeBootstrapComponents() {
                 classRef: 'ShowroomsManagement',
                 instanceName: 'showroomsManagement',
                 initFunction: 'initializeShowroomsManagement'
+            },
+            {
+                urlPattern: '/admin/pages',
+                scriptPath: '/js/admin/pages.js',
+                classRef: 'PagesManagement',
+                instanceName: 'pagesManagement',
+                initFunction: 'initializePagesManagement'
             }
         ];
         
@@ -824,6 +831,24 @@ function initializeBootstrapComponents() {
      */
     function initModule(module) {
         const { scriptPath, classRef, instanceName, initFunction } = module;
+        
+        // Check if already initialized and exists
+        if (window[instanceName] && typeof window[instanceName] !== 'undefined') {
+            // Re-initialize data by calling loadData, loadPages, loadBanners, etc.
+            const methodsToTry = ['loadData', 'loadPages', 'loadBanners', 'loadColors', 'loadCategories', 'loadCoupons', 'loadShipping', 'loadShowrooms', 'loadUsers'];
+            
+            for (const methodName of methodsToTry) {
+                if (typeof window[instanceName][methodName] === 'function') {
+                    try {
+                        window[instanceName][methodName]();
+                        break;
+                    } catch (error) {
+                        console.error(`Error calling ${methodName} for ${classRef}:`, error);
+                    }
+                }
+            }
+            return;
+        }
         
         // Check if init function exists
         if (typeof window[initFunction] === 'function') {
