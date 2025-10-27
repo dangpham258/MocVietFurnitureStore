@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{delivery/fragments/delivery_layout}"> <head>
+    <title>Đơn hàng cần xử lý</title>
+</head>
+<body>
+
+<div layout:fragment="content">
+    
+    <div th:if="${orders == null or #lists.isEmpty(orders)}" class="delivery-empty-state"> 
+        <i class="bi bi-box2-heart"></i> <h5>Không có đơn hàng nào cần xử lý</h5>
+        <p>Tất cả đơn hàng đã được hoàn tất. Quay lại sau nhé!</p>
+    </div>
+
+    <div th:unless="${orders == null or #lists.isEmpty(orders)}">
+        <p class="text-muted mb-3">Tìm thấy <strong th:text="${#lists.size(orders)}"></strong> đơn hàng đang chờ giao hoặc cần thu hồi.</p>
+        
+        <div class="card manager-card"> 
+            <div class="card-header"> <i class="bi bi-list-task me-2"></i> Danh sách công việc
+            </div>
+            <div class="card-body p-0"> <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead> <tr>
+                                <th>ID Đơn</th>
+                                <th>Trạng thái</th>
+                                <th>Khách hàng</th>
+                                <th>Số điện thoại</th>
+                                <th>Địa chỉ</th>
+                                <th>SP (Loại)</th>
+                                <th>Cập nhật</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="order : ${orders}">
+                                <td>
+                                    <strong th:text="'#' + ${order.orderId}">#12345</strong>
+                                </td>
+                                <td>
+                                    <span class="badge"
+                                          th:classappend="${order.deliveryStatus.name() == 'IN_TRANSIT'} ? 'badge-intransit' : 'badge-returnpickup'"
+                                          th:text="${order.deliveryStatus.name() == 'IN_TRANSIT' ? 'Đang giao' : 'Cần thu hồi'}">
+                                    </span>
+                                </td>
+                                <td th:text="${order.customerName}">Trần Khách A</td>
+                                <td>
+                                    <a th:href="'tel:' + ${order.customerPhone}" th:text="${order.customerPhone}" class="text-decoration-none fw-bold"></a>
+                                </td>
+                                <td th:text="${order.deliveryAddress}" style="max-width: 300px; white-space: normal;"></td>
+                                <td class="text-center" th:text="${order.itemCount}">2</td>
+                                <td th:text="${#temporals.format(order.updatedAt, 'HH:mm dd/MM/yy')}"></td>
+                                <td>
+                                    <a th:href="@{/delivery/orders/{id}(id=${order.orderDeliveryId})}" class="btn btn-primary btn-sm">
+                                        Chi tiết
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

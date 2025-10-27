@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head><meta charset="UTF-8"></head>
+<body>
+
+<header th:fragment="header" class="manager-header">
+    <div class="d-flex justify-content-between align-items-center">
+        <h4 class="mb-0" th:text="${pageTitle ?: 'Dashboard'}">Page Title</h4>
+        
+        <div class="dropdown" sec:authorize="isAuthenticated()">
+            <button class="btn btn-outline-dark btn-sm dropdown-toggle" type="button" id="userMenuButton" data-bs-toggle="dropdown">
+                <i class="bi bi-person-circle me-1"></i>
+                <span sec:authentication="name">Delivery User</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenuButton">
+                <li><a class="dropdown-item" th:href="@{/delivery/profile}">Tài khoản</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item text-danger" href="/logout">Đăng xuất</a></li>
+            </ul>
+        </div>
+    </div>
+</header>
+
+</body>
+</html>

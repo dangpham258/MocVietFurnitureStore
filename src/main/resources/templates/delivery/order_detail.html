@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{delivery/fragments/delivery_layout}">
+<head>
+    <title th:text="'Chi tiết đơn hàng #' + ${orderDetail != null ? orderDetail.orderId : ''}">Chi tiết đơn hàng</title>
+</head>
+<body>
+
+<div layout:fragment="content" th:if="${orderDetail != null}">
+    <a th:href="@{/delivery}" class="btn btn-outline-secondary btn-sm mb-3">
+        <i class="bi bi-arrow-left me-1"></i> Quay lại danh sách
+    </a>
+    
+    <div class="row g-4">
+        <div class="col-lg-4 order-lg-2">
+            <div class="sticky-top" style="top: 20px;">
+                <div th:if="${orderDetail.canConfirmDelivery}" class="delivery-card shadow-sm mb-4">
+                    <div class="delivery-card-header bg-success text-white">
+                        <h5 class="mb-0"><i class="bi bi-check-circle me-2"></i>Xác nhận Giao hàng (IN_TRANSIT)</h5>
+                    </div>
+                    <div class="delivery-card-body">
+                        <p>Xác nhận đã giao hàng thành công đến khách hàng.</p>
+                        <form th:action="@{/delivery/orders/{id}/deliver(id=${orderDetail.orderDeliveryId})}" method="post" th:object="${deliveryUpdate}">
+                            <div class="mb-3">
+                                <label for="deliverNote" class="form-label">Ghi chú (tùy chọn)</label>
+                                <textarea class="form-control" id="deliverNote" rows="3" th:field="*{note}" placeholder="Vd: Khách hẹn giao chiều..."></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="deliverProof" class="form-label">Link ảnh bàn giao (tùy chọn)</label>
+                                <input type="text" class="form-control" id="deliverProof" th:field="*{proofImageUrl}" placeholder="https://...">
+                            </div>
+                            <button type="submit" class="btn btn-success w-100 fw-bold">
+                                <i class="bi bi-check-lg me-1"></i> XÁC NHẬN ĐÃ GIAO
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <div th:if="${orderDetail.canProcessReturn}" class="delivery-card shadow-sm mb-4">
+                     <div class="delivery-card-header bg-warning text-dark">
+                        <h5 class="mb-0"><i class="bi bi-arrow-counterclockwise me-2"></i>Xử lý Thu hồi hàng (RETURN_PICKUP)</h5>
+                    </div>
+                    <div class="delivery-card-body">
+                         <p>Xác nhận đã thu hồi hàng và hoàn tiền tại chỗ cho khách.</p>
+                         <form th:action="@{/delivery/orders/{id}/return(id=${orderDetail.orderDeliveryId})}" method="post" th:object="${deliveryUpdate}">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Phương thức hoàn tiền <span class="text-danger">*</span></label>
+                                <div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="refundMethod" id="refundCod" value="COD_CASH" required th:field="*{refundMethod}">
+                                        <label class="form-check-label" for="refundCod">Tiền mặt</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="refundMethod" id="refundBank" value="BANK_TRANSFER" th:field="*{refundMethod}">
+                                        <label class="form-check-label" for="refundBank">Chuyển khoản</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="refundMethod" id="refundVnpay" value="VNPAY" th:field="*{refundMethod}">
+                                        <label class="form-check-label" for="refundVnpay">VNPAY</label>
+                                    </div>
+                                     <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="refundMethod" id="refundMomo" value="MOMO" th:field="*{refundMethod}">
+                                        <label class="form-check-label" for="refundMomo">MOMO</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="returnNote" class="form-label">Ghi chú (tùy chọn)</label>
+                                <textarea class="form-control" id="returnNote" rows="3" th:field="*{note}" placeholder="Vd: Đã thu hồi hàng, hoàn tiền..."></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="returnProof" class="form-label">Link ảnh thu hồi (tùy chọn)</label>
+                                <input type="text" class="form-control" id="returnProof" th:field="*{proofImageUrl}" placeholder="https://...">
+                            </div>
+                            <button type="submit" class="btn btn-warning w-100 fw-bold">
+                                <i class="bi bi-check-lg me-1"></i> XÁC NHẬN ĐÃ THU HỒI
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <div th:if="${!orderDetail.canConfirmDelivery and !orderDetail.canProcessReturn}" class="delivery-card shadow-sm mb-4">
+                     <div class="delivery-card-header bg-secondary text-white">
+                        <h5 class="mb-0"><i class="bi bi-check2-all me-2"></i>Đã hoàn thành (DONE)</h5>
+                    </div>
+                    <div class="delivery-card-body">
+                        <p>Đơn hàng này đã được xử lý hoàn tất.</p>
+                        <p th:if="${orderDetail.deliveryNote != null}" class="mb-1"><strong>Ghi chú cuối:</strong> <span th:text="${orderDetail.deliveryNote}"></span></p>
+                        <p th:if="${orderDetail.proofImageUrl != null}" class="mb-1"><strong>Ảnh:</strong> <a th:href="${orderDetail.proofImageUrl}" target="_blank">Xem ảnh</a></p>
+                    </div>
+                 </div>
+
+            </div>
+        </div>
+
+        <div class="col-lg-8 order-lg-1">
+            <div class="delivery-card">
+                <div class="delivery-card-header">
+                    Thông tin đơn hàng
+                </div>
+                <div class="delivery-card-body">
+                    <div class="detail-section">
+                        <h5><i class="bi bi-person-badge me-2"></i>Khách hàng & Địa chỉ</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>Khách hàng:</strong></p>
+                                <p class="lead" th:text="${orderDetail.customerName}">Tên Khách Hàng</p>
+                                <p class="mb-1"><strong>Số điện thoại (Liên hệ):</strong></p>
+                                <p class="lead"><a th:href="'tel:' + ${orderDetail.customerPhone}" th:text="${orderDetail.customerPhone}" class="text-decoration-none fw-bold"></a></p>
+                            </div>
+                            <div class="col-md-6">
+                                 <p class="mb-1"><strong>Người nhận hàng:</strong></p>
+                                 <p th:text="${orderDetail.receiverName ?: orderDetail.customerName}"></p>
+                                 <p class="mb-1"><strong>Địa chỉ giao/thu hồi:</strong></p>
+                                 <p class="fw-bold" th:text="${orderDetail.deliveryAddress}"></p>
+                            </div>
+                        </div>
+                        <hr>
+                         <p class="mb-1"><strong>Ngày đặt hàng:</strong> <span th:text="${#temporals.format(orderDetail.orderCreatedAt, 'dd/MM/yyyy HH:mm')}"></span></p>
+                         <p class="mb-1"><strong>Thanh toán:</strong> <span th:text="${orderDetail.paymentMethod}"></span></p>
+                         <p class="mb-1"><strong>Tổng tiền (tham khảo):</strong> <span class="fw-bold" th:text="${#numbers.formatDecimal(orderDetail.totalAmount, 0, 'POINT', 0, 'COMMA') + ' đ'}"></span></p>
+                    </div>
+
+                     <div class="detail-section">
+                        <h5><i class="bi bi-box me-2"></i>Danh sách Sản phẩm</h5>
+                        <ul class="list-group list-group-flush">
+                            <li th:each="item : ${orderDetail.items}" class="list-group-item d-flex align-items-center px-0">
+                                <img src="https://via.placeholder.com/60x60/eee/999?text=SP" class="me-3 item-row-img" alt="Ảnh SP">
+                                <div class="flex-grow-1">
+                                    <div class="fw-bold" th:text="${item.sku}">SKU</div>
+                                    <small class="text-muted" th:text="${item.colorName + ' - ' + item.typeName}"></small>
+                                </div>
+                                <div class="text-end">
+                                    <div class="fw-bold" th:text="'x ' + ${item.qty}">x 1</div>
+                                    <small class="text-muted" th:text="${#numbers.formatDecimal(item.unitPrice, 0, 'POINT', 0, 'COMMA') + ' đ'}"></small>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                     <div class="detail-section">
+                         <h5><i class="bi bi-clock-history me-2"></i>Lịch sử Giao hàng (Delivery)</h5>
+                         <ul class="list-group list-group-flush history-list">
+                            <li th:each="history : ${orderDetail.deliveryHistory}" class="list-group-item">
+                                <span class="timeline-dot" th:classappend="${historyStat.first} ? 'current'"></span>
+                                <strong th:text="${history.status}">Trạng thái</strong>
+                                <small class="text-muted ms-2" th:text="${#temporals.format(history.changedAt, 'HH:mm dd/MM/yyyy')}"></small>
+                                <p class="mb-0 small" th:if="${history.note != null}" th:text="${history.note}"></p>
+                            </li>
+                             <li th:if="${#lists.isEmpty(orderDetail.deliveryHistory)}" class="list-group-item text-muted">Chưa có lịch sử.</li>
+                        </ul>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

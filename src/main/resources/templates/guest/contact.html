@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>Liên hệ - Mộc Việt</title>
+    <style>
+        .contact-form {
+            background-color: #f8f9fa;
+            padding: 30px;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+        .contact-info i {
+            color: #8B4513; /* Màu nâu */
+            font-size: 1.5rem;
+            margin-right: 15px;
+            width: 25px; /* Đảm bảo icon thẳng hàng */
+            text-align: center;
+        }
+        .contact-info p {
+            margin-bottom: 15px;
+            display: flex; /* Dùng flex để icon và text thẳng hàng */
+            align-items: center;
+        }
+        .btn-submit {
+             background-color: #8B4513;
+             border-color: #8B4513;
+             color: white;
+             padding: 10px 30px;
+             font-weight: 500;
+        }
+        .btn-submit:hover {
+            background-color: #A0522D;
+            border-color: #A0522D;
+        }
+        .alert {
+            border-radius: 8px;
+        }
+         .section-title { font-weight: bold; color: #8B4513; border-bottom: 2px solid #A0522D; padding-bottom: 10px; margin-bottom: 30px; }
+    </style>
+</head>
+<body>
+
+<div layout:fragment="content">
+    <div class="container my-5">
+        <h1 class="text-center mb-5 section-title">Liên hệ với Mộc Việt</h1>
+
+        <div class="row g-5">
+            <div class="col-lg-5">
+                <h3 class="mb-4 fw-bold" style="color: #8B4513;">Thông tin liên hệ</h3>
+                <div class="contact-info">
+                     <p><i class="bi bi-geo-alt-fill"></i> <span>162 HT17, P. Hiệp Thành, Q. 12, TP. HCM</span></p>
+                     <p><i class="bi bi-telephone-fill"></i> <a href="tel:0971141140" class="text-decoration-none text-dark">0971 141 140</a></p>
+                     <p><i class="bi bi-envelope-fill"></i> <a href="mailto:cskh@mocviet.vn" class="text-decoration-none text-dark">cskh@mocviet.vn</a></p>
+                     <p><i class="bi bi-clock-fill"></i> <span>8:00 - 21:00 (Tất cả các ngày trong tuần)</span></p>
+                     <p><i class="bi bi-facebook"></i> <a href="#" target="_blank" class="text-decoration-none text-dark">facebook.com/mocviet</a></p>
+                     <p><i class="bi bi-instagram"></i> <a href="#" target="_blank" class="text-decoration-none text-dark">instagram.com/mocviet</a></p>
+                </div>
+                 <div class="mt-4 shadow-sm">
+                     <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3918.171440871217!2d106.6346814147499!3d10.87483989225338!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752a1df0f3e6c9%3A0xf6fef3a1e90a0f5d!2zMTYyIEhUMTcsIEhp4buHcCB ciudadanosEw6BuaCwgUXXhuq1uIDEyLCBUaMOgbmggcGjhu5EgSOG7kyBDaMOtIE1pbmgsIFZp4buHdCBOYW0!5e0!3m2!1svi!2s!4v1678886454321!5m2!1svi!2s" width="100%" height="250" style="border:0; border-radius: 8px;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                 </div>
+            </div>
+
+            <div class="col-lg-7">
+                <h3 class="mb-4 fw-bold" style="color: #8B4513;">Gửi tin nhắn cho chúng tôi</h3>
+
+                 <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="bi bi-check-circle-fill me-2"></i>
+                    <span th:text="${successMessage}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                     <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    <span th:text="${errorMessage}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+
+                <form th:action="@{/contact/send-message}" method="post" th:object="${guestMessageRequest}" class="contact-form shadow-sm">
+                    <div class="mb-3">
+                        <label for="guestName" class="form-label">Họ và tên <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="guestName" th:field="*{guestName}" required>
+                         <div th:if="${#fields.hasErrors('guestName')}" class="text-danger small mt-1" th:errors="*{guestName}"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="guestEmail" class="form-label">Email <span class="text-danger">*</span></label>
+                        <input type="email" class="form-control" id="guestEmail" th:field="*{guestEmail}" required>
+                         <div th:if="${#fields.hasErrors('guestEmail')}" class="text-danger small mt-1" th:errors="*{guestEmail}"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="content" class="form-label">Nội dung tin nhắn <span class="text-danger">*</span></label>
+                        <textarea class="form-control" id="content" rows="5" th:field="*{content}" required placeholder="Nhập nội dung bạn cần tư vấn..."></textarea>
+                         <div th:if="${#fields.hasErrors('content')}" class="text-danger small mt-1" th:errors="*{content}"></div>
+                    </div>
+                    <button type="submit" class="btn btn-submit">
+                         <i class="bi bi-send-fill me-2"></i> Gửi tin nhắn
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div> </div> </body>
+</html>
