@@ -117,7 +117,7 @@ public class CheckoutController {
         );
         
         if (addresses.isEmpty()) {
-            return "redirect:/customer/addresses?error=no_address";
+            return "redirect:/customer/profile?error=no_address&goto_address=true";
         }
         
         CheckoutSummaryDTO summary = CheckoutSummaryDTO.builder()

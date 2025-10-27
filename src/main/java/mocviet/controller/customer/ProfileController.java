@@ -29,7 +29,8 @@ public class ProfileController {
     private final ICustomerService customerService;
     
     @GetMapping
-    public String profilePage(Model model) {
+    public String profilePage(@RequestParam(value = "error", required = false) String error,
+                             Model model) {
         User user = profileService.getCurrentUserProfile();
         List<Address> addresses = profileService.getUserAddresses();
         
@@ -40,6 +41,17 @@ public class ProfileController {
         profileUpdateRequest.setGender(user.getGender());
         profileUpdateRequest.setDob(user.getDob());
         profileUpdateRequest.setPhone(user.getPhone());
+        
+        // Handle error message
+        if (error != null) {
+            switch (error) {
+                case "no_address":
+                    model.addAttribute("error", "Bạn chưa có địa chỉ nhận hàng. Vui lòng thêm địa chỉ để tiếp tục thanh toán.");
+                    break;
+                default:
+                    model.addAttribute("error", "Có lỗi xảy ra");
+            }
+        }
         
         model.addAttribute("user", user);
         model.addAttribute("addresses", addresses);
