@@ -554,7 +554,10 @@ public class OrderServiceImpl implements IOrderService {
         // Action flags
         dto.setCanCancel(canCancelOrder(order.getId()));
         dto.setCanRequestReturn(canRequestReturn(order.getId()));
-        dto.setCanReview(false); // TODO: implement logic
+        // Kiểm tra đơn hàng có thể đánh giá: DELIVERED và có ít nhất 1 order item chưa review
+        boolean canReview = order.getStatus() == Orders.OrderStatus.DELIVERED && 
+                           orderItems.stream().anyMatch(item -> item.getReview() == null);
+        dto.setCanReview(canReview);
         dto.setCanReorder(order.getStatus() == Orders.OrderStatus.CANCELLED || 
                          order.getStatus() == Orders.OrderStatus.RETURNED);
         

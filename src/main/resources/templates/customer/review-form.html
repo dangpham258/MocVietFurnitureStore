@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đánh giá sản phẩm - Mộc Việt</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link th:href="@{/css/customer.css}" rel="stylesheet">
+    <style>
+        .star-rating {
+            display: flex;
+            gap: 5px;
+            margin: 20px 0;
+        }
+        .star-rating .star {
+            cursor: pointer;
+            font-size: 32px;
+            color: #ddd;
+            transition: color 0.2s;
+        }
+        .star-rating .star:hover,
+        .star-rating .star.active {
+            color: #ffc107;
+        }
+        .image-preview {
+            max-width: 200px;
+            max-height: 200px;
+            margin-top: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            display: none;
+        }
+        .image-preview img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div th:replace="fragments/header :: header"></div>
+
+    <!-- Main Content -->
+    <div class="container my-5">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="bi bi-person"></i> Tài khoản của tôi</h5>
+                    </div>
+                    <div class="list-group list-group-flush">
+                        <a href="/customer/profile" class="list-group-item list-group-item-action">
+                            <i class="bi bi-person"></i> Thông tin cá nhân
+                        </a>
+                        <a href="/customer/orders" class="list-group-item list-group-item-action">
+                            <i class="bi bi-box-seam"></i> Đơn hàng của tôi
+                        </a>
+                        <a href="/customer/wishlist" class="list-group-item list-group-item-action">
+                            <i class="bi bi-heart"></i> Danh sách yêu thích
+                        </a>
+                        <a href="/customer/addresses" class="list-group-item list-group-item-action">
+                            <i class="bi bi-geo-alt"></i> Địa chỉ nhận hàng
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9">
+                <!-- Breadcrumb -->
+                <nav aria-label="breadcrumb" class="mb-4">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/customer/orders">Đơn hàng của tôi</a></li>
+                        <li class="breadcrumb-item"><a th:href="@{/customer/orders/{id}(id=${orderId})}">Chi tiết đơn hàng</a></li>
+                        <li class="breadcrumb-item active">Đánh giá sản phẩm</li>
+                    </ol>
+                </nav>
+
+                <!-- Alert Messages -->
+                <div th:if="${param.error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="bi bi-exclamation-triangle"></i> <span th:text="${param.error}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+
+                <!-- Review Form -->
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0"><i class="bi bi-star"></i> Đánh giá sản phẩm</h4>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted mb-4">
+                            Vui lòng đánh giá sản phẩm bạn đã mua để giúp người khác có thông tin tốt hơn
+                        </p>
+
+                        <!-- Unreviewed Items -->
+                        <div th:each="item : ${unreviewedItems}" class="review-item mb-4 p-3 border rounded">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <h5 th:text="${item.productName}"></h5>
+                                    <p class="text-muted mb-2">
+                                        SKU: <span th:text="${item.sku}"></span>
+                                        <span class="mx-2">|</span>
+                                        Màu: <span th:text="${item.colorName}"></span>
+                                        <span class="mx-2">|</span>
+                                        Loại: <span th:text="${item.typeName}"></span>
+                                        <span class="mx-2">|</span>
+                                        Số lượng: <span th:text="${item.qty}"></span>
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Review Form cho từng sản phẩm -->
+                            <form class="review-form mt-3" th:data-order-item-id="${item.id}">
+                                <!-- Rating -->
+                                <div class="mb-3">
+                                    <label class="form-label"><strong>Bạn đánh giá sản phẩm này như thế nào?</strong></label>
+                                    <div class="star-rating">
+                                        <span class="star" data-rating="1"><i class="bi bi-star"></i></span>
+                                        <span class="star" data-rating="2"><i class="bi bi-star"></i></span>
+                                        <span class="star" data-rating="3"><i class="bi bi-star"></i></span>
+                                        <span class="star" data-rating="4"><i class="bi bi-star"></i></span>
+                                        <span class="star" data-rating="5"><i class="bi bi-star"></i></span>
+                                    </div>
+                                    <input type="hidden" th:name="'rating_' + ${item.id}" th:id="'rating_' + ${item.id}" value="0" required>
+                                    <small class="text-muted">Vui lòng chọn số sao đánh giá</small>
+                                </div>
+
+                                <!-- Review Content -->
+                                <div class="mb-3">
+                                    <label class="form-label"><strong>Viết đánh giá (tùy chọn)</strong></label>
+                                    <textarea 
+                                        class="form-control" 
+                                        th:name="'content_' + ${item.id}"
+                                        th:id="'content_' + ${item.id}"
+                                        rows="5" 
+                                        maxlength="1000"
+                                        placeholder="Chia sẻ trải nghiệm của bạn về sản phẩm này..."></textarea>
+                                    <small class="text-muted">Tối đa 1000 ký tự</small>
+                                </div>
+
+                                <!-- Image Upload -->
+                                <div class="mb-3">
+                                    <label class="form-label"><strong>Đính kèm hình ảnh (tùy chọn)</strong></label>
+                                    <input 
+                                        type="file" 
+                                        class="form-control" 
+                                        th:name="'image_' + ${item.id}"
+                                        th:id="'image_' + ${item.id}"
+                                        accept="image/*"
+                                        th:onchange="|previewImage(this, 'preview_${item.id}')|">
+                                    <small class="text-muted">Chỉ chấp nhận file ảnh (JPG, PNG, WebP), tối đa 2MB</small>
+                                    <div class="image-preview" th:id="'preview_' + ${item.id}">
+                                        <img src="" alt="Preview">
+                                    </div>
+                                </div>
+
+                                <!-- Submit Button -->
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-send"></i> Gửi đánh giá
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Back Button -->
+                        <div class="mt-4">
+                            <a th:href="@{/customer/orders/{id}(id=${orderId})}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left"></i> Quay lại chi tiết đơn hàng
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="modal fade" id="successModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title"><i class="bi bi-check-circle"></i> Thành công</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="successMessage">Đánh giá đã được gửi thành công!</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" onclick="redirectToOrder()">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error Modal -->
+    <div class="modal fade" id="errorModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title"><i class="bi bi-exclamation-triangle"></i> Lỗi</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="errorMessage"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Star rating functionality
+        document.querySelectorAll('.star-rating').forEach(ratingContainer => {
+            const stars = ratingContainer.querySelectorAll('.star');
+            const hiddenInput = ratingContainer.parentElement.querySelector('input[type="hidden"]');
+            
+            stars.forEach((star, index) => {
+                star.addEventListener('click', () => {
+                    const rating = index + 1;
+                    
+                    // Update visual
+                    stars.forEach((s, i) => {
+                        if (i < rating) {
+                            s.classList.add('active');
+                            s.querySelector('i').classList.remove('bi-star');
+                            s.querySelector('i').classList.add('bi-star-fill');
+                        } else {
+                            s.classList.remove('active');
+                            s.querySelector('i').classList.remove('bi-star-fill');
+                            s.querySelector('i').classList.add('bi-star');
+                        }
+                    });
+                    
+                    // Update hidden input
+                    hiddenInput.value = rating;
+                });
+            });
+        });
+
+        // Preview image function
+        function previewImage(input, previewId) {
+            const preview = document.getElementById(previewId);
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.style.display = 'block';
+                    preview.querySelector('img').src = e.target.result;
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // Form submission
+        document.querySelectorAll('.review-form').forEach(form => {
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const formData = new FormData(this);
+                const orderItemId = this.getAttribute('data-order-item-id');
+                
+                // Get values from form
+                const ratingInput = this.querySelector('input[type="hidden"]');
+                const contentTextArea = this.querySelector('textarea');
+                const imageInput = this.querySelector('input[type="file"]');
+                
+                const rating = ratingInput.value;
+                
+                if (!rating || rating === '0') {
+                    showError('Vui lòng chọn điểm đánh giá');
+                    return;
+                }
+                
+                // Prepare form data for API
+                const submitData = new FormData();
+                submitData.append('orderItemId', orderItemId);
+                submitData.append('rating', rating);
+                
+                if (contentTextArea.value) {
+                    submitData.append('content', contentTextArea.value);
+                }
+                
+                if (imageInput.files[0]) {
+                    submitData.append('image', imageInput.files[0]);
+                }
+                
+                // Disable submit button
+                const submitBtn = this.querySelector('button[type="submit"]');
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Đang gửi...';
+                
+                try {
+                    const response = await fetch('/customer/reviews', {
+                        method: 'POST',
+                        body: submitData
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        showSuccess('Đánh giá đã được gửi thành công!');
+                        // Reload page after 2 seconds
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 2000);
+                    } else {
+                        showError(result.message || 'Có lỗi xảy ra khi gửi đánh giá');
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '<i class="bi bi-send"></i> Gửi đánh giá';
+                    }
+                } catch (error) {
+                    showError('Có lỗi xảy ra: ' + error.message);
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="bi bi-send"></i> Gửi đánh giá';
+                }
+            });
+        });
+
+        // Show error modal
+        function showError(message) {
+            document.getElementById('errorMessage').textContent = message;
+            const errorModal = new bootstrap.Modal(document.getElementById('errorModal'));
+            errorModal.show();
+        }
+
+        // Show success modal
+        function showSuccess(message) {
+            document.getElementById('successMessage').textContent = message;
+            const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+            successModal.show();
+        }
+
+        // Redirect to order
+        function redirectToOrder() {
+            window.location.href = '/customer/orders';
+        }
+    </script>
+</body>
+</html>
+
