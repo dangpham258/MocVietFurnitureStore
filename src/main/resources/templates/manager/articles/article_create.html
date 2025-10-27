@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{manager/fragments/manager_layout}">
+<head>
+    <title>Tạo bài viết mới - Mộc Việt</title>
+    <!-- TinyMCE Editor -->
+    <script src="https://cdn.tiny.cloud/1/kmvrtfovcvchjwos1oiy981mtlrk4dq7kfszxy30no1i1197/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="mb-1">Tạo bài viết mới</h2>
+                    <p class="text-muted mb-0">Thêm bài viết tin tức mới</p>
+                </div>
+                <a href="/manager/articles" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Quay lại
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Error Messages -->
+    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i><span th:text="${errorMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form method="post" action="/manager/articles/create" 
+                          th:object="${createArticleRequest}" 
+                          enctype="multipart/form-data">
+                        
+                        <!-- Tiêu đề -->
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Tiêu đề bài viết <span class="text-danger">*</span></label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   th:classappend="${#fields.hasErrors('title')} ? 'is-invalid'" 
+                                   id="title" 
+                                   name="title" 
+                                   th:field="*{title}" 
+                                   placeholder="Nhập tiêu đề bài viết" 
+                                   maxlength="300" 
+                                   required>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></div>
+                        </div>
+                        
+                        <!-- Loại bài viết và Trạng thái -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="articleType" class="form-label">Loại bài viết <span class="text-danger">*</span></label>
+                                    <select class="form-select" 
+                                            th:classappend="${#fields.hasErrors('articleType')} ? 'is-invalid'" 
+                                            id="articleType" 
+                                            name="articleType" 
+                                            th:field="*{articleType}" 
+                                            required>
+                                        <option value="">-- Chọn loại bài viết --</option>
+                                        <option value="MEDIA">MEDIA (Phong cách nội thất)</option>
+                                        <option value="NEWS">NEWS (Tin tức)</option>
+                                        <option value="PEOPLE">PEOPLE (Nghệ nhân)</option>
+                                    </select>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('articleType')}" th:errors="*{articleType}"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="linkedProductId" class="form-label">Sản phẩm liên quan (tùy chọn)</label>
+                                    <select class="form-select" id="linkedProductId" name="linkedProductId" th:field="*{linkedProductId}">
+                                        <option value="">-- Không liên kết --</option>
+                                        <option th:each="product : ${products}" 
+                                                th:value="${product.id}" 
+                                                th:text="${product.name}"></option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Tóm tắt -->
+                        <div class="mb-3">
+                            <label for="summary" class="form-label">Tóm tắt</label>
+                            <textarea class="form-control" 
+                                      th:classappend="${#fields.hasErrors('summary')} ? 'is-invalid'" 
+                                      id="summary" 
+                                      name="summary" 
+                                      th:field="*{summary}" 
+                                      rows="3" 
+                                      maxlength="500" 
+                                      placeholder="Nhập tóm tắt ngắn gọn (tối đa 500 ký tự)"></textarea>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('summary')}" th:errors="*{summary}"></div>
+                            <small class="text-muted">Tóm tắt ngắn gọn về nội dung bài viết (~25 từ)</small>
+                        </div>
+                        
+                        <!-- Nội dung -->
+                        <div class="mb-3">
+                            <label for="content" class="form-label">Nội dung</label>
+                            <textarea id="content" name="content" th:field="*{content}"></textarea>
+                            <small class="text-muted">Nội dung chi tiết của bài viết</small>
+                        </div>
+                        
+                        <!-- Ảnh thumbnail -->
+                        <div class="mb-3">
+                            <label for="thumbnailFile" class="form-label">Ảnh thumbnail <span class="text-danger">*</span></label>
+                            <input type="file" 
+                                   class="form-control" 
+                                   id="thumbnailFile" 
+                                   name="thumbnailFile" 
+                                   accept="image/jpeg,image/png,image/jpg,image/webp" 
+                                   required
+                                   onchange="previewThumbnail(this)">
+                            <small class="text-muted">Ảnh đại diện cho bài viết (JPG, PNG, WEBP, tối đa 2MB)</small>
+                            <div id="thumbnailPreview" class="mt-2" style="display: none;">
+                                <img id="thumbnailImage" src="" alt="Preview" class="img-thumbnail" style="max-width: 200px; max-height: 150px;">
+                            </div>
+                        </div>
+                        
+                        <!-- Ảnh nội dung -->
+                        <div class="mb-3">
+                            <label for="contentFiles" class="form-label">Ảnh nội dung (tùy chọn)</label>
+                            <input type="file" 
+                                   class="form-control" 
+                                   id="contentFiles" 
+                                   name="contentFiles" 
+                                   accept="image/jpeg,image/png,image/jpg,image/webp" 
+                                   multiple
+                                   onchange="previewContentImages(this)">
+                            <small class="text-muted">Có thể chọn nhiều ảnh (JPG, PNG, WEBP, tối đa 2MB mỗi ảnh)</small>
+                            <div id="contentImagesPreview" class="mt-2 d-flex flex-wrap gap-2"></div>
+                        </div>
+                        
+                        <!-- Caption cho ảnh nội dung -->
+                        <div id="captionsContainer" class="mb-3" style="display: none;">
+                            <label class="form-label">Chú thích cho ảnh nội dung</label>
+                            <div id="captionInputs"></div>
+                        </div>
+                        
+                        <!-- Checkbox options -->
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" 
+                                       type="checkbox" 
+                                       id="isFeatured" 
+                                       name="isFeatured" 
+                                       th:field="*{isFeatured}">
+                                <label class="form-check-label" for="isFeatured">
+                                    <i class="fas fa-star text-warning me-1"></i>Đánh dấu là bài viết nổi bật
+                                </label>
+                            </div>
+                            <div class="form-check mt-2">
+                                <input class="form-check-input" 
+                                       type="checkbox" 
+                                       id="status" 
+                                       name="status" 
+                                       th:field="*{status}">
+                                <label class="form-check-label" for="status">
+                                    <i class="fas fa-check-circle text-success me-1"></i>Xuất bản ngay (nếu không chọn sẽ lưu nháp)
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Actions -->
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="/manager/articles" class="btn btn-secondary">
+                                <i class="fas fa-times me-2"></i>Hủy
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Tạo bài viết
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Initialize TinyMCE
+        tinymce.init({
+            selector: '#content',
+            height: 500,
+            menubar: true,
+            plugins: [
+                'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+                'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                'insertdatetime', 'media', 'table', 'help', 'wordcount', 'emoticons',
+                'template', 'paste', 'textcolor', 'colorpicker', 'textpattern'
+            ],
+            toolbar: 'undo redo | blocks | bold italic underline strikethrough | forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media table | charmap emoticons | insertdatetime | searchreplace | code fullscreen | help',
+            content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
+            branding: false,
+            promotion: false,
+            language: 'vi',
+            paste_data_images: true,
+            image_upload_handler: function (blobInfo, success, failure) {
+                // Handle image upload if needed
+                failure('Image upload not implemented yet');
+            },
+            setup: function (editor) {
+                editor.on('change', function () {
+                    editor.save();
+                });
+            }
+        });
+        
+        // Preview thumbnail
+        function previewThumbnail(input) {
+            const preview = document.getElementById('thumbnailPreview');
+            const image = document.getElementById('thumbnailImage');
+            
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    image.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+        
+        // Preview content images
+        function previewContentImages(input) {
+            const previewContainer = document.getElementById('contentImagesPreview');
+            const captionsContainer = document.getElementById('captionsContainer');
+            const captionInputs = document.getElementById('captionInputs');
+            
+            previewContainer.innerHTML = '';
+            captionInputs.innerHTML = '';
+            
+            if (input.files && input.files.length > 0) {
+                captionsContainer.style.display = 'block';
+                
+                Array.from(input.files).forEach((file, index) => {
+                    // Preview image
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const div = document.createElement('div');
+                        div.style.position = 'relative';
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.className = 'img-thumbnail';
+                        img.style.width = '100px';
+                        img.style.height = '80px';
+                        img.style.objectFit = 'cover';
+                        div.appendChild(img);
+                        previewContainer.appendChild(div);
+                    };
+                    reader.readAsDataURL(file);
+                    
+                    // Caption input
+                    const captionDiv = document.createElement('div');
+                    captionDiv.className = 'mb-2';
+                    captionDiv.innerHTML = `
+                        <label class="form-label">Ảnh ${index + 1}: ${file.name}</label>
+                        <input type="text" class="form-control" name="captions" placeholder="Nhập chú thích (tùy chọn)" maxlength="255">
+                    `;
+                    captionInputs.appendChild(captionDiv);
+                });
+            } else {
+                captionsContainer.style.display = 'none';
+            }
+        }
+    </script>
+</div>
+</body>
+</html>
+

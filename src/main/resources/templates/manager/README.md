@@ -6,6 +6,7 @@ Module quản lý dành cho Manager, bao gồm:
 - Phân công đội giao hàng
 - Quản lý đơn hàng (xác nhận, hủy, trả hàng)
 - **Quản lý tồn kho** (cảnh báo, cập nhật, báo cáo)
+- **Quản lý tin tức** (tạo, sửa, ẩn/hiện bài viết)
 
 ## Cấu trúc thư mục
 
@@ -15,7 +16,8 @@ src/main/java/mocviet/
 │   ├── ManagerController.java               # Controller chính cho manager
 │   ├── DeliveryAssignmentController.java    # Controller phân công đội giao hàng
 │   ├── OrderManagementController.java       # Controller quản lý đơn hàng
-│   └── InventoryManagementController.java   # Controller quản lý tồn kho
+│   ├── InventoryManagementController.java   # Controller quản lý tồn kho
+│   └── ArticleManagementController.java     # Controller quản lý tin tức
 ├── dto/manager/
 │   ├── UpdateProfileRequest.java            # DTO cho cập nhật profile
 │   ├── ChangePasswordRequest.java           # DTO cho đổi mật khẩu
@@ -33,13 +35,20 @@ src/main/java/mocviet/
 │   ├── StockReportDTO.java                  # DTO báo cáo tồn kho
 │   ├── StockSummaryDTO.java                 # DTO tổng quan tồn kho
 │   ├── UpdateStockRequest.java              # DTO cập nhật tồn kho
-│   └── LowStockProductDTO.java              # DTO sản phẩm tồn kho thấp
+│   ├── LowStockProductDTO.java              # DTO sản phẩm tồn kho thấp
+│   ├── CreateArticleRequest.java            # DTO tạo bài viết mới
+│   ├── UpdateArticleRequest.java            # DTO cập nhật bài viết
+│   ├── ArticleListDTO.java                  # DTO danh sách bài viết
+│   ├── ArticleDetailDTO.java                # DTO chi tiết bài viết
+│   └── ArticleDashboardDTO.java             # DTO thống kê bài viết
 ├── service/manager/
 │   ├── ManagerAccountService.java           # Service xử lý logic quản lý tài khoản
 │   ├── DeliveryAssignmentService.java       # Service xử lý logic phân công
 │   ├── OrderManagementService.java          # Service quản lý đơn hàng
 │   ├── OrderStoredProcedureService.java     # Service tích hợp stored procedures
-│   └── InventoryManagementService.java      # Service quản lý tồn kho
+│   ├── InventoryManagementService.java      # Service quản lý tồn kho
+│   ├── ArticleService.java                  # Service quản lý bài viết
+│   └── ArticleImageService.java             # Service quản lý ảnh bài viết
 └── repository/
     ├── OrdersRepository.java                # Repository đơn hàng
     ├── OrderDeliveryRepository.java         # Repository giao hàng
@@ -50,7 +59,9 @@ src/main/java/mocviet/
     ├── DeliveryHistoryRepository.java       # Repository lịch sử giao hàng
     ├── OrderStatusHistoryRepository.java    # Repository lịch sử trạng thái
     ├── ProductVariantRepository.java        # Repository biến thể sản phẩm
-    └── ProductRepository.java               # Repository sản phẩm
+    ├── ProductRepository.java               # Repository sản phẩm
+    ├── ArticleRepository.java               # Repository bài viết
+    └── ArticleImageRepository.java          # Repository ảnh bài viết
 
 src/main/resources/
 ├── templates/manager/
@@ -76,11 +87,16 @@ src/main/resources/
 │   │   ├── completed-detail.html      # Chi tiết đơn hoàn thành
 │   │   ├── returns.html               # Danh sách yêu cầu trả hàng
 │   │   └── return-detail.html         # Chi tiết yêu cầu trả hàng
-│   └── inventory/
-│       ├── alerts.html                # Cảnh báo tồn kho
-│       ├── update-stock.html          # Cập nhật tồn kho
-│       ├── report.html                # Báo cáo tồn kho
-│       └── low-stock.html             # Quản lý sản phẩm tồn kho thấp
+│   ├── inventory/
+│   │   ├── alerts.html                # Cảnh báo tồn kho
+│   │   ├── update-stock.html          # Cập nhật tồn kho
+│   │   ├── report.html                # Báo cáo tồn kho
+│   │   └── low-stock.html             # Quản lý sản phẩm tồn kho thấp
+│   └── articles/
+│       ├── article_list.html          # Danh sách bài viết
+│       ├── article_create.html        # Tạo bài viết mới
+│       ├── article_edit.html          # Chỉnh sửa bài viết
+│       └── article_detail.html        # Chi tiết bài viết
 ├── static/css/
 │   └── manager.css                     # CSS cho giao diện manager (đã cập nhật)
 └── static/js/
@@ -242,6 +258,77 @@ src/main/resources/
   - Tạo đơn nhập hàng (đang phát triển)
   - Xem lịch sử thay đổi (đang phát triển)
 
+### 7. Quản lý tin tức (`/manager/articles/*`)
+
+#### 7.1. UC-MGR-ART-ListMyPosts - Xem danh sách bài viết
+**Route:** `/manager/articles`
+
+- **Dashboard tổng quan:**
+  - Tổng số bài viết
+  - Số bài viết đã xuất bản
+  - Số bài viết nháp
+  - Tổng lượt xem
+
+- **Danh sách bài viết:**
+  - Xem tất cả bài viết của chính mình
+  - Lọc theo loại bài viết (MEDIA/NEWS/PEOPLE)
+  - Lọc theo trạng thái (Đã xuất bản/Nháp)
+  - Tìm kiếm theo tiêu đề, tóm tắt
+  - Sắp xếp theo: Ngày tạo, Ngày xuất bản, Lượt xem
+  - Phân trang
+  - Actions: Xem, Sửa, Ẩn/Hiện
+
+#### 7.2. UC-MGR-ART-CreatePost - Tạo bài viết mới
+**Route:** `/manager/articles/create`
+
+- **Các trường:**
+  - **Tiêu đề** (bắt buộc, max 300 ký tự)
+  - **Loại bài viết** (bắt buộc): MEDIA, NEWS, PEOPLE
+  - **Tóm tắt** (tùy chọn, max 500 ký tự)
+  - **Nội dung** (Rich text editor với TinyMCE)
+  - **Ảnh thumbnail** (bắt buộc, JPG/PNG/WEBP, max 2MB)
+  - **Ảnh nội dung** (tùy chọn, nhiều ảnh, max 2MB mỗi ảnh)
+  - **Sản phẩm liên quan** (tùy chọn - chọn từ dropdown sản phẩm active)
+  - **Nổi bật** (checkbox)
+  - **Xuất bản** (checkbox - nếu không chọn sẽ lưu nháp)
+
+- **Quy tắc:**
+  - Slug tự động tạo từ tiêu đề (Vietnamese-friendly)
+  - Slug đảm bảo duy nhất (thêm số nếu trùng)
+  - Ảnh lưu theo cấu trúc: `/static/images/articles/<type>/<slug>/thumbnail/` và `/content/`
+  - Set `published_at` nếu status = true
+  - Tác giả tự động lấy từ user đang đăng nhập
+
+#### 7.3. UC-MGR-ART-EditPost - Chỉnh sửa bài viết
+**Route:** `/manager/articles/{id}/edit`
+
+- **Chức năng:**
+  - Cập nhật tất cả thông tin
+  - Thay đổi thumbnail
+  - Thêm/xóa ảnh nội dung
+  - Checkbox "Xóa ảnh cũ" trước khi upload ảnh mới
+  - Nếu đổi tiêu đề, slug tự động cập nhật
+  - Chỉ tác giả mới được chỉnh sửa
+
+- **Validation:**
+  - Kiểm tra quyền sở hữu (author phải trùng với user đăng nhập)
+  - Validate định dạng và kích thước file
+  - Slug uniqueness
+
+#### 7.4. UC-MGR-ART-ViewDetail - Xem chi tiết bài viết
+**Route:** `/manager/articles/{id}`
+
+- **Hiển thị:**
+  - Tất cả thông tin của bài viết
+  - Metadata (tác giả, ngày tạo, ngày xuất bản, lượt xem)
+  - Thumbnail và danh sách ảnh nội dung
+  - Sản phẩm liên quan (nếu có)
+  - Trạng thái: Nổi bật, Xuất bản/Nháp
+
+- **Cấu trúc lưu trữ ảnh:**
+  - Thumbnail: `/static/images/articles/<type>/<slug>/thumbnail/00_<slug>.jpg`
+  - Content: `/static/images/articles/<type>/<slug>/content/00_<slug>.jpg`, `01_<slug>.jpg`, ...
+
 ## Bảo mật
 
 ### 1. Authentication & Authorization
@@ -346,6 +433,11 @@ URL: http://localhost:8080/manager/inventory/report
 URL: http://localhost:8080/manager/inventory/low-stock
 ```
 
+### 8. Quản lý tin tức
+```
+URL: http://localhost:8080/manager/articles
+```
+
 ## Validation Rules
 
 ### UpdateProfileRequest
@@ -391,6 +483,18 @@ URL: http://localhost:8080/manager/inventory/low-stock
 - **Audit Trail:** Ghi log mọi thay đổi tồn kho
 - **Ẩn sản phẩm:** Sản phẩm ẩn không hiển thị trên website nhưng không ảnh hưởng đơn đã tạo
 
+### Quản lý tin tức
+- **Tiêu đề:** Bắt buộc, tối đa 300 ký tự
+- **Slug:** Tự động tạo từ tiêu đề, duy nhất (thêm số nếu trùng)
+- **Loại bài viết:** Bắt buộc, chỉ nhận MEDIA/NEWS/PEOPLE
+- **Tóm tắt:** Tùy chọn, tối đa 500 ký tự
+- **Ảnh thumbnail:** Bắt buộc khi tạo mới, JPG/PNG/WEBP, max 2MB
+- **Ảnh nội dung:** Tùy chọn, nhiều ảnh, JPG/PNG/WEBP, max 2MB mỗi ảnh
+- **Quyền sở hữu:** Chỉ tác giả mới được sửa bài viết của mình
+- **Sản phẩm liên quan:** Chỉ chọn từ sản phẩm active
+- **Trạng thái:** true = Xuất bản, false = Nháp
+- **Lưu ý:** Manager không có quyền ẩn bài viết (chỉ Admin mới có quyền này)
+
 ## Error Handling
 
 ### 1. Validation Errors
@@ -421,6 +525,8 @@ URL: http://localhost:8080/manager/inventory/low-stock
 - `Color` - Màu sắc sản phẩm
 - `Category` - Danh mục sản phẩm
 - `OrderItems` - Dùng để tính số lượng đã bán
+- `Article` - Bài viết tin tức
+- `ArticleImage` - Ảnh bài viết
 
 ### Stored Procedures & Triggers
 - `sp_MarkDispatched` - Đánh dấu đơn đã xuất kho
@@ -436,6 +542,7 @@ URL: http://localhost:8080/manager/inventory/low-stock
 - `TR_ProductVariant_StockAlerts` - Tự động tạo cảnh báo tồn kho
 - `TR_OrderDelivery_NotifyDeliveryTeam` - Thông báo cho đội giao hàng
 - `TR_ProductVariant_NotifyWishlistBackInStock` - Thông báo khách hàng khi có hàng trở lại
+- `TR_Article_NotifyNew` - Thông báo khi có bài viết mới được xuất bản
 
 ## Tính năng đặc biệt
 
@@ -507,6 +614,7 @@ URL: http://localhost:8080/manager/inventory/low-stock
 - Ghi log duyệt/từ chối trả hàng
 - **Ghi log cập nhật tồn kho** (manager_id, variant_id, old_qty, new_qty, note)
 - **Ghi log ẩn/hiện sản phẩm** (manager_id, variant_id, action, reason)
+- **Ghi log tạo/sửa/xóa bài viết** (manager_id, article_id, action, changes)
 - Sử dụng Spring AOP (có thể implement thêm)
 
 ### 2. Security Logging
@@ -518,6 +626,7 @@ URL: http://localhost:8080/manager/inventory/low-stock
 - Log return request processing
 - **Log stock update actions** (thời gian, user, sản phẩm, thay đổi)
 - **Log product visibility changes** (thời gian, user, sản phẩm, lý do)
+- **Log article management actions** (thời gian, user, bài viết, action)
 
 ## Performance
 
@@ -618,6 +727,11 @@ spring.jpa.show-sql=true
 - **Tích hợp với hệ thống ERP/WMS**
 - **Bulk update tồn kho (upload Excel)**
 - **Stock forecasting với ML**
+- **Quản lý tags cho bài viết**
+- **SEO optimization cho bài viết**
+- **Scheduled publishing (đăng bài theo lịch)**
+- **Draft auto-save**
+- **Version control cho bài viết**
 
 ### 2. UI/UX
 - Dark mode
