@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/fragments/admin_layout}">
+<head>
+    <title>Quản lý Danh mục - Admin Panel</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">Quản lý Danh mục & Bộ sưu tập</h2>
+            <p class="text-muted mb-0">Quản lý danh mục sản phẩm và bộ sưu tập</p>
+        </div>
+        <div>
+            <button class="btn btn-admin-primary me-2" data-bs-toggle="modal" data-bs-target="#createCategoryModal">
+                <i class="bi bi-plus-circle me-2"></i>Tạo Danh mục
+            </button>
+            <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#createCollectionModal">
+                <i class="bi bi-collection me-2"></i>Tạo Bộ sưu tập
+            </button>
+        </div>
+    </div>
+    
+    <!-- Categories Tree -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card admin-card">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-diagram-3 me-2"></i>
+                        Danh mục sản phẩm
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="tree-view">
+                        <div class="tree-item">
+                            <i class="bi bi-folder me-2"></i>
+                            <strong>Phòng khách</strong>
+                            <div class="tree-children ms-4">
+                                <div class="tree-item">
+                                    <i class="bi bi-folder me-2"></i>
+                                    Ghế sofa
+                                </div>
+                                <div class="tree-item">
+                                    <i class="bi bi-folder me-2"></i>
+                                    Bàn sofa - Bàn cafe - Bàn trà
+                                </div>
+                                <div class="tree-item">
+                                    <i class="bi bi-folder me-2"></i>
+                                    Tủ kệ tivi
+                                </div>
+                                <div class="tree-item">
+                                    <i class="bi bi-folder me-2"></i>
+                                    Tủ giày - Tủ trang trí
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tree-item">
+                            <i class="bi bi-folder me-2"></i>
+                            <strong>Phòng ngủ</strong>
+                            <div class="tree-children ms-4">
+                                <div class="tree-item">
+                                    <i class="bi bi-folder me-2"></i>
+                                    Combo phòng ngủ
+                                </div>
+                                <div class="tree-item">
+                                    <i class="bi bi-folder me-2"></i>
+                                    Tủ quần áo
+                                </div>
+                                <div class="tree-item">
+                                    <i class="bi bi-folder me-2"></i>
+                                    Giường ngủ
+                                </div>
+                                <div class="tree-item">
+                                    <i class="bi bi-folder me-2"></i>
+                                    Tủ đầu giường
+                                </div>
+                                <div class="tree-item">
+                                    <i class="bi bi-folder me-2"></i>
+                                    Bàn trang điểm
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tree-item">
+                            <i class="bi bi-folder me-2"></i>
+                            <strong>Phòng ăn</strong>
+                            <div class="tree-children ms-4">
+                                <div class="tree-item">
+                                    <i class="bi bi-folder me-2"></i>
+                                    Bàn ăn
+                                </div>
+                                <div class="tree-item">
+                                    <i class="bi bi-folder me-2"></i>
+                                    Ghế ăn
+                                </div>
+                                <div class="tree-item">
+                                    <i class="bi bi-folder me-2"></i>
+                                    Bộ bàn ăn
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tree-item">
+                            <i class="bi bi-folder me-2"></i>
+                            <strong>Phòng làm việc</strong>
+                            <div class="tree-children ms-4">
+                                <div class="tree-item">
+                                    <i class="bi bi-folder me-2"></i>
+                                    Bàn làm việc
+                                </div>
+                                <div class="tree-item">
+                                    <i class="bi bi-folder me-2"></i>
+                                    Ghế văn phòng
+                                </div>
+                                <div class="tree-item">
+                                    <i class="bi bi-folder me-2"></i>
+                                    Tủ và kệ
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card admin-card">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-collection me-2"></i>
+                        Bộ sưu tập
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="card border">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title">PREMIUM</h6>
+                                    <small class="text-muted">15 sản phẩm</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="card border">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title">SCARLET</h6>
+                                    <small class="text-muted">8 sản phẩm</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="card border">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title">SERENA</h6>
+                                    <small class="text-muted">12 sản phẩm</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="card border">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title">PLANK</h6>
+                                    <small class="text-muted">6 sản phẩm</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="card border">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title">KLINE</h6>
+                                    <small class="text-muted">9 sản phẩm</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="card border">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title">DALUMD</h6>
+                                    <small class="text-muted">7 sản phẩm</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Category Modal -->
+<div class="modal fade" id="createCategoryModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Tạo Danh mục mới</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label class="form-label">Danh mục cha</label>
+                        <select class="form-select">
+                            <option value="">Danh mục gốc</option>
+                            <option value="1">Phòng khách</option>
+                            <option value="2">Phòng ngủ</option>
+                            <option value="3">Phòng ăn</option>
+                            <option value="4">Phòng làm việc</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Tên danh mục</label>
+                        <input type="text" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Slug</label>
+                        <input type="text" class="form-control" placeholder="tu-dong-tao">
+                        <small class="form-text text-muted">Sẽ tự động tạo từ tên danh mục</small>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" checked>
+                            <label class="form-check-label">Kích hoạt</label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-admin-primary">Tạo Danh mục</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Collection Modal -->
+<div class="modal fade" id="createCollectionModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Tạo Bộ sưu tập mới</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label class="form-label">Tên bộ sưu tập</label>
+                        <input type="text" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Slug</label>
+                        <input type="text" class="form-control" placeholder="tu-dong-tao">
+                        <small class="form-text text-muted">Sẽ tự động tạo từ tên bộ sưu tập</small>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" checked>
+                            <label class="form-check-label">Kích hoạt</label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-admin-primary">Tạo Bộ sưu tập</button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

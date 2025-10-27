@@ -1,0 +1,165 @@
+package mocviet.controller.customer;
+
+import lombok.RequiredArgsConstructor;
+import mocviet.entity.CartItem;
+import mocviet.service.customer.ICartService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@Controller
+@RequestMapping("/customer/cart")
+@RequiredArgsConstructor
+public class CartController {
+    
+    private final ICartService cartService;
+    
+    @GetMapping
+    public String cartPage(Model model) {
+        List<CartItem> cartItems = cartService.getCurrentUserCartItems();
+        Map<Integer, String> stockErrors = cartService.validateStockAvailability(cartItems);
+        
+        model.addAttribute("cartItems", cartItems);
+        model.addAttribute("stockErrors", stockErrors);
+        model.addAttribute("cartItemCount", cartService.getCartItemCount());
+        
+        return "customer/cart";
+    }
+    
+    @PostMapping("/add")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> addToCart(@RequestParam Integer variantId,
+                                                        @RequestParam Integer quantity) {
+        Map<String, Object> response = new HashMap<>();
+        
+        try {
+            boolean success = cartService.addToCart(variantId, quantity);
+            if (success) {
+                response.put("success", true);
+                response.put("message", "Đã thêm sản phẩm vào giỏ hàng");
+                response.put("cartItemCount", cartService.getCartItemCount());
+            } else {
+                response.put("success", false);
+                response.put("message", "Không thể thêm sản phẩm vào giỏ hàng. Vui lòng kiểm tra lại tồn kho.");
+            }
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "Có lỗi xảy ra. Vui lòng thử lại sau");
+        }
+        
+        return ResponseEntity.ok(response);
+    }
+    
+    @PostMapping("/update-quantity")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> updateQuantity(@RequestParam Integer cartItemId,
+                                                              @RequestParam Integer quantity) {
+        Map<String, Object> response = new HashMap<>();
+        
+        try {
+            boolean success = cartService.updateCartItemQuantity(cartItemId, quantity);
+            if (success) {
+                response.put("success", true);
+                response.put("message", "Đã cập nhật số lượng");
+                
+                // Tính lại tổng tiền nếu cần
+                List<CartItem> cartItems = cartService.getCurrentUserCartItems();
+                Map<Integer, String> stockErrors = cartService.validateStockAvailability(cartItems);
+                response.put("stockErrors", stockErrors);
+            } else {
+                response.put("success", false);
+                response.put("message", "Không thể cập nhật số lượng. Vui lòng kiểm tra lại tồn kho.");
+            }
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "Có lỗi xảy ra. Vui lòng thử lại sau");
+        }
+        
+        return ResponseEntity.ok(response);
+    }
+    
+    @PostMapping("/remove")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> removeFromCart(@RequestParam Integer cartItemId) {
+        Map<String, Object> response = new HashMap<>();
+        
+        try {
+            boolean success = cartService.removeFromCart(cartItemId);
+            if (success) {
+                response.put("success", true);
+                response.put("message", "Đã xóa sản phẩm khỏi giỏ hàng");
+                response.put("cartItemCount", cartService.getCartItemCount());
+            } else {
+                response.put("success", false);
+                response.put("message", "Không thể xóa sản phẩm khỏi giỏ hàng");
+            }
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "Có lỗi xảy ra. Vui lòng thử lại sau");
+        }
+        
+        return ResponseEntity.ok(response);
+    }
+    
+    @PostMapping("/clear")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> clearCart() {
+        Map<String, Object> response = new HashMap<>();
+        
+        try {
+            boolean success = cartService.clearCart();
+            if (success) {
+                response.put("success", true);
+                response.put("message", "Đã xóa tất cả sản phẩm khỏi giỏ hàng");
+                response.put("cartItemCount", 0);
+            } else {
+                response.put("success", false);
+                response.put("message", "Không thể xóa giỏ hàng");
+            }
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "Có lỗi xảy ra. Vui lòng thử lại sau");
+        }
+        
+        return ResponseEntity.ok(response);
+    }
+    
+    @PostMapping("/calculate-total")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> calculateTotal(@RequestBody List<Integer> selectedItemIds) {
+        Map<String, Object> response = new HashMap<>();
+        
+        try {
+            Long total = cartService.calculateCartTotal(selectedItemIds);
+            response.put("success", true);
+            response.put("total", total);
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "Có lỗi xảy ra khi tính tổng tiền");
+        }
+        
+        return ResponseEntity.ok(response);
+    }
+    
+    @GetMapping("/count")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> getCartItemCount() {
+        Map<String, Object> response = new HashMap<>();
+        
+        try {
+            int count = cartService.getCartItemCount();
+            response.put("success", true);
+            response.put("count", count);
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("count", 0);
+        }
+        
+        return ResponseEntity.ok(response);
+    }
+}

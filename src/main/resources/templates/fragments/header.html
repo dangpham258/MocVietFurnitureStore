@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+<!-- Header Fragment -->
+<header th:fragment="header">
+    <!-- Top Bar -->
+    <div class="bg-dark text-white py-2">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 small">
+                    <i class="bi bi-telephone"></i> Hotline: 0971 141 140
+                    <span class="ms-3"><i class="bi bi-envelope"></i> cskh@mocviet.vn</span>
+                </div>
+                <div class="col-md-6 text-end small">
+                    <span sec:authorize="isAuthenticated()">
+                        <div class="dropdown d-inline-block">
+                        <!-- Xin chào, <span sec:authentication="name"></span> | 
+                        <a href="/logout" class="text-white text-decoration-none">Đăng xuất</a> -->
+                            <a class="text-white text-decoration-none dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                                Xin chào, <span sec:authentication="name"></span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="/customer/profile">Thông tin tài khoản</a></li>
+                                <li><a class="dropdown-item" href="/customer/orders">Đơn hàng của tôi</a></li>
+                                <li><a class="dropdown-item" href="/customer/wishlist">Danh sách yêu thích</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="/logout">Đăng xuất</a></li>
+                            </ul>
+                        </div>
+                    </span>
+                    <span sec:authorize="!isAuthenticated()">
+                        <a href="/login" class="text-white text-decoration-none">Đăng nhập</a> / 
+                        <a href="/register" class="text-white text-decoration-none">Đăng ký</a>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
+        <div class="container">
+            <!-- Logo -->
+            <a class="navbar-brand fw-bold fs-4" href="/">
+                🪑 MỘC VIỆT
+            </a>
+            
+            <!-- Mobile Toggle -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <!-- Navigation Menu -->
+            <div class="collapse navbar-collapse" id="navbarMain">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Trang chủ</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Sản phẩm</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/products/living-room">Phòng khách</a></li>
+                            <li><a class="dropdown-item" href="/products/bedroom">Phòng ngủ</a></li>
+                            <li><a class="dropdown-item" href="/products/dining-room">Phòng ăn</a></li>
+                            <li><a class="dropdown-item" href="/products/office">Phòng làm việc</a></li>
+                            <li><a class="dropdown-item" href="/products/kitchen">Tủ bếp</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/about">Về Mộc Việt</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/news">Tin tức</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/contact">Liên hệ</a>
+                    </li>
+                </ul>
+                
+                <!-- Right Menu -->
+                <div class="d-flex">
+                    <a href="/search" class="btn btn-link text-dark">
+                        <i class="bi bi-search"></i>
+                    </a>
+                    <a href="/customer/cart" class="btn btn-link text-dark position-relative">
+                        <i class="bi bi-cart3"></i>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger cart-count" style="display: none;">
+                            0
+                        </span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<!-- Bootstrap Icons CDN -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+<!-- Cart Header Script -->
+<script th:src="@{/js/customer.js}"></script>
+
+</body>
+</html>
+
