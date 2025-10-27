@@ -995,3 +995,88 @@ body, html {
     z-index: 10 !important;
     box-shadow: 0 2px 8px rgba(0,0,0,0.2) !important;
 }
+
+/* ========================================
+   SHOWROOMS MANAGEMENT STYLES
+   ======================================== */
+
+/* Showroom card styles */
+.showroom-card {
+    transition: box-shadow 0.2s;
+}
+
+.showroom-card:hover {
+    box-shadow: 0 0.5rem 1.5rem rgba(0,0,0,0.15) !important;
+}
+
+/* Card content padding cho info section */
+.showroom-card .card-body {
+    padding: 1.5rem;
+}
+
+/* Responsive: Mobile stack map on top */
+@media (max-width: 991.98px) {
+    .showroom-map-preview-full {
+        min-height: 350px;
+    }
+}
+
+/* Showroom map preview */
+.showroom-map-preview {
+    height: 200px;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.showroom-map-preview iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+/* Showroom map preview full width (grid view) */
+.showroom-map-preview-full {
+    height: 100%;
+    min-height: 400px;
+    border-radius: 0;
+    overflow: hidden;
+}
+
+.showroom-map-preview-full iframe {
+    width: 100%;
+    height: 100%;
+    min-height: 400px;
+    border: none;
+}
+
+/* Status badge styles */
+.status-badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 50px;
+}
+
+/* Upload area styles */
+.upload-area {
+    border: 2px dashed #dee2e6;
+    border-radius: 8px;
+    padding: 3rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.upload-area:hover {
+    border-color: #0d6efd;
+    background-color: #f8f9fa;
+}
+
+/* Grid view specific styles */
+#showroomGrid .card {
+    margin-bottom: 1.5rem;
+}
+
+/* List view specific styles */
+#showroomList table {
+    margin-bottom: 0;
+}

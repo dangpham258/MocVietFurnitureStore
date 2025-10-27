@@ -800,6 +800,13 @@ function initializeBootstrapComponents() {
                 classRef: 'BannersManagement',
                 instanceName: 'bannersManagement',
                 initFunction: 'initializeBannersManagement'
+            },
+            {
+                urlPattern: '/admin/showrooms',
+                scriptPath: '/js/admin/showrooms.js',
+                classRef: 'ShowroomsManagement',
+                instanceName: 'showroomsManagement',
+                initFunction: 'initializeShowroomsManagement'
             }
         ];
         

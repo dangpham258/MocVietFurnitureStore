@@ -118,5 +118,8 @@
     <!-- Banners Management JS - Chỉ load ở trang banners -->
     <script th:if="${activeMenu == 'banners'}" 
             th:src="@{/js/admin/banners.js(v=${jsVersion ?: 'HuynhNgocThang'})}"></script>
+    <!-- Showrooms Management JS - Chỉ load ở trang showrooms -->
+    <script th:if="${activeMenu == 'showrooms'}" 
+            th:src="@{/js/admin/showrooms.js(v=${jsVersion ?: 'HuynhNgocThang'})}"></script>
 </body>
 </html>
