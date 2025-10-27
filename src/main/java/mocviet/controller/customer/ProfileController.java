@@ -7,6 +7,7 @@ import mocviet.dto.PasswordChangeRequest;
 import mocviet.dto.ProfileUpdateRequest;
 import mocviet.entity.Address;
 import mocviet.entity.User;
+import mocviet.repository.AddressRepository;
 import mocviet.service.customer.IProfileService;
 import mocviet.service.customer.ICustomerService;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +28,7 @@ public class ProfileController {
     
     private final IProfileService profileService;
     private final ICustomerService customerService;
+    private final AddressRepository addressRepository;
     
     @GetMapping
     public String profilePage(@RequestParam(value = "error", required = false) String error,
@@ -219,22 +221,31 @@ public class ProfileController {
     // AJAX endpoint để lấy thông tin địa chỉ cho edit modal
     @GetMapping("/address/{id}")
     @ResponseBody
-    public ResponseEntity<Address> getAddress(@PathVariable Integer id) {
+    public ResponseEntity<Map<String, Object>> getAddress(@PathVariable Integer id) {
         try {
             User currentUser = profileService.getCurrentUserProfile();
-            List<Address> addresses = profileService.getUserAddresses();
             
-            Address address = addresses.stream()
-                    .filter(addr -> addr.getId().equals(id))
-                    .findFirst()
+            // Sử dụng repository để kiểm tra ownership và lấy address
+            Address address = addressRepository.findByIdAndUserId(id, currentUser.getId())
                     .orElse(null);
             
-            if (address != null && address.getUser().getId().equals(currentUser.getId())) {
-                return ResponseEntity.ok(address);
-            } else {
+            if (address == null) {
                 return ResponseEntity.notFound().build();
             }
+            
+            // Tạo Map để tránh vấn đề lazy loading và circular reference
+            Map<String, Object> addressData = new HashMap<>();
+            addressData.put("id", address.getId());
+            addressData.put("receiverName", address.getReceiverName());
+            addressData.put("phone", address.getPhone());
+            addressData.put("addressLine", address.getAddressLine());
+            addressData.put("city", address.getCity());
+            addressData.put("district", address.getDistrict());
+            addressData.put("isDefault", address.getIsDefault());
+            
+            return ResponseEntity.ok(addressData);
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.badRequest().build();
         }
     }
