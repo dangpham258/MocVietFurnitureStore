@@ -6,14 +6,16 @@ import mocviet.entity.UserNotification;
 import mocviet.repository.UserNotificationRepository;
 import mocviet.service.UserDetailsServiceImpl;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@RestController
-@RequestMapping("/api/notifications")
+@Controller
 @RequiredArgsConstructor
 public class NotificationController {
     
@@ -21,10 +23,25 @@ public class NotificationController {
     private final UserDetailsServiceImpl userDetailsService;
     
     /**
+     * Trang hiển thị danh sách thông báo
+     */
+    @GetMapping("/notifications")
+    public String showNotificationsPage(Model model) {
+        User currentUser = userDetailsService.getCurrentUser();
+        if (currentUser != null) {
+            // Lấy tất cả notifications chưa đọc, sắp xếp từ mới đến cũ
+            List<UserNotification> notifications = notificationRepository
+                .findByUserAndIsReadFalseOrderByCreatedAtDesc(currentUser);
+            model.addAttribute("notifications", notifications);
+        }
+        return "notifications";
+    }
+    
+    /**
      * API: Lấy tất cả notifications chưa đọc của user hiện tại
      * Sắp xếp từ cũ nhất đến mới nhất
      */
-    @GetMapping("/unread")
+    @GetMapping("/api/notifications/unread")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> getUnreadNotifications() {
         Map<String, Object> response = new HashMap<>();
@@ -62,7 +79,7 @@ public class NotificationController {
     /**
      * API: Đánh dấu notification là đã đọc
      */
-    @PostMapping("/{notificationId}/read")
+    @PostMapping("/api/notifications/{notificationId}/read")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> markAsRead(@PathVariable Integer notificationId) {
         Map<String, Object> response = new HashMap<>();
@@ -105,8 +122,9 @@ public class NotificationController {
     /**
      * API: Đánh dấu tất cả notifications là đã đọc
      */
-    @PostMapping("/read-all")
+    @PostMapping("/api/notifications/read-all")
     @ResponseBody
+    @Transactional
     public ResponseEntity<Map<String, Object>> markAllAsRead() {
         Map<String, Object> response = new HashMap<>();
         

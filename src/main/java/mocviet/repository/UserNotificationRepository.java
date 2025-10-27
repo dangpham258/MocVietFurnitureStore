@@ -41,14 +41,14 @@ public interface UserNotificationRepository extends JpaRepository<UserNotificati
     /**
      * Đánh dấu tất cả notifications là đã đọc
      */
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Query("UPDATE UserNotification n SET n.isRead = true WHERE n.user = :user")
     void markAllAsRead(@Param("user") User user);
     
     /**
      * Đánh dấu notification là đã đọc
      */
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Query("UPDATE UserNotification n SET n.isRead = true WHERE n.id = :id")
     void markAsRead(@Param("id") Integer id);
 }
