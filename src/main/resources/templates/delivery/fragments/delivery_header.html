@@ -6,19 +6,34 @@
 <header th:fragment="header" class="manager-header">
     <div class="d-flex justify-content-between align-items-center">
         <h4 class="mb-0" th:text="${pageTitle ?: 'Dashboard'}">Page Title</h4>
-        
-        <div class="dropdown" sec:authorize="isAuthenticated()">
-            <button class="btn btn-outline-dark btn-sm dropdown-toggle" type="button" id="userMenuButton" data-bs-toggle="dropdown">
-                <i class="bi bi-person-circle me-1"></i>
-                <span sec:authentication="name">Delivery User</span>
-            </button>
-            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenuButton">
-                <li><a class="dropdown-item" th:href="@{/delivery/profile}">Tài khoản</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item text-danger" href="/logout">Đăng xuất</a></li>
-            </ul>
-        </div>
-    </div>
+
+        <div class="d-flex align-items-center"> <div class="dropdown me-3">
+                <button class="btn btn-outline-secondary btn-sm position-relative" type="button" id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false" title="Thông báo">
+                    <i class="bi bi-bell"></i>
+                    <span id="notificationBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="display: none; font-size: 0.6em;">
+                        0
+                    </span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationDropdown" id="notificationList" style="min-width: 300px; max-height: 400px; overflow-y: auto;">
+                    <li><h6 class="dropdown-header">Thông báo</h6></li>
+                    <li><a class="dropdown-item text-muted text-center disabled" id="notificationPlaceholder" href="#">Đang tải...</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-center small text-primary" href="#" onclick="markAllNotificationsRead(event)">Đánh dấu tất cả đã đọc</a></li>
+                    <li><a class="dropdown-item text-center small text-secondary" href="#" onclick="createTestNotification(event)">Tạo thông báo test</a></li>
+                    </ul>
+            </div>
+            <div class="dropdown" sec:authorize="isAuthenticated()">
+                <button class="btn btn-outline-dark btn-sm dropdown-toggle" type="button" id="userMenuButton" data-bs-toggle="dropdown">
+                    <i class="bi bi-person-circle me-1"></i>
+                    <span sec:authentication="name">Delivery User</span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenuButton">
+                    <li><a class="dropdown-item" th:href="@{/delivery/profile}">Tài khoản</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" href="/logout">Đăng xuất</a></li>
+                </ul>
+            </div>
+        </div> </div>
 </header>
 
 </body>

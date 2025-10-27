@@ -1,46 +1,44 @@
 package mocviet.service.delivery;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.TemporalAdjusters;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service; // Repository gốc
+import org.springframework.transaction.annotation.Transactional; // Repositories trong package delivery
+
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.ParameterMode;
 import jakarta.persistence.StoredProcedureQuery;
-import lombok.RequiredArgsConstructor;
+import lombok.RequiredArgsConstructor; // Import PasswordEncoder
 import mocviet.dto.MessageResponse;
 import mocviet.dto.PasswordChangeRequest;
 import mocviet.dto.ProfileUpdateRequest;
 import mocviet.dto.delivery.DeliveryOrderDetailDTO;
 import mocviet.dto.delivery.DeliveryOrderSummaryDTO;
+import mocviet.dto.delivery.DeliveryStatsDTO;
 import mocviet.dto.delivery.DeliveryUpdateRequestDTO;
-import mocviet.entity.*;
-import mocviet.repository.UserRepository; // Repository gốc
-import mocviet.repository.delivery.*; // Repositories trong package delivery
-import mocviet.service.UserDetailsServiceImpl; // Service chung
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.password.PasswordEncoder; // Import PasswordEncoder
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDate; // Import LocalDate
-import java.time.LocalDateTime; // Thêm import
-import java.util.Arrays;
-import java.util.Collections; // Thêm import
-import java.util.Comparator; // Thêm import
-import java.util.List;
-import java.util.Optional; // Thêm import
-import java.util.stream.Collectors;
-import mocviet.dto.delivery.DeliveryStatsDTO; // Thêm import
-import java.time.DayOfWeek; // Thêm import
-import java.time.temporal.TemporalAdjusters; // Thêm import
+import mocviet.entity.DeliveryTeam;
+import mocviet.entity.OrderDelivery;
+import mocviet.entity.User;
+import mocviet.repository.UserRepository;
+import mocviet.repository.delivery.DeliveryOrderDeliveryRepository;
+import mocviet.repository.delivery.DeliveryTeamRepository;
 
 @Service
 @RequiredArgsConstructor
 public class DeliveryServiceImpl implements IDeliveryService {
 
-    private final UserDetailsServiceImpl userDetailsService;
     private final DeliveryTeamRepository deliveryTeamRepository;
-    private final DeliveryOrderDeliveryRepository orderDeliveryRepository; // <<<--- Giữ lại 1 khai báo
-    // private final DeliveryHistoryRepository deliveryHistoryRepository; // Bỏ comment nếu dùng
+    private final DeliveryOrderDeliveryRepository orderDeliveryRepository;
     private final UserRepository userRepository; // Repo gốc để lấy User
     private final PasswordEncoder passwordEncoder; // Để đổi mật khẩu
     private final EntityManager entityManager; // Để gọi Stored Procedure
@@ -51,15 +49,15 @@ public class DeliveryServiceImpl implements IDeliveryService {
             throw new RuntimeException("Người dùng chưa được xác thực.");
         }
         Object principal = authentication.getPrincipal();
-        if (principal instanceof User) {
-            return (User) principal;
-        } else if (principal instanceof String) {
-            // Tải lại user từ username nếu principal chỉ là String
-            return userRepository.findByUsername((String) principal)
-                    .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng: " + principal));
-        }
-        throw new RuntimeException("Không thể xác định người dùng hiện tại.");
+        return switch (principal) {
+            case User user -> user;
+            case String username -> userRepository.findByUsername(username)
+                    .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng: " + username));
+            default -> throw new RuntimeException("Không thể xác định người dùng hiện tại.");
+        };
     }
+    
+    
  // <<<--- THÊM PHƯƠNG THỨC NÀY --- >>>
     @Override
     @Transactional(readOnly = true)
@@ -102,6 +100,7 @@ public class DeliveryServiceImpl implements IDeliveryService {
                 OrderDelivery.DeliveryStatus.IN_TRANSIT,
                 OrderDelivery.DeliveryStatus.RETURN_PICKUP
         );
+        
         // Phương thức này giữ nguyên OrderBy vì dùng List, không phải Pageable
         List<OrderDelivery> deliveries = orderDeliveryRepository
                 .findByDeliveryTeamIdAndStatusInOrderByUpdatedAtDesc(teamId, statuses);
@@ -118,6 +117,17 @@ public class DeliveryServiceImpl implements IDeliveryService {
         Integer teamId = getCurrentDeliveryTeamId(authentication);
         OrderDelivery orderDelivery = orderDeliveryRepository
                 .findByIdAndDeliveryTeamId(orderDeliveryId, teamId) // Tìm theo ID và teamId để bảo mật
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn giao hàng hoặc bạn không có quyền xem."));
+
+        // Map sang DTO chi tiết
+        return DeliveryOrderDetailDTO.fromEntity(orderDelivery);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public DeliveryOrderDetailDTO getOrderDetailByOrderId(Authentication authentication, Integer orderId) {
+        Integer teamId = getCurrentDeliveryTeamId(authentication);
+        OrderDelivery orderDelivery = orderDeliveryRepository.findByOrderIdAndDeliveryTeamId(orderId, teamId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn giao hàng hoặc bạn không có quyền xem."));
 
         // Map sang DTO chi tiết
@@ -152,7 +162,19 @@ public class DeliveryServiceImpl implements IDeliveryService {
             query.registerStoredProcedureParameter("note", String.class, ParameterMode.IN);
 
             query.setParameter("order_id", orderId);
-            query.setParameter("proof_image_url", request.getProofImageUrl()); // Có thể null
+            
+            // Xử lý proof_image_url để tuân thủ constraint
+            String proofImageUrl = request.getProofImageUrl();
+            if (proofImageUrl != null && !proofImageUrl.trim().isEmpty()) {
+                // Nếu có URL nhưng không đúng format, chuyển thành null
+                if (!proofImageUrl.startsWith("/static/images/deliveries/")) {
+                    proofImageUrl = null;
+                }
+            } else {
+                proofImageUrl = null;
+            }
+            
+            query.setParameter("proof_image_url", proofImageUrl); // Đã xử lý để tuân thủ constraint
             query.setParameter("actor_user_id", currentUser.getId()); // ID của người dùng delivery
             query.setParameter("note", request.getNote()); // Có thể null
 
@@ -210,6 +232,106 @@ public class DeliveryServiceImpl implements IDeliveryService {
             query.setParameter("reason", request.getNote()); // Ghi chú của delivery
             query.setParameter("refund_method", request.getRefundMethod().toUpperCase()); // Chuẩn hóa
             // query.setParameter("proof_image_url", request.getProofImageUrl()); // Nếu SP cần
+
+            query.execute();
+
+            return MessageResponse.success("Xử lý thu hồi và hoàn tiền thành công cho đơn #" + orderId);
+        } catch (Exception e) {
+             String rootCauseMessage = getRootCauseMessage(e); // Lấy lỗi gốc
+            return MessageResponse.error("Lỗi khi xử lý thu hồi hàng: " + rootCauseMessage);
+        }
+    }
+
+    @Override
+    @Transactional
+    public MessageResponse confirmDeliveryByOrderId(Authentication authentication, Integer orderId, DeliveryUpdateRequestDTO request) {
+        User currentUser = getCurrentUser(authentication);
+        Integer teamId = getCurrentDeliveryTeamId(authentication);
+
+        // Tìm OrderDelivery bằng orderId và teamId
+        OrderDelivery od = orderDeliveryRepository.findByOrderIdAndDeliveryTeamId(orderId, teamId)
+                .orElseThrow(() -> new RuntimeException("Đơn giao hàng không hợp lệ hoặc không được phân công cho bạn."));
+
+        // Chỉ xác nhận khi đang IN_TRANSIT
+        if (od.getStatus() != OrderDelivery.DeliveryStatus.IN_TRANSIT) {
+            return MessageResponse.error("Không thể xác nhận giao hàng cho đơn ở trạng thái " + od.getStatus());
+        }
+         // Kiểm tra null cho order gốc
+        if (od.getOrder() == null) {
+             return MessageResponse.error("Lỗi: Không tìm thấy thông tin đơn hàng gốc.");
+        }
+
+        try {
+            StoredProcedureQuery query = entityManager.createStoredProcedureQuery("dbo.sp_MarkDelivered");
+            query.registerStoredProcedureParameter("order_id", Integer.class, ParameterMode.IN);
+            query.registerStoredProcedureParameter("proof_image_url", String.class, ParameterMode.IN);
+            query.registerStoredProcedureParameter("actor_user_id", Integer.class, ParameterMode.IN);
+            query.registerStoredProcedureParameter("note", String.class, ParameterMode.IN);
+
+            // Xử lý proof_image_url để tuân thủ constraint
+            String proofImageUrl = request.getProofImageUrl();
+            if (proofImageUrl != null && !proofImageUrl.trim().isEmpty()) {
+                // Nếu có URL nhưng không đúng format, chuyển thành null
+                if (!proofImageUrl.startsWith("/static/images/deliveries/")) {
+                    proofImageUrl = null;
+                }
+            } else {
+                proofImageUrl = null;
+            }
+
+            query.setParameter("order_id", orderId);
+            query.setParameter("proof_image_url", proofImageUrl); // Đã xử lý để tuân thủ constraint
+            query.setParameter("actor_user_id", currentUser.getId()); // ID của người dùng delivery
+            query.setParameter("note", request.getNote()); // Có thể null
+
+            query.execute();
+
+            return MessageResponse.success("Xác nhận giao hàng thành công cho đơn #" + orderId);
+        } catch (Exception e) {
+            String rootCauseMessage = getRootCauseMessage(e); // Lấy lỗi gốc
+            return MessageResponse.error("Lỗi khi xác nhận giao hàng: " + rootCauseMessage);
+        }
+    }
+
+    @Override
+    @Transactional
+    public MessageResponse processReturnPickupByOrderId(Authentication authentication, Integer orderId, DeliveryUpdateRequestDTO request) {
+        User currentUser = getCurrentUser(authentication);
+        Integer teamId = getCurrentDeliveryTeamId(authentication);
+
+        // Tìm OrderDelivery bằng orderId và teamId
+        OrderDelivery od = orderDeliveryRepository.findByOrderIdAndDeliveryTeamId(orderId, teamId)
+                .orElseThrow(() -> new RuntimeException("Đơn giao hàng không hợp lệ hoặc không được phân công cho bạn."));
+
+        // Chỉ xử lý khi đang RETURN_PICKUP
+        if (od.getStatus() != OrderDelivery.DeliveryStatus.RETURN_PICKUP) {
+            return MessageResponse.error("Không thể xử lý thu hồi cho đơn ở trạng thái " + od.getStatus());
+        }
+         // Kiểm tra null cho order gốc
+         if (od.getOrder() == null) {
+             return MessageResponse.error("Lỗi: Không tìm thấy thông tin đơn hàng gốc.");
+        }
+
+        // Kiểm tra refundMethod có hợp lệ không
+        if (request.getRefundMethod() == null || request.getRefundMethod().isBlank()) {
+             return MessageResponse.error("Vui lòng chọn phương thức hoàn tiền.");
+        }
+        List<String> allowedMethods = Arrays.asList("COD_CASH", "BANK_TRANSFER", "VNPAY", "MOMO");
+        if (!allowedMethods.contains(request.getRefundMethod().toUpperCase())) {
+            return MessageResponse.error("Phương thức hoàn tiền không hợp lệ.");
+        }
+
+        try {
+            StoredProcedureQuery query = entityManager.createStoredProcedureQuery("dbo.sp_ReturnOrder");
+            query.registerStoredProcedureParameter("order_id", Integer.class, ParameterMode.IN);
+            query.registerStoredProcedureParameter("actor_user_id", Integer.class, ParameterMode.IN);
+            query.registerStoredProcedureParameter("reason", String.class, ParameterMode.IN);
+            query.registerStoredProcedureParameter("refund_method", String.class, ParameterMode.IN);
+
+            query.setParameter("order_id", orderId);
+            query.setParameter("actor_user_id", currentUser.getId());
+            query.setParameter("reason", request.getNote()); // Ghi chú của delivery
+            query.setParameter("refund_method", request.getRefundMethod().toUpperCase()); // Chuẩn hóa
 
             query.execute();
 

@@ -26,11 +26,27 @@
         .stat-card-icon.bg-month { background-color: #fffbe6; color: #faad14; }
         .stat-card-info h5 { font-size: 1.75rem; font-weight: 700; color: #333; margin: 0;}
         .stat-card-info p { font-size: 0.9rem; color: #666; margin: 0;}
+
+        /* Thêm CSS cho badge trạng thái OrderStatus */
+        .badge-delivered { background-color: #28a745; color: white; }
+        .badge-returned { background-color: #fd7e14; color: white; }
+        /* Bạn có thể thêm các màu khác cho các trạng thái khác nếu cần */
+
     </style>
 </head>
 <body>
 
 <div layout:fragment="content">
+    <div th:if="${param.error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle"></i> <span th:text="${param.error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    
+    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle"></i> <span th:text="${errorMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
     <div class="row" th:if="${stats != null}">
         <div class="col-md-4">
             <div class="stat-card">
@@ -66,6 +82,7 @@
             </div>
         </div>
     </div>
+
     <div th:if="${orderPage == null or orderPage.empty}" class="delivery-empty-state mt-4">
         <i class="bi bi-calendar-x"></i>
         <h5>Chưa có đơn hàng nào được hoàn thành</h5>
@@ -74,7 +91,7 @@
 
     <div th:unless="${orderPage == null or orderPage.empty}">
         <p class="text-muted mb-3">Danh sách các đơn hàng bạn đã giao hoặc thu hồi thành công.</p>
-        
+
         <div class="card manager-card">
             <div class="card-header">
                 <i class="bi bi-list-check me-2"></i> Lịch sử đơn hàng (DONE)
@@ -108,7 +125,7 @@
                                 <td th:text="${order.deliveryAddress}" style="max-width: 250px; white-space: normal;"></td>
                                 <td th:text="${#temporals.format(order.updatedAt, 'dd/MM/yyyy')}"></td>
                                 <td>
-                                    <a th:href="@{/delivery/orders/{id}(id=${order.orderDeliveryId})}" class="btn btn-primary btn-sm" title="Xem chi tiết">
+                                    <a th:href="@{/delivery/orders/original/{id}(id=${order.orderId})}" class="btn btn-primary btn-sm" title="Xem chi tiết đơn gốc">
                                         <i class="bi bi-eye"></i>
                                     </a>
                                 </td>

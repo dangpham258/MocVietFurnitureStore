@@ -2,15 +2,15 @@ package mocviet.dto.delivery;
 
 import lombok.Data;
 import mocviet.dto.OrderItemDTO;
-import mocviet.dto.StatusHistoryDTO;
+import mocviet.dto.StatusHistoryDTO; // Đảm bảo import DTO đã sửa
 import mocviet.entity.*;
-
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.Comparator; // <<<--- ĐÃ THÊM IMPORT
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.math.BigDecimal; // Đảm bảo import BigDecimal
+import java.time.LocalDateTime; // Đảm bảo import LocalDateTime
+import java.util.Collections; // <<<--- THÊM IMPORT NÀY
 
 @Data
 public class DeliveryOrderDetailDTO {
@@ -74,7 +74,7 @@ public class DeliveryOrderDetailDTO {
 
         // Customer Info
         dto.setCustomerName(customer != null ? customer.getFullName() : "N/A");
-        dto.setCustomerPhone(address != null ? address.getPhone() : "N/A");
+        dto.setCustomerPhone(address != null ? address.getPhone() : "N/A"); // Lấy SĐT từ Address
 
         // Address Info
         dto.setReceiverName(address != null ? address.getReceiverName() : "N/A");
@@ -97,40 +97,40 @@ public class DeliveryOrderDetailDTO {
                         item.getVariant() != null ? item.getVariant().getTypeName() : "N/A",
                         item.getQty(),
                         item.getUnitPrice(),
-                        // Cần kiểm tra null trước khi nhân
                         (item.getUnitPrice() != null && item.getQty() != null) ? item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQty())) : BigDecimal.ZERO,
                         (item.getVariant() != null && item.getVariant().getProduct() != null) ? item.getVariant().getProduct().getSlug() : null
                 ))
                 .collect(Collectors.toList()));
 
-            // Tính tổng tiền
             dto.setTotalAmount(order.getOrderItems().stream()
-                // Kiểm tra null unitPrice và qty
                 .map(item -> (item.getUnitPrice() != null && item.getQty() != null) ? item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQty())) : BigDecimal.ZERO)
                 .reduce(BigDecimal.ZERO, BigDecimal::add)
                 .add(order.getShippingFee() != null ? order.getShippingFee() : BigDecimal.ZERO));
         } else {
-            dto.setItems(List.of());
+            dto.setItems(Collections.emptyList()); // <<<--- Dòng 127 dùng Collections
             dto.setTotalAmount(order.getShippingFee() != null ? order.getShippingFee() : BigDecimal.ZERO);
         }
 
         // History
         if (order.getStatusHistories() != null) {
             dto.setOrderStatusHistory(order.getStatusHistories().stream()
-                .map(h -> new StatusHistoryDTO(h.getId(), h.getStatus(), h.getNote(), h.getChangedAt()))
-                .sorted(Comparator.comparing(StatusHistoryDTO::getChangedAt).reversed()) // <<<--- Sử dụng Comparator
+                .map(h -> {
+                    String changedByName = (h.getChangedBy() != null) ? h.getChangedBy().getFullName() : "Hệ thống";
+                    return new StatusHistoryDTO(h.getId(), h.getStatus(), h.getNote(), h.getChangedAt(), changedByName);
+                })
+                .sorted(Comparator.comparing(StatusHistoryDTO::getChangedAt).reversed())
                 .collect(Collectors.toList()));
         } else {
-            dto.setOrderStatusHistory(List.of());
+            dto.setOrderStatusHistory(Collections.emptyList()); // <<<--- Dòng 137 dùng Collections
         }
 
         if (od.getDeliveryHistories() != null) {
             dto.setDeliveryHistory(od.getDeliveryHistories().stream()
-                .map(h -> new StatusHistoryDTO(h.getId(), h.getStatus() != null ? h.getStatus().name() : null, h.getNote(), h.getChangedAt())) // Kiểm tra null status
-                .sorted(Comparator.comparing(StatusHistoryDTO::getChangedAt).reversed()) // <<<--- Sử dụng Comparator
+                .map(h -> new StatusHistoryDTO(h.getId(), h.getStatus() != null ? h.getStatus().name() : null, h.getNote(), h.getChangedAt(), null))
+                .sorted(Comparator.comparing(StatusHistoryDTO::getChangedAt).reversed())
                 .collect(Collectors.toList()));
         } else {
-            dto.setDeliveryHistory(List.of());
+            dto.setDeliveryHistory(Collections.emptyList()); // Sử dụng Collections.emptyList()
         }
 
         // Actions allowed

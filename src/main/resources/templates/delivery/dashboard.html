@@ -7,16 +7,21 @@
 <body>
 
 <div layout:fragment="content">
-    
-    <div th:if="${orders == null or #lists.isEmpty(orders)}" class="delivery-empty-state"> 
+
+    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle"></i> <span th:text="${errorMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div th:if="${orders == null or #lists.isEmpty(orders)}" class="delivery-empty-state">
         <i class="bi bi-box2-heart"></i> <h5>Không có đơn hàng nào cần xử lý</h5>
         <p>Tất cả đơn hàng đã được hoàn tất. Quay lại sau nhé!</p>
     </div>
 
     <div th:unless="${orders == null or #lists.isEmpty(orders)}">
         <p class="text-muted mb-3">Tìm thấy <strong th:text="${#lists.size(orders)}"></strong> đơn hàng đang chờ giao hoặc cần thu hồi.</p>
-        
-        <div class="card manager-card"> 
+
+        <div class="card manager-card">
             <div class="card-header"> <i class="bi bi-list-task me-2"></i> Danh sách công việc
             </div>
             <div class="card-body p-0"> <div class="table-responsive">
@@ -51,7 +56,7 @@
                                 <td class="text-center" th:text="${order.itemCount}">2</td>
                                 <td th:text="${#temporals.format(order.updatedAt, 'HH:mm dd/MM/yy')}"></td>
                                 <td>
-                                    <a th:href="@{/delivery/orders/{id}(id=${order.orderDeliveryId})}" class="btn btn-primary btn-sm">
+                                    <a th:href="@{/delivery/orders/{id}(id=${order.orderId})}" class="btn btn-primary btn-sm">
                                         Chi tiết
                                     </a>
                                 </td>

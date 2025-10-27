@@ -11,7 +11,7 @@
     <a th:href="@{/delivery}" class="btn btn-outline-secondary btn-sm mb-3">
         <i class="bi bi-arrow-left me-1"></i> Quay lại danh sách
     </a>
-    
+
     <div class="row g-4">
         <div class="col-lg-4 order-lg-2">
             <div class="sticky-top" style="top: 20px;">
@@ -21,14 +21,15 @@
                     </div>
                     <div class="delivery-card-body">
                         <p>Xác nhận đã giao hàng thành công đến khách hàng.</p>
-                        <form th:action="@{/delivery/orders/{id}/deliver(id=${orderDetail.orderDeliveryId})}" method="post" th:object="${deliveryUpdate}">
+                        <form th:action="@{/delivery/orders/{id}/deliver(id=${orderDetail.orderId})}" method="post" th:object="${deliveryUpdate}">
                             <div class="mb-3">
                                 <label for="deliverNote" class="form-label">Ghi chú (tùy chọn)</label>
                                 <textarea class="form-control" id="deliverNote" rows="3" th:field="*{note}" placeholder="Vd: Khách hẹn giao chiều..."></textarea>
                             </div>
                             <div class="mb-3">
                                 <label for="deliverProof" class="form-label">Link ảnh bàn giao (tùy chọn)</label>
-                                <input type="text" class="form-control" id="deliverProof" th:field="*{proofImageUrl}" placeholder="https://...">
+                                <input type="text" class="form-control" id="deliverProof" th:field="*{proofImageUrl}" placeholder="/static/images/deliveries/order-2/00_order-2.jpg">
+                                <div class="form-text">URL phải bắt đầu bằng <code>/static/images/deliveries/</code> hoặc để trống</div>
                             </div>
                             <button type="submit" class="btn btn-success w-100 fw-bold">
                                 <i class="bi bi-check-lg me-1"></i> XÁC NHẬN ĐÃ GIAO
@@ -43,7 +44,7 @@
                     </div>
                     <div class="delivery-card-body">
                          <p>Xác nhận đã thu hồi hàng và hoàn tiền tại chỗ cho khách.</p>
-                         <form th:action="@{/delivery/orders/{id}/return(id=${orderDetail.orderDeliveryId})}" method="post" th:object="${deliveryUpdate}">
+                         <form th:action="@{/delivery/orders/{id}/return(id=${orderDetail.orderId})}" method="post" th:object="${deliveryUpdate}">
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Phương thức hoàn tiền <span class="text-danger">*</span></label>
                                 <div>
@@ -138,7 +139,7 @@
                             </li>
                         </ul>
                     </div>
-                    
+
                      <div class="detail-section">
                          <h5><i class="bi bi-clock-history me-2"></i>Lịch sử Giao hàng (Delivery)</h5>
                          <ul class="list-group list-group-flush history-list">
@@ -151,6 +152,23 @@
                              <li th:if="${#lists.isEmpty(orderDetail.deliveryHistory)}" class="list-group-item text-muted">Chưa có lịch sử.</li>
                         </ul>
                     </div>
+
+                    <div class="detail-section">
+                       <h5><i class="bi bi-list-check me-2"></i>Lịch sử Đơn hàng (Order)</h5>
+                       <ul class="list-group list-group-flush history-list">
+                          <li th:each="history : ${orderDetail.orderStatusHistory}" class="list-group-item">
+                              <span class="timeline-dot" th:classappend="${historyStat.first} ? 'current'"></span>
+                              <strong th:text="${history.status}">Trạng thái Order</strong>
+                              <small class="text-muted ms-2" th:text="${#temporals.format(history.changedAt, 'HH:mm dd/MM/yyyy')}"></small>
+                              <p class="mb-0 small" th:if="${history.note != null}" th:text="${history.note}"></p>
+                              <p class="mb-0 small text-muted" th:if="${history.changedByName != null}">
+                                  Thực hiện bởi: <span th:text="${history.changedByName}"></span>
+                              </p>
+                          </li>
+                           <li th:if="${#lists.isEmpty(orderDetail.orderStatusHistory)}" class="list-group-item text-muted">Chưa có lịch sử đơn hàng.</li>
+                      </ul>
+                   </div>
+
 
                 </div>
             </div>

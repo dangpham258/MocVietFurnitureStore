@@ -1,18 +1,19 @@
 package mocviet.service.delivery;
 
-import mocviet.dto.delivery.DeliveryStatsDTO; // Thêm import
-import mocviet.dto.MessageResponse;
-import mocviet.dto.PasswordChangeRequest; // Import DTO chung
-import mocviet.dto.ProfileUpdateRequest;   // Import DTO chung
-import mocviet.dto.delivery.DeliveryOrderDetailDTO;
-import mocviet.dto.delivery.DeliveryOrderSummaryDTO;
-import mocviet.dto.delivery.DeliveryUpdateRequestDTO;
-import mocviet.entity.User; // Import User
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.Authentication; // Import Authentication
+import java.util.List; // Thêm import
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable; // Import DTO chung
+import org.springframework.security.core.Authentication;   // Import DTO chung
+
+import mocviet.dto.MessageResponse;
+import mocviet.dto.PasswordChangeRequest;
+import mocviet.dto.ProfileUpdateRequest;
+import mocviet.dto.delivery.DeliveryOrderDetailDTO; // Import User
+import mocviet.dto.delivery.DeliveryOrderSummaryDTO;
+import mocviet.dto.delivery.DeliveryStatsDTO;
+import mocviet.dto.delivery.DeliveryUpdateRequestDTO; // Import Authentication
+import mocviet.entity.User;
 
 public interface IDeliveryService {
 
@@ -27,11 +28,20 @@ public interface IDeliveryService {
     /** Lấy chi tiết một đơn hàng được giao */
     DeliveryOrderDetailDTO getOrderDetail(Authentication authentication, Integer orderDeliveryId);
 
+    /** Lấy chi tiết một đơn hàng được giao bằng orderId */
+    DeliveryOrderDetailDTO getOrderDetailByOrderId(Authentication authentication, Integer orderId);
+
     /** Xác nhận đã giao hàng thành công */
     MessageResponse confirmDelivery(Authentication authentication, Integer orderDeliveryId, DeliveryUpdateRequestDTO request);
 
+    /** Xác nhận đã giao hàng thành công bằng orderId */
+    MessageResponse confirmDeliveryByOrderId(Authentication authentication, Integer orderId, DeliveryUpdateRequestDTO request);
+
     /** Xử lý thu hồi hàng và hoàn tiền */
     MessageResponse processReturnPickup(Authentication authentication, Integer orderDeliveryId, DeliveryUpdateRequestDTO request);
+
+    /** Xử lý thu hồi hàng và hoàn tiền bằng orderId */
+    MessageResponse processReturnPickupByOrderId(Authentication authentication, Integer orderId, DeliveryUpdateRequestDTO request);
 
     /** Lấy lịch sử đơn hàng đã hoàn thành (DONE) */
     Page<DeliveryOrderSummaryDTO> getCompletedOrders(Authentication authentication, Pageable pageable);

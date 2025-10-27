@@ -2,6 +2,7 @@ package mocviet.repository;
 
 import mocviet.entity.ProductVariant;
 import org.springframework.data.domain.Pageable; // Thêm import
+import org.springframework.data.jpa.repository.EntityGraph; // <<< THÊM IMPORT NÀY
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -31,12 +32,14 @@ public interface ProductVariantRepository extends JpaRepository<ProductVariant, 
     /**
      * Lấy danh sách ProductVariant đang active theo product ID
      */
+    @EntityGraph(attributePaths = {"color"}) // <<< THÊM DÒNG NÀY
     @Query("SELECT pv FROM ProductVariant pv WHERE pv.product.id = :productId AND pv.isActive = true")
     List<ProductVariant> findActiveByProductId(@Param("productId") Integer productId);
 
     /**
      * Kiểm tra tồn kho của ProductVariant
      */
+    @EntityGraph(attributePaths = {"color"}) // <<< THÊM DÒNG NÀY
     @Query("SELECT pv.stockQty FROM ProductVariant pv WHERE pv.id = :variantId")
     Integer getStockQtyById(@Param("variantId") Integer variantId);
 

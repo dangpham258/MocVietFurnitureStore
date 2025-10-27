@@ -2,6 +2,23 @@
 /* Manager Dashboard Styles - Monochrome Theme */
 
 /* Layout */
+
+/* Thêm màu cho các badge trạng thái đơn hàng trong trang lịch sử delivery */
+.badge-delivered {
+    background-color: #28a745; /* Màu xanh lá cây */
+    color: #ffffff; /* Màu chữ trắng */
+}
+
+.badge-returned {
+    background-color: #fd7e14; /* Màu cam */
+    color: #ffffff; /* Màu chữ trắng */
+}
+
+/* Bạn có thể thêm các màu khác nếu cần */
+.badge-cancelled {
+    background-color: #dc3545; /* Màu đỏ */
+    color: #ffffff;
+}
 body {
     background-color: #ffffff;
     font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;

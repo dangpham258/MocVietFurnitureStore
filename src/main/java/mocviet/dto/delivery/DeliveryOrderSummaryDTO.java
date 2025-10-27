@@ -1,16 +1,16 @@
 package mocviet.dto.delivery;
 
-import lombok.AllArgsConstructor;
+import java.time.LocalDateTime;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import lombok.AllArgsConstructor; // Import Address
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import mocviet.entity.Address; // Import Address
+import mocviet.entity.Address; // Import User
 import mocviet.entity.OrderDelivery;
-import mocviet.entity.Orders;
-import mocviet.entity.User; // Import User
-
-import java.time.LocalDateTime;
-import java.util.stream.Collectors; // Import Collectors
-import java.util.stream.Stream; // Import Stream
+import mocviet.entity.Orders; // Import Collectors
+import mocviet.entity.User; // Import Stream
 
 // DTO tóm tắt đơn hàng cho trang danh sách của Delivery
 @Data
@@ -42,13 +42,19 @@ public class DeliveryOrderSummaryDTO {
             fullAddress = Stream.of(address.getAddressLine(), address.getDistrict(), address.getCity())
                               .filter(s -> s != null && !s.trim().isEmpty())
                               .collect(Collectors.joining(", "));
-            phone = address.getPhone();
+            if (fullAddress.isEmpty()) {
+                fullAddress = "N/A";
+            }
+            phone = address.getPhone() != null ? address.getPhone() : "N/A";
         }
 
-        String custName = (customer != null) ? customer.getFullName() : "Khách hàng ẩn danh";
+        String custName = (customer != null && customer.getFullName() != null) ? customer.getFullName() : "Khách hàng ẩn danh";
 
         // Đếm số lượng item (cần kiểm tra null)
-        int count = (order.getOrderItems() != null) ? order.getOrderItems().size() : 0;
+        int count = 0;
+        if (order.getOrderItems() != null) {
+            count = order.getOrderItems().size();
+        }
 
         return new DeliveryOrderSummaryDTO(
                 od.getId(),
@@ -56,9 +62,9 @@ public class DeliveryOrderSummaryDTO {
                 custName,
                 phone,
                 fullAddress,
-                order.getStatus(),
-                od.getStatus(),
-                od.getUpdatedAt(),
+                order.getStatus() != null ? order.getStatus() : Orders.OrderStatus.PENDING,
+                od.getStatus() != null ? od.getStatus() : OrderDelivery.DeliveryStatus.RECEIVED,
+                od.getUpdatedAt() != null ? od.getUpdatedAt() : LocalDateTime.now(),
                 count
         );
     }

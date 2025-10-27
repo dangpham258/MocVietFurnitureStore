@@ -1,22 +1,39 @@
 package mocviet.service.customer.impl;
 
-import lombok.RequiredArgsConstructor;
-import mocviet.dto.OrderDetailDTO;
-import mocviet.dto.OrderItemDTO;
-import mocviet.dto.StatusHistoryDTO;
-import mocviet.entity.*;
-import mocviet.repository.*;
-import mocviet.service.UserDetailsServiceImpl;
-import mocviet.service.customer.IOrderService;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import mocviet.dto.OrderDetailDTO;
+import mocviet.dto.OrderItemDTO;
+import mocviet.dto.StatusHistoryDTO;
+import mocviet.entity.Cart;
+import mocviet.entity.CartItem;
+import mocviet.entity.OrderItem;
+import mocviet.entity.OrderStatusHistory;
+import mocviet.entity.Orders;
+import mocviet.entity.Product;
+import mocviet.entity.ProductVariant;
+import mocviet.entity.User;
+import mocviet.repository.CartItemRepository;
+import mocviet.repository.CartRepository;
+import mocviet.repository.OrderItemRepository;
+import mocviet.repository.OrderRepository;
+import mocviet.repository.OrderStatusHistoryRepository;
+import mocviet.repository.ProductRepository;
+import mocviet.repository.ProductVariantRepository;
+import mocviet.service.UserDetailsServiceImpl;
+import mocviet.service.customer.IOrderService;
 
 @Service
 @RequiredArgsConstructor
@@ -170,6 +187,26 @@ public class OrderServiceImpl implements IOrderService {
         }
         
         Orders order = orderRepository.findByIdAndUserId(orderId, currentUser.getId()).orElse(null);
+        if (order == null) {
+            return null;
+        }
+        
+        // Fetch orderItems với ProductVariant và Color
+        List<OrderItem> orderItems = orderItemRepository.findByOrderIdWithVariantAndColor(orderId);
+        
+        // Fetch status histories
+        List<OrderStatusHistory> statusHistories = orderStatusHistoryRepository.findByOrderIdOrderByChangedAtAsc(orderId);
+        
+        // Map sang DTO
+        return mapToOrderDetailDTO(order, orderItems, statusHistories);
+    }
+    
+    /**
+     * Lấy chi tiết đơn hàng dưới dạng DTO cho delivery team (không cần kiểm tra userId)
+     */
+    @Transactional
+    public OrderDetailDTO getOrderDetailDTOForDelivery(Integer orderId) {
+        Orders order = orderRepository.findById(orderId).orElse(null);
         if (order == null) {
             return null;
         }

@@ -14,4 +14,5 @@ public class StatusHistoryDTO {
     private String status;
     private String note;
     private LocalDateTime changedAt;
+    private String changedByName; // <<<--- THÊM TRƯỜNG NÀY
 }
