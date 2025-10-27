@@ -4,11 +4,17 @@ import lombok.RequiredArgsConstructor;
 import mocviet.entity.Orders;
 import mocviet.entity.ProductVariant;
 import mocviet.entity.OrderDelivery;
+import mocviet.entity.User;
+import mocviet.entity.UserNotification;
 import mocviet.repository.OrdersRepository;
 import mocviet.repository.ProductRepository;
 import mocviet.repository.ProductVariantRepository;
 import mocviet.repository.ReviewRepository;
 import mocviet.repository.OrderDeliveryRepository;
+import mocviet.repository.UserNotificationRepository;
+import mocviet.repository.UserRepository;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +32,8 @@ public class DashboardService {
     private final ProductVariantRepository productVariantRepository;
     private final ReviewRepository reviewRepository;
     private final OrderDeliveryRepository orderDeliveryRepository;
+    private final UserNotificationRepository userNotificationRepository;
+    private final UserRepository userRepository;
     
     @Transactional(readOnly = true)
     public DashboardStats getDashboardStats() {
@@ -79,53 +87,165 @@ public class DashboardService {
     
     @Transactional(readOnly = true)
     public List<NotificationDTO> getNotifications() {
-        // Tạo thông báo dựa trên dữ liệu thực
+        // Lấy current user (manager)
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || auth.getName() == null) {
+            return new java.util.ArrayList<>();
+        }
+        
+        User currentUser = userRepository.findByUsername(auth.getName()).orElse(null);
+        if (currentUser == null) {
+            return new java.util.ArrayList<>();
+        }
+        
+        // Lấy 10 thông báo mới nhất từ database (do trigger tự động tạo)
+        List<UserNotification> dbNotifications = userNotificationRepository.findTop10ByUserOrderByCreatedAtDesc(currentUser);
+        
         List<NotificationDTO> notifications = new java.util.ArrayList<>();
         
-        // Thông báo đơn hàng mới
-        long newOrdersToday = ordersRepository.countByCreatedAtAfter(LocalDateTime.now().withHour(0).withMinute(0).withSecond(0));
-        if (newOrdersToday > 0) {
-            notifications.add(new NotificationDTO(
-                "Đơn hàng mới hôm nay",
-                "Có " + newOrdersToday + " đơn hàng mới cần xử lý",
-                "info"
-            ));
-        }
-        
-        // Thông báo cần phân công
-        long pendingAssignment = ordersRepository.countByStatusAndOrderDeliveryIsNull(Orders.OrderStatus.CONFIRMED);
-        if (pendingAssignment > 0) {
-            notifications.add(new NotificationDTO(
-                "Cần phân công đội giao hàng",
-                "Có " + pendingAssignment + " đơn hàng chờ phân công",
-                "warning"
-            ));
-        }
-        
-        // Thông báo tồn kho thấp và hết hàng
-        // LessThan(6) tương đương LessThanEqual(5)
-        List<ProductVariant> criticalStockVariants = productVariantRepository.findByStockQtyLessThanAndIsActive(6, true);
-        if (!criticalStockVariants.isEmpty()) {
-            long outOfStock = criticalStockVariants.stream().filter(v -> v.getStockQty() == 0).count();
-            long lowStock = criticalStockVariants.stream().filter(v -> v.getStockQty() > 0 && v.getStockQty() <= 5).count();
+        // Convert UserNotification sang NotificationDTO
+        for (UserNotification notif : dbNotifications) {
+            String type = determineNotificationType(notif.getTitle());
+            String link = determineLinkFromNotification(notif);
             
-            String message;
-            if (outOfStock > 0 && lowStock > 0) {
-                message = "Có " + outOfStock + " sản phẩm hết hàng và " + lowStock + " sản phẩm tồn kho thấp";
-            } else if (outOfStock > 0) {
-                message = "Có " + outOfStock + " sản phẩm đã hết hàng, cần nhập kho gấp";
-            } else {
-                message = "Có " + lowStock + " sản phẩm tồn kho thấp (1-5 sản phẩm)";
+            notifications.add(new NotificationDTO(
+                notif.getTitle(),
+                notif.getMessage(),
+                type,
+                link,
+                notif.getIsRead()
+            ));
+        }
+        
+        // Nếu không có thông báo từ DB, thêm thống kê thủ công (fallback)
+        if (notifications.isEmpty()) {
+            // Thông báo đánh giá chưa trả lời
+            long unansweredReviews = reviewRepository.countByManagerResponseIsNull();
+            if (unansweredReviews > 0) {
+                notifications.add(new NotificationDTO(
+                    "Có đánh giá mới",
+                    "Có " + unansweredReviews + " đánh giá chưa trả lời",
+                    "warning",
+                    "/manager/reviews/alerts",
+                    false
+                ));
             }
             
-            notifications.add(new NotificationDTO(
-                "⚠️ Cảnh báo tồn kho",
-                message,
-                "danger"
-            ));
+            // Thông báo đơn hàng mới
+            long newOrdersToday = ordersRepository.countByCreatedAtAfter(LocalDateTime.now().withHour(0).withMinute(0).withSecond(0));
+            if (newOrdersToday > 0) {
+                notifications.add(new NotificationDTO(
+                    "Đơn hàng mới hôm nay",
+                    "Có " + newOrdersToday + " đơn hàng mới cần xử lý",
+                    "info",
+                    "/manager/orders",
+                    false
+                ));
+            }
+            
+            // Thông báo cần phân công
+            long pendingAssignment = ordersRepository.countByStatusAndOrderDeliveryIsNull(Orders.OrderStatus.CONFIRMED);
+            if (pendingAssignment > 0) {
+                notifications.add(new NotificationDTO(
+                    "Cần phân công đội giao hàng",
+                    "Có " + pendingAssignment + " đơn hàng chờ phân công",
+                    "warning",
+                    "/manager/delivery/assign",
+                    false
+                ));
+            }
+            
+            // Thông báo tồn kho thấp
+            List<ProductVariant> criticalStockVariants = productVariantRepository.findByStockQtyLessThanAndIsActive(6, true);
+            if (!criticalStockVariants.isEmpty()) {
+                long outOfStock = criticalStockVariants.stream().filter(v -> v.getStockQty() == 0).count();
+                long lowStock = criticalStockVariants.stream().filter(v -> v.getStockQty() > 0 && v.getStockQty() <= 5).count();
+                
+                String message;
+                if (outOfStock > 0 && lowStock > 0) {
+                    message = "Có " + outOfStock + " sản phẩm hết hàng và " + lowStock + " sản phẩm tồn kho thấp";
+                } else if (outOfStock > 0) {
+                    message = "Có " + outOfStock + " sản phẩm đã hết hàng, cần nhập kho gấp";
+                } else {
+                    message = "Có " + lowStock + " sản phẩm tồn kho thấp (1-5 sản phẩm)";
+                }
+                
+                notifications.add(new NotificationDTO(
+                    "⚠️ Cảnh báo tồn kho",
+                    message,
+                    "danger",
+                    "/manager/inventory",
+                    false
+                ));
+            }
         }
         
         return notifications;
+    }
+    
+    /**
+     * Xác định loại thông báo dựa trên title
+     */
+    private String determineNotificationType(String title) {
+        if (title == null) return "info";
+        
+        if (title.contains("đánh giá") || title.contains("review") || title.contains("Review")) {
+            return "warning";
+        } else if (title.contains("Hết hàng") || title.contains("Tồn kho thấp") || title.contains("yêu cầu trả")) {
+            return "danger";
+        } else if (title.contains("đơn hàng") || title.contains("Order")) {
+            return "info";
+        }
+        return "info";
+    }
+    
+    /**
+     * Xác định link đến trang chi tiết từ nội dung thông báo
+     */
+    private String determineLinkFromNotification(UserNotification notification) {
+        if (notification.getTitle() == null || notification.getMessage() == null) {
+            return null;
+        }
+        
+        String title = notification.getTitle();
+        String message = notification.getMessage();
+        
+        // Review notifications
+        if (title.contains("đánh giá") || title.contains("review") || title.contains("Review") || 
+            title.contains("phản hồi")) {
+            // Extract review ID if present
+            if (message.matches(".*Review #\\d+.*") || message.matches(".*review #\\d+.*")) {
+                try {
+                    String reviewIdStr = message.replaceAll(".*[Rr]eview #(\\d+).*", "$1");
+                    return "/manager/reviews/" + reviewIdStr + "/respond";
+                } catch (Exception e) {
+                    // Fallback to alerts page
+                }
+            }
+            return "/manager/reviews/alerts";
+        }
+        
+        // Order notifications
+        if (title.contains("đơn hàng") || title.contains("Order") || 
+            title.contains("yêu cầu trả") || title.contains("phân công")) {
+            // Extract order ID if present
+            if (message.matches(".*[Đđ]ơn hàng #\\d+.*") || message.matches(".*[Đđ]ơn #\\d+.*")) {
+                try {
+                    String orderIdStr = message.replaceAll(".*[Đđ]ơn(?: hàng)? #(\\d+).*", "$1");
+                    return "/manager/orders/" + orderIdStr;
+                } catch (Exception e) {
+                    // Fallback to orders list
+                }
+            }
+            return "/manager/orders";
+        }
+        
+        // Inventory notifications
+        if (title.contains("Tồn kho") || title.contains("Hết hàng") || title.contains("tồn kho")) {
+            return "/manager/inventory";
+        }
+        
+        return null; // No specific link
     }
     
     private BigDecimal calculateOrderTotal(Orders order) {
@@ -212,11 +332,23 @@ public class DashboardService {
         private String title;
         private String message;
         private String type;
+        private String link;       // Link đến trang chi tiết
+        private Boolean isRead;     // Đã đọc chưa
         
         public NotificationDTO(String title, String message, String type) {
             this.title = title;
             this.message = message;
             this.type = type;
+            this.link = null;
+            this.isRead = false;
+        }
+        
+        public NotificationDTO(String title, String message, String type, String link, Boolean isRead) {
+            this.title = title;
+            this.message = message;
+            this.type = type;
+            this.link = link;
+            this.isRead = isRead;
         }
         
         // Getters and setters
@@ -228,5 +360,11 @@ public class DashboardService {
         
         public String getType() { return type; }
         public void setType(String type) { this.type = type; }
+        
+        public String getLink() { return link; }
+        public void setLink(String link) { this.link = link; }
+        
+        public Boolean getIsRead() { return isRead; }
+        public void setIsRead(Boolean isRead) { this.isRead = isRead; }
     }
 }

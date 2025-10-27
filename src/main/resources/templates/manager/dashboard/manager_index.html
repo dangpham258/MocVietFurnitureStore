@@ -204,27 +204,40 @@
             
             <div class="col-lg-4">
                 <div class="card shadow mb-4">
-                    <div class="card-header py-3">
+                    <div class="card-header py-3 d-flex justify-content-between align-items-center">
                         <h6 class="m-0 font-weight-bold text-primary">Thông báo</h6>
+                        <a th:href="@{/manager/notifications}" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-bell"></i> Tất cả
+                        </a>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body p-0">
                         <div class="list-group list-group-flush" th:if="${notifications != null and !notifications.empty}">
-                            <div class="list-group-item d-flex justify-content-between align-items-center" 
-                                 th:each="notification : ${notifications}">
-                                <div>
-                                    <div class="fw-bold" th:text="${notification.title}">Thông báo</div>
-                                    <small class="text-muted" th:text="${notification.message}">Nội dung thông báo</small>
+                            <a th:each="notification : ${notifications}" 
+                               th:href="${notification.link != null ? notification.link : '#'}"
+                               th:class="${notification.link != null ? 'list-group-item list-group-item-action' : 'list-group-item'}"
+                               th:classappend="${notification.isRead != null and !notification.isRead ? 'notification-unread' : ''}"
+                               style="border-left: none; border-right: none; text-decoration: none;">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex align-items-center gap-2 mb-1">
+                                            <i th:if="${notification.isRead != null and !notification.isRead}" 
+                                               class="fas fa-circle text-primary" style="font-size: 6px;"></i>
+                                            <span class="fw-bold" th:text="${notification.title}">Thông báo</span>
+                                        </div>
+                                        <small class="text-muted d-block" th:text="${notification.message}">Nội dung thông báo</small>
+                                    </div>
+                                    <span class="badge rounded-pill ms-2" 
+                                          th:classappend="${notification.type == 'info'} ? 'bg-primary' : 
+                                                         (${notification.type == 'warning'} ? 'bg-warning text-dark' : 'bg-danger')">
+                                        <i th:class="${notification.type == 'info'} ? 'fas fa-info-circle' : 
+                                                     (${notification.type == 'warning'} ? 'fas fa-exclamation-triangle' : 'fas fa-exclamation-circle')"></i>
+                                    </span>
                                 </div>
-                                <span class="badge rounded-pill" 
-                                      th:classappend="${notification.type == 'info'} ? 'bg-primary' : 
-                                                     (${notification.type == 'warning'} ? 'bg-warning' : 'bg-danger')"
-                                      th:text="${notification.type == 'info'} ? 'Mới' : 
-                                               (${notification.type == 'warning'} ? 'Cảnh báo' : 'Nguy hiểm')">Mới</span>
-                            </div>
+                            </a>
                         </div>
-                        <div th:if="${notifications == null or notifications.empty}" class="text-center py-4">
-                            <i class="fas fa-bell-slash fa-2x text-muted mb-3"></i>
-                            <p class="text-muted">Không có thông báo mới</p>
+                        <div th:if="${notifications == null or notifications.empty}" class="text-center py-5">
+                            <i class="fas fa-bell-slash fa-3x text-muted mb-3"></i>
+                            <p class="text-muted mb-0">Không có thông báo mới</p>
                         </div>
                     </div>
                 </div>

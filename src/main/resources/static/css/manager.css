@@ -1159,3 +1159,532 @@ body {
         min-height: 36px;
     }
 }
+
+/* ===== REVIEW MANAGEMENT STYLES ===== */
+
+/* Review Table */
+.review-table {
+    font-size: 14px;
+}
+
+.review-table thead th {
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #dee2e6;
+    font-weight: 600;
+    color: #333;
+    padding: 12px 8px;
+    vertical-align: middle;
+}
+
+.review-table tbody td {
+    vertical-align: middle;
+    padding: 12px 8px;
+}
+
+.review-table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+/* Rating Stars */
+.rating-stars {
+    display: inline-flex;
+    gap: 2px;
+}
+
+.rating-stars .star-filled {
+    color: #ffc107;
+    font-size: 1.2rem;
+}
+
+.rating-stars .star-empty {
+    color: #e0e0e0;
+    font-size: 1.2rem;
+}
+
+/* Review Content */
+.review-content {
+    max-width: 100%;
+}
+
+.review-content p {
+    margin-bottom: 0.5rem;
+    line-height: 1.5;
+    word-break: break-word;
+}
+
+.review-image {
+    max-width: 80px;
+    max-height: 80px;
+    object-fit: cover;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.review-image:hover {
+    transform: scale(1.5);
+    z-index: 1000;
+}
+
+/* Manager Response */
+.manager-response {
+    background-color: #f0f7ff;
+    border-left: 3px solid #0d6efd;
+    padding: 10px;
+    border-radius: 4px;
+    margin-top: 8px;
+}
+
+.manager-response strong {
+    color: #0d6efd;
+    font-size: 13px;
+}
+
+.manager-response p {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.manager-response small {
+    font-size: 11px;
+    color: #6c757d;
+}
+
+/* Review Alert Item */
+.alert-item {
+    background-color: #fff;
+    transition: box-shadow 0.2s;
+}
+
+.alert-item:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.alert-item .review-content-preview p {
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+/* Response Form */
+.review-original-content .alert {
+    border-left: 4px solid #0d6efd;
+}
+
+/* Character counter */
+#charCount {
+    font-weight: bold;
+    color: #6c757d;
+}
+
+textarea#response:focus + .form-text #charCount {
+    color: #0d6efd;
+}
+
+/* Filter Panel for Reviews */
+.filter-panel {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.filter-form .form-label {
+    font-weight: 600;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 6px;
+}
+
+.filter-form .form-control,
+.filter-form .form-select {
+    font-size: 14px;
+    border: 1px solid #dee2e6;
+}
+
+.filter-form .form-control:focus,
+.filter-form .form-select:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+}
+
+/* Review Stats Cards (specific for reviews page) */
+.stats-card .stats-icon.bg-warning {
+    background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+}
+
+.stats-card .stats-icon.bg-danger {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+}
+
+/* Responsive for Review Management */
+@media (max-width: 768px) {
+    .review-table {
+        font-size: 12px;
+    }
+    
+    .review-image {
+        max-width: 60px;
+        max-height: 60px;
+    }
+    
+    .manager-response {
+        padding: 8px;
+        font-size: 12px;
+    }
+    
+    .rating-stars .star-filled,
+    .rating-stars .star-empty {
+        font-size: 1rem;
+    }
+}
+
+/* ========================================
+   PREMIUM REVIEW KPI CARDS (Mộc Việt Brand)
+   ======================================== */
+
+/* Container & Card Base */
+.review-kpi-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    border: 1px solid #f0f0f0;
+    height: 100%;
+}
+
+.review-kpi-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    border-color: #e0e0e0;
+}
+
+/* Icon Wrapper - Brand Colors */
+.kpi-icon-wrapper {
+    flex-shrink: 0;
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    transition: all 0.3s ease;
+}
+
+.review-kpi-card:hover .kpi-icon-wrapper {
+    transform: rotate(-5deg) scale(1.05);
+}
+
+/* Icon Color Schemes - Mộc Việt Brand Palette */
+.kpi-icon-wrapper.kpi-gold {
+    background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(253, 160, 133, 0.3);
+}
+
+.kpi-icon-wrapper.kpi-amber {
+    background: linear-gradient(135deg, #ff9a56 0%, #ff6a88 100%);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(255, 106, 136, 0.3);
+}
+
+.kpi-icon-wrapper.kpi-red {
+    background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(235, 51, 73, 0.3);
+}
+
+.kpi-icon-wrapper.kpi-emerald {
+    background: linear-gradient(135deg, #56ab2f 0%, #a8e063 100%);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(86, 171, 47, 0.3);
+}
+
+.kpi-icon-wrapper.kpi-azure {
+    background: linear-gradient(135deg, #2196f3 0%, #64b5f6 100%);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+}
+
+/* Content Area */
+.kpi-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.kpi-number {
+    font-size: 32px;
+    font-weight: 700;
+    color: #2d3436;
+    line-height: 1.2;
+    margin-bottom: 6px;
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+    letter-spacing: -0.5px;
+}
+
+.kpi-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #636e72;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 12px;
+    line-height: 1.3;
+}
+
+/* Progress Bar Container */
+.kpi-progress {
+    margin-top: 12px;
+}
+
+.kpi-progress .progress {
+    height: 4px;
+    border-radius: 4px;
+    background-color: #e9ecef;
+    overflow: hidden;
+}
+
+.kpi-progress .progress-bar {
+    border-radius: 4px;
+    transition: width 1s ease-in-out;
+}
+
+/* Responsive Design */
+@media (max-width: 1199.98px) {
+    .review-kpi-card {
+        padding: 20px;
+        gap: 16px;
+    }
+    
+    .kpi-icon-wrapper {
+        width: 48px;
+        height: 48px;
+        font-size: 20px;
+    }
+    
+    .kpi-number {
+        font-size: 28px;
+    }
+    
+    .kpi-label {
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .review-kpi-card {
+        padding: 18px;
+        gap: 14px;
+    }
+    
+    .kpi-icon-wrapper {
+        width: 44px;
+        height: 44px;
+        font-size: 18px;
+    }
+    
+    .kpi-number {
+        font-size: 24px;
+    }
+    
+    .kpi-label {
+        font-size: 11px;
+    }
+}
+
+/* Animation on Load */
+@keyframes kpiCardFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.review-kpi-card {
+    animation: kpiCardFadeIn 0.5s ease-out forwards;
+}
+
+.review-kpi-card:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.review-kpi-card:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.review-kpi-card:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+.review-kpi-card:nth-child(4) {
+    animation-delay: 0.4s;
+}
+
+/* ========================================
+   ALERT ITEM STYLING
+   ======================================== */
+
+.alert-item {
+    background: #ffffff;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.alert-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.alert-item.border-danger::before {
+    background: linear-gradient(180deg, #eb3349 0%, #f45c43 100%);
+}
+
+.alert-item.border-warning::before {
+    background: linear-gradient(180deg, #f6d365 0%, #fda085 100%);
+}
+
+.alert-item:hover {
+    transform: translateX(4px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.review-content-preview {
+    background: #f8f9fa;
+    padding: 10px 12px;
+    border-radius: 6px;
+    border-left: 3px solid #dee2e6;
+    margin-top: 8px;
+}
+
+.review-content-preview p {
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* ========================================
+   NOTIFICATION STYLING (Dashboard)
+   ======================================== */
+
+.notification-unread {
+    background-color: #f0f8ff !important;
+    border-left: 3px solid #2196f3 !important;
+    font-weight: 500;
+}
+
+.notification-unread:hover {
+    background-color: #e3f2fd !important;
+}
+
+.list-group-item-action {
+    transition: all 0.2s ease;
+}
+
+.list-group-item-action:hover {
+    background-color: #f8f9fa;
+    transform: translateX(2px);
+}
+
+/* ========================================
+   NOTIFICATION PAGE STYLING
+   ======================================== */
+
+.notification-item {
+    border-left: 3px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.notification-item.notification-unread {
+    background-color: #f0f8ff;
+    border-left-color: #2196f3;
+}
+
+.notification-item:hover {
+    background-color: #f8f9fa;
+}
+
+.notification-item.notification-unread:hover {
+    background-color: #e3f2fd;
+}
+
+/* Badge in sidebar */
+.sidebar-item .notification-badge {
+    position: absolute;
+    top: 8px;
+    right: 15px;
+    font-size: 10px;
+    padding: 2px 6px;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+/* ========================================
+   USER DROPDOWN STYLING
+   ======================================== */
+
+.user-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.user-avatar i {
+    font-size: 1.5rem;
+}
+
+.user-name {
+    font-weight: 500;
+}
+
+.dropdown-menu {
+    min-width: 250px;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+}
+
+.dropdown-header {
+    background-color: #f8f9fa;
+    border-radius: 8px 8px 0 0;
+}
+
+.dropdown-item {
+    padding: 0.6rem 1rem;
+    transition: all 0.2s ease;
+}
+
+.dropdown-item:hover {
+    background-color: #f0f8ff;
+    padding-left: 1.2rem;
+}
+
+.dropdown-item.text-danger:hover {
+    background-color: #fff0f0;
+}
+
+.dropdown-item i {
+    width: 20px;
+    text-align: center;
+}
