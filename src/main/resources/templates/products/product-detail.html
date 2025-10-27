@@ -84,9 +84,12 @@
                     </div>
                 </div>
                 
-                <div class="d-grid gap-2">
+                <div class="d-grid gap-2 mb-3">
                     <button id="btnAddToCart" type="button" class="btn btn-dark btn-lg disabled">
                         Đăng nhập để thêm vào giỏ
+                    </button>
+                    <button id="btnWishlist" type="button" class="btn btn-outline-danger" style="display: none;">
+                        <i class="bi bi-heart"></i> Thêm vào yêu thích
                     </button>
                 </div>
                 
@@ -112,9 +115,12 @@
         const btnMinus = document.getElementById('btnMinus');
         const btnPlus = document.getElementById('btnPlus');
         const btnAddToCart = document.getElementById('btnAddToCart');
+        const btnWishlist = document.getElementById('btnWishlist');
         
         let selectedVariant = null;
         let isAuthenticated = false;
+        let productId = /*[[${product.id}]]*/ 0;
+        let isInWishlist = false;
 
         // Định dạng tiền tệ
         const formatter = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' });
@@ -278,7 +284,7 @@
             }
         });
 
-        // Kiểm tra trạng thái đăng nhập
+        // Kiểm tra trạng thái đăng nhập và wishlist
         async function checkAuthStatus() {
             try {
                 const response = await fetch('/api/auth/status');
@@ -291,12 +297,90 @@
                     if (btnText === 'Thêm vào giỏ hàng' || btnText === 'Đăng nhập để thêm vào giỏ') {
                         btnAddToCart.textContent = 'Đăng nhập để thêm vào giỏ';
                     }
+                    btnWishlist.style.display = 'none';
+                } else {
+                    // Kiểm tra xem sản phẩm đã có trong wishlist chưa
+                    await checkWishlistStatus();
+                    btnWishlist.style.display = 'block';
                 }
             } catch (error) {
                 console.error('Error checking auth status:', error);
                 isAuthenticated = false;
             }
         }
+        
+        // Kiểm tra trạng thái wishlist
+        async function checkWishlistStatus() {
+            try {
+                const response = await fetch(`/customer/wishlist/check?productId=${productId}`);
+                const data = await response.json();
+                isInWishlist = data.inWishlist === true;
+                updateWishlistButton();
+            } catch (error) {
+                console.error('Error checking wishlist status:', error);
+                isInWishlist = false;
+            }
+        }
+        
+        // Cập nhật UI nút wishlist
+        function updateWishlistButton() {
+            if (isInWishlist) {
+                btnWishlist.innerHTML = '<i class="bi bi-heart-fill"></i> Đã thêm vào yêu thích';
+                btnWishlist.classList.remove('btn-outline-danger');
+                btnWishlist.classList.add('btn-danger');
+            } else {
+                btnWishlist.innerHTML = '<i class="bi bi-heart"></i> Thêm vào yêu thích';
+                btnWishlist.classList.remove('btn-danger');
+                btnWishlist.classList.add('btn-outline-danger');
+            }
+        }
+        
+        // Xử lý nút wishlist
+        btnWishlist.addEventListener('click', async () => {
+            if (!isAuthenticated) {
+                window.location.href = '/login?redirect=' + encodeURIComponent(window.location.href);
+                return;
+            }
+            
+            try {
+                let url, method, successMsg, failMsg;
+                
+                if (isInWishlist) {
+                    // Xóa khỏi wishlist
+                    url = '/customer/wishlist/remove';
+                    method = 'POST';
+                    successMsg = 'Đã xóa khỏi danh sách yêu thích';
+                    failMsg = 'Không thể xóa khỏi danh sách yêu thích';
+                } else {
+                    // Thêm vào wishlist
+                    url = '/customer/wishlist/add';
+                    method = 'POST';
+                    successMsg = 'Đã thêm vào danh sách yêu thích';
+                    failMsg = 'Không thể thêm vào danh sách yêu thích';
+                }
+                
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `productId=${productId}`
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    isInWishlist = !isInWishlist;
+                    updateWishlistButton();
+                    alert(data.message || successMsg);
+                } else {
+                    alert(data.message || failMsg);
+                }
+            } catch (error) {
+                console.error('Error toggling wishlist:', error);
+                alert('Có lỗi xảy ra. Vui lòng thử lại sau');
+            }
+        });
         
         // Khởi chạy: Chọn màu đầu tiên (nếu có)
         document.addEventListener('DOMContentLoaded', async () => {
