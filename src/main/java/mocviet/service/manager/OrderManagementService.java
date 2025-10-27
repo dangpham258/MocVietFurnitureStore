@@ -118,6 +118,44 @@ public class OrderManagementService {
         storedProcedureService.cancelOrder(orderId, managerId, reason);
     }
     
+    // ===== XEM ĐƠN HÀNG ĐANG GIAO =====
+    
+    @Transactional(readOnly = true)
+    public Page<OrderListDTO> getInDeliveryOrders(Pageable pageable) {
+        // Lấy đơn hàng CONFIRMED hoặc DISPATCHED (đang trong quá trình giao)
+        Page<Orders> orders = ordersRepository.findByStatusIn(
+            java.util.Arrays.asList(Orders.OrderStatus.CONFIRMED, Orders.OrderStatus.DISPATCHED), 
+            pageable);
+        return orders.map(this::mapToOrderListDTO);
+    }
+    
+    @Transactional(readOnly = true)
+    public Page<OrderListDTO> getInDeliveryOrdersWithKeyword(String keyword, Pageable pageable) {
+        Page<Orders> orders = ordersRepository.findByStatusInAndKeyword(
+            java.util.Arrays.asList(Orders.OrderStatus.CONFIRMED, Orders.OrderStatus.DISPATCHED),
+            keyword,
+            pageable);
+        return orders.map(this::mapToOrderListDTO);
+    }
+    
+    // ===== XEM ĐƠN HÀNG ĐÃ HỦY =====
+    
+    @Transactional(readOnly = true)
+    public Page<OrderListDTO> getCancelledOrders(Pageable pageable) {
+        // Lấy đơn hàng đã hủy
+        Page<Orders> orders = ordersRepository.findByStatus(Orders.OrderStatus.CANCELLED, pageable);
+        return orders.map(this::mapToOrderListDTO);
+    }
+    
+    @Transactional(readOnly = true)
+    public Page<OrderListDTO> getCancelledOrdersWithKeyword(String keyword, Pageable pageable) {
+        Page<Orders> orders = ordersRepository.findByStatusAndKeyword(
+            Orders.OrderStatus.CANCELLED,
+            keyword,
+            pageable);
+        return orders.map(this::mapToOrderListDTO);
+    }
+    
     // ===== XEM ĐƠN HÀNG HOÀN THÀNH =====
     
     @Transactional(readOnly = true)

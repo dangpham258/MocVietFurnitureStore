@@ -247,4 +247,14 @@ public interface OrdersRepository extends JpaRepository<Orders, Integer> {
                                                    @Param("returnStatus") Orders.ReturnStatus returnStatus,
                                                    @Param("keyword") String keyword,
                                                    Pageable pageable);
+        
+        // Query cho đơn hàng đang giao (CONFIRMED hoặc DISPATCHED)
+        @Query("SELECT o FROM Orders o WHERE o.status IN :statuses")
+        Page<Orders> findByStatusIn(@Param("statuses") List<Orders.OrderStatus> statuses, Pageable pageable);
+        
+        @Query("SELECT o FROM Orders o WHERE o.status IN :statuses AND " +
+               "(CAST(o.id AS string) LIKE %:keyword% OR o.user.fullName LIKE %:keyword%)")
+        Page<Orders> findByStatusInAndKeyword(@Param("statuses") List<Orders.OrderStatus> statuses,
+                                              @Param("keyword") String keyword,
+                                              Pageable pageable);
 }

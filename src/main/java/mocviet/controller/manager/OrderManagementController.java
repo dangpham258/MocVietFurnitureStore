@@ -136,6 +136,154 @@ public class OrderManagementController {
         return "redirect:/manager/orders/pending";
     }
     
+    // ===== XEM ĐƠN HÀNG ĐANG GIAO =====
+    
+    @GetMapping("/in-delivery")
+    public String inDeliveryOrders(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "desc") String sortDir,
+            @RequestParam(required = false) String keyword,
+            Model model) {
+        
+        // Set active menu for sidebar
+        model.addAttribute("activeMenu", "orders");
+        model.addAttribute("activeSubmenu", "in-delivery");
+        
+        // Reset page về 0 khi có keyword mới
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            page = 0;
+        }
+        
+        // Đảm bảo page không bao giờ âm
+        if (page < 0) {
+            page = 0;
+        }
+        
+        // Validate và map sortBy field
+        String validSortBy = sortBy;
+        if (!"createdAt".equals(sortBy) && !"updatedAt".equals(sortBy) && 
+            !"id".equals(sortBy) && !"totalAmount".equals(sortBy)) {
+            validSortBy = "createdAt"; // Default fallback
+        }
+        
+        Sort sort = sortDir.equalsIgnoreCase("desc") ? 
+                Sort.by(validSortBy).descending() : Sort.by(validSortBy).ascending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+        
+        Page<OrderListDTO> orders;
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            orders = orderManagementService.getInDeliveryOrdersWithKeyword(keyword.trim(), pageable);
+        } else {
+            orders = orderManagementService.getInDeliveryOrders(pageable);
+        }
+        
+        model.addAttribute("orders", orders);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", orders.getTotalPages());
+        model.addAttribute("totalElements", orders.getTotalElements());
+        model.addAttribute("sortBy", sortBy);
+        model.addAttribute("sortDir", sortDir);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("pageTitle", "Đơn hàng đang giao");
+        model.addAttribute("activeMenu", "orders");
+        
+        return "manager/orders/in-delivery";
+    }
+    
+    @GetMapping("/in-delivery/{id}")
+    public String inDeliveryOrderDetail(@PathVariable Integer id, Model model) {
+        
+        // Set active menu for sidebar
+        model.addAttribute("activeMenu", "orders");
+        model.addAttribute("activeSubmenu", "in-delivery");
+        
+        try {
+            OrderManagementDTO order = orderManagementService.getOrderDetails(id);
+            model.addAttribute("order", order);
+            model.addAttribute("pageTitle", "Chi tiết đơn hàng #" + id);
+            return "manager/orders/in-delivery-detail";
+        } catch (RuntimeException e) {
+            model.addAttribute("error", e.getMessage());
+            return "manager/orders/in-delivery";
+        }
+    }
+    
+    // ===== XEM ĐƠN HÀNG ĐÃ HỦY =====
+    
+    @GetMapping("/cancelled")
+    public String cancelledOrders(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "desc") String sortDir,
+            @RequestParam(required = false) String keyword,
+            Model model) {
+        
+        // Set active menu for sidebar
+        model.addAttribute("activeMenu", "orders");
+        model.addAttribute("activeSubmenu", "cancelled");
+        
+        // Reset page về 0 khi có keyword mới
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            page = 0;
+        }
+        
+        // Đảm bảo page không bao giờ âm
+        if (page < 0) {
+            page = 0;
+        }
+        
+        // Validate và map sortBy field
+        String validSortBy = sortBy;
+        if (!"createdAt".equals(sortBy) && !"updatedAt".equals(sortBy) && 
+            !"id".equals(sortBy) && !"totalAmount".equals(sortBy)) {
+            validSortBy = "createdAt"; // Default fallback
+        }
+        
+        Sort sort = sortDir.equalsIgnoreCase("desc") ? 
+                Sort.by(validSortBy).descending() : Sort.by(validSortBy).ascending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+        
+        Page<OrderListDTO> orders;
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            orders = orderManagementService.getCancelledOrdersWithKeyword(keyword.trim(), pageable);
+        } else {
+            orders = orderManagementService.getCancelledOrders(pageable);
+        }
+        
+        model.addAttribute("orders", orders);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", orders.getTotalPages());
+        model.addAttribute("totalElements", orders.getTotalElements());
+        model.addAttribute("sortBy", sortBy);
+        model.addAttribute("sortDir", sortDir);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("pageTitle", "Đơn hàng đã hủy");
+        model.addAttribute("activeMenu", "orders");
+        
+        return "manager/orders/cancelled";
+    }
+    
+    @GetMapping("/cancelled/{id}")
+    public String cancelledOrderDetail(@PathVariable Integer id, Model model) {
+        
+        // Set active menu for sidebar
+        model.addAttribute("activeMenu", "orders");
+        model.addAttribute("activeSubmenu", "cancelled");
+        
+        try {
+            OrderManagementDTO order = orderManagementService.getOrderDetails(id);
+            model.addAttribute("order", order);
+            model.addAttribute("pageTitle", "Chi tiết đơn hàng #" + id);
+            return "manager/orders/cancelled-detail";
+        } catch (RuntimeException e) {
+            model.addAttribute("error", e.getMessage());
+            return "manager/orders/cancelled";
+        }
+    }
+    
     // ===== XEM ĐƠN HÀNG HOÀN THÀNH =====
     
     @GetMapping("/completed")
