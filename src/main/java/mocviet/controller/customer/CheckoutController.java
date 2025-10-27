@@ -1,9 +1,11 @@
 package mocviet.controller.customer;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import mocviet.dto.CheckoutSummaryDTO;
 import mocviet.dto.CreateOrderRequest;
 import mocviet.dto.CreateOrderResponse;
+import mocviet.dto.PaymentRequestDTO;
 import mocviet.entity.Address;
 import mocviet.entity.CartItem;
 import mocviet.entity.ProductImage;
@@ -12,6 +14,7 @@ import mocviet.repository.AddressRepository;
 import mocviet.repository.CouponRepository;
 import mocviet.repository.ProvinceZoneRepository;
 import mocviet.repository.ShippingFeeRepository;
+import mocviet.service.customer.IPaymentService;
 import mocviet.service.UserDetailsServiceImpl;
 import mocviet.service.customer.ICartService;
 import mocviet.service.customer.IOrderService;
@@ -40,6 +43,7 @@ public class CheckoutController {
     private final CouponRepository couponRepository;
     private final mocviet.repository.OrderRepository orderRepository;
     private final UserDetailsServiceImpl userDetailsService;
+    private final IPaymentService paymentService;
     
     /**
      * Trang checkout - hiển thị form thanh toán
@@ -243,7 +247,8 @@ public class CheckoutController {
      */
     @PostMapping("/create")
     @ResponseBody
-    public ResponseEntity<CreateOrderResponse> createOrder(@RequestBody CreateOrderRequest request) {
+    public ResponseEntity<CreateOrderResponse> createOrder(@RequestBody CreateOrderRequest request,
+                                                          HttpServletRequest httpRequest) {
         try {
             // Validate request
             if (request.getAddressId() == null) {
@@ -260,10 +265,25 @@ public class CheckoutController {
             
             CreateOrderResponse response = orderService.createOrder(request);
             
-            // TODO: Generate payment URL nếu là VNPAY/MoMo
+            // Generate payment URL nếu là VNPAY/MoMo
             if ("VNPAY".equals(request.getPaymentMethod()) || "MOMO".equals(request.getPaymentMethod())) {
-                // response.setPaymentUrl(generatePaymentUrl(response));
-                response.setPaymentUrl("#"); // Placeholder
+                try {
+                    PaymentRequestDTO paymentRequest = PaymentRequestDTO.builder()
+                        .orderId(response.getOrderId())
+                        .paymentMethod(request.getPaymentMethod())
+                        .amount(response.getGrandTotal())
+                        .orderDescription("MocViet Furniture - Order #" + response.getOrderId())
+                        .returnUrl(httpRequest.getRequestURL().toString().replace("/create", "/callback"))
+                        .ipAddress(getClientIpAddress(httpRequest))
+                        .build();
+                    
+                    String paymentUrl = paymentService.createPaymentUrl(paymentRequest);
+                    response.setPaymentUrl(paymentUrl);
+                } catch (Exception e) {
+                    // Nếu không tạo được payment URL, vẫn cho phép order được tạo với status PENDING
+                    response.setPaymentUrl(null);
+                    response.setMessage("Đơn hàng đã được tạo nhưng không thể tạo link thanh toán. Vui lòng liên hệ CSKH.");
+                }
             }
             
             return ResponseEntity.ok(response);
@@ -282,6 +302,27 @@ public class CheckoutController {
                 .build();
             return ResponseEntity.badRequest().body(errorResponse);
         }
+    }
+    
+    /**
+     * Lấy IP address của client
+     */
+    private String getClientIpAddress(HttpServletRequest request) {
+        String ipAddress = request.getHeader("X-Forwarded-For");
+        if (ipAddress == null || ipAddress.isEmpty() || "unknown".equalsIgnoreCase(ipAddress)) {
+            ipAddress = request.getHeader("Proxy-Client-IP");
+        }
+        if (ipAddress == null || ipAddress.isEmpty() || "unknown".equalsIgnoreCase(ipAddress)) {
+            ipAddress = request.getHeader("WL-Proxy-Client-IP");
+        }
+        if (ipAddress == null || ipAddress.isEmpty() || "unknown".equalsIgnoreCase(ipAddress)) {
+            ipAddress = request.getRemoteAddr();
+        }
+        // Lấy IP đầu tiên nếu có nhiều IP (vì X-Forwarded-For có thể chứa nhiều IP)
+        if (ipAddress != null && ipAddress.contains(",")) {
+            ipAddress = ipAddress.split(",")[0].trim();
+        }
+        return ipAddress;
     }
 }
 

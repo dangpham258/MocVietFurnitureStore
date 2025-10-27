@@ -690,6 +690,46 @@ public class OrderServiceImpl implements IOrderService {
         history.setChangedAt(LocalDateTime.now());
         orderStatusHistoryRepository.save(history);
         
+        // Xóa các sản phẩm trong đơn hàng khỏi giỏ hàng
+        try {
+            Cart cart = cartRepository.findByUserId(currentUser.getId()).orElse(null);
+            if (cart != null) {
+                // Lấy tất cả cart items hiện tại
+                List<CartItem> cartItems = cartItemRepository.findByCartIdOrderByIdAsc(cart.getId());
+                
+                // Xóa cart items theo số lượng trong đơn hàng
+                for (Map.Entry<Integer, Integer> entry : itemQuantityMap.entrySet()) {
+                    Integer variantId = entry.getKey();
+                    Integer remainingQty = entry.getValue();
+                    
+                    for (CartItem cartItem : cartItems) {
+                        if (remainingQty <= 0) break;
+                        
+                        if (cartItem.getVariant().getId().equals(variantId)) {
+                            if (cartItem.getQty() <= remainingQty) {
+                                // Nếu số lượng trong cart <= số lượng trong đơn → xóa toàn bộ cart item
+                                remainingQty -= cartItem.getQty();
+                                cartItemRepository.deleteById(cartItem.getId());
+                            } else {
+                                // Nếu số lượng trong cart > số lượng trong đơn → giảm số lượng
+                                cartItem.setQty(cartItem.getQty() - remainingQty);
+                                cartItemRepository.save(cartItem);
+                                remainingQty = 0;
+                                break;
+                            }
+                        }
+                    }
+                }
+                
+                // Cập nhật thời gian cart
+                cart.setUpdatedAt(LocalDateTime.now());
+                cartRepository.save(cart);
+            }
+        } catch (Exception e) {
+            // Log error nhưng không throw để không ảnh hưởng tới việc tạo đơn hàng
+            System.err.println("Lỗi xóa giỏ hàng: " + e.getMessage());
+        }
+        
         return CreateOrderResponse.builder()
             .orderId(savedOrder.getId())
             .status(savedOrder.getStatus().name())

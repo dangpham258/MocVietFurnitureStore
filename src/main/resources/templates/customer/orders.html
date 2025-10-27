@@ -207,6 +207,13 @@
                                         th:onclick="'reorderProducts(' + ${order.id} + ')'">
                                     <i class="bi bi-cart-plus"></i> Mua lại
                                 </button>
+                                
+                                <!-- Pay Now Button - Only for VNPAY/MoMo with UNPAID status -->
+                                <a th:if="${order.paymentStatus.name() == 'UNPAID' and (order.paymentMethod.name() == 'VNPAY' or order.paymentMethod.name() == 'MOMO')}"
+                                   th:href="@{/payment/retry/{id}(id=${order.id})}"
+                                   class="btn btn-primary btn-sm">
+                                    <i class="bi bi-credit-card"></i> Thanh toán ngay
+                                </a>
                             </div>
                         </div>
                     </div>
