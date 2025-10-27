@@ -135,3 +135,19 @@ Alternative 6a. Nếu liên kết đã có ID (đã tồn tại trong DB): gọi
 Exception 7a. URL không hợp lệ 8a. Hiển thị thông báo "Vui lòng nhập URL hợp lệ" 9a. Giữ modal mở để sửa 8b. Lỗi hệ thống 9b. Hiển thị thông báo "Có lỗi xảy ra" 10b. Cho phép thử lại 8c. Platform đã tồn tại (khi tạo mới) 9c. Hiển thị thông báo "Platform đã tồn tại" 10c. Giữ modal mở để sửa
 
 Bảng 3-8. Use case Quản lý liên kết mạng xã hội
+
+---
+
+## UC_009 - Quản lý banner (Manage banners)
+
+Use case ID UC_009
+Name Manage banners
+Goal Quản lý banner trang chủ - Carousel (Xem danh sách, thêm/sửa banner, xóa banner, bật/tắt hiển thị, thiết lập thứ tự hiển thị)
+Actors Quản trị viên (Admin)
+Pre-conditions Đã đăng nhập vào hệ thống với vai trò ADMIN
+Post-conditions - Nếu thành công, danh sách banner được hiển thị hoặc thao tác quản lý được thực hiện - Nếu thất bại, hiển thị thông báo lỗi
+Main Flow 1. Vào trang quản lý banner (/admin/banners) 2. Hệ thống hiển thị danh sách banner dưới dạng grid, mỗi card hiển thị: Ảnh banner, Badge số thứ tự (STT), Tiêu đề banner, Liên kết (nếu có), Trạng thái (Đang hiển thị/Đã tắt), Nút "Truy cập URL" (nếu có liên kết), Nút "Sửa", Nút "Xóa", Ngày tạo 3. Hệ thống hiển thị thống kê: Tổng banner, Đang hiển thị, Đã tắt, Có liên kết 4. Banner được sắp xếp theo số thứ tự (00-99), banner mới nhất hiển thị cuối 5. Click "Thêm Banner" để tạo banner mới 6. Modal hiển thị form nhập: Số thứ tự (00-99, bắt buộc), Tiêu đề (bắt buộc, max 160 ký tự), Ảnh banner (bắt buộc, JPG/PNG/WebP, max 10MB), Liên kết (tùy chọn, URL), Checkbox "Kích hoạt ngay" 7. Khi nhập tiêu đề và số thứ tự, hiển thị preview tên file: NN_title.jpg (tự động chuyển tiếng Việt có dấu thành không dấu) 8. Upload ảnh bằng drag-drop hoặc click chọn file, validate ngay khi chọn (max 10MB) 9. Nhập đầy đủ thông tin bắt buộc và click "Thêm Banner" 10. Hệ thống kiểm tra số thứ tự không trùng với banner khác 11. Hệ thống kiểm tra tiêu đề không trống 12. Nếu hợp lệ, tạo banner mới và hiển thị thông báo thành công 13. Cập nhật danh sách banner và đóng modal, form tự động reset 14. Click "Sửa" trên một banner để cập nhật 15. Modal hiển thị: Ảnh hiện tại, Nút upload ảnh mới (tùy chọn), Số thứ tự hiện tại, Tiêu đề hiện tại, Liên kết hiện tại, Checkbox trạng thái 16. Sửa đổi thông tin và click "Cập nhật" 17. Nếu đổi số thứ tự mà không upload ảnh mới, hệ thống tự động rename file ảnh trên server 18. Hệ thống kiểm tra số thứ tự mới không trùng (nếu thay đổi) 19. Nếu hợp lệ, cập nhật banner và hiển thị thông báo thành công 20. Cập nhật danh sách banner và đóng modal, form tự động reset 21. Click "Xóa" trên một banner 22. Modal xác nhận hiển thị: Tiêu đề banner, Cảnh báo "Banner và ảnh sẽ bị xóa vĩnh viễn" 23. Click "Xóa" để xác nhận 24. Hệ thống xóa banner và ảnh khỏi server (cả 2 thư mục src và target) 25. Hiển thị thông báo thành công 26. Cập nhật danh sách banner và đóng modal 27. Click "Truy cập URL" để mở liên kết trong tab mới (chỉ khi có liên kết) 28. Hệ thống tự động thêm http:// vào URL nếu không có protocol
+Alternative 8a. Người dùng click vào file input nhưng không chọn file 9a. Preview ảnh tự động ẩn đi, validation vẫn bắt buộc upload ảnh 14a. Người dùng click vào file input edit nhưng không chọn file 15a. Preview ảnh tự động khôi phục về ảnh cũ
+Exception 10a. Số thứ tự đã được sử dụng 11a. Hiển thị thông báo "Số thứ tự XX đã được sử dụng bởi banner 'Tên'" 12a. Giữ modal mở để sửa 11b. Tiêu đề trống 12b. Hiển thị thông báo "Vui lòng nhập tiêu đề banner" 13b. Yêu cầu nhập tiêu đề 11c. Ảnh vượt quá 10MB 12c. Hiển thị thông báo "Kích thước ảnh vượt quá 10MB" ngay khi chọn file 13c. Xóa file đã chọn 18a. Số thứ tự mới đã được sử dụng bởi banner khác 19a. Hiển thị thông báo "Số thứ tự XX đã được sử dụng bởi banner 'Tên'" 20a. Giữ modal mở để sửa 24a. Lỗi hệ thống 25a. Hiển thị thông báo "Có lỗi xảy ra" 26a. Cho phép thử lại
+
+Bảng 3-9. Use case Quản lý banner

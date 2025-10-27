@@ -2,329 +2,180 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{admin/fragments/admin_layout}">
 <head>
-    <title>Quản lý banner - Admin Panel</title>
+    <title>Quản lý Banner - Admin Panel</title>
 </head>
 <body>
 <div layout:fragment="content" th:fragment="content" class="main-content">
-    <!-- Page Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h2 class="mb-1">Quản lý banner</h2>
-            <p class="text-muted mb-0">Quản lý banner và hình ảnh quảng cáo</p>
-        </div>
-        <div>
+    
+    <div class="container-fluid p-4">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="mb-1">
+                    <i class="bi bi-images me-2 text-primary"></i>Quản lý Banner
+                </h3>
+                <p class="text-muted small mb-0">Quản lý banner trang chủ - Carousel</p>
+            </div>
             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addBannerModal">
-                <i class="bi bi-plus-circle me-1"></i>Thêm banner
+                <i class="bi bi-plus-circle me-1"></i>Thêm Banner
             </button>
         </div>
-    </div>
 
-    <!-- Stats Cards -->
-    <div class="row mb-4">
-        <div class="col-md-3 mb-3">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-shrink-0">
-                            <div class="bg-primary bg-opacity-10 rounded-circle p-3">
-                                <i class="bi bi-image text-primary fs-4"></i>
+        <!-- Stats Cards -->
+        <div class="row mb-4">
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <div class="bg-primary bg-opacity-10 rounded-circle p-3">
+                                    <i class="bi bi-images text-primary fs-4"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h5 class="card-title mb-0" id="totalBanners">0</h5>
+                                <small class="text-muted">Tổng banner</small>
                             </div>
                         </div>
-                        <div class="flex-grow-1 ms-3">
-                            <h5 class="card-title mb-0">12</h5>
-                            <small class="text-muted">Tổng banner</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <div class="bg-success bg-opacity-10 rounded-circle p-3">
+                                    <i class="bi bi-check-circle text-success fs-4"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h5 class="card-title mb-0" id="activeBanners">0</h5>
+                                <small class="text-muted">Đang hiển thị</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <div class="bg-secondary bg-opacity-10 rounded-circle p-3">
+                                    <i class="bi bi-pause-circle text-secondary fs-4"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h5 class="card-title mb-0" id="inactiveBanners">0</h5>
+                                <small class="text-muted">Đã tắt</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <div class="bg-info bg-opacity-10 rounded-circle p-3">
+                                    <i class="bi bi-link-45deg text-info fs-4"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h5 class="card-title mb-0" id="bannersWithLink">0</h5>
+                                <small class="text-muted">Có liên kết</small>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-3 mb-3">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-shrink-0">
-                            <div class="bg-success bg-opacity-10 rounded-circle p-3">
-                                <i class="bi bi-check-circle text-success fs-4"></i>
-                            </div>
-                        </div>
-                        <div class="flex-grow-1 ms-3">
-                            <h5 class="card-title mb-0">8</h5>
-                            <small class="text-muted">Đang hiển thị</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3 mb-3">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-shrink-0">
-                            <div class="bg-warning bg-opacity-10 rounded-circle p-3">
-                                <i class="bi bi-clock text-warning fs-4"></i>
-                            </div>
-                        </div>
-                        <div class="flex-grow-1 ms-3">
-                            <h5 class="card-title mb-0">2</h5>
-                            <small class="text-muted">Chờ duyệt</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3 mb-3">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-shrink-0">
-                            <div class="bg-danger bg-opacity-10 rounded-circle p-3">
-                                <i class="bi bi-x-circle text-danger fs-4"></i>
-                            </div>
-                        </div>
-                        <div class="flex-grow-1 ms-3">
-                            <h5 class="card-title mb-0">2</h5>
-                            <small class="text-muted">Tạm dừng</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
-                    <!-- Filters -->
-                    <div class="card mb-4">
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-3">
-                                    <label class="form-label">Tìm kiếm</label>
-                                    <input type="text" class="form-control search-input" placeholder="Tìm theo tên banner..." data-target="#bannersTable">
-                                </div>
-                                <div class="col-md-2">
-                                    <label class="form-label">Vị trí</label>
-                                    <select class="form-select">
-                                        <option value="">Tất cả</option>
-                                        <option value="homepage">Trang chủ</option>
-                                        <option value="category">Danh mục</option>
-                                        <option value="product">Sản phẩm</option>
-                                        <option value="sidebar">Sidebar</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-2">
-                                    <label class="form-label">Trạng thái</label>
-                                    <select class="form-select">
-                                        <option value="">Tất cả</option>
-                                        <option value="active">Đang hiển thị</option>
-                                        <option value="pending">Chờ duyệt</option>
-                                        <option value="inactive">Tạm dừng</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-2">
-                                    <label class="form-label">Sắp xếp</label>
-                                    <select class="form-select">
-                                        <option value="created">Mới nhất</option>
-                                        <option value="position">Vị trí</option>
-                                        <option value="name">Tên A-Z</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-3 d-flex align-items-end">
-                                    <button class="btn btn-admin-primary me-2">
-                                        <i class="bi bi-funnel me-1"></i>Lọc
-                                    </button>
-                                    <button class="btn btn-outline-secondary">
-                                        <i class="bi bi-download me-1"></i>Xuất Excel
-                                    </button>
-                                </div>
+        <!-- Banners Grid -->
+        <div class="row" id="bannersContainer">
+            <div class="col-12 mb-3">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <div class="text-center py-5">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Đang tải...</span>
                             </div>
-                        </div>
-                    </div>
-
-    <!-- Data Table -->
-    <div class="card border-0 shadow-sm">
-        <div class="card-header bg-white">
-            <h5 class="card-title mb-0">
-                <i class="bi bi-image me-2"></i>
-                Danh sách banner
-            </h5>
-        </div>
-        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-hover data-table" id="bannersTable">
-                                    <thead>
-                                        <tr>
-                                            <th data-sort="name">Tên banner</th>
-                                            <th>Hình ảnh</th>
-                                            <th>Vị trí</th>
-                                            <th>Thứ tự</th>
-                                            <th>Ngày bắt đầu</th>
-                                            <th>Ngày kết thúc</th>
-                                            <th>Trạng thái</th>
-                                            <th>Thao tác</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>
-                                                <div>
-                                                    <div class="fw-bold">Banner chào mừng mùa hè</div>
-                                                    <small class="text-muted">Khuyến mãi mùa hè 2024</small>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <img src="https://via.placeholder.com/80x40" class="rounded" width="80" height="40">
-                                            </td>
-                                            <td><span class="badge bg-primary">Trang chủ</span></td>
-                                            <td>1</td>
-                                            <td>2024-06-01</td>
-                                            <td>2024-08-31</td>
-                                            <td><span class="badge bg-success">Đang hiển thị</span></td>
-                                            <td>
-                                                <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#editBannerModal">
-                                                    <i class="bi bi-pencil"></i>
-                                                </button>
-                                                <button class="btn btn-sm btn-outline-info me-1" data-bs-toggle="modal" data-bs-target="#viewBannerModal">
-                                                    <i class="bi bi-eye"></i>
-                                                </button>
-                                                <button class="btn btn-sm btn-outline-danger btn-delete">
-                                                    <i class="bi bi-trash"></i>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div>
-                                                    <div class="fw-bold">Banner sản phẩm mới</div>
-                                                    <small class="text-muted">Giới thiệu sản phẩm mới</small>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <img src="https://via.placeholder.com/80x40" class="rounded" width="80" height="40">
-                                            </td>
-                                            <td><span class="badge bg-success">Danh mục</span></td>
-                                            <td>2</td>
-                                            <td>2024-07-01</td>
-                                            <td>2024-12-31</td>
-                                            <td><span class="badge bg-success">Đang hiển thị</span></td>
-                                            <td>
-                                                <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#editBannerModal">
-                                                    <i class="bi bi-pencil"></i>
-                                                </button>
-                                                <button class="btn btn-sm btn-outline-info me-1" data-bs-toggle="modal" data-bs-target="#viewBannerModal">
-                                                    <i class="bi bi-eye"></i>
-                                                </button>
-                                                <button class="btn btn-sm btn-outline-danger btn-delete">
-                                                    <i class="bi bi-trash"></i>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div>
-                                                    <div class="fw-bold">Banner khuyến mãi Black Friday</div>
-                                                    <small class="text-muted">Siêu sale Black Friday</small>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <img src="https://via.placeholder.com/80x40" class="rounded" width="80" height="40">
-                                            </td>
-                                            <td><span class="badge bg-warning">Sidebar</span></td>
-                                            <td>1</td>
-                                            <td>2024-11-20</td>
-                                            <td>2024-11-30</td>
-                                            <td><span class="badge bg-warning">Chờ duyệt</span></td>
-                                            <td>
-                                                <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#editBannerModal">
-                                                    <i class="bi bi-pencil"></i>
-                                                </button>
-                                                <button class="btn btn-sm btn-outline-info me-1" data-bs-toggle="modal" data-bs-target="#viewBannerModal">
-                                                    <i class="bi bi-eye"></i>
-                                                </button>
-                                                <button class="btn btn-sm btn-outline-danger btn-delete">
-                                                    <i class="bi bi-trash"></i>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
+                            <p class="text-muted mt-3 mb-0">Đang tải danh sách banner...</p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
+    
     <!-- Add Banner Modal -->
     <div class="modal fade" id="addBannerModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Thêm banner mới</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">
+                        <i class="bi bi-plus-circle me-2"></i>Thêm Banner Mới
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body">
-                    <form class="needs-validation" novalidate>
-                        <div class="mb-3">
-                            <label class="form-label">Tên banner *</label>
-                            <input type="text" class="form-control" placeholder="VD: Banner chào mừng mùa hè" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Mô tả</label>
-                            <textarea class="form-control" rows="2" placeholder="Mô tả ngắn về banner"></textarea>
-                        </div>
+                <div class="modal-body p-4">
+                    <form id="addBannerForm" enctype="multipart/form-data">
                         <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">Vị trí hiển thị *</label>
-                                    <select class="form-select" required>
-                                        <option value="">Chọn vị trí</option>
-                                        <option value="homepage">Trang chủ</option>
-                                        <option value="category">Danh mục</option>
-                                        <option value="product">Sản phẩm</option>
-                                        <option value="sidebar">Sidebar</option>
-                                    </select>
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label fw-bold">Số thứ tự *</label>
+                                <input type="number" class="form-control" id="bannerOrderNumber" 
+                                       placeholder="00" min="0" max="99"
+                                       oninput="updateFilenamePreview()" required>
+                                <div class="form-text">
+                                    <i class="bi bi-hash me-1"></i> 00-99
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">Thứ tự hiển thị</label>
-                                    <input type="number" class="form-control" placeholder="1" value="1">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Hình ảnh *</label>
-                            <input type="file" class="form-control" accept="image/*" required>
-                            <div class="form-text">Kích thước khuyến nghị: 1200x400px</div>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Link đích</label>
-                            <input type="url" class="form-control" placeholder="https://example.com">
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">Ngày bắt đầu</label>
-                                    <input type="date" class="form-control">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">Ngày kết thúc</label>
-                                    <input type="date" class="form-control">
+                            <div class="col-md-9 mb-3">
+                                <label class="form-label fw-bold">Tiêu đề *</label>
+                                <input type="text" class="form-control" id="bannerTitle" 
+                                       placeholder="Nhập tiêu đề banner" maxlength="160"
+                                       oninput="updateFilenamePreview()" required>
+                                <div class="form-text">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    Tên file: <span id="filenamePreview" class="fw-bold text-primary">chưa có</span>
                                 </div>
                             </div>
                         </div>
                         <div class="mb-3">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" checked>
-                                <label class="form-check-label">Hiển thị ngay</label>
+                            <label class="form-label fw-bold">Ảnh banner *</label>
+                            <div class="upload-area" id="uploadArea">
+                                <input type="file" id="bannerImageInput" accept="image/*" style="display: none;" required>
+                                <i class="bi bi-cloud-upload fs-1 text-muted"></i>
+                                <p class="mt-2 mb-0 text-muted">Kéo thả ảnh vào đây hoặc click để chọn</p>
+                                <small class="text-muted">JPG, PNG, WebP (Max 10MB)</small>
+                            </div>
+                            <div class="mt-2" id="imagePreview" style="display: none;">
+                                <img id="previewImg" src="" alt="Preview" class="img-fluid rounded" style="max-height: 200px;">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Liên kết</label>
+                            <input type="url" class="form-control" id="bannerLink" 
+                                   placeholder="https://example.com">
+                            <div class="form-text">URL sẽ được mở khi click vào banner</div>
+                        </div>
+                        <div class="mb-0">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="bannerActive" checked>
+                                <label class="form-check-label" for="bannerActive">
+                                    Kích hoạt ngay
+                                </label>
                             </div>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="button" class="btn btn-admin-primary btn-submit">Thêm banner</button>
+                    <button type="button" class="btn btn-primary" onclick="createBanner()">
+                        <i class="bi bi-check-circle me-1"></i>Thêm Banner
+                    </button>
                 </div>
             </div>
         </div>
@@ -334,137 +185,75 @@
     <div class="modal fade" id="editBannerModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Chỉnh sửa banner</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">
+                        <i class="bi bi-pencil-square me-2"></i>Sửa Banner
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body">
-                    <form class="needs-validation" novalidate>
+                <div class="modal-body p-4">
+                    <form id="editBannerForm" enctype="multipart/form-data">
+                        <input type="hidden" id="editBannerId">
                         <div class="mb-3">
-                            <label class="form-label">Tên banner *</label>
-                            <input type="text" class="form-control" value="Banner chào mừng mùa hè" required>
+                            <label class="form-label fw-bold">Ảnh hiện tại</label>
+                            <div id="currentImagePreview">
+                                <img id="currentImg" src="" alt="Current" class="img-fluid rounded banner-image-preview">
+                            </div>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Mô tả</label>
-                            <textarea class="form-control" rows="2">Khuyến mãi mùa hè 2024</textarea>
+                            <label class="form-label fw-bold">Thay đổi ảnh</label>
+                            <input type="file" class="form-control" id="editBannerImageInput" accept="image/*">
+                            <div class="form-text">Để trống nếu không muốn thay đổi ảnh</div>
                         </div>
                         <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">Vị trí hiển thị *</label>
-                                    <select class="form-select" required>
-                                        <option value="homepage" selected>Trang chủ</option>
-                                        <option value="category">Danh mục</option>
-                                        <option value="product">Sản phẩm</option>
-                                        <option value="sidebar">Sidebar</option>
-                                    </select>
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label fw-bold">Số thứ tự *</label>
+                                <input type="number" class="form-control" id="editBannerOrderNumber" 
+                                       placeholder="00" min="0" max="99"
+                                       oninput="updateEditFilenamePreview()" required>
+                                <div class="form-text">
+                                    <i class="bi bi-hash me-1"></i> 00-99
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">Thứ tự hiển thị</label>
-                                    <input type="number" class="form-control" value="1">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Hình ảnh hiện tại</label>
-                            <div class="mb-2">
-                                <img src="https://via.placeholder.com/200x100" class="rounded" width="200" height="100">
-                            </div>
-                            <input type="file" class="form-control" accept="image/*">
-                            <div class="form-text">Để trống nếu không muốn thay đổi hình ảnh</div>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Link đích</label>
-                            <input type="url" class="form-control" value="https://example.com/summer-sale">
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">Ngày bắt đầu</label>
-                                    <input type="date" class="form-control" value="2024-06-01">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">Ngày kết thúc</label>
-                                    <input type="date" class="form-control" value="2024-08-31">
+                            <div class="col-md-9 mb-3">
+                                <label class="form-label fw-bold">Tiêu đề *</label>
+                                <input type="text" class="form-control" id="editBannerTitle" 
+                                       placeholder="Nhập tiêu đề banner" maxlength="160"
+                                       oninput="updateEditFilenamePreview()" required>
+                                <div class="form-text">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    Tên file mới: <span id="editFilenamePreview" class="fw-bold text-primary">giữ nguyên</span>
                                 </div>
                             </div>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Trạng thái</label>
-                            <select class="form-select">
-                                <option value="active" selected>Đang hiển thị</option>
-                                <option value="pending">Chờ duyệt</option>
-                                <option value="inactive">Tạm dừng</option>
-                            </select>
+                            <label class="form-label fw-bold">Liên kết</label>
+                            <input type="url" class="form-control" id="editBannerLink" 
+                                   placeholder="https://example.com">
+                            <div class="form-text">URL sẽ được mở khi click vào banner</div>
+                        </div>
+                        <div class="mb-0">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="editBannerActive">
+                                <label class="form-check-label" for="editBannerActive">
+                                    Đang hiển thị
+                                </label>
+                            </div>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="button" class="btn btn-admin-primary btn-submit">Cập nhật</button>
+                    <button type="button" class="btn btn-success" onclick="updateBanner()">
+                        <i class="bi bi-check-circle me-1"></i>Cập nhật
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- View Banner Modal -->
-    <div class="modal fade" id="viewBannerModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Chi tiết banner</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <h6>Hình ảnh banner:</h6>
-                            <img src="https://via.placeholder.com/400x200" class="img-fluid rounded mb-3">
-                        </div>
-                        <div class="col-md-6">
-                            <div class="row mb-2">
-                                <div class="col-4"><strong>Tên:</strong></div>
-                                <div class="col-8">Banner chào mừng mùa hè</div>
-                            </div>
-                            <div class="row mb-2">
-                                <div class="col-4"><strong>Mô tả:</strong></div>
-                                <div class="col-8">Khuyến mãi mùa hè 2024</div>
-                            </div>
-                            <div class="row mb-2">
-                                <div class="col-4"><strong>Vị trí:</strong></div>
-                                <div class="col-8"><span class="badge bg-primary">Trang chủ</span></div>
-                            </div>
-                            <div class="row mb-2">
-                                <div class="col-4"><strong>Thứ tự:</strong></div>
-                                <div class="col-8">1</div>
-                            </div>
-                            <div class="row mb-2">
-                                <div class="col-4"><strong>Link đích:</strong></div>
-                                <div class="col-8"><a href="#" target="_blank">https://example.com/summer-sale</a></div>
-                            </div>
-                            <div class="row mb-2">
-                                <div class="col-4"><strong>Ngày bắt đầu:</strong></div>
-                                <div class="col-8">01/06/2024</div>
-                            </div>
-                            <div class="row mb-2">
-                                <div class="col-4"><strong>Ngày kết thúc:</strong></div>
-                                <div class="col-8">31/08/2024</div>
-                            </div>
-                            <div class="row mb-2">
-                                <div class="col-4"><strong>Trạng thái:</strong></div>
-                                <div class="col-8"><span class="badge bg-success">Đang hiển thị</span></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-        </div>
-    </div>
 </div>
+
 </body>
 </html>
+

@@ -339,14 +339,7 @@ class ColorsManagement {
         if (colorName && colorSlug) {
             colorName.addEventListener('input', function() {
                 if (!colorSlug.dataset.edited) {
-                    const slug = this.value
-                        .toLowerCase()
-                        .normalize('NFD')
-                        .replace(/[\u0300-\u036f]/g, '')
-                        .replace(/[^a-z0-9\s-]/g, '')
-                        .replace(/\s+/g, '-')
-                        .replace(/-+/g, '-')
-                        .replace(/^-|-$/g, '');
+                    const slug = colorsManagement.sanitizeTitle(this.value);
                     colorSlug.value = slug;
                 }
             });
@@ -355,6 +348,58 @@ class ColorsManagement {
                 this.dataset.edited = 'true';
             });
         }
+    }
+    
+    /**
+     * Sanitize title to slug (same logic as banners)
+     */
+    sanitizeTitle(title) {
+        if (!title) return "";
+        
+        // Remove Vietnamese accents first
+        const withoutAccents = this.removeVietnameseAccents(title);
+        
+        return withoutAccents
+            .toLowerCase()
+            .replace(/[^a-z0-9\s-]/g, '')
+            .replace(/\s+/g, '-')
+            .replace(/-+/g, '-')
+            .replace(/^-|-$/g, '');
+    }
+    
+    /**
+     * Remove Vietnamese accents/diacritics
+     */
+    removeVietnameseAccents(str) {
+        if (!str) return "";
+        
+        return str
+            .replace(/à/g, "a").replace(/á/g, "a").replace(/ả/g, "a").replace(/ã/g, "a").replace(/ạ/g, "a")
+            .replace(/â/g, "a").replace(/ầ/g, "a").replace(/ấ/g, "a").replace(/ẩ/g, "a").replace(/ẫ/g, "a").replace(/ậ/g, "a")
+            .replace(/ă/g, "a").replace(/ằ/g, "a").replace(/ắ/g, "a").replace(/ẳ/g, "a").replace(/ẵ/g, "a").replace(/ặ/g, "a")
+            .replace(/è/g, "e").replace(/é/g, "e").replace(/ẻ/g, "e").replace(/ẽ/g, "e").replace(/ẹ/g, "e")
+            .replace(/ê/g, "e").replace(/ề/g, "e").replace(/ế/g, "e").replace(/ể/g, "e").replace(/ễ/g, "e").replace(/ệ/g, "e")
+            .replace(/đ/g, "d")
+            .replace(/ì/g, "i").replace(/í/g, "i").replace(/ỉ/g, "i").replace(/ĩ/g, "i").replace(/ị/g, "i")
+            .replace(/ò/g, "o").replace(/ó/g, "o").replace(/ỏ/g, "o").replace(/õ/g, "o").replace(/ọ/g, "o")
+            .replace(/ô/g, "o").replace(/ồ/g, "o").replace(/ố/g, "o").replace(/ổ/g, "o").replace(/ỗ/g, "o").replace(/ộ/g, "o")
+            .replace(/ơ/g, "o").replace(/ờ/g, "o").replace(/ớ/g, "o").replace(/ở/g, "o").replace(/ỡ/g, "o").replace(/ợ/g, "o")
+            .replace(/ù/g, "u").replace(/ú/g, "u").replace(/ủ/g, "u").replace(/ũ/g, "u").replace(/ụ/g, "u")
+            .replace(/ư/g, "u").replace(/ừ/g, "u").replace(/ứ/g, "u").replace(/ử/g, "u").replace(/ữ/g, "u").replace(/ự/g, "u")
+            .replace(/ỳ/g, "y").replace(/ý/g, "y").replace(/ỷ/g, "y").replace(/ỹ/g, "y").replace(/ỵ/g, "y")
+            .replace(/À/g, "A").replace(/Á/g, "A").replace(/Ả/g, "A").replace(/Ã/g, "A").replace(/Ạ/g, "A")
+            .replace(/Â/g, "A").replace(/Ầ/g, "A").replace(/Ấ/g, "A").replace(/Ẩ/g, "A").replace(/Ẫ/g, "A").replace(/Ậ/g, "A")
+            .replace(/Ă/g, "A").replace(/Ằ/g, "A").replace(/Ắ/g, "A").replace(/Ẳ/g, "A").replace(/Ẵ/g, "A").replace(/Ặ/g, "A")
+            .replace(/È/g, "E").replace(/É/g, "E").replace(/Ẻ/g, "E").replace(/Ẽ/g, "E").replace(/Ẹ/g, "E")
+            .replace(/Ê/g, "E").replace(/Ề/g, "E").replace(/Ế/g, "E").replace(/Ể/g, "E").replace(/Ễ/g, "E").replace(/Ệ/g, "E")
+            .replace(/Đ/g, "D")
+            .replace(/Ì/g, "I").replace(/Í/g, "I").replace(/Ỉ/g, "I").replace(/Ĩ/g, "I").replace(/Ị/g, "I")
+            .replace(/Ò/g, "O").replace(/Ó/g, "O").replace(/Ỏ/g, "O").replace(/Õ/g, "O").replace(/Ọ/g, "O")
+            .replace(/Ô/g, "O").replace(/Ồ/g, "O").replace(/Ố/g, "O").replace(/Ổ/g, "O").replace(/Ỗ/g, "O").replace(/Ộ/g, "O")
+            .replace(/Ơ/g, "O").replace(/Ờ/g, "O").replace(/Ớ/g, "O").replace(/Ở/g, "O").replace(/Ỡ/g, "O").replace(/Ợ/g, "O")
+            .replace(/Ù/g, "U").replace(/Ú/g, "U").replace(/Ủ/g, "U").replace(/Ũ/g, "U").replace(/Ụ/g, "U")
+            .replace(/Ư/g, "U").replace(/Ừ/g, "U").replace(/Ứ/g, "U").replace(/Ử/g, "U").replace(/Ữ/g, "U").replace(/Ự/g, "U")
+            .replace(/Ỳ/g, "Y").replace(/Ý/g, "Y").replace(/Ỷ/g, "Y").replace(/Ỹ/g, "Y").replace(/Ỵ/g, "Y");
     }
     
     /**

@@ -115,5 +115,8 @@
     <!-- Social Links Management JS - Chỉ load ở trang social-links -->
     <script th:if="${activeMenu == 'social-links'}" 
             th:src="@{/js/admin/social-links.js(v=${jsVersion ?: 'HuynhNgocThang'})}"></script>
+    <!-- Banners Management JS - Chỉ load ở trang banners -->
+    <script th:if="${activeMenu == 'banners'}" 
+            th:src="@{/js/admin/banners.js(v=${jsVersion ?: 'HuynhNgocThang'})}"></script>
 </body>
 </html>

@@ -18,7 +18,7 @@ public class BannersController {
     @GetMapping({"", "/"})
     @PreAuthorize("hasRole('ADMIN')")
     public String banners(Model model, HttpServletRequest request) {
-        model.addAttribute("pageTitle", "Quản lý banner");
+        model.addAttribute("pageTitle", "Quản lý Banner");
         model.addAttribute("activeMenu", "banners");
         
         // Check if it's an AJAX request

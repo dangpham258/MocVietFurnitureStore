@@ -923,3 +923,75 @@ body, html {
 .card-body[style*='min-height'] .table-responsive {
     min-height: 400px;
 }
+
+/* ========================================
+   BANNER MANAGEMENT - Quản lý banner
+   ======================================== */
+
+/* Banner card */
+.banner-card {
+    transition: all 0.3s ease !important;
+}
+
+.banner-card:hover {
+    transform: translateY(-5px) !important;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+}
+
+/* Banner image preview */
+.banner-image-preview {
+    height: 200px !important;
+    object-fit: cover !important;
+    border-radius: 8px !important;
+    width: 100% !important;
+}
+
+.banner-image-wrapper {
+    height: 200px !important;
+    position: relative !important;
+    overflow: hidden !important;
+    border-radius: 8px !important;
+}
+
+.banner-placeholder {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%) !important;
+}
+
+/* Upload area */
+.upload-area {
+    border: 2px dashed #ddd;
+    border-radius: 8px;
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.upload-area:hover {
+    border-color: #0d6efd;
+    background-color: #f8f9fa;
+}
+
+.upload-area.dragover {
+    border-color: #0d6efd;
+    background-color: #e7f1ff;
+}
+
+/* Badge custom */
+.badge-custom {
+    font-size: 0.75rem;
+    padding: 0.35rem 0.65rem;
+}
+
+/* Order number badge styling */
+.banner-card .badge.bg-primary {
+    font-size: 0.875rem !important;
+    padding: 0.5rem 0.75rem !important;
+    z-index: 10 !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2) !important;
+}

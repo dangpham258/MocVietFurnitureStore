@@ -793,6 +793,13 @@ function initializeBootstrapComponents() {
                 classRef: 'SocialLinksManagement',
                 instanceName: 'socialLinksManagement',
                 initFunction: 'initializeSocialLinksManagement'
+            },
+            {
+                urlPattern: '/admin/banners',
+                scriptPath: '/js/admin/banners.js',
+                classRef: 'BannersManagement',
+                instanceName: 'bannersManagement',
+                initFunction: 'initializeBannersManagement'
             }
         ];
         
