@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{manager/fragments/manager_layout}">
+<head>
+    <title>Quản lý biến thể - Mộc Việt</title>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="mb-1">Quản lý biến thể</h2>
+                    <p class="text-muted mb-0" th:text="'Sản phẩm: ' + ${product.name}"></p>
+                </div>
+                <a th:href="@{/manager/products/{id}(id=${product.id})}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Quay lại chi tiết
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Thêm biến thể mới -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0" th:text="${editingVariantId != null} ? 'Chỉnh sửa biến thể' : 'Thêm biến thể mới'"></h5>
+                </div>
+                <div class="card-body">
+                    <form th:action="${editingVariantId != null} ? @{/manager/products/{id}/variants/{variantId}/update(id=${product.id}, variantId=${editingVariantId})} : @{/manager/products/{id}/variants/add(id=${product.id})}" 
+                          th:object="${variantRequest}" method="post">
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <label for="colorId" class="form-label">Màu sắc <span class="text-danger">*</span></label>
+                                <select class="form-select" id="colorId" th:field="*{colorId}"
+                                        th:class="${#fields.hasErrors('colorId')} ? 'form-select is-invalid' : 'form-select'">
+                                    <option value="">Chọn màu sắc</option>
+                                    <option th:each="color : ${colors}" 
+                                            th:value="${color.id}" 
+                                            th:text="${color.name}"></option>
+                                </select>
+                                <div th:if="${#fields.hasErrors('colorId')}" class="invalid-feedback">
+                                    <span th:errors="*{colorId}"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="typeName" class="form-label">Loại/Kích thước <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="typeName" th:field="*{typeName}"
+                                       th:class="${#fields.hasErrors('typeName')} ? 'form-control is-invalid' : 'form-control'"
+                                       placeholder="Ví dụ: 4-ghe, 6-ghe, 1m2, 1m6...">
+                                <div th:if="${#fields.hasErrors('typeName')}" class="invalid-feedback">
+                                    <span th:errors="*{typeName}"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="sku" class="form-label">SKU <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="sku" th:field="*{sku}"
+                                       th:class="${#fields.hasErrors('sku')} ? 'form-control is-invalid' : 'form-control'"
+                                       placeholder="Mã sản phẩm duy nhất">
+                                <div th:if="${#fields.hasErrors('sku')}" class="invalid-feedback">
+                                    <span th:errors="*{sku}"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="price" class="form-label">Giá gốc <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="price" th:field="*{price}"
+                                           th:class="${#fields.hasErrors('price')} ? 'form-control is-invalid' : 'form-control'"
+                                           placeholder="0" min="0" step="1000">
+                                    <span class="input-group-text">VNĐ</span>
+                                </div>
+                                <div th:if="${#fields.hasErrors('price')}" class="invalid-feedback">
+                                    <span th:errors="*{price}"></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <label for="discountPercent" class="form-label">% Giảm giá</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="discountPercent" th:field="*{discountPercent}"
+                                           th:class="${#fields.hasErrors('discountPercent')} ? 'form-control is-invalid' : 'form-control'"
+                                           placeholder="0" min="0" max="100">
+                                    <span class="input-group-text">%</span>
+                                </div>
+                                <div th:if="${#fields.hasErrors('discountPercent')}" class="invalid-feedback">
+                                    <span th:errors="*{discountPercent}"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="stockQty" class="form-label">Tồn kho <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="stockQty" th:field="*{stockQty}"
+                                       th:class="${#fields.hasErrors('stockQty')} ? 'form-control is-invalid' : 'form-control'"
+                                       placeholder="0" min="0">
+                                <div th:if="${#fields.hasErrors('stockQty')}" class="invalid-feedback">
+                                    <span th:errors="*{stockQty}"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="promotionType" class="form-label">Loại khuyến mãi</label>
+                                <select class="form-select" id="promotionType" th:field="*{promotionType}"
+                                        th:class="${#fields.hasErrors('promotionType')} ? 'form-select is-invalid' : 'form-select'">
+                                    <option value="">Không có</option>
+                                    <option value="SALE">SALE</option>
+                                    <option value="OUTLET">OUTLET</option>
+                                </select>
+                                <div th:if="${#fields.hasErrors('promotionType')}" class="invalid-feedback">
+                                    <span th:errors="*{promotionType}"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">&nbsp;</label>
+                                <div class="d-flex gap-2">
+                                    <button type="submit" class="btn btn-primary flex-fill">
+                                        <i th:class="${editingVariantId != null} ? 'fas fa-save me-2' : 'fas fa-plus me-2'"></i>
+                                        <span th:text="${editingVariantId != null} ? 'Cập nhật' : 'Thêm biến thể'"></span>
+                                    </button>
+                                    <a th:if="${editingVariantId != null}" 
+                                       th:href="@{/manager/products/{id}/variants(id=${product.id})}" 
+                                       class="btn btn-outline-secondary">
+                                        <i class="fas fa-times me-2"></i>Hủy
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Danh sách biến thể -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Danh sách biến thể</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Màu sắc</th>
+                                    <th>Loại</th>
+                                    <th>SKU</th>
+                                    <th>Giá gốc</th>
+                                    <th>Giá bán</th>
+                                    <th>Tồn kho</th>
+                                    <th>Trạng thái</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="variant : ${variants}">
+                                    <td th:text="${variant.id}"></td>
+                                    <td>
+                                        <span class="badge bg-info" th:text="${variant.color.name}"></span>
+                                    </td>
+                                    <td th:text="${variant.typeName}"></td>
+                                    <td>
+                                        <code th:text="${variant.sku}"></code>
+                                    </td>
+                                    <td th:text="${#numbers.formatDecimal(variant.price, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"></td>
+                                    <td th:text="${#numbers.formatDecimal(variant.salePrice, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"></td>
+                                    <td>
+                                        <span th:class="${variant.stockQty <= 5} ? 'text-warning fw-bold' : 'text-success'"
+                                              th:text="${variant.stockQty}"></span>
+                                    </td>
+                                    <td>
+                                        <span th:if="${variant.isActive}" class="badge bg-success">Hoạt động</span>
+                                        <span th:unless="${variant.isActive}" class="badge bg-danger">Ẩn</span>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a th:href="@{/manager/products/{id}/variants/{variantId}/edit(id=${product.id}, variantId=${variant.id})}" 
+                                               class="btn btn-sm btn-outline-warning" title="Chỉnh sửa">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <form th:action="@{/manager/products/{id}/variants/{variantId}/delete(id=${product.id}, variantId=${variant.id})}" 
+                                                  method="post" class="d-inline">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Xóa"
+                                                        onclick="return confirm('Bạn có chắc chắn muốn xóa biến thể này?')">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr th:if="${variants.isEmpty()}">
+                                    <td colspan="9" class="text-center py-4">
+                                        <div class="text-muted">
+                                            <i class="fas fa-layer-group fa-2x mb-3"></i>
+                                            <p>Chưa có biến thể nào</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

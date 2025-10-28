@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{manager/fragments/manager_layout}">
+
+<head>
+    <title th:text="${pageTitle}">Chi tiết yêu cầu trả hàng</title>
+    <style>
+        .return-detail-card {
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .return-detail-header {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .return-detail-body {
+            padding: 20px;
+        }
+        .info-row {
+            margin-bottom: 15px;
+        }
+        .info-label {
+            font-weight: 600;
+            color: #495057;
+        }
+        .info-value {
+            color: #212529;
+        }
+        .status-badge {
+            font-size: 0.875rem;
+            padding: 0.5rem 1rem;
+        }
+        .order-item {
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+        .product-image {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+        .urgency-alert {
+            border-left: 4px solid #dc3545;
+            background-color: #f8d7da;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .normal-alert {
+            border-left: 4px solid #28a745;
+            background-color: #d4edda;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div layout:fragment="content">
+        <div class="container-fluid">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-undo text-warning"></i> Chi tiết yêu cầu trả hàng #<span th:text="${returnRequest.orderId}"></span></h2>
+                <div class="d-flex gap-2">
+                    <a th:href="@{/manager/orders/returns}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> Quay lại
+                    </a>
+                    <button type="button" class="btn btn-success" onclick="approveReturn()">
+                        <i class="fas fa-check"></i> Duyệt trả hàng
+                    </button>
+                    <button type="button" class="btn btn-danger" onclick="rejectReturn()">
+                        <i class="fas fa-times"></i> Từ chối trả hàng
+                    </button>
+                </div>
+            </div>
+
+            <!-- Urgency Alert -->
+            <div th:if="${!returnRequest.withinReturnPeriod}" class="urgency-alert">
+                <h5 class="text-danger"><i class="fas fa-exclamation-triangle"></i> Cảnh báo</h5>
+                <p class="mb-0">Yêu cầu trả hàng này đã quá thời hạn 30 ngày kể từ khi giao hàng. 
+                Hiện tại đã <strong th:text="${returnRequest.daysSinceDelivery} + ' ngày'"></strong>.</p>
+            </div>
+            <div th:if="${returnRequest.withinReturnPeriod && returnRequest.daysSinceDelivery > 20}" class="normal-alert">
+                <h5 class="text-warning"><i class="fas fa-clock"></i> Lưu ý</h5>
+                <p class="mb-0">Yêu cầu trả hàng này sắp hết hạn. Còn lại 
+                <strong th:text="${30 - returnRequest.daysSinceDelivery} + ' ngày'"></strong> để xử lý.</p>
+            </div>
+
+            <div class="row">
+                <!-- Return Request Information -->
+                <div class="col-md-8">
+                    <!-- Customer Information -->
+                    <div class="return-detail-card">
+                        <div class="return-detail-header">
+                            <h5 class="mb-0"><i class="fas fa-user"></i> Thông tin khách hàng</h5>
+                        </div>
+                        <div class="return-detail-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="info-row">
+                                        <div class="info-label">Họ và tên:</div>
+                                        <div class="info-value" th:text="${returnRequest.customerName}"></div>
+                                    </div>
+                                    <div class="info-row">
+                                        <div class="info-label">Số điện thoại:</div>
+                                        <div class="info-value" th:text="${returnRequest.customerPhone}"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="info-row">
+                                        <div class="info-label">Địa chỉ giao hàng:</div>
+                                        <div class="info-value" th:text="${returnRequest.deliveryAddress}"></div>
+                                    </div>
+                                    <div class="info-row">
+                                        <div class="info-label">Tỉnh/Thành phố:</div>
+                                        <div class="info-value" th:text="${returnRequest.city}"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Return Request Details -->
+                    <div class="return-detail-card">
+                        <div class="return-detail-header">
+                            <h5 class="mb-0"><i class="fas fa-undo"></i> Chi tiết yêu cầu trả hàng</h5>
+                        </div>
+                        <div class="return-detail-body">
+                            <div class="info-row">
+                                <div class="info-label">Lý do trả hàng:</div>
+                                <div class="info-value" th:text="${returnRequest.returnReason}"></div>
+                            </div>
+                            <div class="info-row" th:if="${returnRequest.returnNote}">
+                                <div class="info-label">Ghi chú hiện tại:</div>
+                                <div class="info-value" th:text="${returnRequest.returnNote}"></div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="info-row">
+                                        <div class="info-label">Ngày giao hàng:</div>
+                                        <div class="info-value" th:text="${#temporals.format(returnRequest.orderDeliveredAt, 'dd/MM/yyyy HH:mm')}"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="info-row">
+                                        <div class="info-label">Ngày yêu cầu trả:</div>
+                                        <div class="info-value" th:text="${#temporals.format(returnRequest.returnRequestedAt, 'dd/MM/yyyy HH:mm')}"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Products to Return -->
+                    <div class="return-detail-card">
+                        <div class="return-detail-header">
+                            <h5 class="mb-0"><i class="fas fa-box"></i> Sản phẩm cần trả</h5>
+                        </div>
+                        <div class="return-detail-body">
+                            <div th:each="item : ${returnRequest.orderItems}" class="order-item">
+                                <div class="row align-items-center">
+                                    <div class="col-md-2">
+                                        <img th:src="${item.productImageUrl}" th:alt="${item.productName}" 
+                                             class="product-image" th:onerror="this.onerror=null; this.style.display='none'">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6 class="mb-1" th:text="${item.productName}"></h6>
+                                        <small class="text-muted">
+                                            SKU: <span th:text="${item.variantSku}"></span><br>
+                                            Màu: <span th:text="${item.colorName}"></span><br>
+                                            Loại: <span th:text="${item.typeName}"></span>
+                                        </small>
+                                    </div>
+                                    <div class="col-md-2 text-center">
+                                        <span class="badge bg-secondary" th:text="${item.quantity}"></span>
+                                    </div>
+                                    <div class="col-md-2 text-end">
+                                        <small class="text-muted">Số lượng trả</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Return Summary -->
+                <div class="col-md-4">
+                    <!-- Return Status -->
+                    <div class="return-detail-card">
+                        <div class="return-detail-header">
+                            <h5 class="mb-0"><i class="fas fa-info-circle"></i> Trạng thái yêu cầu</h5>
+                        </div>
+                        <div class="return-detail-body">
+                            <div class="info-row">
+                                <div class="info-label">Trạng thái:</div>
+                                <div class="info-value">
+                                    <span class="badge bg-warning status-badge" th:text="${returnRequest.returnStatus}"></span>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Số ngày từ khi giao:</div>
+                                <div class="info-value">
+                                    <span th:class="${returnRequest.withinReturnPeriod} ? 'text-success' : 'text-danger'"
+                                          th:text="${returnRequest.daysSinceDelivery} + ' ngày'"></span>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Trong thời hạn:</div>
+                                <div class="info-value">
+                                    <span th:if="${returnRequest.withinReturnPeriod}" class="badge bg-success">Có</span>
+                                    <span th:if="${!returnRequest.withinReturnPeriod}" class="badge bg-danger">Không</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Delivery Information -->
+                    <div class="return-detail-card" th:if="${returnRequest.deliveryTeamName}">
+                        <div class="return-detail-header">
+                            <h5 class="mb-0"><i class="fas fa-truck"></i> Thông tin giao hàng</h5>
+                        </div>
+                        <div class="return-detail-body">
+                            <div class="info-row">
+                                <div class="info-label">Đội giao hàng:</div>
+                                <div class="info-value" th:text="${returnRequest.deliveryTeamName}"></div>
+                            </div>
+                            <div class="info-row" th:if="${returnRequest.deliveryTeamPhone}">
+                                <div class="info-label">Số điện thoại:</div>
+                                <div class="info-value" th:text="${returnRequest.deliveryTeamPhone}"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Guidelines -->
+                    <div class="return-detail-card">
+                        <div class="return-detail-header">
+                            <h5 class="mb-0"><i class="fas fa-lightbulb"></i> Hướng dẫn xử lý</h5>
+                        </div>
+                        <div class="return-detail-body">
+                            <div th:if="${returnRequest.withinReturnPeriod}">
+                                <div class="alert alert-success">
+                                    <h6><i class="fas fa-check-circle"></i> Có thể duyệt</h6>
+                                    <p class="mb-0">Yêu cầu trả hàng này nằm trong thời hạn 30 ngày và có thể được duyệt.</p>
+                                </div>
+                            </div>
+                            <div th:if="${!returnRequest.withinReturnPeriod}">
+                                <div class="alert alert-danger">
+                                    <h6><i class="fas fa-exclamation-triangle"></i> Quá thời hạn</h6>
+                                    <p class="mb-0">Yêu cầu trả hàng này đã quá thời hạn 30 ngày. Cần xem xét kỹ trước khi duyệt.</p>
+                                </div>
+                            </div>
+                            
+                            <h6>Quy trình xử lý:</h6>
+                            <ol class="small">
+                                <li>Kiểm tra điều kiện trả hàng</li>
+                                <li>Duyệt hoặc từ chối yêu cầu</li>
+                                <li>Nếu duyệt: Phân công đội thu hồi</li>
+                                <li>Thông báo cho khách hàng</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Approve Return Modal -->
+        <div class="modal fade" id="approveModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Duyệt yêu cầu trả hàng</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <form th:action="@{/manager/orders/returns/{id}/approve(id=${returnRequest.orderId})}" method="post">
+                        <div class="modal-body">
+                            <p>Bạn có chắc chắn muốn duyệt yêu cầu trả hàng #<span th:text="${returnRequest.orderId}"></span>?</p>
+                            <div class="mb-3">
+                                <label for="approveNote" class="form-label">Ghi chú (tùy chọn)</label>
+                                <textarea class="form-control" id="approveNote" name="note" rows="3"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="deliveryTeamId" class="form-label">Đội giao hàng (nếu cần)</label>
+                                <select class="form-select" id="deliveryTeamId" name="deliveryTeamId">
+                                    <option value="">Tự động phân công</option>
+                                    <!-- Delivery teams will be loaded here -->
+                                </select>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                            <button type="submit" class="btn btn-success">Duyệt</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reject Return Modal -->
+        <div class="modal fade" id="rejectModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Từ chối yêu cầu trả hàng</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <form th:action="@{/manager/orders/returns/{id}/reject(id=${returnRequest.orderId})}" method="post">
+                        <div class="modal-body">
+                            <p>Bạn có chắc chắn muốn từ chối yêu cầu trả hàng #<span th:text="${returnRequest.orderId}"></span>?</p>
+                            <div class="mb-3">
+                                <label for="rejectReason" class="form-label">Lý do từ chối <span class="text-danger">*</span></label>
+                                <textarea class="form-control" id="rejectReason" name="reason" rows="3" required></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                            <button type="submit" class="btn btn-danger">Từ chối</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <script th:inline="javascript">
+            function approveReturn() {
+                const modal = new bootstrap.Modal(document.getElementById('approveModal'));
+                modal.show();
+            }
+
+            function rejectReturn() {
+                const modal = new bootstrap.Modal(document.getElementById('rejectModal'));
+                modal.show();
+            }
+        </script>
+    </div>
+</body>
+</html>

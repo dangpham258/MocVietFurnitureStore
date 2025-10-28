@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{manager/fragments/manager_layout}">
+<head>
+    <title>Thông báo - Manager</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="manager-content">
+            <!-- Header -->
+            <div class="page-header">
+                <h1 class="page-title">
+                    <i class="fas fa-bell"></i> Thông báo
+                    <span class="badge bg-danger ms-2" th:if="${unreadCount > 0}" th:text="${unreadCount}"></span>
+                </h1>
+                <div class="page-actions">
+                    <button type="button" class="btn btn-primary" onclick="markAllAsRead()">
+                        <i class="fas fa-check-double"></i> Đánh dấu tất cả đã đọc
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Success Message -->
+            <div id="successAlert" class="alert alert-success alert-dismissible fade" role="alert" style="display: none;">
+                <i class="fas fa-check-circle"></i> <span id="successMessage"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            
+            <!-- Notifications List -->
+            <div class="card">
+                <div class="card-body p-0">
+                    <div th:if="${notifications.empty}" class="text-center py-5">
+                        <i class="fas fa-bell-slash fa-4x text-muted mb-3"></i>
+                        <p class="text-muted h5">Không có thông báo nào</p>
+                    </div>
+                    
+                    <div class="list-group list-group-flush" th:if="${!notifications.empty}">
+                        <a th:each="notif : ${notifications}" 
+                           th:with="link=${notificationService.generateLinkFromNotification(notif)}"
+                           th:id="'notif-' + ${notif.id}"
+                           th:href="${link != null ? link : '#'}"
+                           th:class="${link != null ? 'list-group-item list-group-item-action notification-item' : 'list-group-item notification-item'}"
+                           th:classappend="${!notif.isRead ? 'notification-unread' : ''}"
+                           th:onclick="'markAsRead(' + ${notif.id} + ')'"
+                           style="text-decoration: none; color: inherit; cursor: pointer;">
+                            <div class="d-flex align-items-start">
+                                <!-- Unread indicator -->
+                                <div class="me-3 mt-1">
+                                    <i th:if="${!notif.isRead}" 
+                                       class="fas fa-circle text-primary" 
+                                       style="font-size: 8px;"></i>
+                                    <i th:if="${notif.isRead}" 
+                                       class="far fa-circle text-muted" 
+                                       style="font-size: 8px;"></i>
+                                </div>
+                                
+                                <!-- Content -->
+                                <div class="flex-grow-1">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h6 class="mb-0" th:classappend="${!notif.isRead ? 'fw-bold' : ''}" 
+                                            th:text="${notif.title}">Tiêu đề</h6>
+                                        <small class="text-muted ms-3" 
+                                               th:text="${#temporals.format(notif.createdAt, 'dd/MM/yyyy HH:mm')}"></small>
+                                    </div>
+                                    <p class="mb-2 text-muted" th:text="${notif.message}">Nội dung thông báo</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Pagination -->
+                <div th:if="${totalPages > 1}" class="card-footer">
+                    <nav>
+                        <ul class="pagination justify-content-center mb-0">
+                            <li class="page-item" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
+                                <a class="page-link" th:href="@{/manager/notifications(page=0)}">Đầu</a>
+                            </li>
+                            <li class="page-item" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
+                                <a class="page-link" th:href="@{/manager/notifications(page=${currentPage - 1})}">Trước</a>
+                            </li>
+                            
+                            <li class="page-item" 
+                                th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                                th:if="${i >= currentPage - 2 && i <= currentPage + 2}"
+                                th:classappend="${i == currentPage ? 'active' : ''}">
+                                <a class="page-link" 
+                                   th:href="@{/manager/notifications(page=${i})}"
+                                   th:text="${i + 1}"></a>
+                            </li>
+                            
+                            <li class="page-item" th:classappend="${currentPage >= totalPages - 1 ? 'disabled' : ''}">
+                                <a class="page-link" th:href="@{/manager/notifications(page=${currentPage + 1})}">Sau</a>
+                            </li>
+                            <li class="page-item" th:classappend="${currentPage >= totalPages - 1 ? 'disabled' : ''}">
+                                <a class="page-link" th:href="@{/manager/notifications(page=${totalPages - 1})}">Cuối</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+<!-- JavaScript -->
+<th:block layout:fragment="extra-scripts">
+    <script>
+            function markAsRead(notificationId) {
+                fetch(`/manager/notifications/${notificationId}/mark-read`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.text())
+                .then(data => {
+                    if (data === 'success') {
+                        // Update UI
+                        const notifElement = document.getElementById(`notif-${notificationId}`);
+                        if (notifElement) {
+                            notifElement.classList.remove('notification-unread');
+                            const icon = notifElement.querySelector('.fas.fa-circle');
+                            if (icon) {
+                                icon.classList.remove('fas', 'fa-circle', 'text-primary');
+                                icon.classList.add('far', 'fa-circle', 'text-muted');
+                            }
+                            const title = notifElement.querySelector('h6');
+                            if (title) {
+                                title.classList.remove('fw-bold');
+                            }
+                            const button = notifElement.querySelector('button');
+                            if (button) {
+                                button.remove();
+                            }
+                        }
+                        
+                        // Update badge counter
+                        updateUnreadCount();
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            }
+            
+            function markAllAsRead() {
+                if (!confirm('Đánh dấu tất cả thông báo là đã đọc?')) {
+                    return;
+                }
+                
+                fetch('/manager/notifications/mark-all-read', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.text())
+                .then(data => {
+                    if (data === 'success') {
+                        // Show success message
+                        showSuccess('Đã đánh dấu tất cả thông báo là đã đọc');
+                        
+                        // Reload page after 1 second
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1000);
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            }
+            
+            function updateUnreadCount() {
+                fetch('/manager/notifications/unread-count')
+                    .then(response => response.json())
+                    .then(count => {
+                        const badges = document.querySelectorAll('.notification-badge');
+                        badges.forEach(badge => {
+                            if (count > 0) {
+                                badge.textContent = count;
+                                badge.style.display = 'inline';
+                            } else {
+                                badge.style.display = 'none';
+                            }
+                        });
+                        
+                        // Update page header badge
+                        const headerBadge = document.querySelector('.page-title .badge');
+                        if (headerBadge) {
+                            if (count > 0) {
+                                headerBadge.textContent = count;
+                                headerBadge.style.display = 'inline';
+                            } else {
+                                headerBadge.style.display = 'none';
+                            }
+                        }
+                    });
+            }
+            
+            function showSuccess(message) {
+                const alert = document.getElementById('successAlert');
+                const messageSpan = document.getElementById('successMessage');
+                messageSpan.textContent = message;
+                alert.classList.add('show');
+                alert.style.display = 'block';
+            }
+    </script>
+</th:block>
+</html>
+

@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{manager/fragments/manager_layout}">
+
+<head>
+    <title th:text="${pageTitle}">Đơn hàng đã hoàn trả</title>
+    <style>
+        .order-card {
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            transition: box-shadow 0.3s;
+        }
+        .order-card:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .order-header {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .order-body {
+            padding: 15px;
+        }
+        .status-badge {
+            font-size: 0.875rem;
+            padding: 0.375rem 0.75rem;
+        }
+        .payment-status {
+            font-size: 0.8rem;
+        }
+        .order-actions {
+            margin-top: 10px;
+        }
+        .order-actions .btn {
+            margin-right: 5px;
+        }
+        .filter-card {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div layout:fragment="content">
+        <div class="container-fluid">
+            <!-- Header with Tabs -->
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2><i class="fas fa-shopping-cart"></i> Quản lý đơn hàng</h2>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-outline-success" onclick="exportToExcel()">
+                        <i class="fas fa-file-excel"></i> Xuất Excel
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary" onclick="printList()">
+                        <i class="fas fa-print"></i> In
+                    </button>
+                    <span class="badge bg-info fs-6 py-2 px-3" th:text="${totalElements} + ' đơn'"></span>
+                </div>
+            </div>
+            
+            <!-- Navigation Tabs -->
+            <ul class="nav nav-tabs mb-4">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/manager/orders/pending}">
+                        <i class="fas fa-clock"></i> Chờ xác nhận
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/manager/orders/in-delivery}">
+                        <i class="fas fa-shipping-fast"></i> Đang giao
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/manager/orders/completed}">
+                        <i class="fas fa-check-circle"></i> Đã hoàn thành
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/manager/orders/returns}">
+                        <i class="fas fa-undo"></i> Yêu cầu hoàn trả
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" th:href="@{/manager/orders/returned}">
+                        <i class="fas fa-box-open"></i> Đã hoàn trả
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/manager/orders/cancelled}">
+                        <i class="fas fa-times-circle"></i> Đã hủy
+                    </a>
+                </li>
+            </ul>
+
+            <!-- Filters -->
+            <div class="filter-card">
+                <form method="get" th:action="@{/manager/orders/returned}">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Tìm kiếm</label>
+                            <input type="text" class="form-control" name="keyword" 
+                                   th:value="${keyword}" placeholder="Mã đơn, tên khách...">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Sắp xếp</label>
+                            <select class="form-select" name="sortBy">
+                                <option value="createdAt" th:selected="${sortBy == 'createdAt'}">Ngày tạo</option>
+                                <option value="updatedAt" th:selected="${sortBy == 'updatedAt'}">Ngày cập nhật</option>
+                                <option value="id" th:selected="${sortBy == 'id'}">Mã đơn</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Thứ tự</label>
+                            <select class="form-select" name="sortDir">
+                                <option value="desc" th:selected="${sortDir == 'desc'}">Mới nhất</option>
+                                <option value="asc" th:selected="${sortDir == 'asc'}">Cũ nhất</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Hiển thị</label>
+                            <select class="form-select" name="size">
+                                <option value="10" th:selected="${size == 10}">10</option>
+                                <option value="20" th:selected="${size == 20}">20</option>
+                                <option value="50" th:selected="${size == 50}">50</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">&nbsp;</label>
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-search"></i> Tìm kiếm
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Orders List -->
+            <div class="row">
+                <div class="col-12">
+                    <div th:if="${orders.empty}" class="text-center py-5">
+                        <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">Không có đơn hàng đã hoàn trả</h5>
+                    </div>
+
+                    <div th:each="order : ${orders}" class="order-card">
+                        <div class="order-header">
+                            <div class="row align-items-center">
+                                <div class="col-md-2">
+                                    <strong>#<span th:text="${order.id}"></span></strong>
+                                </div>
+                                <div class="col-md-3">
+                                    <span th:text="${order.customerName}"></span><br>
+                                    <small class="text-muted" th:text="${order.customerPhone}"></small>
+                                </div>
+                                <div class="col-md-3">
+                                    <span th:text="${order.deliveryAddress}"></span><br>
+                                    <small class="text-muted" th:text="${order.city}"></small>
+                                </div>
+                                <div class="col-md-2">
+                                    <span class="badge bg-info status-badge">ĐÃ HOÀN TRẢ</span><br>
+                                    <small class="payment-status text-success">ĐÃ HOÀN TIỀN</small>
+                                </div>
+                                <div class="col-md-2 text-end">
+                                    <strong class="text-info" th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT')} + '₫'"></strong>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="order-body">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <small class="text-muted">
+                                        <i class="fas fa-calendar"></i> 
+                                        <span th:text="${#temporals.format(order.createdAt, 'dd/MM/yyyy HH:mm')}"></span>
+                                        | <i class="fas fa-box"></i> 
+                                        <span th:text="${order.itemCount} + ' sản phẩm'"></span>
+                                        <span th:if="${order.deliveryTeamName}">
+                                            | <i class="fas fa-truck"></i> 
+                                            <span th:text="${order.deliveryTeamName}"></span>
+                                        </span>
+                                    </small>
+                                </div>
+                                <div class="col-md-4 text-end order-actions">
+                                    <a th:href="@{/manager/orders/completed/{id}(id=${order.id})}" 
+                                       class="btn btn-outline-primary btn-sm">
+                                        <i class="fas fa-eye"></i> Chi tiết
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <nav th:if="${orders.totalPages > 1}" aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                        <a class="page-link" th:href="@{/manager/orders/returned(page=${currentPage - 1}, size=${size}, sortBy=${sortBy}, sortDir=${sortDir}, keyword=${keyword})}">Trước</a>
+                    </li>
+                    <li th:each="pageNum : ${#numbers.sequence(0, orders.totalPages - 1)}" 
+                        class="page-item" th:classappend="${pageNum == currentPage} ? 'active'">
+                        <a class="page-link" th:href="@{/manager/orders/returned(page=${pageNum}, size=${size}, sortBy=${sortBy}, sortDir=${sortDir}, keyword=${keyword})}" 
+                           th:text="${pageNum + 1}"></a>
+                    </li>
+                    <li class="page-item" th:classappend="${currentPage == orders.totalPages - 1} ? 'disabled'">
+                        <a class="page-link" th:href="@{/manager/orders/returned(page=${currentPage + 1}, size=${size}, sortBy=${sortBy}, sortDir=${sortDir}, keyword=${keyword})}">Sau</a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <script th:inline="javascript">
+                // Hàm xuất Excel
+                function exportToExcel() {
+                    // Lấy tất cả parameters hiện tại
+                    const params = new URLSearchParams(window.location.search);
+                    
+                    // Tạo form để submit
+                    const form = document.createElement('form');
+                    form.method = 'GET';
+                    form.action = '/manager/orders/returned/export';
+                    
+                    // Thêm các parameters
+                    for (const [key, value] of params.entries()) {
+                        const input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = key;
+                        input.value = value;
+                        form.appendChild(input);
+                    }
+                    
+                    document.body.appendChild(form);
+                    form.submit();
+                    document.body.removeChild(form);
+                }
+                
+                // Hàm in danh sách
+                function printList() {
+                    window.print();
+                }
+            </script>
+            
+            <style media="print">
+                /* Ẩn các phần không cần thiết khi in */
+                .btn, .filter-card, nav, .sidebar {
+                    display: none !important;
+                }
+                
+                .order-card {
+                    page-break-inside: avoid;
+                    border: 1px solid #000;
+                    margin-bottom: 10px;
+                }
+                
+                .order-actions {
+                    display: none !important;
+                }
+            </style>
+        </div>
+    </div>
+</body>
+</html>

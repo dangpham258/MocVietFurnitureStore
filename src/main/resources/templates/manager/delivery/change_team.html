@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{manager/fragments/manager_layout}">
+<head>
+    <title>Thay đổi đội giao hàng - Mộc Việt</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <!-- Page Header -->
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h2">Thay đổi đội giao hàng</h1>
+            <div class="btn-toolbar mb-2 mb-md-0">
+                <a th:href="@{/manager/delivery/pending}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-1"></i>Quay lại
+                </a>
+            </div>
+        </div>
+
+        <!-- Current Assignment Info -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-info-circle me-2"></i>Thông tin phân công hiện tại
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <strong>Mã đơn hàng:</strong>
+                                    <span th:text="'#' + ${orderId}">#12345</span>
+                                </div>
+                                <div class="mb-3">
+                                    <strong>Khu vực:</strong>
+                                    <span class="badge bg-info" th:text="${zoneName}">Nội thành</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <strong>Trạng thái:</strong>
+                                    <span class="badge bg-warning">Đã phân công</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Change Form -->
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-exchange-alt me-2"></i>Thay đổi đội giao hàng
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form th:action="@{/manager/delivery/change}" method="post" th:object="${changeRequest}">
+                            <input type="hidden" th:field="*{orderId}" th:value="${orderId}">
+                            
+                            <div class="mb-4">
+                                <label for="newDeliveryTeamId" class="form-label">Đội giao hàng mới <span class="text-danger">*</span></label>
+                                <select class="form-select" id="newDeliveryTeamId" th:field="*{newDeliveryTeamId}" required>
+                                    <option value="">-- Chọn đội giao hàng mới --</option>
+                                    <option th:each="team : ${availableTeams}" 
+                                            th:value="${team.id}" 
+                                            th:text="${team.name + ' (' + team.currentOrderCount + ' đơn đang xử lý)'}">
+                                        Đội giao hàng B (1 đơn đang xử lý)
+                                    </option>
+                                </select>
+                                <div class="form-text">
+                                    <i class="fas fa-lightbulb me-1"></i>
+                                    Chỉ hiển thị các đội giao hàng phù hợp với khu vực
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label for="reason" class="form-label">Lý do thay đổi <span class="text-danger">*</span></label>
+                                <textarea class="form-control" id="reason" th:field="*{reason}" 
+                                          rows="3" placeholder="Nhập lý do thay đổi đội giao hàng..." required></textarea>
+                                <div class="form-text">
+                                    Lý do thay đổi là bắt buộc và sẽ được ghi lại trong lịch sử
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label for="note" class="form-label">Ghi chú bổ sung</label>
+                                <textarea class="form-control" id="note" th:field="*{note}" 
+                                          rows="2" placeholder="Ghi chú bổ sung..."></textarea>
+                                <div class="form-text">
+                                    Ghi chú này sẽ được gửi kèm thông báo cho đội giao hàng mới
+                                </div>
+                            </div>
+                            
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <a th:href="@{/manager/delivery/pending}" class="btn btn-outline-secondary me-md-2">
+                                    <i class="fas fa-times me-1"></i>Hủy
+                                </a>
+                                <button type="submit" class="btn btn-warning">
+                                    <i class="fas fa-exchange-alt me-1"></i>Thay đổi đội giao
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="card-title mb-0">
+                            <i class="fas fa-exclamation-triangle me-2"></i>Lưu ý quan trọng
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <strong>Chỉ có thể thay đổi</strong> khi đơn hàng chưa bắt đầu giao hàng.
+                        </div>
+                        
+                        <div class="mb-3">
+                            <strong>Trạng thái hiện tại:</strong>
+                            <span class="badge bg-warning">Đã phân công</span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <strong>Khu vực:</strong>
+                            <span class="badge bg-info" th:text="${zoneName}">Nội thành</span>
+                        </div>
+                        
+                        <hr>
+                        
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Thông báo:</strong> Đội giao hàng cũ và mới sẽ nhận được thông báo về việc thay đổi này.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script th:src="@{/js/delivery-assignment.js}"></script>
+    <script>
+        // Handle team selection
+        document.addEventListener('DOMContentLoaded', function() {
+            const teamSelect = document.getElementById('newDeliveryTeamId');
+            teamSelect.addEventListener('change', function() {
+                if (this.value) {
+                    // Enable submit button or show additional info
+                    console.log('Selected team:', this.value);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -40,4 +40,19 @@ public interface ProductVariantRepository extends JpaRepository<ProductVariant, 
     Integer getStockQtyById(@Param("variantId") Integer variantId);
     
     List<ProductVariant> findByProductIdAndIsActiveTrue(Integer productId);
+    
+    boolean existsBySku(String sku);
+    
+    boolean existsBySkuAndIdNot(String sku, Integer id);
+    
+    @Query("SELECT pv FROM ProductVariant pv WHERE pv.product.id = :productId AND pv.color.id = :colorId AND pv.typeName = :typeName")
+    Optional<ProductVariant> findByProductAndColorAndType(@Param("productId") Integer productId, @Param("colorId") Integer colorId, @Param("typeName") String typeName);
+    
+    @Query("SELECT pv FROM ProductVariant pv LEFT JOIN FETCH pv.color WHERE pv.product.id = :productId")
+    List<ProductVariant> findByProductIdWithColor(@Param("productId") Integer productId);
+    
+    @Query("SELECT pv FROM ProductVariant pv WHERE pv.stockQty <= :threshold")
+    List<ProductVariant> findLowStockVariants(@Param("threshold") Integer threshold);
+    
+    List<ProductVariant> findByStockQtyLessThanAndIsActive(Integer stockQty, Boolean isActive);
 }

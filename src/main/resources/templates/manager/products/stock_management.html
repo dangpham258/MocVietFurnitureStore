@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{manager/fragments/manager_layout}">
+<head>
+    <title>Quản lý tồn kho - Mộc Việt</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="mb-1">Quản lý tồn kho</h2>
+                    <p class="text-muted mb-0">Theo dõi và cập nhật tồn kho sản phẩm</p>
+                </div>
+                <a href="/manager/products" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Quay lại
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Cảnh báo tồn kho thấp -->
+    <div class="row mb-4" th:if="${!lowStockVariants.isEmpty()}">
+        <div class="col-12">
+            <div class="alert alert-warning">
+                <h5 class="alert-heading">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Cảnh báo tồn kho thấp
+                </h5>
+                <p class="mb-0">Có <strong th:text="${#lists.size(lowStockVariants)}"></strong> biến thể có tồn kho ≤ 5 sản phẩm</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Tìm kiếm -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form method="get" action="/manager/products/stock">
+                        <div class="row g-3">
+                            <div class="col-md-8">
+                                <label for="keyword" class="form-label">Tìm kiếm sản phẩm</label>
+                                <input type="text" class="form-control" id="keyword" name="keyword" 
+                                       th:value="${keyword}" placeholder="Tên sản phẩm, SKU...">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">&nbsp;</label>
+                                <button type="submit" class="btn btn-primary d-block w-100">
+                                    <i class="fas fa-search me-2"></i>Tìm kiếm
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Danh sách sản phẩm -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Danh sách sản phẩm</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Tên sản phẩm</th>
+                                    <th>Biến thể</th>
+                                    <th>SKU</th>
+                                    <th>Tồn kho</th>
+                                    <th>Trạng thái</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="product : ${products.content}">
+                                    <td th:text="${product.id}"></td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="me-3">
+                                                <div class="bg-light rounded" style="width: 40px; height: 40px;"></div>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-0" th:text="${product.name}"></h6>
+                                                <small class="text-muted" th:text="${product.slug}"></small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info" th:text="${product.category.name}"></span>
+                                    </td>
+                                    <td>
+                                        <code th:text="${product.sku}"></code>
+                                    </td>
+                                    <td>
+                                        <span th:class="${product.stockQty <= 5} ? 'text-warning fw-bold' : 'text-success'"
+                                              th:text="${product.stockQty}"></span>
+                                    </td>
+                                    <td>
+                                        <span th:if="${product.isActive}" class="badge bg-success">Hoạt động</span>
+                                        <span th:unless="${product.isActive}" class="badge bg-danger">Ẩn</span>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary" 
+                                                th:onclick="'updateStock(' + ${product.id} + ', \'' + ${product.name} + '\', ' + ${product.stockQty} + ')'"
+                                                title="Cập nhật tồn kho">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr th:if="${products.content.isEmpty()}">
+                                    <td colspan="7" class="text-center py-4">
+                                        <div class="text-muted">
+                                            <i class="fas fa-box-open fa-2x mb-3"></i>
+                                            <p>Không có sản phẩm nào</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Pagination -->
+    <div class="row mt-4" th:if="${products.totalPages > 1}">
+        <div class="col-12">
+            <nav aria-label="Stock pagination">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                        <a class="page-link" th:href="@{/manager/products/stock(page=${currentPage - 1}, size=${products.size}, keyword=${keyword})}">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    </li>
+                    <li class="page-item" th:each="i : ${#numbers.sequence(0, products.totalPages - 1)}" 
+                        th:classappend="${i == currentPage} ? 'active'">
+                        <a class="page-link" th:href="@{/manager/products/stock(page=${i}, size=${products.size}, keyword=${keyword})}" 
+                           th:text="${i + 1}"></a>
+                    </li>
+                    <li class="page-item" th:classappend="${currentPage == products.totalPages - 1} ? 'disabled'">
+                        <a class="page-link" th:href="@{/manager/products/stock(page=${currentPage + 1}, size=${products.size}, keyword=${keyword})}">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<!-- Modal cập nhật tồn kho -->
+<div class="modal fade" id="stockModal" tabindex="-1" aria-labelledby="stockModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="stockModalLabel">Cập nhật tồn kho</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form th:action="@{/manager/products/variants/{variantId}/stock(variantId=0)}" th:object="${stockRequest}" method="post">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="productName" class="form-label">Sản phẩm</label>
+                        <input type="text" class="form-control" id="productName" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="stockQty" class="form-label">Số lượng tồn kho <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="stockQty" th:field="*{stockQty}"
+                               th:class="${#fields.hasErrors('stockQty')} ? 'form-control is-invalid' : 'form-control'"
+                               placeholder="0" min="0">
+                        <div th:if="${#fields.hasErrors('stockQty')}" class="invalid-feedback">
+                            <span th:errors="*{stockQty}"></span>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="note" class="form-label">Ghi chú</label>
+                        <textarea class="form-control" id="note" th:field="*{note}" rows="3"
+                                  placeholder="Ghi chú về việc cập nhật tồn kho..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-primary">Cập nhật</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    function updateStock(variantId, productName, currentStock) {
+        document.getElementById('productName').value = productName;
+        document.getElementById('stockQty').value = currentStock;
+        
+        // Update form action URL
+        const form = document.querySelector('#stockModal form');
+        form.action = '/manager/products/variants/' + variantId + '/stock';
+        
+        // Show modal
+        const modal = new bootstrap.Modal(document.getElementById('stockModal'));
+        modal.show();
+    }
+</script>
+</body>
+</html>

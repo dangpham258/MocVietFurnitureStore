@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{manager/fragments/manager_layout}">
+<head>
+    <title>Chi tiết bài viết - Mộc Việt</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="mb-1">Chi tiết bài viết</h2>
+                    <p class="text-muted mb-0" th:text="'#' + ${article.id} + ' - ' + ${article.title}">Bài viết</p>
+                </div>
+                <div>
+                    <a href="/manager/articles" class="btn btn-outline-secondary me-2">
+                        <i class="fas fa-arrow-left me-2"></i>Quay lại
+                    </a>
+                    <a th:href="@{/manager/articles/{id}/edit(id=${article.id})}" class="btn btn-primary">
+                        <i class="fas fa-edit me-2"></i>Chỉnh sửa
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Success/Error Messages -->
+    <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i><span th:text="${successMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i><span th:text="${errorMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    
+    <div class="row">
+        <!-- Main Content -->
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <!-- Title and Meta -->
+                    <h1 class="mb-3" th:text="${article.title}">Tiêu đề bài viết</h1>
+                    
+                    <div class="d-flex flex-wrap gap-2 mb-3">
+                        <span class="badge" 
+                              th:classappend="${article.articleType == 'MEDIA'} ? 'bg-info' : (${article.articleType == 'NEWS'} ? 'bg-primary' : 'bg-success')"
+                              th:text="${article.articleType == 'MEDIA'} ? 'Phong cách' : (${article.articleType == 'NEWS'} ? 'Tin tức' : 'Nghệ nhân')">
+                        </span>
+                        <span th:if="${article.status}" class="badge bg-success">
+                            <i class="fas fa-check-circle me-1"></i>Đã xuất bản
+                        </span>
+                        <span th:unless="${article.status}" class="badge bg-secondary">
+                            <i class="fas fa-file me-1"></i>Nháp
+                        </span>
+                        <span th:if="${article.isFeatured}" class="badge bg-warning text-dark">
+                            <i class="fas fa-star me-1"></i>Nổi bật
+                        </span>
+                    </div>
+                    
+                    <div class="text-muted mb-3">
+                        <small>
+                            <i class="fas fa-user me-1"></i>Tác giả: <span th:text="${article.author}">Manager</span>
+                            <span class="mx-2">|</span>
+                            <i class="fas fa-calendar me-1"></i>Ngày tạo: <span th:text="${#temporals.format(article.createdAt, 'dd/MM/yyyy HH:mm')}">01/01/2024</span>
+                            <span th:if="${article.publishedAt}" class="mx-2">|</span>
+                            <span th:if="${article.publishedAt}">
+                                <i class="fas fa-newspaper me-1"></i>Xuất bản: <span th:text="${#temporals.format(article.publishedAt, 'dd/MM/yyyy HH:mm')}">01/01/2024</span>
+                            </span>
+                            <span class="mx-2">|</span>
+                            <i class="fas fa-eye me-1"></i>Lượt xem: <span th:text="${article.views}">0</span>
+                        </small>
+                    </div>
+                    
+                    <hr>
+                    
+                    <!-- Thumbnail -->
+                    <div th:if="${article.thumbnail}" class="mb-4">
+                        <img th:src="${article.thumbnail}" alt="Thumbnail" class="img-fluid rounded">
+                    </div>
+                    
+                    <!-- Summary -->
+                    <div th:if="${article.summary}" class="alert alert-info mb-4">
+                        <h6 class="fw-bold mb-2"><i class="fas fa-info-circle me-2"></i>Tóm tắt</h6>
+                        <p class="mb-0" th:text="${article.summary}">Tóm tắt nội dung</p>
+                    </div>
+                    
+                    <!-- Content -->
+                    <div class="article-content mb-4" th:if="${article.content}">
+                        <h5 class="mb-3">Nội dung</h5>
+                        <div th:utext="${article.content}">Nội dung bài viết</div>
+                    </div>
+                    
+                    <!-- Content Images -->
+                    <div th:if="${!article.images.isEmpty()}" class="mb-4">
+                        <h5 class="mb-3">Ảnh nội dung</h5>
+                        <div class="row g-3">
+                            <div class="col-md-6" th:each="image : ${article.images}">
+                                <div class="card">
+                                    <img th:src="${image.url}" alt="Content image" class="card-img-top">
+                                    <div th:if="${image.caption}" class="card-body">
+                                        <p class="card-text text-muted small mb-0" th:text="${image.caption}">Caption</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Linked Product -->
+                    <div th:if="${article.linkedProductName}" class="alert alert-secondary">
+                        <h6 class="fw-bold mb-2"><i class="fas fa-link me-2"></i>Sản phẩm liên quan</h6>
+                        <p class="mb-0" th:text="${article.linkedProductName}">Tên sản phẩm</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Actions Card -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h6 class="mb-0"><i class="fas fa-cog me-2"></i>Hành động</h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a th:href="@{/manager/articles/{id}/edit(id=${article.id})}" class="btn btn-outline-primary">
+                            <i class="fas fa-edit me-2"></i>Chỉnh sửa bài viết
+                        </a>
+                        <button type="button" 
+                                class="btn btn-outline-danger" 
+                                th:if="${article.status}"
+                                th:onclick="'hideArticle(' + ${article.id} + ', \'' + ${article.title} + '\')'"
+                                title="Ẩn bài viết">
+                            <i class="fas fa-eye-slash me-2"></i>Ẩn bài viết
+                        </button>
+                        <a href="/manager/articles" class="btn btn-outline-secondary">
+                            <i class="fas fa-list me-2"></i>Danh sách bài viết
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Info Card -->
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h6 class="mb-0"><i class="fas fa-info-circle me-2"></i>Thông tin</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <strong>ID:</strong>
+                        <span class="float-end" th:text="${article.id}">1</span>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Slug:</strong>
+                        <div class="text-muted small" th:text="${article.slug}">slug</div>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Loại bài viết:</strong>
+                        <span class="float-end badge" 
+                              th:classappend="${article.articleType == 'MEDIA'} ? 'bg-info' : (${article.articleType == 'NEWS'} ? 'bg-primary' : 'bg-success')"
+                              th:text="${article.articleType}">
+                        </span>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Trạng thái:</strong>
+                        <span class="float-end" th:if="${article.status}">
+                            <span class="badge bg-success">Đã xuất bản</span>
+                        </span>
+                        <span class="float-end" th:unless="${article.status}">
+                            <span class="badge bg-secondary">Nháp</span>
+                        </span>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Nổi bật:</strong>
+                        <span class="float-end">
+                            <span th:if="${article.isFeatured}" class="badge bg-warning text-dark">
+                                <i class="fas fa-star"></i>
+                            </span>
+                            <span th:unless="${article.isFeatured}" class="text-muted">Không</span>
+                        </span>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Lượt xem:</strong>
+                        <span class="float-end" th:text="${article.views}">0</span>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Số ảnh nội dung:</strong>
+                        <span class="float-end" th:text="${article.images.size()}">0</span>
+                    </div>
+                    <div class="mb-0">
+                        <strong>Ngày tạo:</strong>
+                        <div class="text-muted small" th:text="${#temporals.format(article.createdAt, 'dd/MM/yyyy HH:mm:ss')}">01/01/2024</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Hidden form for hide article -->
+    <form id="hideArticleForm" method="post" style="display: none;">
+        <input type="hidden" name="_method" value="post">
+    </form>
+    
+    <script th:inline="javascript">
+        function hideArticle(articleId, articleTitle) {
+            if (confirm('Bạn có chắc chắn muốn ẩn bài viết "' + articleTitle + '"?')) {
+                const form = document.getElementById('hideArticleForm');
+                form.action = '/manager/articles/' + articleId + '/hide';
+                form.submit();
+            }
+        }
+    </script>
+</div>
+</body>
+</html>
+

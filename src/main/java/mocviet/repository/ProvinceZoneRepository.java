@@ -12,7 +12,7 @@ import java.util.Optional;
 @Repository
 public interface ProvinceZoneRepository extends JpaRepository<ProvinceZone, Integer> {
     
-    List<ProvinceZone> findAllByOrderByProvinceNameAsc();
+    Optional<ProvinceZone> findByProvinceName(String provinceName);
     
     /**
      * Tìm zone ID theo province name
@@ -20,4 +20,5 @@ public interface ProvinceZoneRepository extends JpaRepository<ProvinceZone, Inte
     @Query("SELECT pz.zone.id FROM ProvinceZone pz WHERE pz.provinceName = :provinceName")
     Optional<Integer> findZoneIdByProvinceName(@Param("provinceName") String provinceName);
     
+    List<ProvinceZone> findAllByOrderByProvinceNameAsc();
 }

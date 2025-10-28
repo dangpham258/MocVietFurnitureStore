@@ -88,4 +88,10 @@ public interface OrderRepository extends JpaRepository<Orders, Integer> {
      */
     @Query("SELECT COUNT(o) > 0 FROM Orders o WHERE o.user.id = :userId AND o.coupon.code = :couponCode")
     boolean hasUserUsedCoupon(@Param("userId") Integer userId, @Param("couponCode") String couponCode);
+    
+    List<Orders> findByUserId(Integer userId);
+    
+    List<Orders> findByStatus(Orders.OrderStatus status);
+    
+    List<Orders> findByUserIdAndStatus(Integer userId, Orders.OrderStatus status);
 }
