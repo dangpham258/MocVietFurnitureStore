@@ -1,16 +1,14 @@
 package mocviet.controller.customer;
 
 import lombok.RequiredArgsConstructor;
-import mocviet.dto.ReviewRequestDTO;
-import mocviet.dto.UnreviewedItemDTO;
-import mocviet.entity.OrderItem;
-import mocviet.entity.Review;
+import mocviet.dto.customer.ReviewDTO;
+import mocviet.dto.customer.ReviewRequestDTO;
+import mocviet.dto.customer.UnreviewedItemDTO;
 import mocviet.repository.OrderItemRepository;
 import mocviet.service.customer.IReviewService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -88,8 +86,8 @@ public class ReviewController {
                 return ResponseEntity.badRequest().body(response);
             }
             
-            // Lấy thông tin order item
-            OrderItem orderItem = orderItemRepository.findById(orderItemId)
+            // Validate order item tồn tại
+            var orderItem = orderItemRepository.findById(orderItemId)
                     .orElseThrow(() -> new RuntimeException("Order item không tồn tại"));
             
             // Tạo request DTO
@@ -99,7 +97,7 @@ public class ReviewController {
             request.setContent(content);
             
             // Tạo review
-            Review review = reviewService.createReview(request);
+            ReviewDTO review = reviewService.createReview(request);
             
             // Upload ảnh nếu có
             if (image != null && !image.isEmpty()) {
@@ -127,7 +125,7 @@ public class ReviewController {
      */
     @GetMapping("/{reviewId}")
     public String reviewDetail(@PathVariable Integer reviewId, Model model) {
-        Review review = reviewService.getReviewById(reviewId);
+        ReviewDTO review = reviewService.getReviewById(reviewId);
         if (review == null) {
             return "redirect:/customer/orders?error=Không tìm thấy đánh giá";
         }

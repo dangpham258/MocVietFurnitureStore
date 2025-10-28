@@ -1,9 +1,8 @@
 package mocviet.controller.customer;
 
 import lombok.RequiredArgsConstructor;
-import mocviet.dto.OrderDetailDTO;
-import mocviet.entity.Orders;
-import mocviet.entity.OrderItem;
+import mocviet.dto.customer.OrderDetailDTO;
+import mocviet.dto.customer.OrderSummaryDTO;
 import mocviet.service.customer.IOrderService;
 import mocviet.service.customer.impl.OrderServiceImpl;
 import org.springframework.data.domain.Page;
@@ -38,13 +37,12 @@ public class OrderController {
             Model model) {
         
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        Page<Orders> ordersPage;
+        Page<OrderSummaryDTO> ordersPage;
         
         // Lọc theo trạng thái
         if (!"ALL".equals(status)) {
             try {
-                Orders.OrderStatus orderStatus = Orders.OrderStatus.valueOf(status);
-                List<Orders> orders = orderService.getCurrentUserOrdersByStatus(orderStatus);
+                List<OrderSummaryDTO> orders = orderService.getCurrentUserOrdersByStatus(status);
                 model.addAttribute("orders", orders);
                 model.addAttribute("currentPage", 0);
                 model.addAttribute("totalPages", 1);

@@ -1,6 +1,5 @@
-package mocviet.dto;
+package mocviet.dto.customer;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 

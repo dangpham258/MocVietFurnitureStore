@@ -1,4 +1,4 @@
-package mocviet.dto;
+package mocviet.dto.customer;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.ConstraintValidator;

@@ -1,4 +1,4 @@
-package mocviet.dto;
+package mocviet.dto.customer;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

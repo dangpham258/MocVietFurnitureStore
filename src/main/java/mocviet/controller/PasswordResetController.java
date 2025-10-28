@@ -2,10 +2,10 @@ package mocviet.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import mocviet.dto.ForgotPasswordRequest;
+import mocviet.dto.customer.ForgotPasswordRequest;
 import mocviet.dto.MessageResponse;
-import mocviet.dto.ResetPasswordRequest;
-import mocviet.dto.VerifyOTPRequest;
+import mocviet.dto.customer.ResetPasswordRequest;
+import mocviet.dto.customer.VerifyOTPRequest;
 import mocviet.service.customer.IPasswordResetService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;

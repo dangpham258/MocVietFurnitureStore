@@ -123,33 +123,36 @@
                                     <small th:text="${#temporals.format(order.createdAt, 'dd/MM/yyyy HH:mm')}"></small>
                                 </div>
                                 <div class="col-md-6 text-end">
-                                    <span class="status-badge status-${order.status.name().toLowerCase()}" 
-                                          th:text="${order.status.name()}"></span>
+                                    <span class="status-badge"
+                                          th:classappend="' status-' + (${order.status} != null ? ${order.status.toLowerCase()} : '')"
+                                          th:text="${order.status}"></span>
                                     <div th:if="${order.returnStatus != null}" class="mt-1">
-                                        <span class="status-badge return-status-${order.returnStatus.name().toLowerCase()}" 
-                                              th:text="${order.returnStatus.name()}"></span>
+                                        <span class="status-badge"
+                                              th:classappend="' return-status-' + (${order.returnStatus} != null ? ${order.returnStatus.toLowerCase()} : '')"
+                                              th:text="${order.returnStatus}"></span>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         
                         <div class="order-body">
-                            <!-- Order Items -->
-                            <div th:each="item : ${order.orderItems}" class="row align-items-center mb-3">
+                            <!-- Order Items hiển thị theo DTO -->
+                            <div th:each="item : ${order.items}" class="row align-items-center mb-3">
                                 <div class="col-md-2">
-                                    <a th:href="@{/products/{slug}(slug=${item.variant.product.slug})}" class="product-image-link">
+                                    <a th:href="@{/products/{slug}(slug=${item.productSlug})}" class="product-image-link">
                                         <div class="product-image bg-light d-flex align-items-center justify-content-center">
-                                            <i class="bi bi-image text-muted"></i>
+                                            <img th:if="${item.imageUrl != null}" th:src="${item.imageUrl}" alt="" style="max-width:100%; max-height:100%; object-fit:cover;"/>
+                                            <i th:if="${item.imageUrl == null}" class="bi bi-image text-muted"></i>
                                         </div>
                                     </a>
                                 </div>
                                 <div class="col-md-6">
-                                    <a th:href="@{/products/{slug}(slug=${item.variant.product.slug})}" class="product-name-link">
-                                        <h6 th:text="${item.variant.product.name}"></h6>
+                                    <a th:href="@{/products/{slug}(slug=${item.productSlug})}" class="product-name-link">
+                                        <h6 th:text="${item.productName}"></h6>
                                     </a>
                                     <p class="text-muted mb-1">
-                                        <span th:text="${item.variant.color.name}"></span> - 
-                                        <span th:text="${item.variant.typeName}"></span>
+                                        <span th:text="${item.colorName}"></span> - 
+                                        <span th:text="${item.typeName}"></span>
                                     </p>
                                     <small class="text-muted">Số lượng: <span th:text="${item.qty}"></span></small>
                                 </div>
@@ -168,7 +171,7 @@
                                 </div>
                                 <div class="col-md-4 text-end">
                                     <div class="fw-bold fs-5 text-primary">
-                                        Tổng: <span th:text="${#numbers.formatDecimal(#aggregates.sum(order.orderItems.![unitPrice * qty]) + order.shippingFee, 0, 'COMMA', 0, 'POINT')} + ' đ'"></span>
+                                        Tổng: <span th:text="${#numbers.formatDecimal((order.subtotal ?: 0) + (order.shippingFee ?: 0), 0, 'COMMA', 0, 'POINT')} + ' đ'"></span>
                                     </div>
                                 </div>
                             </div>
@@ -181,35 +184,35 @@
                                 </a>
                                 
                                 <!-- Cancel Button -->
-                                <button th:if="${order.status.name() == 'PENDING'}" 
+                                <button th:if="${order.status == 'PENDING'}" 
                                         class="btn btn-outline-danger btn-sm"
                                         th:onclick="'cancelOrder(' + ${order.id} + ')'">
                                     <i class="bi bi-x-circle"></i> Hủy đơn
                                 </button>
                                 
                                 <!-- Review Button -->
-                                <a th:if="${order.status.name() == 'DELIVERED'}" 
+                                <a th:if="${order.status == 'DELIVERED'}" 
                                    th:href="@{/customer/reviews/new?orderId={id}(id=${order.id})}" 
                                    class="btn btn-outline-success btn-sm">
                                     <i class="bi bi-star"></i> Đánh giá
                                 </a>
                                 
                                 <!-- Return Request Button -->
-                                <button th:if="${order.status.name() == 'DELIVERED' and order.returnStatus == null}" 
+                                <button th:if="${order.status == 'DELIVERED' and order.returnStatus == null}" 
                                         class="btn btn-outline-warning btn-sm"
                                         th:onclick="'requestReturn(' + ${order.id} + ')'">
                                     <i class="bi bi-arrow-return-left"></i> Yêu cầu trả hàng
                                 </button>
                                 
                                 <!-- Reorder Button -->
-                                <button th:if="${order.status.name() == 'CANCELLED' or order.status.name() == 'RETURNED'}" 
+                                <button th:if="${order.status == 'CANCELLED' or order.status == 'RETURNED'}" 
                                         class="btn btn-outline-info btn-sm"
                                         th:onclick="'reorderProducts(' + ${order.id} + ')'">
                                     <i class="bi bi-cart-plus"></i> Mua lại
                                 </button>
                                 
                                 <!-- Pay Now Button - Only for VNPAY/MoMo with UNPAID status -->
-                                <a th:if="${order.paymentStatus.name() == 'UNPAID' and (order.paymentMethod.name() == 'VNPAY' or order.paymentMethod.name() == 'MOMO')}"
+                                <a th:if="${order.paymentStatus == 'UNPAID' and (order.paymentMethod == 'VNPAY' or order.paymentMethod == 'MOMO')}"
                                    th:href="@{/payment/retry/{id}(id=${order.id})}"
                                    class="btn btn-primary btn-sm">
                                     <i class="bi bi-credit-card"></i> Thanh toán ngay

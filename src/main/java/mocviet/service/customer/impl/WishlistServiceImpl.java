@@ -1,6 +1,7 @@
 package mocviet.service.customer.impl;
 
 import lombok.RequiredArgsConstructor;
+import mocviet.dto.customer.WishlistItemDTO;
 import mocviet.entity.Product;
 import mocviet.entity.User;
 import mocviet.entity.Wishlist;
@@ -25,44 +26,14 @@ public class WishlistServiceImpl implements IWishlistService {
     
     @Override
     @Transactional(readOnly = true)
-    public List<Wishlist> getCurrentUserWishlist() {
+    public List<WishlistItemDTO> getCurrentUserWishlist() {
         User currentUser = userDetailsService.getCurrentUser();
         if (currentUser == null) {
             return List.of();
         }
         
         List<Wishlist> wishlist = wishlistRepository.findByUserOrderByCreatedAtDesc(currentUser);
-        
-        // Initialize collections để tránh LazyInitializationException
-        for (Wishlist item : wishlist) {
-            if (item.getProduct() != null) {
-                Product product = item.getProduct();
-                
-                // Khởi tạo category và collection
-                if (product.getCategory() != null) {
-                    Hibernate.initialize(product.getCategory());
-                }
-                if (product.getCollection() != null) {
-                    Hibernate.initialize(product.getCollection());
-                }
-                
-                // Khởi tạo collections để có thể sử dụng trong view
-                if (product.getProductImages() != null) {
-                    Hibernate.initialize(product.getProductImages());
-                }
-                if (product.getVariants() != null) {
-                    Hibernate.initialize(product.getVariants());
-                    // Khởi tạo màu sắc cho variants
-                    product.getVariants().forEach(variant -> {
-                        if (variant.getColor() != null) {
-                            Hibernate.initialize(variant.getColor());
-                        }
-                    });
-                }
-            }
-        }
-        
-        return wishlist;
+        return wishlist.stream().map(this::mapToDTO).toList();
     }
     
     @Override
@@ -188,6 +159,30 @@ public class WishlistServiceImpl implements IWishlistService {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    private WishlistItemDTO mapToDTO(Wishlist item) {
+        WishlistItemDTO dto = new WishlistItemDTO();
+        dto.setId(item.getId());
+        if (item.getProduct() != null) {
+            Product product = item.getProduct();
+            dto.setProductId(product.getId());
+            dto.setProductName(product.getName());
+            dto.setProductSlug(product.getSlug());
+            // Image
+            if (product.getProductImages() != null && !product.getProductImages().isEmpty()) {
+                dto.setImageUrl(product.getProductImages().get(0).getUrl());
+            }
+            // Price (nếu có variants, lấy giá variant đầu tiên)
+            try {
+                if (product.getVariants() != null && !product.getVariants().isEmpty()) {
+                    var v = product.getVariants().get(0);
+                    dto.setPrice(v.getSalePrice());
+                    dto.setInStock(v.getIsActive() && v.getStockQty() > 0);
+                }
+            } catch (Exception ignored) {}
+        }
+        return dto;
     }
 }
 

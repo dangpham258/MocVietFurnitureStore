@@ -1,10 +1,9 @@
 package mocviet.controller;
 
 import lombok.RequiredArgsConstructor;
-import mocviet.entity.User;
-import mocviet.entity.UserNotification;
 import mocviet.repository.UserNotificationRepository;
 import mocviet.service.UserDetailsServiceImpl;
+import mocviet.dto.customer.UserNotificationDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,12 +26,21 @@ public class NotificationController {
      */
     @GetMapping("/notifications")
     public String showNotificationsPage(Model model) {
-        User currentUser = userDetailsService.getCurrentUser();
+        var currentUser = userDetailsService.getCurrentUser();
         if (currentUser != null) {
-            // Lấy tất cả notifications chưa đọc, sắp xếp từ mới đến cũ
-            List<UserNotification> notifications = notificationRepository
-                .findByUserAndIsReadFalseOrderByCreatedAtDesc(currentUser);
-            model.addAttribute("notifications", notifications);
+            var notifications = notificationRepository
+                .findByUserIdAndIsReadFalseOrderByCreatedAtDesc(currentUser.getId());
+            // Map entity -> DTO nhẹ để view
+            List<UserNotificationDTO> dtoList = notifications.stream().map(n -> {
+                UserNotificationDTO dto = new UserNotificationDTO();
+                dto.setId(n.getId());
+                dto.setTitle(n.getTitle());
+                dto.setContent(n.getMessage());
+                dto.setIsRead(n.getIsRead());
+                dto.setCreatedAt(n.getCreatedAt());
+                return dto;
+            }).toList();
+            model.addAttribute("notifications", dtoList);
         }
         return "notifications";
     }
@@ -47,20 +55,19 @@ public class NotificationController {
         Map<String, Object> response = new HashMap<>();
         
         try {
-            User currentUser = userDetailsService.getCurrentUser();
+            var currentUser = userDetailsService.getCurrentUser();
             if (currentUser != null) {
-                // Lấy notifications chưa đọc, sắp xếp từ cũ đến mới
-                List<UserNotification> notifications = notificationRepository
-                    .findByUserAndIsReadFalseOrderByCreatedAtAsc(currentUser);
-                
+                var notifications = notificationRepository
+                    .findByUserIdAndIsReadFalseOrderByCreatedAtAsc(currentUser.getId());
+
                 response.put("success", true);
-                response.put("notifications", notifications.stream().map(notif -> {
+                response.put("notifications", notifications.stream().map(n -> {
                     Map<String, Object> notifMap = new HashMap<>();
-                    notifMap.put("id", notif.getId());
-                    notifMap.put("title", notif.getTitle());
-                    notifMap.put("message", notif.getMessage());
-                    notifMap.put("isRead", notif.getIsRead());
-                    notifMap.put("createdAt", notif.getCreatedAt().toString());
+                    notifMap.put("id", n.getId());
+                    notifMap.put("title", n.getTitle());
+                    notifMap.put("message", n.getMessage());
+                    notifMap.put("isRead", n.getIsRead());
+                    notifMap.put("createdAt", n.getCreatedAt().toString());
                     return notifMap;
                 }).toList());
             } else {
@@ -85,14 +92,14 @@ public class NotificationController {
         Map<String, Object> response = new HashMap<>();
         
         try {
-            User currentUser = userDetailsService.getCurrentUser();
+            var currentUser = userDetailsService.getCurrentUser();
             if (currentUser == null) {
                 response.put("success", false);
                 response.put("message", "User not authenticated");
                 return ResponseEntity.ok(response);
             }
             
-            UserNotification notification = notificationRepository.findById(notificationId).orElse(null);
+            var notification = notificationRepository.findById(notificationId).orElse(null);
             if (notification == null) {
                 response.put("success", false);
                 response.put("message", "Notification not found");
@@ -129,14 +136,14 @@ public class NotificationController {
         Map<String, Object> response = new HashMap<>();
         
         try {
-            User currentUser = userDetailsService.getCurrentUser();
+            var currentUser = userDetailsService.getCurrentUser();
             if (currentUser == null) {
                 response.put("success", false);
                 response.put("message", "User not authenticated");
                 return ResponseEntity.ok(response);
             }
             
-            notificationRepository.markAllAsRead(currentUser);
+            notificationRepository.markAllAsReadByUserId(currentUser.getId());
             
             response.put("success", true);
             response.put("message", "All notifications marked as read");

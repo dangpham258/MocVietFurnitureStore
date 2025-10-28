@@ -2,19 +2,18 @@ package mocviet.controller.customer;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import mocviet.dto.CheckoutSummaryDTO;
-import mocviet.dto.CreateOrderRequest;
-import mocviet.dto.CreateOrderResponse;
-import mocviet.dto.PaymentRequestDTO;
-import mocviet.entity.Address;
-import mocviet.entity.CartItem;
-import mocviet.entity.ProductImage;
-import mocviet.entity.ShippingFee;
+import mocviet.dto.customer.AddressDTO;
+import mocviet.dto.customer.CartItemDTO;
+import mocviet.dto.customer.CheckoutSummaryDTO;
+import mocviet.dto.customer.CreateOrderRequest;
+import mocviet.dto.customer.CreateOrderResponse;
+import mocviet.dto.customer.PaymentRequestDTO;
 import mocviet.repository.AddressRepository;
 import mocviet.repository.CouponRepository;
 import mocviet.repository.ProvinceZoneRepository;
 import mocviet.repository.ShippingFeeRepository;
 import mocviet.service.customer.IPaymentService;
+import mocviet.service.customer.IProfileService;
 import mocviet.service.UserDetailsServiceImpl;
 import mocviet.service.customer.ICartService;
 import mocviet.service.customer.IOrderService;
@@ -44,6 +43,7 @@ public class CheckoutController {
     private final mocviet.repository.OrderRepository orderRepository;
     private final UserDetailsServiceImpl userDetailsService;
     private final IPaymentService paymentService;
+    private final IProfileService profileService;
     
     /**
      * Trang checkout - hiển thị form thanh toán
@@ -52,7 +52,7 @@ public class CheckoutController {
     @Transactional(readOnly = true)
     public String checkoutPage(@RequestParam(required = false) String selectedItemIds, Model model) {
         // Lấy cart items được chọn với ProductImages (eager fetch)
-        List<CartItem> allCartItems = cartService.getCurrentUserCartItemsWithImages();
+        List<CartItemDTO> allCartItems = cartService.getCurrentUserCartItemsWithImages();
         
         if (allCartItems.isEmpty()) {
             return "redirect:/customer/cart?error=empty";
@@ -79,31 +79,26 @@ public class CheckoutController {
         List<CheckoutSummaryDTO.CheckoutItemDTO> checkoutItems = new ArrayList<>();
         BigDecimal subtotal = BigDecimal.ZERO;
         
-        for (CartItem item : allCartItems) {
+        for (CartItemDTO item : allCartItems) {
             // Chỉ thêm nếu được chọn
             boolean isSelected = selectedIds.contains(item.getId());
             
-            if (isSelected && item.getVariant() != null && item.getVariant().getIsActive() && item.getVariant().getProduct() != null) {
+            if (isSelected) {
                 CheckoutSummaryDTO.CheckoutItemDTO dto = new CheckoutSummaryDTO.CheckoutItemDTO();
                 dto.setCartItemId(item.getId());
-                dto.setVariantId(item.getVariant().getId());
-                dto.setProductName(item.getVariant().getProduct().getName());
-                dto.setProductSlug(item.getVariant().getProduct().getSlug());
+                dto.setVariantId(item.getVariantId());
+                dto.setProductName(item.getProductName());
+                dto.setProductSlug(item.getProductSlug());
                 
-                if (item.getVariant().getColor() != null) {
-                    dto.setColorName(item.getVariant().getColor().getName());
-                }
-                dto.setTypeName(item.getVariant().getTypeName());
-                dto.setUnitPrice(item.getVariant().getSalePrice());
+                dto.setColorName(item.getColorName());
+                dto.setTypeName(item.getTypeName());
+                dto.setUnitPrice(item.getUnitPrice());
                 dto.setQty(item.getQty());
-                dto.setTotalPrice(item.getVariant().getSalePrice().multiply(BigDecimal.valueOf(item.getQty())));
+                dto.setTotalPrice(item.getTotalPrice() != null ? item.getTotalPrice() :
+                        (item.getUnitPrice() != null ? item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQty())) : BigDecimal.ZERO));
                 
                 // Get first image (already eager fetched)
-                String imageUrl = "/images/products/placeholder.jpg";
-                if (item.getVariant().getProduct().getProductImages() != null && 
-                    !item.getVariant().getProduct().getProductImages().isEmpty()) {
-                    imageUrl = item.getVariant().getProduct().getProductImages().get(0).getUrl();
-                }
+                String imageUrl = item.getImageUrl() != null ? item.getImageUrl() : "/images/products/placeholder.jpg";
                 dto.setImageUrl(imageUrl);
                 
                 checkoutItems.add(dto);
@@ -115,10 +110,8 @@ public class CheckoutController {
             return "redirect:/customer/cart?error=not_found";
         }
         
-        // Lấy danh sách địa chỉ của user
-        List<Address> addresses = addressRepository.findByUserIdOrderByIsDefaultDescCreatedAtDesc(
-            userDetailsService.getCurrentUser().getId()
-        );
+        // Lấy danh sách địa chỉ của user (DTO)
+        List<AddressDTO> addresses = profileService.getUserAddresses();
         
         if (addresses.isEmpty()) {
             return "redirect:/customer/profile?error=no_address&goto_address=true";
@@ -135,7 +128,7 @@ public class CheckoutController {
         
         model.addAttribute("summary", summary);
         model.addAttribute("addresses", addresses);
-        model.addAttribute("hasDefaultAddress", addresses.stream().anyMatch(Address::getIsDefault));
+        model.addAttribute("hasDefaultAddress", addresses.stream().anyMatch(AddressDTO::getIsDefault));
         
         return "customer/checkout";
     }
@@ -150,8 +143,8 @@ public class CheckoutController {
         Map<String, Object> response = new HashMap<>();
         
         try {
-            // Lấy địa chỉ
-            Address address = addressRepository.findById(addressId).orElse(null);
+            // Lấy địa chỉ của user hiện tại theo DTO
+            AddressDTO address = profileService.getAddressById(addressId);
             if (address == null) {
                 response.put("success", false);
                 response.put("message", "Không tìm thấy địa chỉ");
@@ -169,17 +162,27 @@ public class CheckoutController {
                 return ResponseEntity.ok(response);
             }
             
-            // Get shipping fee
-            ShippingFee shippingFee = shippingFeeRepository.findByZoneId(zoneId).orElse(null);
+            // Get shipping fee và map sang DTO
+            var shippingFee = shippingFeeRepository.findByZoneId(zoneId).orElse(null);
             
             if (shippingFee != null) {
+                mocviet.dto.customer.ShippingFeeDTO feeDTO = mocviet.dto.customer.ShippingFeeDTO.builder()
+                    .id(shippingFee.getId())
+                    .zoneId(zoneId)
+                    .baseFee(shippingFee.getBaseFee())
+                    .build();
                 response.put("success", true);
-                response.put("shippingFee", shippingFee.getBaseFee());
+                response.put("shippingFee", feeDTO);
                 response.put("message", "Phí vận chuyển");
             } else {
                 // Default fee
                 response.put("success", true);
-                response.put("shippingFee", BigDecimal.valueOf(30000));
+                mocviet.dto.customer.ShippingFeeDTO feeDTO = mocviet.dto.customer.ShippingFeeDTO.builder()
+                    .id(null)
+                    .zoneId(zoneId)
+                    .baseFee(BigDecimal.valueOf(30000))
+                    .build();
+                response.put("shippingFee", feeDTO);
                 response.put("message", "Phí vận chuyển mặc định");
             }
         } catch (Exception e) {

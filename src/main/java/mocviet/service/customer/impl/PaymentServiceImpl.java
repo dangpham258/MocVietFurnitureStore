@@ -1,8 +1,9 @@
 package mocviet.service.customer.impl;
 
 import lombok.RequiredArgsConstructor;
-import mocviet.dto.PaymentRequestDTO;
-import mocviet.dto.PaymentWebhookDTO;
+import mocviet.dto.customer.OrderDetailDTO;
+import mocviet.dto.customer.PaymentRequestDTO;
+import mocviet.dto.customer.PaymentWebhookDTO;
 import mocviet.entity.Orders;
 import mocviet.repository.OrderRepository;
 import mocviet.repository.OrderStatusHistoryRepository;
@@ -238,6 +239,38 @@ public class PaymentServiceImpl implements IPaymentService {
             return verifyMomoChecksum(webhookDto);
         }
         return false;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public OrderDetailDTO getOrderDetailForPayment(Integer orderId) {
+        return orderRepository.findById(orderId)
+                .map(order -> {
+                    OrderDetailDTO dto = new OrderDetailDTO();
+                    dto.setId(order.getId());
+                    dto.setStatus(order.getStatus() != null ? order.getStatus().name() : null);
+                    dto.setReturnStatus(order.getReturnStatus() != null ? order.getReturnStatus().name() : null);
+                    dto.setPaymentMethod(order.getPaymentMethod() != null ? order.getPaymentMethod().name() : null);
+                    dto.setPaymentStatus(order.getPaymentStatus() != null ? order.getPaymentStatus().name() : null);
+                    dto.setShippingFee(order.getShippingFee());
+                    dto.setCreatedAt(order.getCreatedAt());
+                    dto.setUpdatedAt(order.getUpdatedAt());
+
+                    java.math.BigDecimal grandTotal = java.math.BigDecimal.ZERO;
+                    try {
+                        if (order.getOrderItems() != null && !order.getOrderItems().isEmpty()) {
+                            for (var item : order.getOrderItems()) {
+                                grandTotal = grandTotal.add(item.getUnitPrice().multiply(java.math.BigDecimal.valueOf(item.getQty())));
+                            }
+                        }
+                        grandTotal = grandTotal.add(order.getShippingFee());
+                    } catch (Exception e) {
+                        // ignore lazy loading errors
+                    }
+                    dto.setTotal(grandTotal);
+                    return dto;
+                })
+                .orElse(null);
     }
     
     /**

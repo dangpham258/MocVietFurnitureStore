@@ -1,9 +1,11 @@
 package mocviet.service.customer.impl;
 
 import lombok.RequiredArgsConstructor;
-import mocviet.dto.AddressRequest;
-import mocviet.dto.PasswordChangeRequest;
-import mocviet.dto.ProfileUpdateRequest;
+import mocviet.dto.customer.AddressDTO;
+import mocviet.dto.customer.AddressRequest;
+import mocviet.dto.customer.PasswordChangeRequest;
+import mocviet.dto.customer.ProfileUpdateRequest;
+import mocviet.dto.customer.UserDTO;
 import mocviet.entity.Address;
 import mocviet.entity.User;
 import mocviet.repository.AddressRepository;
@@ -28,16 +30,25 @@ public class ProfileServiceImpl implements IProfileService {
     
     @Override
     @Transactional(readOnly = true)
-    public User getCurrentUserProfile() {
+    public UserDTO getCurrentUserProfile() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        return userRepository.findByUsername(username)
+        User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+        UserDTO dto = new UserDTO();
+        dto.setId(user.getId());
+        dto.setFullName(user.getFullName());
+        dto.setEmail(user.getEmail());
+        dto.setGender(user.getGender());
+        dto.setDob(user.getDob());
+        dto.setPhone(user.getPhone());
+        return dto;
     }
     
     @Override
     public void updateProfile(ProfileUpdateRequest request) {
-        User currentUser = getCurrentUserProfile();
+        User currentUser = userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName())
+                .orElseThrow(() -> new RuntimeException("User not found"));
         
         // Kiểm tra email có bị trùng không (nếu thay đổi)
         if (!currentUser.getEmail().equals(request.getEmail())) {
@@ -58,7 +69,8 @@ public class ProfileServiceImpl implements IProfileService {
     
     @Override
     public void changePassword(PasswordChangeRequest request) {
-        User currentUser = getCurrentUserProfile();
+        User currentUser = userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName())
+                .orElseThrow(() -> new RuntimeException("User not found"));
         
         // Kiểm tra mật khẩu hiện tại
         if (request.getCurrentPassword() != null && !request.getCurrentPassword().isEmpty()) {
@@ -80,14 +92,17 @@ public class ProfileServiceImpl implements IProfileService {
     
     @Override
     @Transactional(readOnly = true)
-    public List<Address> getUserAddresses() {
-        User currentUser = getCurrentUserProfile();
-        return addressRepository.findByUserIdOrderByIsDefaultDescCreatedAtDesc(currentUser.getId());
+    public List<AddressDTO> getUserAddresses() {
+        User currentUser = userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return addressRepository.findByUserIdOrderByIsDefaultDescCreatedAtDesc(currentUser.getId())
+                .stream().map(this::mapToAddressDTO).toList();
     }
     
     @Override
-    public Address addAddress(AddressRequest request) {
-        User currentUser = getCurrentUserProfile();
+    public AddressDTO addAddress(AddressRequest request) {
+        User currentUser = userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName())
+                .orElseThrow(() -> new RuntimeException("User not found"));
         
         // Kiểm tra giới hạn 5 địa chỉ
         long addressCount = addressRepository.countByUserId(currentUser.getId());
@@ -109,12 +124,14 @@ public class ProfileServiceImpl implements IProfileService {
         address.setDistrict(request.getDistrict());
         address.setIsDefault(request.getIsDefault());
         
-        return addressRepository.save(address);
+        Address saved = addressRepository.save(address);
+        return mapToAddressDTO(saved);
     }
     
     @Override
-    public Address updateAddress(Integer addressId, AddressRequest request) {
-        User currentUser = getCurrentUserProfile();
+    public AddressDTO updateAddress(Integer addressId, AddressRequest request) {
+        User currentUser = userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName())
+                .orElseThrow(() -> new RuntimeException("User not found"));
         
         Address address = addressRepository.findByIdAndUserId(addressId, currentUser.getId())
                 .orElseThrow(() -> new RuntimeException("Địa chỉ không tồn tại"));
@@ -131,12 +148,14 @@ public class ProfileServiceImpl implements IProfileService {
         address.setDistrict(request.getDistrict());
         address.setIsDefault(request.getIsDefault());
         
-        return addressRepository.save(address);
+        Address saved = addressRepository.save(address);
+        return mapToAddressDTO(saved);
     }
     
     @Override
     public void deleteAddress(Integer addressId) {
-        User currentUser = getCurrentUserProfile();
+        User currentUser = userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName())
+                .orElseThrow(() -> new RuntimeException("User not found"));
         
         Address address = addressRepository.findByIdAndUserId(addressId, currentUser.getId())
                 .orElseThrow(() -> new RuntimeException("Địa chỉ không tồn tại"));
@@ -146,7 +165,8 @@ public class ProfileServiceImpl implements IProfileService {
     
     @Override
     public void setDefaultAddress(Integer addressId) {
-        User currentUser = getCurrentUserProfile();
+        User currentUser = userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName())
+                .orElseThrow(() -> new RuntimeException("User not found"));
         
         Address address = addressRepository.findByIdAndUserId(addressId, currentUser.getId())
                 .orElseThrow(() -> new RuntimeException("Địa chỉ không tồn tại"));
@@ -156,5 +176,27 @@ public class ProfileServiceImpl implements IProfileService {
         
         // Đặt địa chỉ này làm mặc định
         addressRepository.setDefaultByIdAndUserId(addressId, currentUser.getId());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public AddressDTO getAddressById(Integer addressId) {
+        User currentUser = userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        Address address = addressRepository.findByIdAndUserId(addressId, currentUser.getId())
+                .orElse(null);
+        return address != null ? mapToAddressDTO(address) : null;
+    }
+
+    private AddressDTO mapToAddressDTO(Address address) {
+        AddressDTO dto = new AddressDTO();
+        dto.setId(address.getId());
+        dto.setReceiverName(address.getReceiverName());
+        dto.setPhone(address.getPhone());
+        dto.setAddressLine(address.getAddressLine());
+        dto.setDistrict(address.getDistrict());
+        dto.setCity(address.getCity());
+        dto.setIsDefault(address.getIsDefault());
+        return dto;
     }
 }

@@ -2,11 +2,11 @@ package mocviet.controller.customer;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import mocviet.dto.AddressRequest;
-import mocviet.dto.PasswordChangeRequest;
-import mocviet.dto.ProfileUpdateRequest;
-import mocviet.entity.Address;
-import mocviet.entity.User;
+import mocviet.dto.customer.AddressDTO;
+import mocviet.dto.customer.AddressRequest;
+import mocviet.dto.customer.PasswordChangeRequest;
+import mocviet.dto.customer.ProfileUpdateRequest;
+import mocviet.dto.customer.UserDTO;
 import mocviet.repository.AddressRepository;
 import mocviet.service.customer.IProfileService;
 import mocviet.service.customer.ICustomerService;
@@ -33,8 +33,8 @@ public class ProfileController {
     @GetMapping
     public String profilePage(@RequestParam(value = "error", required = false) String error,
                              Model model) {
-        User user = profileService.getCurrentUserProfile();
-        List<Address> addresses = profileService.getUserAddresses();
+        UserDTO user = profileService.getCurrentUserProfile();
+        List<AddressDTO> addresses = profileService.getUserAddresses();
         
         // Populate ProfileUpdateRequest with current user data
         ProfileUpdateRequest profileUpdateRequest = new ProfileUpdateRequest();
@@ -83,8 +83,8 @@ public class ProfileController {
         
         if (bindingResult.hasErrors()) {
             // Giữ lại dữ liệu và hiển thị lỗi validation
-            User user = profileService.getCurrentUserProfile();
-            List<Address> addresses = profileService.getUserAddresses();
+            UserDTO user = profileService.getCurrentUserProfile();
+            List<AddressDTO> addresses = profileService.getUserAddresses();
             
             model.addAttribute("user", user);
             model.addAttribute("addresses", addresses);
@@ -223,10 +223,10 @@ public class ProfileController {
     @ResponseBody
     public ResponseEntity<Map<String, Object>> getAddress(@PathVariable Integer id) {
         try {
-            User currentUser = profileService.getCurrentUserProfile();
+            UserDTO currentUser = profileService.getCurrentUserProfile();
             
             // Sử dụng repository để kiểm tra ownership và lấy address
-            Address address = addressRepository.findByIdAndUserId(id, currentUser.getId())
+            var address = addressRepository.findByIdAndUserId(id, currentUser.getId())
                     .orElse(null);
             
             if (address == null) {

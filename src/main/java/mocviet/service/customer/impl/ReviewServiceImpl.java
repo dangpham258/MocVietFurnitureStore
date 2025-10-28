@@ -1,8 +1,9 @@
 package mocviet.service.customer.impl;
 
 import lombok.RequiredArgsConstructor;
-import mocviet.dto.ReviewRequestDTO;
-import mocviet.dto.UnreviewedItemDTO;
+import mocviet.dto.customer.ReviewDTO;
+import mocviet.dto.customer.ReviewRequestDTO;
+import mocviet.dto.customer.UnreviewedItemDTO;
 import mocviet.entity.OrderItem;
 import mocviet.entity.Product;
 import mocviet.entity.Review;
@@ -95,7 +96,7 @@ public class ReviewServiceImpl implements IReviewService {
     
     @Override
     @Transactional
-    public Review createReview(ReviewRequestDTO request) {
+    public ReviewDTO createReview(ReviewRequestDTO request) {
         // Validate order item
         OrderItem orderItem = orderItemRepository.findById(request.getOrderItemId())
                 .orElseThrow(() -> new RuntimeException("Order item không tồn tại"));
@@ -120,7 +121,8 @@ public class ReviewServiceImpl implements IReviewService {
         review.setImageUrl(request.getImageUrl());
         review.setIsHidden(false);
         
-        return reviewRepository.save(review);
+        Review saved = reviewRepository.save(review);
+        return mapToDTO(saved);
     }
     
     @Override
@@ -172,23 +174,35 @@ public class ReviewServiceImpl implements IReviewService {
     
     @Override
     @Transactional
-    public Review updateReviewImageUrl(Integer reviewId, String imageUrl) {
+    public ReviewDTO updateReviewImageUrl(Integer reviewId, String imageUrl) {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new RuntimeException("Review không tồn tại"));
         review.setImageUrl(imageUrl);
-        return reviewRepository.save(review);
+        return mapToDTO(reviewRepository.save(review));
     }
     
     @Override
     @Transactional(readOnly = true)
-    public Review getReviewById(Integer reviewId) {
-        return reviewRepository.findById(reviewId).orElse(null);
+    public ReviewDTO getReviewById(Integer reviewId) {
+        return reviewRepository.findById(reviewId).map(this::mapToDTO).orElse(null);
     }
     
     @Override
     @Transactional(readOnly = true)
-    public List<Review> getProductReviews(Integer productId) {
-        return reviewRepository.findByProductIdAndIsHiddenFalse(productId);
+    public List<ReviewDTO> getProductReviews(Integer productId) {
+        return reviewRepository.findByProductIdAndIsHiddenFalse(productId)
+                .stream().map(this::mapToDTO).collect(Collectors.toList());
+    }
+
+    private ReviewDTO mapToDTO(Review review) {
+        ReviewDTO dto = new ReviewDTO();
+        dto.setId(review.getId());
+        dto.setOrderItemId(review.getOrderItem() != null ? review.getOrderItem().getId() : null);
+        dto.setRating(review.getRating());
+        dto.setContent(review.getContent());
+        dto.setImageUrl(review.getImageUrl());
+        dto.setCreatedAt(review.getCreatedAt());
+        return dto;
     }
 }
 

@@ -10,7 +10,7 @@
 </head>
 <body>
     <!-- Header -->
-    <div th:replace="fragments/header :: header"></div>
+    <div th:replace="~{fragments/header :: header}"></div>
 
     <div class="cart-container">
         <!-- Cart Header -->
@@ -60,24 +60,24 @@
 
                             <!-- Product Image -->
                             <div class="col-2">
-                                <a th:href="@{/products/{slug}(slug=${item.variant.product.slug})}" class="product-image-link">
-                                    <img th:src="'/images/products/placeholder.jpg'"
-                                         th:alt="${item.variant.product.name}"
+                                <a th:href="@{/products/{slug}(slug=${item.productSlug})}" class="product-image-link">
+                                    <img th:src="${item.imageUrl != null} ? ${item.imageUrl} : '/images/products/placeholder.jpg'"
+                                         th:alt="${item.productName}"
                                          class="product-image">
                                 </a>
                             </div>
 
                             <!-- Product Info -->
                             <div class="col-4">
-                                <a th:href="@{/products/{slug}(slug=${item.variant.product.slug})}" class="product-name-link">
-                                    <h5 th:text="${item.variant.product.name}">Tên sản phẩm</h5>
+                                <a th:href="@{/products/{slug}(slug=${item.productSlug})}" class="product-name-link">
+                                    <h5 th:text="${item.productName}">Tên sản phẩm</h5>
                                 </a>
                                 <div class="product-variant">
-                                    <span th:text="${item.variant.color.name}">Màu sắc</span> - 
-                                    <span th:text="${item.variant.typeName}">Loại</span>
+                                    <span th:text="${item.colorName}">Màu sắc</span> - 
+                                    <span th:text="${item.typeName}">Loại</span>
                                 </div>
                                 <div class="price-info">
-                                    <span th:text="${#numbers.formatDecimal(item.variant.salePrice, 0, 'COMMA', 0, 'POINT')} + ' ₫'">0 ₫</span>
+                                    <span th:text="${#numbers.formatDecimal(item.unitPrice, 0, 'COMMA', 0, 'POINT')} + ' ₫'">0 ₫</span>
                                 </div>
                                 <div th:if="${stockErrors.containsKey(item.id)}" 
                                      class="stock-error" 
@@ -97,7 +97,7 @@
                                            th:id="'qty-' + ${item.id}"
                                            th:value="${item.qty}"
                                            min="1"
-                                           th:max="${item.variant.stockQty}"
+                                           th:max="${item.stockQty}"
                                            th:disabled="${stockErrors.containsKey(item.id)}">
                                     <button class="btn-quantity" th:onclick="'increaseQuantity(' + ${item.id} + ')'">
                                         <i class="fas fa-plus"></i>
@@ -109,7 +109,8 @@
                             <div class="col-2 text-end">
                                 <div class="price-info mb-2">
                                     <span th:id="'total-' + ${item.id}" 
-                                          th:text="${#numbers.formatDecimal(item.variant.salePrice * item.qty, 0, 'COMMA', 0, 'POINT')} + ' ₫'">
+                                          th:data-unit="${item.unitPrice}"
+                                          th:text="${#numbers.formatDecimal(item.totalPrice, 0, 'COMMA', 0, 'POINT')} + ' ₫'">
                                         0 ₫
                                     </span>
                                 </div>

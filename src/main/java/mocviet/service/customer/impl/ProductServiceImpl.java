@@ -1,9 +1,9 @@
-package mocviet.service;
+package mocviet.service.customer.impl;
 
 import lombok.RequiredArgsConstructor;
-import mocviet.dto.ProductCardDTO;
-import mocviet.dto.ProductCriteriaDTO;
-import mocviet.dto.ProductDetailDTO;
+import mocviet.dto.customer.ProductCardDTO;
+import mocviet.dto.customer.ProductCriteriaDTO;
+import mocviet.dto.customer.ProductDetailDTO;
 import mocviet.entity.Color; // Thêm import
 import mocviet.entity.Product;
 import mocviet.entity.ProductImage;
@@ -12,6 +12,8 @@ import mocviet.repository.ProductImageRepository;
 import mocviet.repository.ProductRepository;
 import mocviet.repository.ProductVariantRepository;
 import mocviet.service.ProductSpecification;
+import mocviet.service.customer.IProductService;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -31,7 +33,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class ProductServiceImpl implements ProductService {
+public class ProductServiceImpl implements IProductService {
 
     private final ProductRepository productRepository;
     private final ProductVariantRepository variantRepository;

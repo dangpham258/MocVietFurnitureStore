@@ -32,9 +32,24 @@ public interface UserNotificationRepository extends JpaRepository<UserNotificati
     List<UserNotification> findByUserAndIsReadFalseOrderByCreatedAtDesc(User user);
     
     /**
+     * Tìm notifications chưa đọc theo userId (DESC)
+     */
+    List<UserNotification> findByUserIdAndIsReadFalseOrderByCreatedAtDesc(Integer userId);
+    
+    /**
+     * Tìm notifications chưa đọc theo userId (ASC)
+     */
+    List<UserNotification> findByUserIdAndIsReadFalseOrderByCreatedAtAsc(Integer userId);
+    
+    /**
      * Đếm số notifications chưa đọc của user
      */
     Long countByUserAndIsReadFalse(User user);
+    
+    /**
+     * Đếm số notifications chưa đọc theo userId (để dùng ở lớp controller không cần entity)
+     */
+    Long countByUserIdAndIsReadFalse(Integer userId);
     
     /**
      * Tìm notifications theo title (để kiểm tra trùng lặp)
@@ -67,7 +82,7 @@ public interface UserNotificationRepository extends JpaRepository<UserNotificati
     /**
      * Đánh dấu tất cả thông báo của user là đã đọc
      */
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Query("UPDATE UserNotification n SET n.isRead = true WHERE n.user.id = :userId AND n.isRead = false")
     int markAllAsReadByUserId(@Param("userId") Integer userId);
     

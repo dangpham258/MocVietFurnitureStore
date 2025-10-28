@@ -1,7 +1,7 @@
 package mocviet.service;
 
 import jakarta.persistence.criteria.*;
-import mocviet.dto.ProductCriteriaDTO;
+import mocviet.dto.customer.ProductCriteriaDTO;
 import mocviet.entity.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;

@@ -3,10 +3,10 @@ package mocviet.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import mocviet.dto.ProductCardDTO;
-import mocviet.dto.ProductCriteriaDTO;
-import mocviet.dto.ProductDetailDTO;
-import mocviet.service.ProductService;
+import mocviet.dto.customer.ProductCardDTO;
+import mocviet.dto.customer.ProductCriteriaDTO;
+import mocviet.dto.customer.ProductDetailDTO;
+import mocviet.service.customer.IProductService;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequiredArgsConstructor
 public class ProductController {
     
-    private final ProductService productService;
+    private final IProductService productService;
     private final ObjectMapper objectMapper; // Dùng để chuyển DTO sang JSON cho JavaScript
     
     /**

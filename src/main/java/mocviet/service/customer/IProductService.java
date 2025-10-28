@@ -1,11 +1,11 @@
-package mocviet.service;
+package mocviet.service.customer;
 
-import mocviet.dto.ProductCardDTO;
-import mocviet.dto.ProductCriteriaDTO;
-import mocviet.dto.ProductDetailDTO;
+import mocviet.dto.customer.ProductCardDTO;
+import mocviet.dto.customer.ProductCriteriaDTO;
+import mocviet.dto.customer.ProductDetailDTO;
 import org.springframework.data.domain.Page;
 
-public interface ProductService {
+public interface IProductService {
     
     Page<ProductCardDTO> findProducts(ProductCriteriaDTO criteria);
     

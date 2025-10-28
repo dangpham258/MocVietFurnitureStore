@@ -1,4 +1,4 @@
-package mocviet.dto;
+package mocviet.dto.customer;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
