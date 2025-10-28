@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{manager/fragments/manager_layout}">
+
+<head>
+    <title th:text="${pageTitle}">Cập nhật tồn kho</title>
+    <style>
+        .product-detail-card {
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        }
+        .color-swatch {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 2px solid #ddd;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+        .stock-input {
+            font-size: 1.5rem;
+            text-align: center;
+            font-weight: bold;
+        }
+        .info-row {
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .info-row:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div layout:fragment="content">
+        <div class="container-fluid">
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb" class="mb-3">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a th:href="@{/manager/inventory/alerts}">Quản lý tồn kho</a>
+                    </li>
+                    <li class="breadcrumb-item active">Cập nhật tồn kho</li>
+                </ol>
+            </nav>
+
+            <!-- Page Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="h3 mb-0">
+                    <i class="fas fa-edit text-primary me-2"></i>
+                    Cập nhật tồn kho
+                </h2>
+                <a th:href="@{/manager/inventory/alerts}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Quay lại
+                </a>
+            </div>
+
+            <!-- Error Messages -->
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                <span th:text="${error}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <div class="row">
+                <!-- Product Information (Left Column) -->
+                <div class="col-md-6">
+                    <div class="card product-detail-card">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">
+                                <i class="fas fa-info-circle me-2"></i>Thông tin sản phẩm
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="info-row">
+                                <label class="text-muted small mb-1">Tên sản phẩm</label>
+                                <div class="fw-bold" th:text="${variant.productName}">Tên sản phẩm</div>
+                            </div>
+
+                            <div class="info-row">
+                                <label class="text-muted small mb-1">SKU</label>
+                                <div class="fw-bold" th:text="${variant.sku}">SKU123</div>
+                            </div>
+
+                            <div class="info-row">
+                                <label class="text-muted small mb-1">Màu sắc</label>
+                                <div>
+                                    <span class="color-swatch" th:style="'background-color: ' + ${variant.colorHex}"></span>
+                                    <span class="fw-bold" th:text="${variant.colorName}">Màu</span>
+                                </div>
+                            </div>
+
+                            <div class="info-row">
+                                <label class="text-muted small mb-1">Loại</label>
+                                <div class="fw-bold" th:text="${variant.typeName}">Type</div>
+                            </div>
+
+                            <div class="info-row">
+                                <label class="text-muted small mb-1">Giá bán</label>
+                                <div class="text-primary fw-bold fs-5" 
+                                     th:text="${#numbers.formatDecimal(variant.salePrice, 0, 'COMMA', 0, 'POINT')} + '₫'">0₫</div>
+                            </div>
+
+                            <div class="info-row">
+                                <label class="text-muted small mb-1">Tồn kho hiện tại</label>
+                                <div>
+                                    <span class="fs-3 fw-bold" th:classappend="${variant.statusBadgeClass}" th:text="${variant.stockQty}">0</span>
+                                    <span class="text-muted ms-2" th:text="${variant.statusDisplay}">Trạng thái</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Update Form (Right Column) -->
+                <div class="col-md-6">
+                    <div class="card product-detail-card">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-warehouse me-2"></i>Cập nhật số lượng tồn kho
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form th:action="@{/manager/inventory/update}" method="post" th:object="${request}">
+                                <!-- Hidden Field -->
+                                <input type="hidden" th:field="*{variantId}">
+
+                                <!-- New Stock Quantity -->
+                                <div class="mb-4">
+                                    <label for="newStockQty" class="form-label fw-bold">
+                                        <i class="fas fa-box me-2"></i>Số lượng tồn kho mới <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group input-group-lg">
+                                        <button class="btn btn-outline-secondary" type="button" 
+                                                onclick="document.getElementById('newStockQty').stepDown()">
+                                            <i class="fas fa-minus"></i>
+                                        </button>
+                                        <input type="number" id="newStockQty" th:field="*{newStockQty}" 
+                                               class="form-control stock-input" min="0" required>
+                                        <button class="btn btn-outline-secondary" type="button" 
+                                                onclick="document.getElementById('newStockQty').stepUp()">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </div>
+                                    <div class="form-text">Số lượng phải >= 0</div>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('newStockQty')}" 
+                                         th:errors="*{newStockQty}">Lỗi</div>
+                                </div>
+
+                                <!-- Note -->
+                                <div class="mb-4">
+                                    <label for="note" class="form-label fw-bold">
+                                        <i class="fas fa-sticky-note me-2"></i>Ghi chú (tùy chọn)
+                                    </label>
+                                    <textarea id="note" th:field="*{note}" class="form-control" rows="4"
+                                              placeholder="Nhập lý do cập nhật tồn kho (ví dụ: Nhập hàng mới, Kiểm kê, Điều chỉnh...)"></textarea>
+                                </div>
+
+                                <!-- Preview Change -->
+                                <div class="alert alert-info">
+                                    <h6 class="alert-heading">
+                                        <i class="fas fa-info-circle me-2"></i>Xem trước thay đổi
+                                    </h6>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <span class="text-muted">Tồn kho cũ:</span>
+                                            <span class="badge bg-secondary ms-2" th:text="${variant.stockQty}">0</span>
+                                        </div>
+                                        <div>
+                                            <i class="fas fa-arrow-right text-muted"></i>
+                                        </div>
+                                        <div>
+                                            <span class="text-muted">Tồn kho mới:</span>
+                                            <span class="badge bg-primary ms-2" id="previewNewStock">0</span>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <div class="text-muted small">
+                                        <i class="fas fa-bell me-1"></i>
+                                        Hệ thống sẽ tự động tạo thông báo nếu tồn kho thấp hoặc hết hàng.
+                                    </div>
+                                </div>
+
+                                <!-- Action Buttons -->
+                                <div class="d-grid gap-2">
+                                    <button type="submit" class="btn btn-primary btn-lg">
+                                        <i class="fas fa-save me-2"></i>Cập nhật tồn kho
+                                    </button>
+                                    <a th:href="@{/manager/inventory/alerts}" class="btn btn-outline-secondary">
+                                        <i class="fas fa-times me-2"></i>Hủy bỏ
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Warning Box -->
+                    <div class="alert alert-warning mt-3">
+                        <h6 class="alert-heading">
+                            <i class="fas fa-exclamation-triangle me-2"></i>Lưu ý quan trọng
+                        </h6>
+                        <ul class="mb-0 small">
+                            <li>Việc cập nhật tồn kho sẽ ảnh hưởng trực tiếp đến khả năng bán hàng</li>
+                            <li>Hãy đảm bảo số lượng nhập chính xác trước khi lưu</li>
+                            <li>Hệ thống sẽ ghi log mọi thay đổi tồn kho</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- JavaScript for Preview -->
+        <script th:inline="javascript">
+            document.addEventListener('DOMContentLoaded', function() {
+                const input = document.getElementById('newStockQty');
+                const preview = document.getElementById('previewNewStock');
+                
+                function updatePreview() {
+                    preview.textContent = input.value || '0';
+                }
+                
+                input.addEventListener('input', updatePreview);
+                updatePreview(); // Initial update
+            });
+        </script>
+    </div>
+</body>
+</html>
+

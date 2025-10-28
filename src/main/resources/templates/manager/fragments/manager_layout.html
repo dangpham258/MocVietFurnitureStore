@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle} + ' - Mộc Việt'">Manager Dashboard - Mộc Việt</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link th:href="@{/css/manager.css}" rel="stylesheet">
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 px-0">
+                <div class="sidebar bg-primary text-white" style="min-height: 100vh;">
+                    <div class="p-3">
+                        <h5 class="text-white mb-4">
+                            <i class="fas fa-store me-2"></i>Manager Panel
+                        </h5>
+                        <nav class="nav flex-column sidebar-nav">
+                            <a class="nav-link sidebar-item" th:classappend="${activeMenu == 'dashboard'} ? 'active'" href="/manager">
+                                <i class="fas fa-tachometer-alt sidebar-icon"></i>
+                                <span class="sidebar-text">Dashboard</span>
+                            </a>
+                            <a class="nav-link sidebar-item position-relative" th:classappend="${activeMenu == 'notifications'} ? 'active'" href="/manager/notifications">
+                                <i class="fas fa-bell sidebar-icon"></i>
+                                <span class="sidebar-text">Thông báo</span>
+                                <span class="badge bg-danger rounded-pill notification-badge ms-2" id="sidebarNotificationBadge" style="display: none;">0</span>
+                            </a>
+                            <a class="nav-link sidebar-item" th:classappend="${activeMenu == 'products'} ? 'active'" href="/manager/products">
+                                <i class="fas fa-box sidebar-icon"></i>
+                                <span class="sidebar-text">Sản phẩm</span>
+                            </a>
+                            <a class="nav-link sidebar-item" th:classappend="${activeMenu == 'orders'} ? 'active'" href="/manager/orders">
+                                <i class="fas fa-shopping-cart sidebar-icon"></i>
+                                <span class="sidebar-text">Đơn hàng</span>
+                            </a>
+                            <a class="nav-link sidebar-item" th:classappend="${activeMenu == 'delivery'} ? 'active'" href="/manager/delivery/pending">
+                                <i class="fas fa-truck sidebar-icon"></i>
+                                <span class="sidebar-text">Phân công giao hàng</span>
+                            </a>
+                            
+                            <!-- Review Management Menu -->
+                            <div class="nav-item sidebar-item-container" th:classappend="${activeMenu == 'reviews'} ? 'active'">
+                                <a class="nav-link sidebar-item sidebar-parent" href="#" 
+                                   role="button" aria-expanded="false" aria-controls="reviewsSubmenu">
+                                    <i class="fas fa-star sidebar-icon"></i>
+                                    <span class="sidebar-text">Quản lý đánh giá</span>
+                                    <i class="fas fa-angle-down sidebar-arrow"></i>
+                                </a>
+                                <div class="sidebar-submenu" id="reviewsSubmenu" th:classappend="${activeMenu == 'reviews'} ? 'show'">
+                                    <div class="nav flex-column">
+                                        <a class="nav-link sidebar-item sidebar-subitem" 
+                                           th:classappend="${activeSubMenu == 'all-reviews'} ? 'active'" 
+                                           href="/manager/reviews/all">
+                                            <i class="fas fa-list sidebar-icon"></i>
+                                            <span class="sidebar-text">Tất cả đánh giá</span>
+                                        </a>
+                                        <a class="nav-link sidebar-item sidebar-subitem" 
+                                           th:classappend="${activeSubMenu == 'review-alerts'} ? 'active'" 
+                                           href="/manager/reviews/alerts">
+                                            <i class="fas fa-bell sidebar-icon"></i>
+                                            <span class="sidebar-text">Cảnh báo đánh giá</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Inventory Management Menu -->
+                            <div class="nav-item sidebar-item-container" th:classappend="${activeMenu == 'inventory'} ? 'active'">
+                                <a class="nav-link sidebar-item sidebar-parent" href="#" 
+                                   role="button" aria-expanded="false" aria-controls="inventorySubmenu">
+                                    <i class="fas fa-warehouse sidebar-icon"></i>
+                                    <span class="sidebar-text">Quản lý tồn kho</span>
+                                    <i class="fas fa-angle-down sidebar-arrow"></i>
+                                </a>
+                                <div class="sidebar-submenu" id="inventorySubmenu" th:classappend="${activeMenu == 'inventory'} ? 'show'">
+                                    <div class="nav flex-column">
+                                        <a class="nav-link sidebar-item sidebar-subitem" href="/manager/inventory/alerts">
+                                            <i class="fas fa-bell sidebar-icon"></i>
+                                            <span class="sidebar-text">Cảnh báo tồn kho</span>
+                                        </a>
+                                        <a class="nav-link sidebar-item sidebar-subitem" href="/manager/inventory/report">
+                                            <i class="fas fa-chart-bar sidebar-icon"></i>
+                                            <span class="sidebar-text">Báo cáo tồn kho</span>
+                                        </a>
+                                        <a class="nav-link sidebar-item sidebar-subitem" href="/manager/inventory/low-stock">
+                                            <i class="fas fa-exclamation-triangle sidebar-icon"></i>
+                                            <span class="sidebar-text">Tồn kho thấp</span>
+                                        </a>
+                                        <a class="nav-link sidebar-item sidebar-subitem" href="/manager/inventory/hidden-products">
+                                            <i class="fas fa-eye-slash sidebar-icon"></i>
+                                            <span class="sidebar-text">Sản phẩm đã ẩn</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <a class="nav-link sidebar-item" th:classappend="${activeMenu == 'articles'} ? 'active'" href="/manager/articles">
+                                <i class="fas fa-newspaper sidebar-icon"></i>
+                                <span class="sidebar-text">Tin tức</span>
+                            </a>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 px-0 main-content">
+                <!-- Header -->
+                <div class="bg-white shadow-sm p-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0" th:text="${pageTitle}">Manager Dashboard</h4>
+                        <div class="dropdown">
+                            <a class="btn btn-outline-primary dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <div class="user-avatar me-2">
+                                    <i class="fas fa-user-circle"></i>
+                                </div>
+                                <span class="user-name" th:text="${username}">manager</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end shadow">
+                                <li>
+                                    <div class="dropdown-header d-flex align-items-center py-2">
+                                        <i class="fas fa-user-circle fa-2x text-primary me-2"></i>
+                                        <div>
+                                            <div class="fw-bold" th:text="${username}">manager</div>
+                                            <small class="text-muted">Manager</small>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="/manager/profile">
+                                    <i class="fas fa-user-edit me-2 text-primary"></i>Quản lý tài khoản
+                                </a></li>
+                                <li><a class="dropdown-item" href="/manager/change-password">
+                                    <i class="fas fa-key me-2 text-warning"></i>Đổi mật khẩu
+                                </a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger" href="/logout">
+                                    <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
+                                </a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Alert Messages -->
+                <div th:if="${success}" class="alert alert-success alert-dismissible fade show m-3" role="alert">
+                    <i class="fas fa-check-circle me-2"></i>
+                    <span th:text="${success}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show m-3" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <span th:text="${error}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                
+                <!-- Page Content -->
+                <main class="p-4" layout:fragment="content">
+                    <!-- Page content goes here -->
+                </main>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script th:src="@{/js/manager.js}"></script>
+    
+    <!-- Sidebar Enhancement Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Handle submenu state persistence for Inventory
+            let inventoryToggle = document.querySelector('.sidebar-parent[aria-controls="inventorySubmenu"]');
+            const inventorySubmenu = document.getElementById('inventorySubmenu');
+            
+            // Handle submenu state persistence for Reviews
+            let reviewsToggle = document.querySelector('.sidebar-parent[aria-controls="reviewsSubmenu"]');
+            const reviewsSubmenu = document.getElementById('reviewsSubmenu');
+            
+            // Function to handle submenu
+            function handleSubmenu(toggle, submenu, pagePattern) {
+                if (toggle && submenu) {
+                    // Check if we're on the relevant page
+                    const isRelevantPage = window.location.pathname.includes(pagePattern);
+                    
+                    if (isRelevantPage) {
+                        // Show submenu and mark as expanded
+                        submenu.classList.add('show');
+                        toggle.setAttribute('aria-expanded', 'true');
+                        toggle.classList.add('expanded');
+                    } else {
+                        // Ensure submenu is closed when not on relevant page
+                        submenu.classList.remove('show');
+                        toggle.setAttribute('aria-expanded', 'false');
+                        toggle.classList.remove('expanded');
+                    }
+                    
+                    // Handle submenu toggle - Override Bootstrap behavior
+                    toggle.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        
+                        const isExpanded = submenu.classList.contains('show');
+                        
+                        if (isExpanded) {
+                            // Close submenu
+                            submenu.classList.remove('show');
+                            toggle.setAttribute('aria-expanded', 'false');
+                            toggle.classList.remove('expanded');
+                        } else {
+                            // Open submenu
+                            submenu.classList.add('show');
+                            toggle.setAttribute('aria-expanded', 'true');
+                            toggle.classList.add('expanded');
+                        }
+                    });
+                }
+            }
+            
+            // Apply to both menus
+            handleSubmenu(inventoryToggle, inventorySubmenu, '/manager/inventory/');
+            handleSubmenu(reviewsToggle, reviewsSubmenu, '/manager/reviews/');
+            
+            // Handle submenu item clicks for smooth navigation
+            const submenuItems = document.querySelectorAll('.sidebar-subitem');
+            submenuItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const href = this.getAttribute('href');
+                    
+                    // Add loading state with visual feedback
+                    this.classList.add('loading');
+                    
+                    // Add ripple effect
+                    const ripple = document.createElement('div');
+                    ripple.style.cssText = `
+                        position: absolute;
+                        border-radius: 50%;
+                        background: rgba(16, 185, 129, 0.3);
+                        transform: scale(0);
+                        animation: ripple 0.6s linear;
+                        pointer-events: none;
+                        left: 50%;
+                        top: 50%;
+                        width: 20px;
+                        height: 20px;
+                        margin-left: -10px;
+                        margin-top: -10px;
+                    `;
+                    this.appendChild(ripple);
+                    
+                    // Navigate after a short delay for smooth transition
+                    setTimeout(() => {
+                        window.location.href = href;
+                    }, 200);
+                });
+            });
+            
+            // Add active class to current submenu item
+            const currentPath = window.location.pathname;
+            submenuItems.forEach(item => {
+                if (item.getAttribute('href') === currentPath) {
+                    item.classList.add('active');
+                }
+            });
+        });
+    </script>
+
+    <!-- Hide Product Confirmation Modal -->
+    <div class="modal fade" id="hideProductModal" tabindex="-1" aria-labelledby="hideProductModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title" id="hideProductModalLabel">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Xác nhận ẩn sản phẩm
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-warning" role="alert">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Bạn có chắc chắn muốn ẩn sản phẩm này tạm thời?
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="productName" class="form-label fw-bold">Tên sản phẩm:</label>
+                        <input type="text" class="form-control" id="productName" readonly>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="hideReason" class="form-label fw-bold">
+                            Lý do ẩn <span class="text-danger">*</span>
+                        </label>
+                        <textarea class="form-control" id="hideReason" rows="3" 
+                                  placeholder="Nhập lý do ẩn sản phẩm (bắt buộc)..."
+                                  required></textarea>
+                        <div class="form-text">Lý do này sẽ được lưu lại để tham khảo sau này.</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Hủy
+                    </button>
+                    <button type="button" class="btn btn-warning" id="confirmHideBtn">
+                        <i class="fas fa-eye-slash me-2"></i>Xác nhận ẩn
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!-- Show Product Confirmation Modal -->
+<div class="modal fade" id="showProductModal" tabindex="-1" aria-labelledby="showProductModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="showProductModalLabel">
+                    <i class="fas fa-eye me-2"></i>Xác nhận hiện sản phẩm
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-success" role="alert">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Bạn có chắc chắn muốn hiện sản phẩm này trở lại?
+                </div>
+                
+                <div class="mb-3">
+                    <label for="showProductName" class="form-label fw-bold">Tên sản phẩm:</label>
+                    <input type="text" class="form-control" id="showProductName" readonly>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>Hủy
+                </button>
+                <button type="button" class="btn btn-success" id="confirmShowBtn">
+                    <i class="fas fa-eye me-2"></i>Xác nhận hiện
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- Global JavaScript for modals -->
+    <script>
+        let currentProductId = null;
+        
+        // Show hide product modal - Define globally
+        function showHideProductModal(button) {
+            currentProductId = button.getAttribute('data-product-id');
+            const productName = button.getAttribute('data-product-name');
+            
+            document.getElementById('productName').value = productName;
+            document.getElementById('hideReason').value = '';
+            
+            const modal = new bootstrap.Modal(document.getElementById('hideProductModal'));
+            modal.show();
+        }
+        
+        // Show show product modal - Define globally
+        function showShowProductModal(button) {
+            currentProductId = button.getAttribute('data-product-id');
+            const productName = button.getAttribute('data-product-name');
+            
+            document.getElementById('showProductName').value = productName;
+            
+            const modal = new bootstrap.Modal(document.getElementById('showProductModal'));
+            modal.show();
+        }
+        
+        // Handle hide product confirmation
+        document.addEventListener('DOMContentLoaded', function() {
+            const confirmHideBtn = document.getElementById('confirmHideBtn');
+            if (confirmHideBtn) {
+                confirmHideBtn.addEventListener('click', function() {
+                    const reason = document.getElementById('hideReason').value.trim();
+                    
+                    if (!reason) {
+                        alert('Vui lòng nhập lý do ẩn sản phẩm!');
+                        document.getElementById('hideReason').focus();
+                        return;
+                    }
+                    
+                    if (reason.length < 10) {
+                        alert('Lý do ẩn phải có ít nhất 10 ký tự!');
+                        document.getElementById('hideReason').focus();
+                        return;
+                    }
+                    
+                    // Submit form
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = '/manager/inventory/hide/' + currentProductId;
+                    
+                    const reasonInput = document.createElement('input');
+                    reasonInput.type = 'hidden';
+                    reasonInput.name = 'reason';
+                    reasonInput.value = reason;
+                    form.appendChild(reasonInput);
+                    
+                    document.body.appendChild(form);
+                    form.submit();
+                });
+            }
+            
+            // Handle show product confirmation
+            const confirmShowBtn = document.getElementById('confirmShowBtn');
+            if (confirmShowBtn) {
+                confirmShowBtn.addEventListener('click', function() {
+                    // Submit form
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = '/manager/inventory/show/' + currentProductId;
+                    
+                    document.body.appendChild(form);
+                    form.submit();
+                });
+            }
+        });
+        
+        // ========================================
+        // NOTIFICATION BADGE AUTO-UPDATE
+        // ========================================
+        function updateNotificationBadge() {
+            fetch('/manager/notifications/unread-count')
+                .then(response => response.json())
+                .then(count => {
+                    const badges = document.querySelectorAll('.notification-badge');
+                    badges.forEach(badge => {
+                        if (count > 0) {
+                            badge.textContent = count;
+                            badge.style.display = 'inline';
+                        } else {
+                            badge.style.display = 'none';
+                        }
+                    });
+                })
+                .catch(error => console.error('Error updating notification badge:', error));
+        }
+        
+        // Update badge on page load
+        updateNotificationBadge();
+        
+        // Update badge every 30 seconds
+        setInterval(updateNotificationBadge, 30000);
+    </script>
+    
+    <!-- Extra scripts for child pages -->
+    <th:block layout:fragment="extra-scripts"></th:block>
+</body>
+</html>

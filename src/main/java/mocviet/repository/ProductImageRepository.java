@@ -26,4 +26,28 @@ public interface ProductImageRepository extends JpaRepository<ProductImage, Inte
      */
     @Query("SELECT pi FROM ProductImage pi WHERE pi.product.id = :productId AND pi.color.id = :colorId ORDER BY pi.id ASC")
     List<ProductImage> findFirstByProductIdAndColorId(@Param("productId") Integer productId, @Param("colorId") Integer colorId);
+    
+    /**
+     * Lấy ảnh sản phẩm với thông tin màu
+     */
+    @Query("SELECT pi FROM ProductImage pi LEFT JOIN FETCH pi.color WHERE pi.product.id = :productId")
+    List<ProductImage> findByProductIdWithColor(@Param("productId") Integer productId);
+    
+    /**
+     * Lấy ảnh sản phẩm theo product và color
+     */
+    @Query("SELECT pi FROM ProductImage pi WHERE pi.product.id = :productId AND pi.color.id = :colorId")
+    List<ProductImage> findByProductAndColor(@Param("productId") Integer productId, @Param("colorId") Integer colorId);
+    
+    /**
+     * Xóa ảnh theo product ID và color ID
+     */
+    @Query("DELETE FROM ProductImage pi WHERE pi.product.id = :productId AND pi.color.id = :colorId")
+    void deleteByProductIdAndColorId(@Param("productId") Integer productId, @Param("colorId") Integer colorId);
+    
+    /**
+     * Xóa tất cả ảnh theo product ID
+     */
+    @Query("DELETE FROM ProductImage pi WHERE pi.product.id = :productId")
+    void deleteByProductId(@Param("productId") Integer productId);
 }

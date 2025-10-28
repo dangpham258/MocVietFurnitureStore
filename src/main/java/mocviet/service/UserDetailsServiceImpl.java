@@ -23,6 +23,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         User user = userRepository.findByUsernameWithRole(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
         
+        // Eager load role to avoid LazyInitializationException
+        if (user.getRole() != null) {
+            user.getRole().getName(); // Force lazy loading
+        }
+        
         return user;
     }
     

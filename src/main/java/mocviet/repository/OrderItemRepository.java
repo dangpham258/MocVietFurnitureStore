@@ -1,6 +1,8 @@
 package mocviet.repository;
 
 import mocviet.entity.OrderItem;
+import mocviet.entity.Orders;
+
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -42,4 +44,8 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Integer> {
      */
     @Query("SELECT oi FROM OrderItem oi WHERE oi.order.id = :orderId AND oi.review IS NULL")
     List<OrderItem> findUnreviewedItemsByOrderId(@Param("orderId") Integer orderId);
+    
+    boolean existsByVariantId(Integer variantId);
+    
+    List<OrderItem> findByOrder(Orders order);
 }

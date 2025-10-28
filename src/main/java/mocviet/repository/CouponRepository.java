@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -21,5 +22,11 @@ public interface CouponRepository extends JpaRepository<Coupon, String> {
     Optional<Coupon> findValidCoupon(@Param("code") String code, 
                                      @Param("currentDate") LocalDateTime currentDate, 
                                      @Param("subtotal") java.math.BigDecimal subtotal);
-}
 
+    Optional<Coupon> findByCodeAndActiveTrue(String code);
+    
+    List<Coupon> findByActiveTrueAndStartDateLessThanEqualAndEndDateGreaterThanEqual(
+        LocalDateTime now, LocalDateTime now2);
+    
+    List<Coupon> findByActiveTrue();
+}

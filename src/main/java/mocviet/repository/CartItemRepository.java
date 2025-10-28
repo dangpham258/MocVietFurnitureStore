@@ -52,4 +52,8 @@ public interface CartItemRepository extends JpaRepository<CartItem, Integer> {
            "WHERE ci.cart.id = :cartId " +
            "ORDER BY ci.id ASC")
     List<CartItem> findByCartIdWithProductImages(@Param("cartId") Integer cartId);
+
+     /* Kiểm tra variant có tồn tại trong giỏ hàng không
+     */
+    boolean existsByVariantId(Integer variantId);
 }

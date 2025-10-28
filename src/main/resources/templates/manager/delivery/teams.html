@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{manager/fragments/manager_layout}">
+<head>
+    <title>Quản lý đội giao hàng - Mộc Việt</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <!-- Page Header -->
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h2">Quản lý đội giao hàng</h1>
+            <div class="btn-toolbar mb-2 mb-md-0">
+                <a th:href="@{/manager/delivery/pending}" class="btn btn-outline-primary">
+                    <i class="fas fa-truck me-1"></i>Phân công giao hàng
+                </a>
+            </div>
+        </div>
+
+        <!-- Teams List -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-users me-2"></i>Danh sách đội giao hàng
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div th:if="${teams.empty}" class="text-center py-5">
+                            <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">Chưa có đội giao hàng nào</h5>
+                            <p class="text-muted">Liên hệ quản trị viên để thêm đội giao hàng.</p>
+                        </div>
+                        
+                        <div th:if="${!teams.empty}" class="row">
+                            <div th:each="team : ${teams}" class="col-md-6 col-lg-4 mb-4">
+                                <div class="card h-100 team-card">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h6 class="mb-0" th:text="${team.teamName}">Đội giao hàng A</h6>
+                                        <span class="badge" th:classappend="${team.isActive} ? 'bg-success' : 'bg-secondary'" 
+                                              th:text="${team.isActive} ? 'Hoạt động' : 'Không hoạt động'">Hoạt động</span>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-2">
+                                            <strong>Trưởng đội:</strong>
+                                            <span th:text="${team.leaderName}">Nguyễn Văn A</span>
+                                        </div>
+                                        <div class="mb-2">
+                                            <strong>Số điện thoại:</strong>
+                                            <span th:text="${team.phoneNumber}">0123456789</span>
+                                        </div>
+                                        <div class="mb-2">
+                                            <strong>Email:</strong>
+                                            <span th:text="${team.email}">team-a@mocviet.com</span>
+                                        </div>
+                                        <div class="mb-2">
+                                            <strong>Đơn đang xử lý:</strong>
+                                            <span class="badge bg-primary" th:text="${team.currentOrders}">2</span>
+                                        </div>
+                                        <div class="mb-3">
+                                            <strong>Khu vực phụ trách:</strong>
+                                            <div th:each="zone : ${team.zones}" class="mt-1">
+                                                <span class="badge bg-info me-1" th:text="${zone.zoneName}">Nội thành</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer">
+                                        <div class="d-flex justify-content-between">
+                                            <button class="btn btn-sm btn-outline-primary" th:onclick="'viewTeamDetails(' + ${team.teamId} + ')'">
+                                                <i class="fas fa-eye me-1"></i>Chi tiết
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-info" th:onclick="'viewTeamOrders(' + ${team.teamId} + ')'">
+                                                <i class="fas fa-list me-1"></i>Đơn hàng
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics -->
+        <div class="row mt-4">
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <i class="fas fa-users fa-2x text-primary mb-2"></i>
+                        <h5 class="card-title" th:text="${teams.size()}">5</h5>
+                        <p class="card-text">Tổng số đội</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
+                        <h5 class="card-title" th:text="${teams.stream().filter(t -> t.isActive).count()}">4</h5>
+                        <p class="card-text">Đội hoạt động</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <i class="fas fa-truck fa-2x text-warning mb-2"></i>
+                        <h5 class="card-title" th:text="${teams.stream().mapToInt(t -> t.currentOrders).sum()}">12</h5>
+                        <p class="card-text">Đơn đang xử lý</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <i class="fas fa-map fa-2x text-info mb-2"></i>
+                        <h5 class="card-title" th:text="${zones.size()}">3</h5>
+                        <p class="card-text">Khu vực phụ trách</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script th:src="@{/js/delivery-assignment.js}"></script>
+    <script>
+        function viewTeamDetails(teamId) {
+            // TODO: Implement team details modal
+            console.log('View team details:', teamId);
+        }
+        
+        function viewTeamOrders(teamId) {
+            // TODO: Implement team orders view
+            console.log('View team orders:', teamId);
+        }
+    </script>
+</body>
+</html>

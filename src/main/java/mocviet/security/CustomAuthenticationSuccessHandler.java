@@ -44,6 +44,18 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
             response.addCookie(cookie);
         }
         
+        // Always generate JWT token for session management
+        String jwt = tokenProvider.generateToken(authentication);
+        
+        // Set JWT as cookie
+        Cookie cookie = new Cookie("JWT_TOKEN", jwt);
+        cookie.setHttpOnly(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(24 * 60 * 60); // 24 hours
+        response.addCookie(cookie);
+        
+        System.out.println("JWT Cookie created: " + jwt.substring(0, Math.min(20, jwt.length())) + "...");
+        
         switch (role) {
             case "ADMIN":
                 response.sendRedirect("/admin");

@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{manager/fragments/manager_layout}">
+<head>
+    <title>Tạo sản phẩm mới - Mộc Việt</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="mb-1">Tạo sản phẩm mới</h2>
+                    <p class="text-muted mb-0">Thêm sản phẩm mới vào hệ thống</p>
+                </div>
+                <a href="/manager/products" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Quay lại
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <form th:action="@{/manager/products/create}" th:object="${createProductRequest}" method="post" enctype="multipart/form-data">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Thông tin sản phẩm</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label for="name" class="form-label">Tên sản phẩm <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="name" th:field="*{name}"
+                                       th:class="${#fields.hasErrors('name')} ? 'form-control is-invalid' : 'form-control'"
+                                       placeholder="Nhập tên sản phẩm">
+                                <div th:if="${#fields.hasErrors('name')}" class="invalid-feedback">
+                                    <span th:errors="*{name}"></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label for="description" class="form-label">Mô tả sản phẩm</label>
+                                <textarea class="form-control" id="description" th:field="*{description}" rows="4"
+                                          th:class="${#fields.hasErrors('description')} ? 'form-control is-invalid' : 'form-control'"
+                                          placeholder="Nhập mô tả sản phẩm"></textarea>
+                                <div th:if="${#fields.hasErrors('description')}" class="invalid-feedback">
+                                    <span th:errors="*{description}"></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="categoryId" class="form-label">Danh mục <span class="text-danger">*</span></label>
+                                <select class="form-select" id="categoryId" th:field="*{categoryId}"
+                                        th:class="${#fields.hasErrors('categoryId')} ? 'form-select is-invalid' : 'form-select'">
+                                    <option value="">Chọn danh mục</option>
+                                    <option th:each="category : ${categories}" 
+                                            th:value="${category.id}" 
+                                            th:text="${category.name}"></option>
+                                </select>
+                                <div th:if="${#fields.hasErrors('categoryId')}" class="invalid-feedback">
+                                    <span th:errors="*{categoryId}"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="collectionId" class="form-label">Bộ sưu tập</label>
+                                <select class="form-select" id="collectionId" th:field="*{collectionId}"
+                                        th:class="${#fields.hasErrors('collectionId')} ? 'form-select is-invalid' : 'form-select'">
+                                    <option value="">Chọn bộ sưu tập (tùy chọn)</option>
+                                    <option th:each="collection : ${collections}" 
+                                            th:value="${collection.id}" 
+                                            th:text="${collection.name}"></option>
+                                </select>
+                                <div th:if="${#fields.hasErrors('collectionId')}" class="invalid-feedback">
+                                    <span th:errors="*{collectionId}"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Biến thể đầu tiên -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Biến thể đầu tiên</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="colorId" class="form-label">Màu sắc <span class="text-danger">*</span></label>
+                                <select class="form-select" id="colorId" th:field="*{colorId}"
+                                        th:class="${#fields.hasErrors('colorId')} ? 'form-select is-invalid' : 'form-select'">
+                                    <option value="">Chọn màu sắc</option>
+                                    <option th:each="color : ${colors}" 
+                                            th:value="${color.id}" 
+                                            th:text="${color.name}"></option>
+                                </select>
+                                <div th:if="${#fields.hasErrors('colorId')}" class="invalid-feedback">
+                                    <span th:errors="*{colorId}"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="typeName" class="form-label">Loại/Kích thước <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="typeName" th:field="*{typeName}"
+                                       th:class="${#fields.hasErrors('typeName')} ? 'form-control is-invalid' : 'form-control'"
+                                       placeholder="Ví dụ: 4-ghe, 6-ghe, 1m2, 1m6...">
+                                <div th:if="${#fields.hasErrors('typeName')}" class="invalid-feedback">
+                                    <span th:errors="*{typeName}"></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="sku" class="form-label">SKU <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="sku" th:field="*{sku}"
+                                       th:class="${#fields.hasErrors('sku')} ? 'form-control is-invalid' : 'form-control'"
+                                       placeholder="Mã sản phẩm duy nhất">
+                                <div th:if="${#fields.hasErrors('sku')}" class="invalid-feedback">
+                                    <span th:errors="*{sku}"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="price" class="form-label">Giá gốc <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="price" th:field="*{price}"
+                                           th:class="${#fields.hasErrors('price')} ? 'form-control is-invalid' : 'form-control'"
+                                           placeholder="0" min="0" step="1000">
+                                    <span class="input-group-text">VNĐ</span>
+                                </div>
+                                <div th:if="${#fields.hasErrors('price')}" class="invalid-feedback">
+                                    <span th:errors="*{price}"></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="discountPercent" class="form-label">% Giảm giá</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="discountPercent" th:field="*{discountPercent}"
+                                           th:class="${#fields.hasErrors('discountPercent')} ? 'form-control is-invalid' : 'form-control'"
+                                           placeholder="0" min="0" max="100">
+                                    <span class="input-group-text">%</span>
+                                </div>
+                                <div th:if="${#fields.hasErrors('discountPercent')}" class="invalid-feedback">
+                                    <span th:errors="*{discountPercent}"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="stockQty" class="form-label">Tồn kho <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="stockQty" th:field="*{stockQty}"
+                                       th:class="${#fields.hasErrors('stockQty')} ? 'form-control is-invalid' : 'form-control'"
+                                       placeholder="0" min="0">
+                                <div th:if="${#fields.hasErrors('stockQty')}" class="invalid-feedback">
+                                    <span th:errors="*{stockQty}"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="promotionType" class="form-label">Loại khuyến mãi</label>
+                                <select class="form-select" id="promotionType" th:field="*{promotionType}"
+                                        th:class="${#fields.hasErrors('promotionType')} ? 'form-select is-invalid' : 'form-select'">
+                                    <option value="">Không có</option>
+                                    <option value="SALE">SALE</option>
+                                    <option value="OUTLET">OUTLET</option>
+                                </select>
+                                <div th:if="${#fields.hasErrors('promotionType')}" class="invalid-feedback">
+                                    <span th:errors="*{promotionType}"></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Giá bán cuối cùng -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Giá bán cuối cùng</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="salePrice" readonly
+                                           placeholder="Sẽ được tính tự động">
+                                    <span class="input-group-text">VNĐ</span>
+                                </div>
+                                <small class="form-text text-muted">Giá bán = Giá gốc - (Giá gốc × % giảm giá)</small>
+                            </div>
+                        </div>
+                        
+                        <!-- Upload ảnh sản phẩm -->
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label for="productImages" class="form-label">Ảnh sản phẩm</label>
+                                <input type="file" class="form-control" id="productImages" name="productImages" 
+                                       multiple accept="image/jpeg,image/jpg,image/png">
+                                <div class="form-text">
+                                    <small class="text-muted">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        Chọn nhiều ảnh cho màu đã chọn. Định dạng: JPG, PNG. Kích thước tối đa: 2MB/ảnh
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Hành động</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Tạo sản phẩm
+                            </button>
+                            <a href="/manager/products" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-2"></i>Hủy bỏ
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Lưu ý</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-unstyled mb-0">
+                            <li class="mb-2">
+                                <i class="fas fa-info-circle text-info me-2"></i>
+                                <small>SKU phải là duy nhất trong hệ thống</small>
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-info-circle text-info me-2"></i>
+                                <small>Tên sản phẩm không được trùng lặp</small>
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-info-circle text-info me-2"></i>
+                                <small>Có thể thêm biến thể sau khi tạo sản phẩm</small>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script th:inline="javascript">
+    // Auto calculate sale price
+    document.addEventListener('DOMContentLoaded', function() {
+        const priceInput = document.getElementById('price');
+        const discountInput = document.getElementById('discountPercent');
+        const salePriceInput = document.getElementById('salePrice');
+        
+        function calculateSalePrice() {
+            const price = parseFloat(priceInput.value) || 0;
+            const discount = parseInt(discountInput.value) || 0;
+            
+            if (price > 0) {
+                const discountAmount = price * (discount / 100);
+                const salePrice = price - discountAmount;
+                salePriceInput.value = new Intl.NumberFormat('vi-VN').format(Math.round(salePrice));
+            } else {
+                salePriceInput.value = '';
+            }
+        }
+        
+        priceInput.addEventListener('input', calculateSalePrice);
+        discountInput.addEventListener('input', calculateSalePrice);
+    });
+</script>
+</body>
+</html>
