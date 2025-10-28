@@ -183,3 +183,19 @@ Alternative 2a. Nếu chưa có trang tĩnh nào 3a. Hiển thị empty state "C
 Exception 11a. Slug đã tồn tại 12a. Hiển thị thông báo "Slug đã tồn tại" 13a. Giữ modal mở để sửa 12b. Slug không được phép (là reserved path) 13b. Hiển thị thông báo "Slug không được bắt đầu với: [reserved_path]" 14b. Yêu cầu nhập lại 20a. Slug mới đã tồn tại 21a. Hiển thị thông báo "Slug đã tồn tại" 22a. Giữ modal mở để sửa 21b. Slug mới không được phép (là reserved path) 22b. Hiển thị thông báo "Slug không được bắt đầu với: [reserved_path]" 23b. Yêu cầu nhập lại 27a. Lỗi hệ thống 28a. Hiển thị thông báo "Có lỗi xảy ra" 29a. Cho phép thử lại
 
 Bảng 3-11. Use case Quản lý trang tĩnh
+
+---
+
+## UC_012 - Báo cáo và thống kê (Reports and statistics)
+
+Use case ID UC_012
+Name Reports and statistics
+Goal Xem báo cáo và thống kê tổng quan về doanh thu, đơn hàng, khách hàng và sản phẩm với các bộ lọc thời gian
+Actors Quản trị viên (Admin)
+Pre-conditions Đã đăng nhập vào hệ thống với vai trò ADMIN
+Post-conditions - Nếu thành công, các báo cáo và biểu đồ được hiển thị - Nếu thất bại, hiển thị thông báo lỗi
+Main Flow 1. Vào trang báo cáo (/admin/reports) 2. Hệ thống hiển thị 4 cards thống kê tổng quan: Tổng doanh thu (tính từ đơn DELIVERED trong khoảng thời gian), Tổng đơn hàng (tất cả đơn trong khoảng thời gian), Tổng khách hàng (distinct users), Tổng sản phẩm (tất cả sản phẩm trong hệ thống) 3. Hệ thống hiển thị bộ lọc thời gian: Hôm nay, Tuần này, Tháng này (mặc định), Năm nay, Tùy chỉnh (hiển thị 2 input date) 4. Mặc định hiển thị dữ liệu Tháng này (từ ngày 1 đến hôm nay) 5. Chọn bộ lọc thời gian từ dropdown 6. Nếu chọn "Tùy chỉnh": hiển thị 2 input "Từ ngày" và "Đến ngày", user nhập hoặc chọn ngày 7. Bấm nút "Cập nhật" để tải lại báo cáo 8. Hệ thống gọi API để lấy dữ liệu thống kê theo khoảng thời gian đã chọn 9. Hệ thống hiển thị biểu đồ doanh thu theo thời gian (line chart, chỉ đơn DELIVERED, nhóm theo ngày) 10. Hệ thống hiển thị biểu đồ phân bố trạng thái đơn hàng (doughnut chart, tất cả trạng thái trong khoảng thời gian) 11. Hệ thống hiển thị biểu đồ doanh thu theo danh mục cấp 2 (bar chart, tất cả danh mục có doanh thu > 0, chỉ đơn DELIVERED, sắp xếp theo doanh thu giảm dần) 12. Hệ thống hiển thị bảng Top 10 sản phẩm bán chạy nhất (rank, tên sản phẩm, tổng số lượng bán, tổng doanh thu, chỉ đơn DELIVERED) 13. Hệ thống hiển thị bảng Top 10 khách hàng mua nhiều nhất (rank, tên, email, số đơn, tổng chi, chỉ đơn DELIVERED) 14. Hệ thống hiển thị bảng đơn hàng theo khu vực (khu vực (city), số đơn, tổng doanh thu, trung bình/đơn, tỷ lệ %, chỉ đơn DELIVERED, sắp xếp theo doanh thu giảm dần) 15. Tất cả biểu đồ và bảng tự động cập nhật khi thay đổi bộ lọc thời gian
+Alternative 5a. Khi thay đổi bộ lọc (không phải "Tùy chỉnh"): tự động load lại dữ liệu mà không cần bấm "Cập nhật" 6a. Chỉ khi chọn "Tùy chỉnh" mới cần bấm "Cập nhật" sau khi chọn ngày 9a. Nếu không có dữ liệu trong khoảng thời gian: hiển thị thông báo "Chưa có dữ liệu" cho các biểu đồ và bảng tương ứng
+Exception 8a. Lỗi khi tải dữ liệu từ API 9a. Hiển thị thông báo "Không thể tải báo cáo" 10a. Cho phép thử lại bằng cách chọn bộ lọc khác hoặc bấm "Cập nhật" 8b. Khoảng thời gian không hợp lệ (ngày bắt đầu sau ngày kết thúc) 9b. Hiển thị thông báo "Khoảng thời gian không hợp lệ" 10b. Yêu cầu chọn lại ngày 8c. Lỗi hệ thống khi tính toán thống kê 9c. Hiển thị thông báo "Có lỗi xảy ra khi tính toán báo cáo" 10c. Cho phép thử lại
+
+Bảng 3-12. Use case Báo cáo và thống kê

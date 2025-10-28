@@ -814,6 +814,13 @@ function initializeBootstrapComponents() {
                 classRef: 'PagesManagement',
                 instanceName: 'pagesManagement',
                 initFunction: 'initializePagesManagement'
+            },
+            {
+                urlPattern: '/admin/reports',
+                scriptPath: '/js/admin/reports.js',
+                classRef: 'ReportsManagement',
+                instanceName: 'reportsManagement',
+                initFunction: 'initializeReportsManagement'
             }
         ];
         
