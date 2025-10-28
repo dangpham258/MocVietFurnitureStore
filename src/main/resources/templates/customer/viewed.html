@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lịch sử xem - Mộc Việt</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link th:href="@{/css/customer.css}" rel="stylesheet">
+    <link th:href="@{/css/web.css}" rel="stylesheet">
+    <script defer th:src="@{/js/customer.js}"></script>
+    <script defer th:src="@{/js/web.js}"></script>
+    <style>
+        .product-card img { object-fit: cover; width: 100%; height: 220px; }
+    </style>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // no-op for now
+        });
+    </script>
+</head>
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <div class="container my-5">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="bi bi-person"></i> Tài khoản của tôi</h5>
+                    </div>
+                    <div class="list-group list-group-flush">
+                        <a href="/customer/profile" class="list-group-item list-group-item-action">
+                            <i class="bi bi-person"></i> Thông tin cá nhân
+                        </a>
+                        <a href="/customer/orders" class="list-group-item list-group-item-action">
+                            <i class="bi bi-box-seam"></i> Đơn hàng của tôi
+                        </a>
+                        <a href="/customer/wishlist" class="list-group-item list-group-item-action">
+                            <i class="bi bi-heart"></i> Danh sách yêu thích
+                        </a>
+                        <a href="/customer/viewed" class="list-group-item list-group-item-action active">
+                            <i class="bi bi-clock-history"></i> Lịch sử xem
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main content -->
+            <div class="col-md-9">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="mb-0"><i class="bi bi-clock-history me-2"></i> Lịch sử xem</h2>
+                    <span class="badge bg-secondary" th:text="${count} + ' sản phẩm'">0 sản phẩm</span>
+                </div>
+
+                <div th:if="${items != null and !items.empty}" class="row g-4">
+                    <div class="col-6 col-md-4 col-lg-3" th:each="it : ${items}">
+                        <div class="card product-card h-100">
+                            <a th:href="@{/products/{slug}(slug=${it.productSlug})}" class="text-decoration-none">
+                                <img th:src="${it.thumbnailUrl}" th:alt="${it.productName}" class="card-img-top">
+                            </a>
+                            <div class="card-body d-flex flex-column">
+                                <a th:href="@{/products/{slug}(slug=${it.productSlug})}" class="text-decoration-none text-dark">
+                                    <h6 class="card-title" th:text="${it.productName}">Tên sản phẩm</h6>
+                                </a>
+                                <small class="text-muted mt-auto" th:text="${#temporals.format(it.viewedAt, 'dd/MM/yyyy HH:mm')}">--/--/---- --:--</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div th:if="${items == null or items.empty}" class="text-center py-5">
+                    <i class="bi bi-clock-history" style="font-size: 4rem; color: #ccc;"></i>
+                    <h4 class="text-muted mt-3">Chưa có lịch sử xem</h4>
+                    <p class="text-muted">Các sản phẩm bạn đã mở sẽ hiển thị ở đây.</p>
+                    <a href="/products" class="btn btn-primary">
+                        <i class="bi bi-shop"></i> Khám phá sản phẩm
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+

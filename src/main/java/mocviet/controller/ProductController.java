@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class ProductController {
     
     private final IProductService productService;
+    private final mocviet.service.customer.IViewedService viewedService;
     private final ObjectMapper objectMapper; // Dùng để chuyển DTO sang JSON cho JavaScript
     
     /**
@@ -57,6 +58,9 @@ public class ProductController {
             String imagesJson = objectMapper.writeValueAsString(productDetail.getImagesByColor());
             model.addAttribute("imagesJson", imagesJson);
             
+            // Ghi nhận lịch sử xem (chỉ khi đã đăng nhập)
+            viewedService.recordViewBySlug(slug);
+
             return "products/product-detail";
             
         } catch (RuntimeException | JsonProcessingException e) {
