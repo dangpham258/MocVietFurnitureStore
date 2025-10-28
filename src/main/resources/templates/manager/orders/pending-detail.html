@@ -349,16 +349,41 @@
         </div>
     </div>
 
-    <script>
-        function confirmOrder() {
-            const modal = new bootstrap.Modal(document.getElementById('confirmModal'));
-            modal.show();
-        }
+    <th:block layout:fragment="extra-scripts">
+        <script>
+            function cleanupModalBackdrops() {
+                document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+                document.body.classList.remove('modal-open');
+                document.body.style.removeProperty('overflow');
+                document.body.style.removeProperty('paddingRight');
+            }
 
-        function cancelOrder() {
-            const modal = new bootstrap.Modal(document.getElementById('cancelModal'));
-            modal.show();
-        }
-    </script>
+            function ensureModalInBody(modalId) {
+                const el = document.getElementById(modalId);
+                if (el && el.parentElement !== document.body) {
+                    document.body.appendChild(el);
+                }
+                return el;
+            }
+
+            function confirmOrder() {
+                cleanupModalBackdrops();
+                const el = ensureModalInBody('confirmModal');
+                const modal = new bootstrap.Modal(el);
+                modal.show();
+            }
+
+            function cancelOrder() {
+                cleanupModalBackdrops();
+                const el = ensureModalInBody('cancelModal');
+                const modal = new bootstrap.Modal(el);
+                modal.show();
+            }
+
+            // Expose to global scope for inline handlers
+            window.confirmOrder = confirmOrder;
+            window.cancelOrder = cancelOrder;
+        </script>
+    </th:block>
 </body>
 </html>

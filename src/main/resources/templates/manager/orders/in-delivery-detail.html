@@ -88,15 +88,9 @@
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2><i class="fas fa-file-invoice text-primary"></i> Chi tiết đơn hàng #<span th:text="${order.id}"></span></h2>
                 <div class="d-flex gap-2">
-                    <a th:href="@{/manager/orders/pending}" class="btn btn-outline-secondary">
+                    <a th:href="@{/manager/orders/in-delivery}" class="btn btn-outline-secondary">
                         <i class="fas fa-arrow-left"></i> Quay lại
                     </a>
-                    <button type="button" class="btn btn-success" onclick="confirmOrder()">
-                        <i class="fas fa-check"></i> Xác nhận đơn hàng
-                    </button>
-                    <button type="button" class="btn btn-danger" onclick="cancelOrder()">
-                        <i class="fas fa-times"></i> Hủy đơn hàng
-                    </button>
                 </div>
             </div>
 
@@ -218,7 +212,7 @@
                             <div class="info-row">
                                 <div class="info-label">Trạng thái:</div>
                                 <div class="info-value">
-                                    <span class="badge bg-warning status-badge" th:text="${order.status}"></span>
+                                    <span class="badge bg-primary status-badge" th:text="${order.status}"></span>
                                 </div>
                             </div>
                             <div class="info-row">
@@ -298,67 +292,6 @@
             </div>
         </div>
 
-        <!-- Confirm Order Modal -->
-        <div class="modal fade" id="confirmModal" tabindex="-1">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Xác nhận đơn hàng</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <form th:action="@{/manager/orders/pending/{id}/confirm(id=${order.id})}" method="post">
-                        <div class="modal-body">
-                            <p>Bạn có chắc chắn muốn xác nhận đơn hàng #<span th:text="${order.id}"></span>?</p>
-                            <div class="mb-3">
-                                <label for="confirmNote" class="form-label">Ghi chú (tùy chọn)</label>
-                                <textarea class="form-control" id="confirmNote" name="note" rows="3"></textarea>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                            <button type="submit" class="btn btn-success">Xác nhận</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <!-- Cancel Order Modal -->
-        <div class="modal fade" id="cancelModal" tabindex="-1">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Hủy đơn hàng</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <form th:action="@{/manager/orders/pending/{id}/cancel(id=${order.id})}" method="post">
-                        <div class="modal-body">
-                            <p>Bạn có chắc chắn muốn hủy đơn hàng #<span th:text="${order.id}"></span>?</p>
-                            <div class="mb-3">
-                                <label for="cancelReason" class="form-label">Lý do hủy <span class="text-danger">*</span></label>
-                                <textarea class="form-control" id="cancelReason" name="reason" rows="3" required></textarea>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                            <button type="submit" class="btn btn-danger">Hủy đơn hàng</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
     </div>
-
-    <script>
-        function confirmOrder() {
-            const modal = new bootstrap.Modal(document.getElementById('confirmModal'));
-            modal.show();
-        }
-
-        function cancelOrder() {
-            const modal = new bootstrap.Modal(document.getElementById('cancelModal'));
-            modal.show();
-        }
-    </script>
 </body>
 </html>

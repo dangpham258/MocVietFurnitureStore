@@ -2,6 +2,8 @@ package mocviet.service.manager;
 
 import lombok.RequiredArgsConstructor;
 import mocviet.entity.User;
+import mocviet.entity.Orders;
+import mocviet.repository.OrdersRepository;
 import mocviet.entity.UserNotification;
 import mocviet.repository.UserNotificationRepository;
 import org.springframework.data.domain.Page;
@@ -17,6 +19,7 @@ import java.util.regex.Pattern;
 public class NotificationService {
     
     private final UserNotificationRepository notificationRepository;
+    private final OrdersRepository ordersRepository;
     
     /**
      * Lấy danh sách thông báo với phân trang
@@ -97,7 +100,61 @@ public class NotificationService {
             Matcher orderMatcher = orderPattern.matcher(message);
             if (orderMatcher.find()) {
                 String orderId = orderMatcher.group(1);
-                return "/manager/orders/" + orderId;
+                try {
+                    Orders order = ordersRepository.findById(Integer.parseInt(orderId)).orElse(null);
+                    if (order != null) {
+                        Orders.OrderStatus status = order.getStatus();
+                        Orders.ReturnStatus returnStatus = order.getReturnStatus();
+                        // Ưu tiên quy trình trả hàng nếu có
+                        if (returnStatus != null) {
+                            switch (returnStatus) {
+                                case REQUESTED:
+                                    return "/manager/orders/returns/" + orderId;
+                                case PROCESSED:
+                                    return "/manager/orders/returned/" + orderId;
+                                case APPROVED:
+                                    return "/manager/orders/returns/" + orderId;
+                                case REJECTED:
+                                    // Bị từ chối và đơn vẫn DELIVERED -> xem ở completed
+                                    return "/manager/orders/completed/" + orderId;
+                            }
+                        }
+                        switch (status) {
+                            case PENDING:
+                            case CONFIRMED:
+                                return "/manager/orders/pending/" + orderId;
+                            case DISPATCHED:
+                                return "/manager/orders/in-delivery/" + orderId;
+                            case DELIVERED:
+                                return "/manager/orders/completed/" + orderId;
+                            case CANCELLED:
+                                return "/manager/orders/cancelled/" + orderId;
+                            case RETURNED:
+                                return "/manager/orders/returned/" + orderId;
+                        }
+                    }
+                } catch (Exception ignored) { }
+                // Fallback khi không đọc được DB: suy luận từ text
+                String lower = (title + " " + message).toLowerCase();
+                if (lower.contains("chờ xác nhận") || lower.contains("pending") || lower.contains("đã xác nhận") || lower.contains("confirmed")) {
+                    return "/manager/orders/pending/" + orderId;
+                }
+                if (lower.contains("đang giao") || lower.contains("in-delivery") || lower.contains("dispatched") || lower.contains("xuất kho")) {
+                    return "/manager/orders/in-delivery/" + orderId;
+                }
+                if (lower.contains("đã hoàn thành") || lower.contains("completed") || lower.contains("delivered") || lower.contains("đã giao")) {
+                    return "/manager/orders/completed/" + orderId;
+                }
+                if (lower.contains("yêu cầu hoàn trả") || lower.contains("returns") || lower.contains("trả hàng")) {
+                    return "/manager/orders/returns/" + orderId;
+                }
+                if (lower.contains("đã hoàn trả") || lower.contains("returned") || lower.contains("hoàn trả thành công")) {
+                    return "/manager/orders/returned/" + orderId;
+                }
+                if (lower.contains("đã hủy") || lower.contains("cancelled") || lower.contains("canceled")) {
+                    return "/manager/orders/cancelled/" + orderId;
+                }
+                return "/manager/orders/pending/" + orderId;
             }
             // Fallback to orders list
             return "/manager/orders";

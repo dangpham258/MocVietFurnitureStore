@@ -232,7 +232,59 @@ public class DashboardService {
             if (message.matches(".*[Đđ]ơn hàng #\\d+.*") || message.matches(".*[Đđ]ơn #\\d+.*")) {
                 try {
                     String orderIdStr = message.replaceAll(".*[Đđ]ơn(?: hàng)? #(\\d+).*", "$1");
-                    return "/manager/orders/" + orderIdStr;
+                    try {
+                        Orders order = ordersRepository.findById(Integer.parseInt(orderIdStr)).orElse(null);
+                        if (order != null) {
+                            Orders.OrderStatus status = order.getStatus();
+                            Orders.ReturnStatus returnStatus = order.getReturnStatus();
+                            if (returnStatus != null) {
+                                switch (returnStatus) {
+                                    case REQUESTED:
+                                        return "/manager/orders/returns/" + orderIdStr;
+                                    case PROCESSED:
+                                        return "/manager/orders/returned/" + orderIdStr;
+                                    case APPROVED:
+                                        return "/manager/orders/returns/" + orderIdStr;
+                                    case REJECTED:
+                                        return "/manager/orders/completed/" + orderIdStr;
+                                }
+                            }
+                            switch (status) {
+                                case PENDING:
+                                case CONFIRMED:
+                                    return "/manager/orders/pending/" + orderIdStr;
+                                case DISPATCHED:
+                                    return "/manager/orders/in-delivery/" + orderIdStr;
+                                case DELIVERED:
+                                    return "/manager/orders/completed/" + orderIdStr;
+                                case CANCELLED:
+                                    return "/manager/orders/cancelled/" + orderIdStr;
+                                case RETURNED:
+                                    return "/manager/orders/returned/" + orderIdStr;
+                            }
+                        }
+                    } catch (Exception ignored) { }
+                    // Fallback: suy luận theo text nếu không đọc được DB
+                    String lower = (title + " " + message).toLowerCase();
+                    if (lower.contains("chờ xác nhận") || lower.contains("pending") || lower.contains("đã xác nhận") || lower.contains("confirmed")) {
+                        return "/manager/orders/pending/" + orderIdStr;
+                    }
+                    if (lower.contains("đang giao") || lower.contains("in-delivery") || lower.contains("dispatched") || lower.contains("xuất kho")) {
+                        return "/manager/orders/in-delivery/" + orderIdStr;
+                    }
+                    if (lower.contains("đã hoàn thành") || lower.contains("completed") || lower.contains("delivered") || lower.contains("đã giao")) {
+                        return "/manager/orders/completed/" + orderIdStr;
+                    }
+                    if (lower.contains("yêu cầu hoàn trả") || lower.contains("returns") || lower.contains("trả hàng")) {
+                        return "/manager/orders/returns/" + orderIdStr;
+                    }
+                    if (lower.contains("đã hoàn trả") || lower.contains("returned") || lower.contains("hoàn trả thành công")) {
+                        return "/manager/orders/returned/" + orderIdStr;
+                    }
+                    if (lower.contains("đã hủy") || lower.contains("cancelled") || lower.contains("canceled")) {
+                        return "/manager/orders/cancelled/" + orderIdStr;
+                    }
+                    return "/manager/orders/pending/" + orderIdStr;
                 } catch (Exception e) {
                     // Fallback to orders list
                 }

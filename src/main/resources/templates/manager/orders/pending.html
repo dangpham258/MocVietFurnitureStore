@@ -320,11 +320,28 @@
                 bulkActions.style.display = bulkActions.style.display === 'none' ? 'block' : 'none';
             }
 
+            function cleanupModalBackdrops() {
+                document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+                document.body.classList.remove('modal-open');
+                document.body.style.removeProperty('overflow');
+                document.body.style.removeProperty('paddingRight');
+            }
+
+            function ensureModalInBody(modalId) {
+                const el = document.getElementById(modalId);
+                if (el && el.parentElement !== document.body) {
+                    document.body.appendChild(el);
+                }
+                return el;
+            }
+
             function confirmOrder(orderId) {
                 currentOrderId = orderId;
                 const form = document.getElementById('confirmForm');
                 form.action = `/manager/orders/pending/${orderId}/confirm`;
-                const modal = new bootstrap.Modal(document.getElementById('confirmModal'));
+                cleanupModalBackdrops();
+                const el = ensureModalInBody('confirmModal');
+                const modal = new bootstrap.Modal(el);
                 modal.show();
             }
 
@@ -332,9 +349,15 @@
                 currentOrderId = orderId;
                 const form = document.getElementById('cancelForm');
                 form.action = `/manager/orders/pending/${orderId}/cancel`;
-                const modal = new bootstrap.Modal(document.getElementById('cancelModal'));
+                cleanupModalBackdrops();
+                const el = ensureModalInBody('cancelModal');
+                const modal = new bootstrap.Modal(el);
                 modal.show();
             }
+
+            // Ensure functions are accessible from inline onclick handlers
+            window.confirmOrder = confirmOrder;
+            window.cancelOrder = cancelOrder;
 
             function bulkConfirm() {
                 const selectedIds = getSelectedOrderIds();

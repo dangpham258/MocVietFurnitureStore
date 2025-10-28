@@ -1688,3 +1688,12 @@ textarea#response:focus + .form-text #charCount {
     width: 20px;
     text-align: center;
 }
+
+/* Ensure Bootstrap modals are above all custom UI layers */
+.modal {
+    z-index: 2000 !important;
+}
+
+.modal-backdrop {
+    z-index: 1990 !important;
+}

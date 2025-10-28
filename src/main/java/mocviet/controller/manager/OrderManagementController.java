@@ -500,6 +500,22 @@ public class OrderManagementController {
         return "manager/orders/returned";
     }
     
+    @GetMapping("/returned/{id}")
+    public String returnedOrderDetail(@PathVariable Integer id, Model model) {
+        // Set active menu for sidebar
+        model.addAttribute("activeMenu", "orders");
+        model.addAttribute("activeSubmenu", "returned");
+        try {
+            OrderManagementDTO order = orderManagementService.getOrderDetails(id);
+            model.addAttribute("order", order);
+            model.addAttribute("pageTitle", "Chi tiết đơn hàng #" + id);
+            return "manager/orders/returned-detail";
+        } catch (RuntimeException e) {
+            model.addAttribute("error", e.getMessage());
+            return "manager/orders/returned";
+        }
+    }
+    
     @GetMapping("/returned/export")
     public void exportReturnedOrdersToExcel(
             @RequestParam(required = false) String keyword,
