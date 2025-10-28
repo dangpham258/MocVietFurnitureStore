@@ -134,5 +134,8 @@
     <!-- Reports Management JS - Chỉ load ở trang reports -->
     <script th:if="${activeMenu == 'reports'}" 
             th:src="@{/js/admin/reports.js(v=${jsVersion ?: 'HuynhNgocThang'})}"></script>
+    <!-- Dashboard Management JS - Chỉ load ở trang dashboard -->
+    <script th:if="${activeMenu == 'dashboard'}" 
+            th:src="@{/js/admin/dashboard.js(v=${jsVersion ?: 'HuynhNgocThang'})}"></script>
 </body>
 </html>

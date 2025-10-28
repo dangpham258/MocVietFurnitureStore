@@ -675,6 +675,22 @@ function initializeBootstrapComponents() {
                 
                 // Re-initialize components
                 initializePageComponents();
+                
+                // Special handling for dashboard - trigger chart render after content loads
+                if (url === '/admin' || url === '/admin/' || url === '/admin/dashboard' || url === '/admin/dashboard/') {
+                    setTimeout(() => {
+                        if (window.dashboardManagement) {
+                            // Fetch fresh data from API
+                            fetch('/admin/dashboard/api')
+                                .then(response => response.json())
+                                .then(data => {
+                                    window.revenueChartData = data.revenueChart || [];
+                                    window.dashboardManagement.renderRevenueChart();
+                                })
+                                .catch(error => console.error('Error fetching dashboard data:', error));
+                        }
+                    }, 700);
+                }
             }
         })
         .catch(error => {
@@ -821,6 +837,13 @@ function initializeBootstrapComponents() {
                 classRef: 'ReportsManagement',
                 instanceName: 'reportsManagement',
                 initFunction: 'initializeReportsManagement'
+            },
+            {
+                urlPattern: '/admin/dashboard',
+                scriptPath: '/js/admin/dashboard.js',
+                classRef: 'DashboardManagement',
+                instanceName: 'dashboardManagement',
+                initFunction: 'initializeDashboardManagement'
             }
         ];
         
@@ -854,6 +877,25 @@ function initializeBootstrapComponents() {
                     }
                 }
             }
+            
+            // Special case: Dashboard needs to re-render chart when content is reloaded
+            if (instanceName === 'dashboardManagement') {
+                setTimeout(() => {
+                    if (window.dashboardManagement) {
+                        // Fetch fresh data from API and update chart
+                        fetch('/admin/dashboard/api')
+                            .then(response => response.json())
+                            .then(data => {
+                                window.revenueChartData = data.revenueChart || [];
+                                window.dashboardManagement.renderRevenueChart();
+                            })
+                            .catch(error => {
+                                console.error('Error fetching dashboard data:', error);
+                            });
+                    }
+                }, 600);
+            }
+            
             return;
         }
         
