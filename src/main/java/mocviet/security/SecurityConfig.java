@@ -60,12 +60,13 @@ public class SecurityConfig {
                     "/css/**",
                     "/js/**",
                     "/images/**",
-                    "/api/auth/**"
+                    "/api/auth/**",
+                    "/products/**"
                 ).permitAll()
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 .requestMatchers("/manager/**").hasRole("MANAGER")
                 .requestMatchers("/delivery/**").hasRole("DELIVERY")
-                .requestMatchers("/customer/**", "/profile/**", "/orders/**", "/cart/**", "/wishlist/**").hasRole("CUSTOMER")
+                .requestMatchers("/customer/**", "/profile/**", "/orders/**", "/cart/**", "/wishlist/**", "/api/cart/**").hasRole("CUSTOMER")
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session

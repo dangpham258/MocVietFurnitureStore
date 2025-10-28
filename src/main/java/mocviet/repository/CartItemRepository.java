@@ -42,7 +42,18 @@ public interface CartItemRepository extends JpaRepository<CartItem, Integer> {
     List<CartItem> findAllById(Iterable<Integer> ids);
     
     /**
-     * Kiểm tra variant có tồn tại trong giỏ hàng không
+     * Lấy CartItem với Product và ProductImages để tránh lazy loading
+     */
+    @Query("SELECT DISTINCT ci FROM CartItem ci " +
+           "LEFT JOIN FETCH ci.variant v " +
+           "LEFT JOIN FETCH v.product p " +
+           "LEFT JOIN FETCH p.productImages " +
+           "LEFT JOIN FETCH v.color " +
+           "WHERE ci.cart.id = :cartId " +
+           "ORDER BY ci.id ASC")
+    List<CartItem> findByCartIdWithProductImages(@Param("cartId") Integer cartId);
+
+     /* Kiểm tra variant có tồn tại trong giỏ hàng không
      */
     boolean existsByVariantId(Integer variantId);
 }

@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danh sách yêu thích - Mộc Việt</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link th:href="@{/css/customer.css}" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <div th:replace="fragments/header :: header"></div>
+
+    <!-- Main Content -->
+    <div class="container my-5">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="bi bi-person"></i> Tài khoản của tôi</h5>
+                    </div>
+                    <div class="list-group list-group-flush">
+                        <a href="/customer/profile" class="list-group-item list-group-item-action">
+                            <i class="bi bi-person"></i> Thông tin cá nhân
+                        </a>
+                        <a href="/customer/orders" class="list-group-item list-group-item-action">
+                            <i class="bi bi-box-seam"></i> Đơn hàng của tôi
+                        </a>
+                        <a href="/customer/wishlist" class="list-group-item list-group-item-action active">
+                            <i class="bi bi-heart"></i> Danh sách yêu thích
+                        </a>
+                        <a href="/customer/profile#address-section" class="list-group-item list-group-item-action">
+                            <i class="bi bi-geo-alt"></i> Địa chỉ nhận hàng
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9">
+                <!-- Page Header -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2><i class="bi bi-heart-fill me-2" style="color: #dc3545;"></i>Danh sách yêu thích</h2>
+                    <span class="badge bg-danger" th:text="${wishlistCount} + ' sản phẩm'">0 sản phẩm</span>
+                </div>
+
+                <!-- Alert Messages -->
+                <div th:if="${param.error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="bi bi-exclamation-triangle"></i> <span th:text="${param.error}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                <div th:if="${param.success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="bi bi-check-circle"></i> <span th:text="${param.success}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+
+                <!-- Wishlist Products -->
+                <div th:if="${wishlist != null and !wishlist.empty}">
+                    <div th:each="item : ${wishlist}" th:id="'wishlist-item-' + ${item.id}" class="card mb-3 wishlist-item">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <!-- Product Image -->
+                                <div class="col-md-2">
+                                    <a th:href="@{/products/{slug}(slug=${item.product.slug})}" class="text-decoration-none">
+                                        <img th:if="${item.product.productImages != null and !item.product.productImages.empty}"
+                                             th:src="${item.product.productImages[0].url}"
+                                             th:alt="${item.product.name}"
+                                             class="img-fluid rounded product-thumbnail">
+                                        <div th:unless="${item.product.productImages != null and !item.product.productImages.empty}"
+                                             class="bg-light d-flex align-items-center justify-content-center rounded"
+                                             style="width: 120px; height: 120px;">
+                                            <i class="bi bi-image text-muted" style="font-size: 2rem;"></i>
+                                        </div>
+                                    </a>
+                                </div>
+
+                                <!-- Product Info -->
+                                <div class="col-md-6">
+                                    <a th:href="@{/products/{slug}(slug=${item.product.slug})}" class="text-decoration-none text-dark">
+                                        <h5 class="card-title mb-2" th:text="${item.product.name}">Tên sản phẩm</h5>
+                                    </a>
+                                    <div class="product-info mb-2">
+                                        <span class="badge bg-secondary me-2" th:text="${item.product.category.name}">Danh mục</span>
+                                        <span th:if="${item.product.collection != null}" 
+                                              class="badge bg-info" th:text="${item.product.collection.name}">Collection</span>
+                                    </div>
+                                    <div class="rating-info mb-2">
+                                        <span th:if="${item.product.avgRating != null}">
+                                            <i class="bi bi-star-fill text-warning"></i>
+                                            <span th:text="${item.product.avgRating}">4.5</span>
+                                            <span class="text-muted">(<span th:text="${item.product.totalReviews}">10</span> đánh giá)</span>
+                                        </span>
+                                        <span th:unless="${item.product.avgRating != null}" class="text-muted">
+                                            Chưa có đánh giá
+                                        </span>
+                                    </div>
+                                    <div class="sold-info">
+                                        <i class="bi bi-cart-check"></i>
+                                        <small class="text-muted">Đã bán: <span th:text="${item.product.soldQty}">0</span></small>
+                                    </div>
+                                </div>
+
+                                <!-- Variant Info & Price -->
+                                <div class="col-md-3">
+                                    <div class="variant-info mb-2">
+                                        <h6 class="text-muted">Biến thể có sẵn:</h6>
+                                        <div th:each="variant : ${item.product.variants}" 
+                                             th:if="${variant.isActive and variant.stockQty > 0}"
+                                             class="mb-1">
+                                            <small>
+                                                <span th:text="${variant.color.name} + ' - ' + ${variant.typeName}">Màu - Loại</span>
+                                                <span class="text-success fw-bold">
+                                                    • <span th:text="${#numbers.formatDecimal(variant.salePrice, 0, 'COMMA', 0, 'POINT')} + ' ₫'">0 ₫</span>
+                                                </span>
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Actions -->
+                                <div class="col-md-1 text-end">
+                                    <button class="btn btn-sm btn-outline-danger" 
+                                            th:onclick="'removeFromWishlist(' + ${item.id} + ', ' + ${item.product.id} + ')'"
+                                            title="Xóa khỏi danh sách yêu thích">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Empty State -->
+                <div th:if="${wishlist == null or wishlist.empty}" class="text-center py-5">
+                    <i class="bi bi-heart" style="font-size: 4rem; color: #ccc;"></i>
+                    <h4 class="text-muted mt-3">Danh sách yêu thích trống</h4>
+                    <p class="text-muted">Bạn chưa có sản phẩm nào trong danh sách yêu thích. Hãy thêm các sản phẩm bạn quan tâm!</p>
+                    <a href="/products" class="btn btn-primary">
+                        <i class="bi bi-shop"></i> Khám phá sản phẩm
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Remove Confirmation Modal -->
+    <div class="modal fade" id="removeConfirmModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Xác nhận xóa</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Bạn có chắc chắn muốn xóa sản phẩm này khỏi danh sách yêu thích?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-danger" id="confirmRemoveBtn" onclick="confirmRemove()">
+                        Đồng ý
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let currentProductId = null;
+        let currentWishlistId = null;
+        
+        function removeFromWishlist(wishlistId, productId) {
+            currentWishlistId = wishlistId;
+            currentProductId = productId;
+            
+            const modal = new bootstrap.Modal(document.getElementById('removeConfirmModal'));
+            modal.show();
+        }
+        
+        function confirmRemove() {
+            if (currentProductId === null) return;
+            
+            fetch('/customer/wishlist/remove', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `productId=${currentProductId}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Hide modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('removeConfirmModal'));
+                    modal.hide();
+                    
+                    // Reload page để cập nhật danh sách
+                    location.reload();
+                } else {
+                    // Hide modal trước khi hiển thị lỗi
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('removeConfirmModal'));
+                    modal.hide();
+                    
+                    // Show error message
+                    showAlert('error', data.message || 'Có lỗi xảy ra khi xóa sản phẩm');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                
+                // Hide modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('removeConfirmModal'));
+                if (modal) modal.hide();
+                
+                // Show error message
+                showAlert('error', 'Có lỗi xảy ra khi xóa sản phẩm');
+            });
+            
+            currentProductId = null;
+            currentWishlistId = null;
+        }
+        
+        function showAlert(type, message) {
+            const alertContainer = document.createElement('div');
+            alertContainer.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show`;
+            alertContainer.innerHTML = `
+                <i class="bi bi-${type === 'success' ? 'check-circle' : 'exclamation-triangle'}"></i>
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            const mainContent = document.querySelector('.col-md-9');
+            if (mainContent) {
+                mainContent.insertBefore(alertContainer, mainContent.firstChild);
+                
+                // Auto dismiss after 3 seconds
+                setTimeout(() => {
+                    alertContainer.remove();
+                }, 3000);
+            }
+        }
+    </script>
+</body>
+</html>
+

@@ -481,7 +481,7 @@ public class OrderManagementService {
     private OrderManagementDTO.OrderStatusHistoryDTO mapToOrderStatusHistoryDTO(OrderStatusHistory history) {
         OrderManagementDTO.OrderStatusHistoryDTO dto = new OrderManagementDTO.OrderStatusHistoryDTO();
         dto.setId(history.getId());
-        dto.setStatus(history.getStatus());
+        dto.setStatus(Orders.OrderStatus.valueOf(history.getStatus()));
         dto.setNote(history.getNote());
         dto.setChangedBy(history.getChangedBy() != null ? history.getChangedBy().getFullName() : "Hệ thống");
         dto.setChangedAt(history.getChangedAt());
@@ -500,10 +500,10 @@ public class OrderManagementService {
     
     private LocalDateTime getDeliveredAt(Orders order) {
         return order.getStatusHistories().stream()
-            .filter(h -> h.getStatus() == Orders.OrderStatus.DELIVERED)
+            .filter(h -> Orders.OrderStatus.valueOf(h.getStatus()) == Orders.OrderStatus.DELIVERED)
             .map(OrderStatusHistory::getChangedAt)
             .findFirst()
-            .orElse(null);
+            .orElse(null);  
     }
     
     private String getStatusDisplay(Orders.OrderStatus status) {

@@ -20,13 +20,32 @@ public class CartController {
     private final ICartService cartService;
     
     @GetMapping
-    public String cartPage(Model model) {
+    public String cartPage(@RequestParam(required = false) String error, Model model) {
         List<CartItem> cartItems = cartService.getCurrentUserCartItems();
         Map<Integer, String> stockErrors = cartService.validateStockAvailability(cartItems);
+        
+        // Parse error message
+        String errorMessage = null;
+        if (error != null) {
+            switch (error) {
+                case "empty":
+                    errorMessage = "Giỏ hàng trống";
+                    break;
+                case "not_selected":
+                    errorMessage = "Vui lòng chọn sản phẩm cần thanh toán";
+                    break;
+                case "not_found":
+                    errorMessage = "Không tìm thấy sản phẩm được chọn hoặc sản phẩm đã bị xóa";
+                    break;
+                default:
+                    errorMessage = "Có lỗi xảy ra";
+            }
+        }
         
         model.addAttribute("cartItems", cartItems);
         model.addAttribute("stockErrors", stockErrors);
         model.addAttribute("cartItemCount", cartService.getCartItemCount());
+        model.addAttribute("errorMessage", errorMessage);
         
         return "customer/cart";
     }
@@ -38,14 +57,21 @@ public class CartController {
         Map<String, Object> response = new HashMap<>();
         
         try {
-            boolean success = cartService.addToCart(variantId, quantity);
-            if (success) {
-                response.put("success", true);
-                response.put("message", "Đã thêm sản phẩm vào giỏ hàng");
-                response.put("cartItemCount", cartService.getCartItemCount());
-            } else {
+            // Kiểm tra sản phẩm đã có trong giỏ hàng chưa
+            CartItem existingItem = cartService.findCartItemByVariantId(variantId);
+            if (existingItem != null) {
                 response.put("success", false);
-                response.put("message", "Không thể thêm sản phẩm vào giỏ hàng. Vui lòng kiểm tra lại tồn kho.");
+                response.put("message", "Sản phẩm này đã có trong giỏ hàng của bạn");
+            } else {
+                boolean success = cartService.addToCart(variantId, quantity);
+                if (success) {
+                    response.put("success", true);
+                    response.put("message", "Đã thêm sản phẩm vào giỏ hàng");
+                    response.put("cartItemCount", cartService.getCartItemCount());
+                } else {
+                    response.put("success", false);
+                    response.put("message", "Không thể thêm sản phẩm vào giỏ hàng. Vui lòng kiểm tra lại tồn kho.");
+                }
             }
         } catch (Exception e) {
             response.put("success", false);

@@ -312,7 +312,7 @@ public class DeliveryAssignmentService {
         User manager = userRepository.findById(managerId).orElse(null);
         OrderStatusHistory statusHistory = new OrderStatusHistory();
         statusHistory.setOrder(order);
-        statusHistory.setStatus(Orders.OrderStatus.DISPATCHED);
+        statusHistory.setStatus(Orders.OrderStatus.DISPATCHED.name());
         statusHistory.setNote("Phân công đội giao: " + team.getName());
         statusHistory.setChangedBy(manager);
         statusHistory.setChangedAt(LocalDateTime.now());
@@ -365,7 +365,7 @@ public class DeliveryAssignmentService {
         User manager = userRepository.findById(managerId).orElse(null);
         OrderStatusHistory statusHistory = new OrderStatusHistory();
         statusHistory.setOrder(order);
-        statusHistory.setStatus(Orders.OrderStatus.DISPATCHED);
+        statusHistory.setStatus(Orders.OrderStatus.DISPATCHED.name());
         statusHistory.setNote("Thay đổi đội giao từ " + oldTeam.getName() + " sang " + newTeam.getName() + 
                               ". Lý do: " + request.getReason());
         statusHistory.setChangedBy(manager);

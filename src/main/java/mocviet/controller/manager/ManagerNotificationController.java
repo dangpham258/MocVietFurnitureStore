@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @Controller
 @RequestMapping("/manager/notifications")
 @RequiredArgsConstructor
-public class NotificationController {
+public class ManagerNotificationController {
     
     private final NotificationService notificationService;
     private final UserRepository userRepository;

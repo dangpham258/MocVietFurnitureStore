@@ -49,6 +49,17 @@ public class CartServiceImpl implements ICartService {
     }
     
     @Override
+    @Transactional(readOnly = true)
+    public List<CartItem> getCurrentUserCartItemsWithImages() {
+        Cart cart = getCurrentUserCart();
+        if (cart == null) {
+            return List.of();
+        }
+        
+        return cartItemRepository.findByCartIdWithProductImages(cart.getId());
+    }
+    
+    @Override
     @Transactional
     public boolean addToCart(Integer variantId, Integer quantity) {
         try {
@@ -80,16 +91,8 @@ public class CartServiceImpl implements ICartService {
             Optional<CartItem> existingItem = cartItemRepository.findByCartIdAndVariantId(cart.getId(), variantId);
             
             if (existingItem.isPresent()) {
-                // Cập nhật số lượng
-                CartItem item = existingItem.get();
-                int newQuantity = item.getQty() + quantity;
-                
-                if (newQuantity > variant.getStockQty()) {
-                    return false; // Không đủ tồn kho
-                }
-                
-                item.setQty(newQuantity);
-                cartItemRepository.save(item);
+                // Sản phẩm đã có trong giỏ hàng, không thêm nữa
+                return false;
             } else {
                 // Thêm mới
                 CartItem newItem = new CartItem();
@@ -97,9 +100,8 @@ public class CartServiceImpl implements ICartService {
                 newItem.setVariant(variant);
                 newItem.setQty(quantity);
                 cartItemRepository.save(newItem);
+                return true;
             }
-            
-            return true;
         } catch (Exception e) {
             return false;
         }
