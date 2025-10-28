@@ -1,4 +1,9 @@
-// Categories Management System
+// ========================================
+// CATEGORIES MANAGEMENT JAVASCRIPT
+// ========================================
+
+console.log('Categories Management JS loaded successfully!');
+
 class CategoriesManagement {
     constructor() {
         this.categories = [];
@@ -14,7 +19,7 @@ class CategoriesManagement {
     }
     
     /**
-     * Load danh sách categories từ API
+     * Tải danh sách categories từ API
      */
     async loadCategories() {
         try {
@@ -29,12 +34,12 @@ class CategoriesManagement {
     }
     
     /**
-     * Apply filters
+     * Áp dụng filters
      */
     applyFilters() {
         let filtered = [...this.categories];
         
-        // Search filter
+        // Search filter (tìm kiếm)
         const searchTerm = document.getElementById('searchInput')?.value.toLowerCase() || '';
         if (searchTerm) {
             filtered = filtered.filter(cat => 
@@ -43,13 +48,13 @@ class CategoriesManagement {
             );
         }
         
-        // Type filter
+        // Type filter (loại filter)
         const typeFilter = document.getElementById('filterType')?.value || '';
         if (typeFilter) {
             filtered = filtered.filter(cat => cat.type === typeFilter);
         }
         
-        // Status filter
+        // Status filter (trạng thái filter)
         const statusFilter = document.getElementById('filterStatus')?.value || '';
         if (statusFilter === 'active') {
             filtered = filtered.filter(cat => cat.isActive);
@@ -63,14 +68,15 @@ class CategoriesManagement {
     }
     
     /**
-     * Render categories tree and collections
+     * Render categories tree và collections
      */
     renderCategories() {
-        // Separate categories and collections
+        // Tách categories và collections
         const categories = this.filteredCategories.filter(cat => cat.type === 'CATEGORY');
         const collections = this.filteredCategories.filter(cat => cat.type === 'COLLECTION');
         
-        // Render Categories tree
+        // Render Categories tree (render lại Categories tree)
+        // Render lại Categories tree theo thứ tự được trả về từ backend (sắp xếp theo số thứ tự)
         const categoriesTree = document.getElementById('categoriesTree');
         if (categoriesTree) {
             if (categories.length === 0) {
@@ -81,7 +87,8 @@ class CategoriesManagement {
             }
         }
         
-        // Render Collections list
+        // Render Collections list (render lại Collections list)
+        // Render lại Collections list theo thứ tự được trả về từ backend (sắp xếp theo số thứ tự)
         const collectionsList = document.getElementById('collectionsList');
         if (collectionsList) {
             if (collections.length === 0) {
@@ -93,18 +100,18 @@ class CategoriesManagement {
     }
     
     /**
-     * Build tree structure from categories only
+     * Build tree structure from categories only (xây dựng cây từ categories chỉ)
      */
     buildTreeStructureFromCategories(categories) {
         const map = new Map();
         const roots = [];
         
-        // Create map of all categories
+        // Tạo map của tất cả categories
         categories.forEach(cat => {
             map.set(cat.id, { ...cat, children: [] });
         });
         
-        // Build tree
+        // Xây dựng cây
         categories.forEach(cat => {
             const node = map.get(cat.id);
             if (cat.parentId) {
@@ -112,7 +119,7 @@ class CategoriesManagement {
                 if (parent) {
                     parent.children.push(node);
                 } else {
-                    // Nếu parent không có trong danh sách, đặt vào roots
+                    // Nếu parent không có trong danh sách, đặt vào roots (đặt vào root)
                     roots.push(node);
                 }
             } else {
@@ -124,7 +131,8 @@ class CategoriesManagement {
     }
     
     /**
-     * Render collections list (no tree structure)
+     * Render collections list (không có cấu trúc cây)
+     * Render lại Collections list theo thứ tự được trả về từ backend (sắp xếp theo số thứ tự)
      */
     renderCollectionsList(collections) {
         return collections.map(collection => {
@@ -160,7 +168,8 @@ class CategoriesManagement {
     
     
     /**
-     * Render tree nodes recursively
+     * Render tree nodes recursively (render lại tree nodes theo thứ tự được trả về từ backend (sắp xếp theo số thứ tự))
+     * Render lại tree nodes theo thứ tự được trả về từ backend (sắp xếp theo số thứ tự)
      */
     renderTreeNodes(nodes, level) {
         if (!nodes || nodes.length === 0) return '';
@@ -200,7 +209,8 @@ class CategoriesManagement {
                 </div>
             `;
             
-            // Render children
+            // Render children (render lại children)
+            // Render lại children theo thứ tự được trả về từ backend (sắp xếp theo số thứ tự)
             if (hasChildren) {
                 html += this.renderTreeNodes(node.children, level + 1);
             }
@@ -210,7 +220,7 @@ class CategoriesManagement {
     }
     
     /**
-     * Update stats
+     * Update stats (cập nhật stats)
      */
     updateStats() {
         const totalCategories = this.filteredCategories.length;
@@ -230,7 +240,7 @@ class CategoriesManagement {
     }
     
     /**
-     * Create category
+     * Create category (tạo danh mục)
      */
     async createCategory() {
         const typeElement = document.getElementById('categoryType');
@@ -245,13 +255,13 @@ class CategoriesManagement {
         const slug = slugElement.value;
         const isActive = isActiveElement ? isActiveElement.checked : true;
         
-        // Validate required fields
+        // Validate required fields (kiểm tra các trường bắt buộc)
         if (!type || !name || !slug) {
             this.showNotification('Vui lòng nhập đầy đủ thông tin bắt buộc', 'warning');
             return;
         }
         
-        // Build request body
+        // Build request body (xây dựng request body)
         const requestBody = {
             type,
             name,
@@ -259,7 +269,7 @@ class CategoriesManagement {
             isActive
         };
         
-        // Add parentId only if it has a value
+        // Add parentId only if it has a value (chỉ thêm parentId nếu có giá trị)
         if (parentId) {
             requestBody.parentId = parentId;
         }
@@ -296,7 +306,7 @@ class CategoriesManagement {
     }
     
     /**
-     * Edit category
+     * Edit category (chỉnh sửa danh mục)
      */
     async editCategory(id) {
         const category = this.categories.find(c => c.id === id);
@@ -340,7 +350,7 @@ class CategoriesManagement {
             }
         }
         
-        // Disable slug field if category has products
+        // Disable slug field if category has products (vô hiệu hóa slug field nếu danh mục có sản phẩm)
         const slugInput = document.getElementById('editCategorySlug');
         const slugHelpText = slugInput.parentElement.querySelector('.form-text');
         if (category.hasProducts) {
@@ -364,7 +374,7 @@ class CategoriesManagement {
     }
     
     /**
-     * Update category
+     * Update category (cập nhật danh mục)
      */
     async updateCategory() {
         const id = document.getElementById('editCategoryId').value;
@@ -411,7 +421,7 @@ class CategoriesManagement {
     }
     
     /**
-     * Toggle category status
+     * Thay đổi trạng thái danh mục
      */
     async toggleCategoryStatus(id) {
         if (!confirm('Bạn có chắc muốn thay đổi trạng thái danh mục này?')) {
@@ -438,7 +448,7 @@ class CategoriesManagement {
     }
     
     /**
-     * Reset filters
+     * Reset filters (reset filters)
      */
     resetFilters() {
         document.getElementById('searchInput').value = '';
@@ -469,7 +479,7 @@ class CategoriesManagement {
             statusFilter.addEventListener('change', () => this.applyFilters());
         }
         
-        // Show/hide parent category based on type
+        // Show/hide parent category based on type (hiển thị/ẩn danh mục cha dựa trên loại)
         const categoryType = document.getElementById('categoryType');
         const parentGroup = document.getElementById('parentCategoryGroup');
         if (categoryType && parentGroup) {
@@ -483,7 +493,7 @@ class CategoriesManagement {
             });
         }
         
-        // Auto-generate slug from name
+        // Auto-generate slug from name (tự động tạo slug từ tên)
         const categoryName = document.getElementById('categoryName');
         const categorySlug = document.getElementById('categorySlug');
         if (categoryName && categorySlug) {
@@ -502,6 +512,7 @@ class CategoriesManagement {
     
     /**
      * Load parent categories for dropdown - CHỈ LOAD DANH MỤC CẤP 1 (parent_id = NULL)
+     * Tải danh mục cha cho dropdown - CHỈ TẢI DANH MỤC CẤP 1 (parent_id = NULL)
      */
     loadParentCategories() {
         const parentSelect = document.getElementById('parentCategoryId');
@@ -509,7 +520,7 @@ class CategoriesManagement {
         
         const categoryType = document.getElementById('categoryType').value;
         if (categoryType === 'CATEGORY') {
-            // CHỈ load các danh mục CẤP 1 (parent_id = null) và active
+            // CHỈ load các danh mục CẤP 1 (parent_id = null) và active (chỉ tải các danh mục CẤP 1 (parent_id = null) và active)
             const parentCategories = this.categories.filter(c => 
                 c.type === 'CATEGORY' && c.isActive && !c.parentId
             );
@@ -526,11 +537,12 @@ class CategoriesManagement {
     
     /**
      * Sanitize title to slug (same logic as banners)
+     * Sanitize title to slug (cùng logic với banners)
      */
     sanitizeTitle(title) {
         if (!title) return "";
         
-        // Remove Vietnamese accents first
+        // Remove Vietnamese accents first (loại bỏ dấu tiếng Việt trước)
         const withoutAccents = this.removeVietnameseAccents(title);
         
         return withoutAccents
@@ -542,7 +554,7 @@ class CategoriesManagement {
     }
     
     /**
-     * Remove Vietnamese accents/diacritics
+     * Remove Vietnamese accents/diacritics (loại bỏ dấu tiếng Việt/dấu thanh)
      */
     removeVietnameseAccents(str) {
         if (!str) return "";
@@ -577,7 +589,7 @@ class CategoriesManagement {
     }
     
     /**
-     * Show notification
+     * Show notification (hiển thị thông báo)
      */
     showNotification(message, type) {
         if (window.showNotification) {
@@ -588,7 +600,7 @@ class CategoriesManagement {
     }
     
     /**
-     * Escape HTML
+     * Escape HTML (escape HTML)
      */
     escapeHtml(text) {
         const map = {
@@ -602,7 +614,7 @@ class CategoriesManagement {
     }
 }
 
-// Global functions for onclick handlers
+// Global functions for onclick handlers (xử lý sự kiện click)
 let categoriesManagement;
 
 function createCategory() {
@@ -635,7 +647,7 @@ function resetFilters() {
     }
 }
 
-// Function to initialize categories management
+// Function to initialize categories management (hàm khởi tạo Categories Management)
 function initializeCategoriesManagement() {
     if (window.location.pathname.includes('/admin/categories')) {
         if (categoriesManagement) {
@@ -650,14 +662,14 @@ function initializeCategoriesManagement() {
     }
 }
 
-// Initialize when DOM is loaded
+// Initialize when DOM is loaded (khởi tạo khi DOM đã tải xong)
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initializeCategoriesManagement);
 } else {
     initializeCategoriesManagement();
 }
 
-// Export for global access
+// Export for global access (export để sử dụng trong admin.js)
 window.CategoriesManagement = CategoriesManagement;
 window.initializeCategoriesManagement = initializeCategoriesManagement;
 

@@ -30,7 +30,7 @@
     margin-bottom: 1rem;
 }
 
-/* Image styles with strict constraints */
+/* Styles hình ảnh với ràng buộc */
 .content-wrapper img {
     max-width: 100% !important;
     height: auto !important;
@@ -110,7 +110,7 @@
     font-weight: 600;
 }
 
-/* Responsive adjustments */
+/* Cập nhật responsive */
 @media (max-width: 768px) {
     .content-wrapper {
         font-size: 1rem;

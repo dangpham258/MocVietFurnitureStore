@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AuthResponse {
-    
+
     private String token;
     private String type = "Bearer";
     private Integer userId;
@@ -16,7 +16,7 @@ public class AuthResponse {
     private String email;
     private String fullName;
     private String role;
-    
+
     public AuthResponse(String token, Integer userId, String username, String email, String fullName, String role) {
         this.token = token;
         this.userId = userId;

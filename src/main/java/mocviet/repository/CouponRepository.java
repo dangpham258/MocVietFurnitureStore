@@ -1,10 +1,11 @@
 package mocviet.repository;
 
-import mocviet.entity.Coupon;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
+import mocviet.entity.Coupon;
 
 @Repository
 public interface CouponRepository extends JpaRepository<Coupon, String> {

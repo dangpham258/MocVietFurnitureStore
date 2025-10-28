@@ -17,7 +17,7 @@ class SocialLinksManagement {
     }
     
     /**
-     * Load social links
+     * Tải liên kết mạng xã hội
      */
     async loadSocialLinks() {
         try {
@@ -33,13 +33,13 @@ class SocialLinksManagement {
     }
     
     /**
-     * Render social links
+     * Render liên kết mạng xã hội
      */
     renderSocialLinks() {
         const container = document.getElementById('socialLinksContainer');
         if (!container) return;
         
-        // Expected platforms
+        // Các platform dự kiến
         const expectedPlatforms = ['FACEBOOK', 'ZALO', 'YOUTUBE'];
         const platformConfig = {
             'FACEBOOK': { icon: 'bi-facebook', color: 'primary', name: 'Facebook' },
@@ -59,7 +59,7 @@ class SocialLinksManagement {
     }
     
     /**
-     * Render individual link card
+     * Render card liên kết riêng lẻ
      */
     renderLinkCard(platform, config, url, isActive, linkId) {
         const statusBadge = isActive 
@@ -106,12 +106,12 @@ class SocialLinksManagement {
     }
     
     /**
-     * Edit social link
+     * Sửa liên kết mạng xã hội
      */
     async editSocialLink(platform, platformName) {
         const link = this.links.find(l => l.platform === platform);
         
-        // Fill form (store platform enum in hidden field)
+        // Điền form (lưu platform enum trong field ẩn)
         document.getElementById('editLinkPlatform').setAttribute('data-platform', platform);
         document.getElementById('editLinkPlatform').value = platformName;
         
@@ -131,7 +131,7 @@ class SocialLinksManagement {
     }
     
     /**
-     * Update social link
+     * Cập nhật liên kết mạng xã hội
      */
     async updateSocialLink() {
         const linkId = document.getElementById('editLinkId').value;
@@ -147,7 +147,7 @@ class SocialLinksManagement {
             let response;
             
             if (linkId) {
-                // Update existing link
+                // Cập nhật liên kết hiện có
                 response = await fetch(`${this.apiEndpoint}/links/${linkId}`, {
                     method: 'PUT',
                     headers: {
@@ -156,7 +156,7 @@ class SocialLinksManagement {
                     body: JSON.stringify({ url, isActive })
                 });
             } else {
-                // Create new link
+                // Tạo liên kết mới
                 const platformEnum = document.getElementById('editLinkPlatform').getAttribute('data-platform');
                 
                 response = await fetch(`${this.apiEndpoint}/links`, {
@@ -191,7 +191,7 @@ class SocialLinksManagement {
     }
     
     /**
-     * Helper: Show notification
+     * Helper: Hiển thị thông báo
      */
     showNotification(message, type = 'info') {
         if (window.notificationSystem) {
@@ -202,10 +202,10 @@ class SocialLinksManagement {
     }
 }
 
-// Global instance
+// Instance global
 let socialLinksManagement;
 
-// Initialize Social Links Management
+// Khởi tạo Social Links Management
 function initializeSocialLinksManagement() {
     if (socialLinksManagement) {
         delete socialLinksManagement;
@@ -213,7 +213,7 @@ function initializeSocialLinksManagement() {
     socialLinksManagement = new SocialLinksManagement();
 }
 
-// Global functions for onclick handlers
+// Functions global cho onclick handlers
 function editSocialLink(platform, platformName) {
     if (socialLinksManagement) {
         socialLinksManagement.editSocialLink(platform, platformName);
@@ -226,6 +226,6 @@ function updateSocialLink() {
     }
 }
 
-// Export for admin.js
+// Xuất ra admin.js
 window.initializeSocialLinksManagement = initializeSocialLinksManagement;
 

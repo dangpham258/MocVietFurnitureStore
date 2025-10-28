@@ -48,19 +48,19 @@ body, html {
 
 /* Sidebar cố định - Phong cách hiện đại tối giản */
 .admin-sidebar {
-    background: #e9ecef; /* Xám đậm hơn để dễ nhìn */
-    border-right: 1px solid #dee2e6; /* Viền đậm hơn */
+    background: #e9ecef;
+    border-right: 1px solid #dee2e6;
     min-height: 100vh;
     height: 100vh;
     position: fixed;
     top: 0;
-    left: var(--sidebar-closed); /* MẶC ĐỊNH ĐÓNG CHO TẤT CẢ */
+    left: var(--sidebar-closed);
     z-index: 1000;
     overflow-y: auto;
-    width: var(--sidebar-width); /* Fixed width thay vì percentage */
+    width: var(--sidebar-width);
     min-width: var(--sidebar-width);
-    transition: none; /* TẮT TRANSITION MẶC ĐỊNH ĐỂ TRÁNH FLASH */
-    box-shadow: 2px 0 8px rgba(0,0,0,0.15); /* Bóng đậm hơn */
+    transition: none;
+    box-shadow: 2px 0 8px rgba(0,0,0,0.15);
 }
 
 /* DESKTOP: CHỈ DÙNG JAVASCRIPT STYLE TAG */
@@ -77,11 +77,11 @@ body, html {
 
 /* Sidebar header styling */
 .admin-sidebar .text-dark {
-    color: #212529 !important; /* Đen đậm để dễ nhìn */
+    color: #212529 !important;
 }
 
 .admin-sidebar .text-muted {
-    color: #6c757d !important; /* Xám đậm để dễ nhìn */
+    color: #6c757d !important;
 }
 
 .admin-sidebar .btn-outline-dark {
@@ -96,17 +96,17 @@ body, html {
 
 /* Nút đăng xuất - Màu đỏ thay vì vàng */
 .admin-sidebar .nav-link.text-danger {
-    color: #dc3545 !important; /* Đỏ Bootstrap */
+    color: #dc3545 !important;
 }
 
 .admin-sidebar .nav-link.text-danger:hover {
-    color: #c82333 !important; /* Đỏ đậm khi hover */
-    background-color: #f8d7da; /* Nền đỏ nhạt */
+    color: #c82333 !important;
+    background-color: #f8d7da;
 }
 
 /* Link điều hướng trong sidebar - Phong cách tối giản */
 .admin-sidebar .nav-link {
-    color: #495057; /* Màu xám đậm như gỗ trong ảnh */
+    color: #495057;
     border-radius: 0.5rem;
     margin: 0.2rem 0;
     transition: all 0.3s ease;
@@ -116,16 +116,16 @@ body, html {
 
 /* Hiệu ứng hover cho nav-link */
 .admin-sidebar .nav-link:hover {
-    color: #212529; /* Đen nhẹ khi hover */
-    background: #f8f9fa; /* Xám nhạt như đệm ghế */
+    color: #212529;
+    background: #f8f9fa;
     transform: translateX(3px);
 }
 
 /* Trạng thái active của nav-link */
 .admin-sidebar .nav-link.active {
-    color: #212529; /* Đen cho active */
-    background: #e9ecef; /* Xám nhạt hơn */
-    border-left: 3px solid #6c757d; /* Viền trái làm điểm nhấn */
+    color: #212529;
+    background: #e9ecef;
+    border-left: 3px solid #6c757d;
 }
 
 /* Thanh cuộn tùy chỉnh cho sidebar - Phong cách tối giản */
@@ -134,16 +134,16 @@ body, html {
 }
 
 .admin-sidebar::-webkit-scrollbar-track {
-    background: #f8f9fa; /* Xám nhạt */
+    background: #f8f9fa;
 }
 
 .admin-sidebar::-webkit-scrollbar-thumb {
-    background: #dee2e6; /* Xám trung bình */
+    background: #dee2e6;
     border-radius: 3px;
 }
 
 .admin-sidebar::-webkit-scrollbar-thumb:hover {
-    background: #adb5bd; /* Xám đậm hơn khi hover */
+    background: #adb5bd;
 }
 
 /* ========================================
@@ -156,10 +156,10 @@ body, html {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    transition: none; /* TẮT TRANSITION MẶC ĐỊNH ĐỂ TRÁNH FLASH */
+    transition: none;
     margin: 0;
     padding: 0;
-    margin-left: 0; /* MẶC ĐỊNH ĐÓNG CHO TẤT CẢ */
+    margin-left: 0;
 }
 
 /* BẬT TRANSITION CHỈ KHI USER TƯƠNG TÁC */
@@ -169,7 +169,7 @@ body, html {
 
 /* Nội dung chính - Phong cách tối giản */
 .main-content {
-    background-color: #f8f9fa; /* Xám nhạt - sáng hơn nhưng tối hơn header */
+    background-color: #f8f9fa;
     flex: 1;
     padding: 1.5rem;
     margin: 0;
@@ -181,7 +181,7 @@ body, html {
 
 /* Header admin */
 .admin-header {
-    background: #ffffff; /* Trắng cho header để tách biệt */
+    background: #ffffff;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     border-bottom: 1px solid #e9ecef;
     position: sticky !important;
@@ -203,7 +203,7 @@ body, html {
    6. FOOTER - Phần chân trang
    ======================================== */
 
-/* Footer admin - siêu nhỏ gọn */
+/* Footer admin*/
 .admin-footer {
     background: white;
     border-top: 1px solid #dee2e6;
@@ -255,12 +255,12 @@ body, html {
     box-shadow: 0 4px 8px rgba(0,0,0,0.15);
 }
 
-/* Card thống kê - Phong cách tối giản */
+/* Card thống kê*/
 .stats-card {
-    background: #ffffff; /* Trắng tinh khiết */
-    color: #495057; /* Xám đậm như gỗ */
-    border: 1px solid #e9ecef; /* Viền nhẹ */
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1); /* Bóng nhẹ */
+    background: #ffffff;
+    color: #495057;
+    border: 1px solid #e9ecef;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 .stats-card .card-body {
@@ -318,9 +318,9 @@ body, html {
    10. BUTTONS - Nút bấm
    ======================================== */
 
-/* Nút primary admin - Phong cách tối giản */
+/* Nút primary admin*/
 .btn-admin-primary {
-    background: #495057; /* Xám đậm như gỗ trong ảnh */
+    background: #495057;
     border: none;
     color: white;
     font-weight: 500;
@@ -328,7 +328,7 @@ body, html {
 }
 
 .btn-admin-primary:hover {
-    background: #343a40; /* Đen nhẹ khi hover */
+    background: #343a40;
     color: white;
     transform: translateY(-1px);
 }
@@ -362,7 +362,7 @@ body, html {
 
 /* Breadcrumb admin */
 .admin-breadcrumb {
-    background-color: #f8f9fa; /* Xám nhạt - sáng hơn nhưng tối hơn header */
+    background-color: #f8f9fa;
     border-bottom: 1px solid #e9ecef;
     padding: 0.75rem 1rem;
 }
@@ -441,14 +441,13 @@ body, html {
 
 /* Fix chiều cao tab content */
 .tab-content {
-    min-height: 400px; /* Chiều cao tối thiểu cho tab content */
+    min-height: 400px;
 }
 
 .tab-pane {
-    min-height: 400px; /* Đảm bảo mỗi tab có chiều cao tối thiểu */
+    min-height: 400px;
 }
 
-/* Đảm bảo form trong tab có chiều cao nhất quán */
 .tab-pane .card {
     min-height: 350px;
 }
@@ -516,8 +515,8 @@ body, html {
     right: 20px;
     z-index: 9999;
     max-width: 400px;
-    width: 400px; /* Fixed width để tránh thay đổi kích thước */
-    min-width: 300px; /* Minimum width */
+    width: 400px;
+    min-width: 300px;
 }
 
 /* Notification Item */
@@ -530,8 +529,8 @@ body, html {
     overflow: hidden;
     transition: all 0.3s ease;
     backdrop-filter: blur(10px);
-    width: 100%; /* Full width của container */
-    min-height: 70px; /* Minimum height để tránh nhảy */
+    width: 100%;
+    min-height: 70px;
     display: flex;
     flex-direction: column;
 }
@@ -539,10 +538,10 @@ body, html {
 .notification-content {
     padding: 18px;
     position: relative;
-    flex: 1; /* Fill remaining space */
+    flex: 1;
     display: flex;
     flex-direction: column;
-    justify-content: center; /* Center content vertically */
+    justify-content: center;
 }
 
 .notification-header {
@@ -591,7 +590,7 @@ body, html {
     line-height: 1.5;
     color: #374151;
     margin-bottom: 8px;
-    word-wrap: break-word; /* Tránh text overflow */
+    word-wrap: break-word;
     overflow-wrap: break-word;
 }
 
@@ -702,18 +701,18 @@ body, html {
 @media (max-width: 991px) {
     /* Mobile: Sidebar đóng mặc định */
     .admin-sidebar {
-        left: var(--sidebar-closed) !important; /* FORCE ĐÓNG */
-        background: #e9ecef !important; /* Đảm bảo màu nền trên mobile */
+        left: var(--sidebar-closed) !important;
+        background: #e9ecef !important;
     }
     
     /* Mobile: Content area đóng mặc định */
     .content-area {
-        margin-left: 0 !important; /* FORCE VỀ 0PX */
+        margin-left: 0 !important;
     }
     
     /* Mobile: Sidebar mở khi có class show */
     .admin-sidebar.show {
-        left: var(--sidebar-open) !important; /* CHỈ MỞ KHI CÓ CLASS SHOW */
+        left: var(--sidebar-open) !important;
     }
     
     /* Mobile: Content area mở khi sidebar có class show */
@@ -743,7 +742,7 @@ body, html {
     
     /* Notification responsive trên mobile */
     .notification-container {
-        width: calc(100vw - 40px); /* Full width minus padding */
+        width: calc(100vw - 40px);
         max-width: 350px;
         min-width: 280px;
         right: 20px;
@@ -751,29 +750,29 @@ body, html {
     }
     
     .notification {
-        min-height: 60px; /* Smaller minimum height on mobile */
+        min-height: 60px;
     }
     
     .notification-content {
-        padding: 14px 16px; /* Smaller padding on mobile */
+        padding: 14px 16px;
     }
     
     .notification-icon {
-        font-size: 1.1rem; /* Smaller icon on mobile */
+        font-size: 1.1rem;
     }
     
     .notification-title {
-        font-size: 0.9rem; /* Smaller title on mobile */
+        font-size: 0.9rem;
     }
     
     .notification-body {
-        font-size: 0.85rem; /* Smaller body text on mobile */
+        font-size: 0.85rem;
     }
 }
 
 
 /* ========================================
-   OTP VERIFICATION STYLES
+   18. OTP VERIFICATION STYLES
    ======================================== */
 
 /* OTP Modal Styles */
@@ -857,7 +856,7 @@ body, html {
 }
 
 /* ========================================
-   18. PASSWORD TOGGLE STYLES - Nút ẩn/hiện mật khẩu
+   19. PASSWORD TOGGLE STYLES - Nút ẩn/hiện mật khẩu
    ======================================== */
 
 .input-group {
@@ -914,7 +913,7 @@ body, html {
 }
 
 /* ========================================
-   USER MANAGEMENT TABLE - Fixed height
+   20. USER MANAGEMENT TABLE - Fixed height
    ======================================== */
 #usersTable {
     min-height: 400px;
@@ -925,7 +924,7 @@ body, html {
 }
 
 /* ========================================
-   BANNER MANAGEMENT - Quản lý banner
+   21. BANNER MANAGEMENT - Quản lý banner
    ======================================== */
 
 /* Banner card */
@@ -938,7 +937,7 @@ body, html {
     box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
 }
 
-/* Banner image preview */
+/* Ảnh banner preview */
 .banner-image-preview {
     height: 200px !important;
     object-fit: cover !important;
@@ -957,11 +956,11 @@ body, html {
     background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%) !important;
 }
 
-/* Upload area */
+/* Vùng upload */
 .upload-area {
-    border: 2px dashed #ddd;
+    border: 2px dashed #dee2e6;
     border-radius: 8px;
-    padding: 2rem;
+    padding: 3rem;
     text-align: center;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -988,7 +987,7 @@ body, html {
     padding: 0.35rem 0.65rem;
 }
 
-/* Order number badge styling */
+/* Badge số thứ tự */
 .banner-card .badge.bg-primary {
     font-size: 0.875rem !important;
     padding: 0.5rem 0.75rem !important;
@@ -997,10 +996,10 @@ body, html {
 }
 
 /* ========================================
-   SHOWROOMS MANAGEMENT STYLES
+   22. SHOWROOMS MANAGEMENT STYLES
    ======================================== */
 
-/* Showroom card styles */
+/* Card cửa hàng */
 .showroom-card {
     transition: box-shadow 0.2s;
 }
@@ -1009,19 +1008,19 @@ body, html {
     box-shadow: 0 0.5rem 1.5rem rgba(0,0,0,0.15) !important;
 }
 
-/* Card content padding cho info section */
+/* Padding cho card content */
 .showroom-card .card-body {
     padding: 1.5rem;
 }
 
-/* Responsive: Mobile stack map on top */
+/* Responsive: Mobile stack map lên trên */
 @media (max-width: 991.98px) {
     .showroom-map-preview-full {
         min-height: 350px;
     }
 }
 
-/* Showroom map preview */
+/* Preview map cửa hàng */
 .showroom-map-preview {
     height: 200px;
     border-radius: 8px;
@@ -1034,7 +1033,7 @@ body, html {
     border: none;
 }
 
-/* Showroom map preview full width (grid view) */
+/* Preview map cửa hàng full width (view grid) */
 .showroom-map-preview-full {
     height: 100%;
     min-height: 400px;
@@ -1049,14 +1048,14 @@ body, html {
     border: none;
 }
 
-/* Status badge styles */
+/* Badge trạng thái */
 .status-badge {
     font-size: 0.75rem;
     padding: 0.25rem 0.75rem;
     border-radius: 50px;
 }
 
-/* Upload area styles */
+/* Vùng upload */
 .upload-area {
     border: 2px dashed #dee2e6;
     border-radius: 8px;
@@ -1071,27 +1070,27 @@ body, html {
     background-color: #f8f9fa;
 }
 
-/* Grid view specific styles */
+/* View grid specific styles */
 #showroomGrid .card {
     margin-bottom: 1.5rem;
 }
 
-/* List view specific styles */
+/* View list specific styles */
 #showroomList table {
     margin-bottom: 0;
 }
 
 /* =========================================================
-   PAGES MANAGEMENT STYLES
+   23. PAGES MANAGEMENT STYLES
    ========================================================= */
 
-/* HTML editor textarea */
+/* Textarea editor HTML */
 #pageContentTextarea {
     font-family: 'Courier New', Consolas, monospace;
     line-height: 1.6;
 }
 
-/* Page preview in view modal */
+/* Preview trang trong modal */
 #viewContent {
     max-height: 500px;
     overflow-y: auto;
@@ -1102,7 +1101,7 @@ body, html {
     height: auto;
 }
 
-/* Code display for slug */
+/* Hiển thị mã slug */
 code.text-primary {
     font-size: 0.9em;
     font-weight: 500;

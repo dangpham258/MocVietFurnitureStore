@@ -24,10 +24,10 @@ class PagesManagement {
     
     
     /**
-     * Setup event listeners
+     * Thiết lập event listeners
      */
     setupEventListeners() {
-        // Search input
+        // Input tìm kiếm
         const searchInput = document.getElementById('searchInput');
         if (searchInput) {
             searchInput.addEventListener('input', () => {
@@ -36,7 +36,7 @@ class PagesManagement {
             });
         }
         
-        // Status filter
+        // Filter trạng thái
         const statusFilterEl = document.getElementById('statusFilter');
         if (statusFilterEl) {
             statusFilterEl.addEventListener('change', () => {
@@ -45,7 +45,7 @@ class PagesManagement {
             });
         }
         
-        // Sort filter
+        // Filter sắp xếp
         const sortFilterEl = document.getElementById('sortFilter');
         if (sortFilterEl) {
             sortFilterEl.addEventListener('change', () => {
@@ -56,7 +56,7 @@ class PagesManagement {
     }
     
     /**
-     * Load pages from API
+     * Tải trang tĩnh từ API
      */
     async loadPages() {
         try {
@@ -76,10 +76,10 @@ class PagesManagement {
     }
     
     /**
-     * Apply filters and render
+     * Áp dụng filters và render
      */
     applyFilters() {
-        // Filter by search
+        // Filter theo tìm kiếm
         let filtered = this.pages;
         
         if (this.searchFilter) {
@@ -89,13 +89,13 @@ class PagesManagement {
             );
         }
         
-        // Filter by status
+        // Filter theo trạng thái
         if (this.statusFilter !== '') {
             const isActive = this.statusFilter === 'true';
             filtered = filtered.filter(page => page.isActive === isActive);
         }
         
-        // Sort
+        // Sắp xếp
         filtered = [...filtered];
         filtered.sort((a, b) => {
             switch(this.sortFilter) {
@@ -118,7 +118,7 @@ class PagesManagement {
     }
     
     /**
-     * Render pages list
+     * Render danh sách trang tĩnh
      */
     renderPages() {
         const container = document.getElementById('pagesContainer');
@@ -128,10 +128,10 @@ class PagesManagement {
         
         if (!container) return;
         
-        // Hide loading
+        // Ẩn loading
         if (loadingSpinner) loadingSpinner.classList.add('d-none');
         
-        // Check if no pages at all
+        // Kiểm tra nếu không có trang tĩnh nào
         if (this.pages.length === 0) {
             if (emptyState) emptyState.classList.remove('d-none');
             if (noResults) noResults.classList.add('d-none');
@@ -139,7 +139,7 @@ class PagesManagement {
             return;
         }
         
-        // Check if no results from filter
+        // Kiểm tra nếu không có kết quả từ filter
         if (this.filteredPages.length === 0) {
             if (emptyState) emptyState.classList.add('d-none');
             if (noResults) noResults.classList.remove('d-none');
@@ -147,11 +147,11 @@ class PagesManagement {
             return;
         }
         
-        // Hide empty states
+        // Ẩn empty states
         if (emptyState) emptyState.classList.add('d-none');
         if (noResults) noResults.classList.add('d-none');
         
-        // Render table
+        // Render bảng
         container.innerHTML = `
             <div class="table-responsive">
                 <table class="table table-hover align-middle">
@@ -174,7 +174,7 @@ class PagesManagement {
     }
     
     /**
-     * Render single page row
+     * Render hàng trang tĩnh
      */
     renderPageRow(page) {
         const statusBadge = page.isActive 
@@ -218,14 +218,14 @@ class PagesManagement {
     }
     
     /**
-     * Update stats cards
+     * Cập nhật stats cards
      */
     updateStats(data) {
         const totalPages = data.length;
         const activePages = data.filter(p => p.isActive).length;
         const inactivePages = totalPages - activePages;
         
-        // Count recent updates (within last 7 days)
+        // Đếm cập nhật gần đây (trong vòng 7 ngày)
         const sevenDaysAgo = new Date();
         sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
         const recentUpdates = data.filter(p => new Date(p.updatedAt) >= sevenDaysAgo).length;
@@ -242,7 +242,7 @@ class PagesManagement {
     }
     
     /**
-     * Show loading spinner
+     * Hiển thị loading spinner
      */
     showLoading() {
         const loadingSpinner = document.getElementById('loadingSpinner');
@@ -255,7 +255,7 @@ class PagesManagement {
     }
     
     /**
-     * Open add page modal
+     * Mở modal thêm trang tĩnh
      */
     async openAddPageModal() {
         const modal = new bootstrap.Modal(document.getElementById('addEditPageModal'));
@@ -263,22 +263,22 @@ class PagesManagement {
         const form = document.getElementById('pageForm');
         const contentSection = document.getElementById('contentSection');
         
-        // Reset form
+        // Xóa form
         form.reset();
         document.getElementById('pageId').value = '';
         document.getElementById('pageIsActive').checked = true;
         
-        // Clear Summernote
+        // Xóa Summernote
         if (this.summernoteEditor) {
             this.summernoteEditor.summernote('code', '');
         }
         
-        // Hide content section for Add mode
+        // Ẩn section nội dung cho mode thêm
         if (contentSection) {
             contentSection.style.display = 'none';
         }
         
-        // Update title
+        // Cập nhật tiêu đề
         if (modalTitle) {
             modalTitle.innerHTML = '<i class="bi bi-plus-circle me-2"></i>Thêm Trang Tĩnh Mới';
         }
@@ -287,11 +287,11 @@ class PagesManagement {
     }
     
     /**
-     * View page details
+     * Xem chi tiết trang tĩnh
      */
     async viewPage(id) {
         try {
-            // Clear old content first
+            // Xóa nội dung cũ trước
             document.getElementById('viewPageTitle').textContent = 'Đang tải...';
             document.getElementById('viewSlug').textContent = '';
             document.getElementById('viewTitle').textContent = '';
@@ -299,11 +299,11 @@ class PagesManagement {
             document.getElementById('viewUpdatedAt').textContent = '';
             document.getElementById('viewContent').innerHTML = '';
             
-            // Show modal first to make overlay visible
+            // Hiển thị modal đầu tiên để làm cho overlay hiển thị
             const modal = new bootstrap.Modal(document.getElementById('viewPageModal'));
             modal.show();
             
-            // Show loading overlay AFTER modal is shown
+            // Hiển thị loading overlay SAU khi modal được hiển thị
             const loadingOverlay = document.getElementById('viewLoadingOverlay');
             if (loadingOverlay) loadingOverlay.classList.remove('d-none');
             
@@ -312,7 +312,7 @@ class PagesManagement {
             
             const page = await response.json();
             
-            // Populate view modal
+            // Điền dữ liệu vào modal xem
             document.getElementById('viewPageTitle').textContent = `Chi tiết: ${page.title}`;
             document.getElementById('viewSlug').textContent = `/${page.slug}`;
             document.getElementById('viewTitle').textContent = page.title;
@@ -331,40 +331,40 @@ class PagesManagement {
                 contentDiv.innerHTML = '<em class="text-muted">Chưa có nội dung</em>';
             }
             
-            // Hide loading overlay when done
+            // Ẩn loading overlay khi hoàn tất
             if (loadingOverlay) loadingOverlay.classList.add('d-none');
         } catch (error) {
             console.error('Error loading page:', error);
             this.showNotification('Không thể tải chi tiết trang', 'danger');
             
-            // Hide loading overlay on error
+            // Ẩn loading overlay khi có lỗi
             const loadingOverlay = document.getElementById('viewLoadingOverlay');
             if (loadingOverlay) loadingOverlay.classList.add('d-none');
         }
     }
     
     /**
-     * Edit page
+     * Sửa trang tĩnh
      */
     async editPage(id) {
         try {
-            // Clear old form data first
+            // Xóa dữ liệu form cũ trước
             document.getElementById('pageId').value = '';
             document.getElementById('pageSlug').value = '';
             document.getElementById('pageTitle').value = '';
             document.getElementById('pageIsActive').checked = true;
             
-            // Hide content section initially
+            // Ẩn section nội dung ban đầu
             const contentSectionInit = document.getElementById('contentSection');
             if (contentSectionInit) {
                 contentSectionInit.style.display = 'none';
             }
             
-            // Show modal first to make overlay visible
+            // Hiển thị modal đầu tiên để làm cho overlay hiển thị
             const modal = new bootstrap.Modal(document.getElementById('addEditPageModal'));
             modal.show();
             
-            // Show loading overlay AFTER modal is shown
+            // Hiển thị loading overlay SAU khi modal được hiển thị
             const loadingOverlay = document.getElementById('formLoadingOverlay');
             if (loadingOverlay) loadingOverlay.classList.remove('d-none');
             
@@ -373,23 +373,23 @@ class PagesManagement {
             
             const page = await response.json();
             
-            // Populate form
+            // Điền dữ liệu vào form
             document.getElementById('pageId').value = page.id;
             document.getElementById('pageSlug').value = page.slug;
             document.getElementById('pageTitle').value = page.title;
             document.getElementById('pageIsActive').checked = page.isActive;
             
-            // Show content section for Edit mode
+            // Hiển thị section nội dung cho mode sửa
             const contentSection = document.getElementById('contentSection');
             if (contentSection) {
                 contentSection.style.display = 'block';
             }
             
-            // Initialize Summernote if not already initialized
+            // Khởi tạo Summernote nếu chưa được khởi tạo
             if (!this.summernoteEditor) {
                 const editorElement = $('#pageContent');
                 if (editorElement.length && typeof $.fn.summernote !== 'undefined') {
-                    // Show loading overlay
+                    // Hiển thị loading overlay
                     const loadingOverlay = document.getElementById('formLoadingOverlay');
                     if (loadingOverlay) loadingOverlay.classList.remove('d-none');
                     editorElement.summernote({
@@ -421,20 +421,20 @@ class PagesManagement {
                     if (page.content) {
                         editorElement.summernote('code', page.content);
                     }
-                    // Hide loading overlay
+                    // Ẩn loading overlay
                     if (loadingOverlay) loadingOverlay.classList.add('d-none');
                 }
             } else {
-                // Editor already exists, just set content
+                // Editor đã tồn tại, chỉ điền nội dung
                 if (page.content) {
                     this.summernoteEditor.summernote('code', page.content);
                 }
-                // Hide loading overlay since editor already exists
+                // Ẩn loading overlay vì editor đã tồn tại
                 const loadingOverlay = document.getElementById('formLoadingOverlay');
                 if (loadingOverlay) loadingOverlay.classList.add('d-none');
             }
             
-            // Update modal title
+            // Cập nhật tiêu đề modal
             const modalTitle = document.getElementById('modalTitle');
             if (modalTitle) {
                 modalTitle.innerHTML = '<i class="bi bi-pencil me-2"></i>Sửa Trang Tĩnh';
@@ -443,14 +443,14 @@ class PagesManagement {
             console.error('Error loading page for edit:', error);
             this.showNotification('Không thể tải thông tin trang', 'danger');
             
-            // Hide loading overlay on error
+            // Ẩn loading overlay khi có lỗi
             const loadingOverlay = document.getElementById('formLoadingOverlay');
             if (loadingOverlay) loadingOverlay.classList.add('d-none');
         }
     }
     
     /**
-     * Save page (create or update)
+     * Lưu trang tĩnh (tạo hoặc cập nhật)
      */
     async savePage() {
         const form = document.getElementById('pageForm');
@@ -459,7 +459,7 @@ class PagesManagement {
         const title = document.getElementById('pageTitle').value.trim();
         const isActive = document.getElementById('pageIsActive').checked;
         
-        // Validation
+        // Kiểm tra validation
         if (!slug) {
             this.showNotification('Vui lòng nhập slug', 'warning');
             return;
@@ -470,7 +470,7 @@ class PagesManagement {
             return;
         }
         
-        // Get content from Summernote
+        // Lấy nội dung từ Summernote
         let content = '';
         if (this.summernoteEditor) {
             content = this.summernoteEditor.summernote('code');
@@ -484,7 +484,7 @@ class PagesManagement {
         };
         
         try {
-            // Show loading on save button
+            // Hiển thị loading trên nút lưu
             const saveBtn = document.getElementById('saveBtn');
             const saveBtnText = document.getElementById('saveBtnText');
             const saveBtnLoading = document.getElementById('saveBtnLoading');
@@ -506,7 +506,7 @@ class PagesManagement {
                 body: JSON.stringify(data)
             });
             
-            // Check if response is OK
+            // Kiểm tra nếu response là OK
             if (!response.ok) {
                 const errorResult = await response.json();
                 throw new Error(errorResult.message || 'Có lỗi xảy ra');
@@ -517,11 +517,11 @@ class PagesManagement {
             if (result.success) {
                 this.showNotification(pageId ? 'Cập nhật trang thành công' : 'Thêm trang thành công', 'success');
                 
-                // Close modal
+                // Đóng modal
                 const modal = bootstrap.Modal.getInstance(document.getElementById('addEditPageModal'));
                 if (modal) modal.hide();
                 
-                // Reload pages
+                // Tải lại trang tĩnh
                 this.loadPages();
             } else {
                 this.showNotification(result.message || 'Có lỗi xảy ra', 'danger');
@@ -530,7 +530,7 @@ class PagesManagement {
             console.error('Error saving page:', error);
             this.showNotification(error.message || 'Không thể lưu trang', 'danger');
         } finally {
-            // Reset button state
+            // Reset trạng thái nút
             const saveBtn = document.getElementById('saveBtn');
             const saveBtnText = document.getElementById('saveBtnText');
             const saveBtnLoading = document.getElementById('saveBtnLoading');
@@ -544,7 +544,7 @@ class PagesManagement {
     }
     
     /**
-     * Delete page confirmation
+     * Xác nhận xóa trang tĩnh
      */
     deletePage(id, title) {
         document.getElementById('deletePageId').value = id;
@@ -555,7 +555,7 @@ class PagesManagement {
     }
     
     /**
-     * Confirm delete
+     * Xác nhận xóa
      */
     async confirmDelete() {
         const pageId = document.getElementById('deletePageId').value;
@@ -570,11 +570,11 @@ class PagesManagement {
             if (result.success) {
                 this.showNotification('Xóa trang thành công', 'success');
                 
-                // Close modal
+                // Đóng modal
                 const modal = bootstrap.Modal.getInstance(document.getElementById('deletePageModal'));
                 if (modal) modal.hide();
                 
-                // Reload pages
+                // Tải lại trang tĩnh
                 this.loadPages();
             } else {
                 this.showNotification(result.message || 'Có lỗi xảy ra', 'danger');
@@ -586,7 +586,7 @@ class PagesManagement {
     }
     
     /**
-     * Reset filters
+     * Reset filters (làm mới filters)
      */
     resetFilters() {
         document.getElementById('searchInput').value = '';
@@ -601,7 +601,7 @@ class PagesManagement {
     }
     
     /**
-     * Format date helper
+     * Format date helper (chuyển đổi chuỗi ngày thành định dạng chuẩn)
      */
     formatDate(dateString) {
         if (!dateString) return '';
@@ -622,7 +622,7 @@ class PagesManagement {
     }
     
     /**
-     * Strip HTML tags
+     * Loại bỏ HTML tags
      */
     stripHtml(html) {
         const tmp = document.createElement('DIV');
@@ -631,48 +631,48 @@ class PagesManagement {
     }
     
     /**
-     * Show notification
+     * Hiển thị thông báo
      */
     showNotification(message, type = 'info') {
         console.log(`[${type.toUpperCase()}] ${message}`);
         
-        // Use notification system if available
+        // Sử dụng notification system nếu có
         if (window.notificationSystem) {
             window.notificationSystem.show(message, type);
         } else {
-            // Fallback: alert
+            // Fallback: hiển thị alert
             alert(message);
         }
     }
     
     /**
-     * Show error message
+     * Hiển thị thông báo lỗi
      */
     showError(message) {
         this.showNotification(message, 'danger');
     }
 }
 
-// Initialize global instance
+// Khởi tạo instance global
 let pagesManagement;
 
 function initializePagesManagement() {
     if (!pagesManagement) {
         pagesManagement = new PagesManagement();
-        // Also expose to window for easier access
+        // Cũng xuất ra window để dễ truy cập
         window.pagesManagement = pagesManagement;
     }
 }
 
-// Auto-initialize when script loads
+// Khởi tạo tự động khi script tải xong
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initializePagesManagement);
 } else {
-    // DOM already loaded, initialize immediately
+    // DOM đã tải xong, khởi tạo ngay
     initializePagesManagement();
 }
 
-// Export functions to global scope for onclick handlers
+// Xuất functions to global scope cho onclick handlers
 window.openAddPageModal = () => {
     if (window.pagesManagement) {
         window.pagesManagement.openAddPageModal();

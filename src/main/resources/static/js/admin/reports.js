@@ -1,3 +1,9 @@
+// ========================================
+// REPORTS MANAGEMENT JAVASCRIPT
+// ========================================
+
+console.log('Reports Management JavaScript loaded');
+
 (function() {
     'use strict';
 
@@ -19,7 +25,7 @@
         }
 
         setupEventListeners() {
-            // Period filter
+            // Filter thời gian
             const periodFilter = document.getElementById('periodFilter');
             if (periodFilter) {
                 periodFilter.addEventListener('change', (e) => {
@@ -30,7 +36,7 @@
                     } else {
                         document.getElementById('startDateFilter').style.display = 'none';
                         document.getElementById('endDateFilter').style.display = 'none';
-                        // Auto refresh when changing period
+                        // Tự động làm mới khi thay đổi thời gian
                         this.loadReports();
                     }
                 });
@@ -354,7 +360,9 @@
                         <td class="text-end">${this.formatCurrency(s.totalRevenue)}</td>
                         <td class="text-end">${this.formatCurrency(s.averageOrderValue)}</td>
                         <td class="text-center">
-                            <span class="badge bg-primary">${s.percentage.toFixed(1)}%</span>
+                            <span class="badge bg-primary" title="Tỷ trọng doanh thu trên tổng doanh thu (DELIVERED)">
+                                ${s.percentage.toFixed(1)}% doanh thu
+                            </span>
                         </td>
                     </tr>
                 `).join('');
@@ -382,7 +390,7 @@
         }
     }
 
-    // Initialize when DOM is ready
+    // Khởi tạo khi DOM đã tải xong
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', () => {
             window.reportsManagement = new ReportsManagement();

@@ -1,15 +1,5 @@
 package mocviet.service.admin.impl;
 
-import lombok.RequiredArgsConstructor;
-import mocviet.dto.admin.BannerResponse;
-import mocviet.entity.Banner;
-import mocviet.repository.BannerRepository;
-import mocviet.service.admin.AdminBannerService;
-import mocviet.service.admin.FileUploadService;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -17,89 +7,100 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import lombok.RequiredArgsConstructor;
+import mocviet.dto.admin.BannerResponse;
+import mocviet.entity.Banner;
+import mocviet.repository.BannerRepository;
+import mocviet.service.admin.AdminBannerService;
+import mocviet.service.admin.FileUploadService;
+
 @Service
 @RequiredArgsConstructor
 public class AdminBannerServiceImpl implements AdminBannerService {
-    
+
     private final BannerRepository bannerRepository;
     private final FileUploadService fileUploadService;
-    
+
     @Override
     @Transactional(readOnly = true)
     public List<BannerResponse> getAllBanners() {
         List<Banner> banners = bannerRepository.findAll();
-        
-        // Sort by order number extracted from image URL
+
+        // Sắp xếp theo số thứ tự lấy từ URL ảnh
         banners.sort((b1, b2) -> {
             int order1 = extractOrderNumber(b1.getImageUrl());
             int order2 = extractOrderNumber(b2.getImageUrl());
             if (order1 != order2) {
                 return Integer.compare(order1, order2);
             }
-            // If same order number, sort by creation date DESC
+            // Nếu cùng số thứ tự, sắp xếp theo ngày tạo DESC
             return b2.getCreatedAt().compareTo(b1.getCreatedAt());
         });
-        
+
         List<BannerResponse> responses = new ArrayList<>();
         for (Banner banner : banners) {
             responses.add(convertToResponse(banner));
         }
-        
+
         return responses;
     }
-    
+
     /**
-     * Extract order number from image URL
+     * Lấy số thứ tự từ URL ảnh
      * Example: "/static/images/banners/12_title.jpg" -> 12
      */
     private int extractOrderNumber(String imageUrl) {
         if (imageUrl == null || imageUrl.isEmpty()) {
-            return 99; // Put invalid URLs at the end
+            return 99; // Đặt URL không hợp lệ ở cuối
         }
         try {
-            // Extract filename from full path
+            // Lấy tên file từ đường dẫn đầy đủ
             String filename = imageUrl.substring(imageUrl.lastIndexOf('/') + 1);
-            
-            // Extract first 2 chars before underscore
+
+            // Lấy 2 ký tự đầu tiên trước dấu gạch dưới
             int underscoreIndex = filename.indexOf('_');
             if (underscoreIndex < 2) {
                 return 99;
             }
-            
-            String orderStr = filename.substring(0, 2); // First 2 chars
+
+            String orderStr = filename.substring(0, 2); // 2 ký tự đầu tiên
             return Integer.parseInt(orderStr);
         } catch (NumberFormatException | StringIndexOutOfBoundsException e) {
-            return 99; // Put invalid formats at the end
+            return 99; // Đặt định dạng không hợp lệ ở cuối
         }
     }
-    
+
     @Override
     @Transactional(readOnly = true)
     public BannerResponse getBannerById(Integer id) {
         Banner banner = bannerRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Banner not found"));
-        
+
         return convertToResponse(banner);
     }
-    
+
     @Override
     @Transactional
     public BannerResponse createBanner(String title, String linkUrl, Boolean isActive, String orderNumber, MultipartFile image) {
         try {
-            // Validate image
+            // Kiểm tra ảnh
             if (image == null || image.isEmpty()) {
                 throw new RuntimeException("Image is required");
             }
-            
+
             if (!fileUploadService.isImage(image)) {
                 throw new RuntimeException("File must be an image");
             }
-            
+
             if (!fileUploadService.isValidSize(image)) {
                 throw new RuntimeException("Image size must be less than 10MB");
             }
-            
-            // Use orderNumber from user (NN for filename)
+
+            // Sử dụng orderNumber từ người dùng (NN cho tên file)
             String nn;
             if (orderNumber != null && !orderNumber.isEmpty()) {
                 try {
@@ -114,47 +115,47 @@ public class AdminBannerServiceImpl implements AdminBannerService {
             } else {
                 nn = String.format("%02d", (int) bannerRepository.countAllBanners());
             }
-            
-            // Use title directly - FileUploadService will sanitize it
+
+            // Sử dụng title trực tiếp - FileUploadService sẽ xử lý nó
             String key = title != null && !title.isEmpty() ? title : UUID.randomUUID().toString().substring(0, 8);
-            
-            // Upload image with NN and key (FileUploadService will sanitize the key)
+
+            // Upload ảnh với NN và key (FileUploadService sẽ xử lý key)
             String imageUrl = fileUploadService.uploadBannerImageWithKey(image, nn, key);
-            
-            // Create banner
+
+            // Tạo banner
             Banner banner = new Banner();
             banner.setTitle(title);
             banner.setImageUrl(imageUrl);
             banner.setLinkUrl(linkUrl);
             banner.setIsActive(isActive != null ? isActive : true);
             banner.setCreatedAt(LocalDateTime.now());
-            
+
             banner = bannerRepository.save(banner);
-            
+
             return convertToResponse(banner);
         } catch (IOException e) {
             throw new RuntimeException("Failed to upload image: " + e.getMessage());
         }
     }
-    
+
     @Override
     @Transactional
     public BannerResponse updateBanner(Integer id, String title, String linkUrl, Boolean isActive, String orderNumber, MultipartFile image) {
         try {
             Banner banner = bannerRepository.findById(id)
                     .orElseThrow(() -> new RuntimeException("Banner not found"));
-            
-            // Update text fields
+
+            // Cập nhật trường văn bản
             banner.setTitle(title);
             banner.setLinkUrl(linkUrl);
             if (isActive != null) {
                 banner.setIsActive(isActive);
             }
-            
-            // Extract current order number from existing image URL
+
+            // Lấy số thứ tự hiện tại từ URL ảnh
             int currentOrderNum = extractOrderNumber(banner.getImageUrl());
-            
-            // Validate and format new order number
+
+            // Kiểm tra và định dạng số thứ tự mới
             String nn = null;
             int newOrderNum = -1;
             if (orderNumber != null && !orderNumber.isEmpty()) {
@@ -168,71 +169,71 @@ public class AdminBannerServiceImpl implements AdminBannerService {
                     throw new RuntimeException("Invalid order number format");
                 }
             }
-            
-            // Update image if new image is provided
+
+            // Cập nhật ảnh nếu có ảnh mới
             if (image != null && !image.isEmpty()) {
                 if (!fileUploadService.isImage(image)) {
                     throw new RuntimeException("File must be an image");
                 }
-                
+
                 if (!fileUploadService.isValidSize(image)) {
                     throw new RuntimeException("Image size must be less than 10MB");
                 }
-                
-                // Delete old image (non-throwing)
+
+                // Xóa ảnh cũ (không ném ngoại lệ)
                 if (banner.getImageUrl() != null && !banner.getImageUrl().isEmpty()) {
                     fileUploadService.deleteBannerImage(banner.getImageUrl());
                 }
-                
-                // Use orderNumber from user or current count
+
+                // Sử dụng orderNumber từ người dùng hoặc số thứ tự hiện tại
                 if (nn == null) {
                     nn = String.format("%02d", (int) bannerRepository.countAllBanners());
                 }
-                
-                // Use title directly - FileUploadService will sanitize it
+
+                // Sử dụng title trực tiếp - FileUploadService sẽ xử lý nó
                 String key = title != null && !title.isEmpty() ? title : UUID.randomUUID().toString().substring(0, 8);
-                
-                // Upload new image with NN and key (FileUploadService will sanitize the key)
+
+                // Upload ảnh mới với NN và key (FileUploadService sẽ xử lý key)
                 String imageUrl = fileUploadService.uploadBannerImageWithKey(image, nn, key);
                 banner.setImageUrl(imageUrl);
             } else if (nn != null && newOrderNum >= 0 && currentOrderNum != newOrderNum) {
-                // No new image but order number changed - rename existing file
+                // Không có ảnh mới nhưng số thứ tự thay đổi - đổi tên file hiện tại
                 try {
                     String oldUrl = banner.getImageUrl();
                     if (oldUrl != null && oldUrl.contains("/")) {
                         String oldFilename = oldUrl.substring(oldUrl.lastIndexOf('/') + 1);
-                        
-                        // Extract old key and extension
+
+                        // Lấy key và phần mở rộng cũ
                         int underscoreIndex = oldFilename.indexOf('_');
                         if (underscoreIndex > 0) {
                             String extension = oldFilename.substring(oldFilename.lastIndexOf('.'));
-                            
-                            // Generate new key from title or keep old key
+
+                            // Tạo key mới từ title hoặc giữ key cũ
                             String oldKey = oldFilename.substring(underscoreIndex + 1, oldFilename.lastIndexOf('.'));
                             String key = title != null && !title.isEmpty() ? title : oldKey;
-                            
-                            // Sanitize key for filename
-                            String keySlug = key != null && !key.isEmpty() ? 
+
+                            // Xử lý key cho tên file
+                            String keySlug = key != null && !key.isEmpty() ?
                                 sanitizeKey(key) : oldKey;
-                            
+
                             String newFilename = String.format("%s_%s%s", nn, keySlug, extension);
                             String newImageUrl = "/static/images/banners/" + newFilename;
-                            
+
                             // Rename file
                             java.nio.file.Path srcOldPath = java.nio.file.Paths.get("src/main/resources/static/images/banners/" + oldFilename);
                             java.nio.file.Path srcNewPath = java.nio.file.Paths.get("src/main/resources/static/images/banners/" + newFilename);
-                            
+
                             java.nio.file.Path targetOldPath = java.nio.file.Paths.get("target/classes/static/images/banners/" + oldFilename);
                             java.nio.file.Path targetNewPath = java.nio.file.Paths.get("target/classes/static/images/banners/" + newFilename);
-                            
+
                             if (java.nio.file.Files.exists(srcOldPath)) {
                                 java.nio.file.Files.move(srcOldPath, srcNewPath, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
                             }
-                            
+
                             if (java.nio.file.Files.exists(targetOldPath)) {
                                 java.nio.file.Files.move(targetOldPath, targetNewPath, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
                             }
-                            
+
                             banner.setImageUrl(newImageUrl);
                         }
                     }
@@ -240,32 +241,32 @@ public class AdminBannerServiceImpl implements AdminBannerService {
                     throw new RuntimeException("Failed to rename image file: " + e.getMessage());
                 }
             }
-            
+
             banner = bannerRepository.save(banner);
-            
+
             return convertToResponse(banner);
         } catch (IOException e) {
             throw new RuntimeException("Failed to update image: " + e.getMessage());
         }
     }
-    
+
     @Override
     @Transactional
     public void deleteBanner(Integer id) {
         Banner banner = bannerRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Banner not found"));
-        
-        // Delete image file (non-throwing)
+
+        // Xóa file ảnh (không ném ngoại lệ)
         if (banner.getImageUrl() != null && !banner.getImageUrl().isEmpty()) {
             fileUploadService.deleteBannerImage(banner.getImageUrl());
         }
-        
-        // Delete banner
+
+        // Xóa banner
         bannerRepository.delete(banner);
     }
-    
+
     /**
-     * Convert Banner to BannerResponse
+     * Chuyển đổi Banner thành BannerResponse
      */
     private BannerResponse convertToResponse(Banner banner) {
         BannerResponse response = new BannerResponse();
@@ -277,18 +278,18 @@ public class AdminBannerServiceImpl implements AdminBannerService {
         response.setCreatedAt(banner.getCreatedAt().format(DateTimeFormatter.ISO_DATE_TIME));
         return response;
     }
-    
+
     /**
-     * Sanitize title to be URL-friendly (same logic as FileUploadService)
+     * Xử lý title để trở thành URL-friendly (cùng logic với FileUploadService)
      */
     private String sanitizeKey(String key) {
         if (key == null || key.isEmpty()) {
             return UUID.randomUUID().toString().substring(0, 8);
         }
-        
-        // Remove Vietnamese accents first
+
+        // Xóa dấu tiếng Việt trước
         String withoutAccents = removeVietnameseAccents(key);
-        
+
         return withoutAccents.trim()
                   .toLowerCase()
                   .replaceAll("\\s+", "-")
@@ -296,13 +297,15 @@ public class AdminBannerServiceImpl implements AdminBannerService {
                   .replaceAll("-+", "-")
                   .replaceAll("^-|-$", "");
     }
-    
+
     /**
-     * Remove Vietnamese accents/diacritics
+     * Xóa dấu tiếng Việt/dấu mũ
      */
     private String removeVietnameseAccents(String str) {
-        if (str == null) return "";
-        
+        if (str == null) {
+			return "";
+		}
+
         return str
             .replace("à", "a").replace("á", "a").replace("ả", "a").replace("ã", "a").replace("ạ", "a")
             .replace("â", "a").replace("ầ", "a").replace("ấ", "a").replace("ẩ", "a").replace("ẫ", "a").replace("ậ", "a")

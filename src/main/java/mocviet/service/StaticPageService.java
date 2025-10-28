@@ -1,11 +1,12 @@
 package mocviet.service;
 
+import java.util.Optional;
+
+import org.springframework.stereotype.Service;
+
 import lombok.RequiredArgsConstructor;
 import mocviet.entity.StaticPage;
 import mocviet.repository.StaticPageRepository;
-import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -14,14 +15,14 @@ public class StaticPageService {
     private final StaticPageRepository staticPageRepository;
 
     /**
-     * Get static page by slug (for public view)
+     * Lấy trang tĩnh theo slug
      */
     public Optional<StaticPage> getPageBySlug(String slug) {
         return staticPageRepository.findBySlugIgnoreCase(slug);
     }
 
     /**
-     * Check if page exists and is active
+     * Kiểm tra xem trang tĩnh có tồn tại và có hoạt động không
      */
     public boolean isPageActive(String slug) {
         Optional<StaticPage> page = staticPageRepository.findBySlugIgnoreCase(slug);

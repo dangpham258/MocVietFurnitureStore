@@ -14,6 +14,25 @@
         </div>
     </div>
     
+    <!-- Quick Actions -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <div class="d-flex flex-nowrap gap-2 overflow-auto">
+                <a href="/admin/users" class="btn btn-sm btn-outline-primary"><i class="bi bi-people me-2"></i>Users</a>
+                <a href="/admin/colors" class="btn btn-sm btn-outline-secondary"><i class="bi bi-palette me-2"></i>Màu sắc</a>
+                <a href="/admin/categories" class="btn btn-sm btn-outline-success"><i class="bi bi-tags me-2"></i>Danh mục</a>
+                <a href="/admin/coupons" class="btn btn-sm btn-outline-warning"><i class="bi bi-percent me-2"></i>Mã giảm giá</a>
+                <a href="/admin/shipping" class="btn btn-sm btn-outline-danger"><i class="bi bi-truck me-2"></i>Phí vận chuyển</a>
+                <a href="/admin/delivery-teams" class="btn btn-sm btn-outline-primary"><i class="bi bi-person-workspace me-2"></i>Đội giao hàng</a>
+                <a href="/admin/banners" class="btn btn-sm btn-outline-dark"><i class="bi bi-image me-2"></i>Banner</a>
+                <a href="/admin/pages" class="btn btn-sm btn-outline-primary"><i class="bi bi-file-text me-2"></i>Trang tĩnh</a>
+                <a href="/admin/showrooms" class="btn btn-sm btn-outline-success"><i class="bi bi-geo-alt me-2"></i>Showroom</a>
+                <a href="/admin/social-links" class="btn btn-sm btn-outline-secondary"><i class="bi bi-share me-2"></i>Mạng xã hội</a>
+                <a href="/admin/reports" class="btn btn-sm btn-outline-info"><i class="bi bi-graph-up me-2"></i>Báo cáo</a>
+            </div>
+        </div>
+    </div>
+
     <!-- Stats Cards -->
     <div class="row mb-4">
         <div class="col-md-3 mb-3">
@@ -26,7 +45,7 @@
                             </div>
                         </div>
                         <div class="flex-grow-1 ms-3">
-                            <h5 class="card-title mb-0" th:text="${stats.totalUsers}">0</h5>
+                            <h5 id="totalUsers" class="card-title mb-0" th:text="${stats.totalUsers}">0</h5>
                             <small class="text-muted">Tổng Users</small>
                         </div>
                     </div>
@@ -44,7 +63,7 @@
                             </div>
                         </div>
                         <div class="flex-grow-1 ms-3">
-                            <h5 class="card-title mb-0" th:text="${stats.totalCategories}">0</h5>
+                            <h5 id="totalCategories" class="card-title mb-0" th:text="${stats.totalCategories}">0</h5>
                             <small class="text-muted">Danh mục</small>
                         </div>
                     </div>
@@ -62,7 +81,7 @@
                             </div>
                         </div>
                         <div class="flex-grow-1 ms-3">
-                            <h5 class="card-title mb-0" th:text="${stats.totalCoupons}">0</h5>
+                            <h5 id="totalCoupons" class="card-title mb-0" th:text="${stats.totalCoupons}">0</h5>
                             <small class="text-muted">Mã giảm giá</small>
                         </div>
                     </div>
@@ -80,7 +99,7 @@
                             </div>
                         </div>
                         <div class="flex-grow-1 ms-3">
-                            <h5 class="card-title mb-0"><span th:text="${#numbers.formatInteger(stats.revenueThisMonth, 0, 'POINT')}">0</span>đ</h5>
+                            <h5 class="card-title mb-0"><span id="revenueThisMonth" th:text="${#numbers.formatInteger(stats.revenueThisMonth, 0, 'POINT')}">0</span>đ</h5>
                             <small class="text-muted">Doanh thu tháng này</small>
                         </div>
                     </div>
@@ -114,19 +133,19 @@
                     <div class="mb-3">
                         <div class="d-flex justify-content-between align-items-center p-2 bg-light rounded">
                             <span class="text-muted">Hôm nay:</span>
-                            <strong th:text="${stats.ordersToday}">0</strong>
+                            <strong id="ordersToday" th:text="${stats.ordersToday}">0</strong>
                         </div>
                     </div>
                     <div class="mb-3">
                         <div class="d-flex justify-content-between align-items-center p-2 bg-light rounded">
                             <span class="text-muted">Tuần này:</span>
-                            <strong th:text="${stats.ordersThisWeek}">0</strong>
+                            <strong id="ordersThisWeek" th:text="${stats.ordersThisWeek}">0</strong>
                         </div>
                     </div>
                     <div>
                         <div class="d-flex justify-content-between align-items-center p-2 bg-light rounded">
                             <span class="text-muted">Tháng này:</span>
-                            <strong th:text="${stats.ordersThisMonth}">0</strong>
+                            <strong id="ordersThisMonth" th:text="${stats.ordersThisMonth}">0</strong>
                         </div>
                     </div>
                 </div>

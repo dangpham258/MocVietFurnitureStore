@@ -199,3 +199,19 @@ Alternative 5a. Khi thay đổi bộ lọc (không phải "Tùy chỉnh"): tự 
 Exception 8a. Lỗi khi tải dữ liệu từ API 9a. Hiển thị thông báo "Không thể tải báo cáo" 10a. Cho phép thử lại bằng cách chọn bộ lọc khác hoặc bấm "Cập nhật" 8b. Khoảng thời gian không hợp lệ (ngày bắt đầu sau ngày kết thúc) 9b. Hiển thị thông báo "Khoảng thời gian không hợp lệ" 10b. Yêu cầu chọn lại ngày 8c. Lỗi hệ thống khi tính toán thống kê 9c. Hiển thị thông báo "Có lỗi xảy ra khi tính toán báo cáo" 10c. Cho phép thử lại
 
 Bảng 3-12. Use case Báo cáo và thống kê
+
+---
+
+## UC_013 - Quản lý thông báo (Manage notifications)
+
+Use case ID UC_013
+Name Manage notifications
+Goal Quản lý thông báo hệ thống cho Admin: xem danh sách, xem chi tiết, đánh dấu đã đọc, đánh dấu tất cả đã đọc, xóa từng thông báo, xóa tất cả thông báo đã đọc; badge thông báo ở header cập nhật gần realtime (polling)
+Actors Quản trị viên (Admin)
+Pre-conditions Đã đăng nhập vào hệ thống với vai trò ADMIN
+Post-conditions - Nếu thành công, trạng thái đọc/xóa của thông báo được cập nhật và hiển thị ngay ở header - Nếu thất bại, hiển thị thông báo lỗi
+Main Flow 1. Vào trang quản lý thông báo (/admin/notifications) 2. Hệ thống hiển thị 3 thẻ thống kê: Tổng, Chưa đọc, Đã đọc 3. Có bộ lọc Trạng thái (Tất cả/Chưa đọc/Đã đọc) và ô tìm kiếm theo tiêu đề/nội dung 4. Danh sách thông báo hiển thị theo thời gian tạo mới nhất: Tiêu đề, trích nội dung, thời gian tạo, trạng thái (badge) và các nút thao tác (Xem, Đánh dấu đã đọc, Xóa) 5. Click "Xem" để mở modal chi tiết: Tiêu đề, Nội dung, Thời gian tạo, Trạng thái; trong modal có nút "Đánh dấu đã đọc" (ẩn nếu đã đọc) 6. Ở danh sách, click "Đánh dấu đã đọc" trên một thông báo chưa đọc 7. Hệ thống gọi API cập nhật trạng thái đã đọc và refresh danh sách 8. Badge số lượng chưa đọc ở header cập nhật ngay sau thao tác 9. Click "Đánh dấu tất cả đã đọc" để chuyển toàn bộ thông báo sang trạng thái đã đọc 10. Hệ thống gọi API cập nhật hàng loạt, refresh danh sách và badge header 11. Click "Xóa" để xóa một thông báo 12. Xác nhận xóa, hệ thống gọi API xóa và refresh danh sách 13. Click "Xóa tất cả đã đọc" để xóa toàn bộ thông báo đã đọc 14. Hệ thống gọi API xóa hàng loạt và refresh danh sách 15. Header thông báo (badge + dropdown 5 thông báo gần nhất) tự động refresh định kỳ (30s) và hiển thị toast khi có thông báo chưa đọc mới
+Alternative 3a. Reset bộ lọc: bấm "Reset" để về mặc định 4a. Không có thông báo phù hợp: hiển thị empty state "Chưa có thông báo" 5a. Mở modal từ thông báo đã đọc: ẩn nút "Đánh dấu đã đọc" 9a. Khi điều hướng AJAX: module header vẫn polling 30s để cập nhật badge 11a. Có thể truy cập trang quản lý từ dropdown header ("Xem tất cả")
+Exception 7a. Lỗi khi đánh dấu đã đọc 8a. Hiển thị "Không thể đánh dấu đã đọc" 9b. Lỗi khi đánh dấu tất cả đã đọc 10b. Hiển thị "Không thể đánh dấu tất cả đã đọc" 12a. Lỗi khi xóa thông báo 12b. Hiển thị "Không thể xóa thông báo" 14a. Lỗi khi xóa tất cả đã đọc 14b. Hiển thị "Không thể xóa tất cả đã đọc" 15a. Lỗi khi tải danh sách 15b. Hiển thị "Không thể tải thông báo"
+
+Bảng 3-13. Use case Quản lý thông báo

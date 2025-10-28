@@ -21,7 +21,7 @@ class CouponsManagement {
     }
     
     /**
-     * Load all coupons from API
+     * Tải danh sách mã giảm giá từ API
      */
     async loadCoupons() {
         try {
@@ -41,22 +41,22 @@ class CouponsManagement {
     }
     
     /**
-     * Bind event listeners
+     * Xử lý sự kiện
      */
     bindEvents() {
-        // Search input
+        // Tìm kiếm
         const searchInput = document.getElementById('searchInput');
         if (searchInput) {
             searchInput.addEventListener('input', () => this.applyFilters());
         }
         
-        // Status filter
+        // Trạng thái filter
         const statusFilter = document.getElementById('filterStatus');
         if (statusFilter) {
             statusFilter.addEventListener('change', () => this.applyFilters());
         }
         
-        // Validity filter
+        // Hiệu lực filter
         const validityFilter = document.getElementById('filterValidity');
         if (validityFilter) {
             validityFilter.addEventListener('change', () => this.applyFilters());
@@ -64,7 +64,7 @@ class CouponsManagement {
     }
     
     /**
-     * Apply filters to coupons list
+     * Áp dụng filters cho danh sách mã giảm giá
      */
     applyFilters() {
         const searchTerm = document.getElementById('searchInput').value.toLowerCase();
@@ -72,17 +72,17 @@ class CouponsManagement {
         const validityFilter = document.getElementById('filterValidity').value;
         
         this.filteredCoupons = this.coupons.filter(coupon => {
-            // Search filter
+            // Tìm kiếm filter
             const matchesSearch = !searchTerm || 
                 coupon.code.toLowerCase().includes(searchTerm) ||
                 coupon.discountPercent.toString().includes(searchTerm);
             
-            // Status filter
+            // Trạng thái filter
             const matchesStatus = !statusFilter || 
                 (statusFilter === 'active' && coupon.active) ||
                 (statusFilter === 'inactive' && !coupon.active);
             
-            // Validity filter
+            // Hiệu lực filter
             let matchesValidity = true;
             if (validityFilter) {
                 const now = new Date();
@@ -107,7 +107,7 @@ class CouponsManagement {
     }
     
     /**
-     * Render coupons list
+     * Render danh sách mã giảm giá
      */
     renderCoupons() {
         const container = document.getElementById('couponsContainer');
@@ -141,7 +141,7 @@ class CouponsManagement {
     }
     
     /**
-     * Render individual coupon card
+     * Render card mã giảm giá
      */
     renderCouponCard(coupon) {
         const now = new Date();
@@ -218,7 +218,7 @@ class CouponsManagement {
     }
     
     /**
-     * Render pagination
+     * Render phân trang
      */
     renderPagination() {
         const totalPages = Math.ceil(this.filteredCoupons.length / this.itemsPerPage);
@@ -254,7 +254,7 @@ class CouponsManagement {
     }
     
     /**
-     * Update stats
+     * Cập nhật stats
      */
     updateStats() {
         const now = new Date();
@@ -279,7 +279,7 @@ class CouponsManagement {
     }
     
     /**
-     * Create coupon
+     * Tạo mã giảm giá
      */
     async createCoupon() {
         const code = document.getElementById('couponCode').value;
@@ -289,7 +289,7 @@ class CouponsManagement {
         const minOrderAmount = parseFloat(document.getElementById('minOrderAmount').value) || 0;
         const isActive = document.getElementById('couponIsActive').checked;
         
-        // Validate
+        // Kiểm tra các trường bắt buộc
         if (!code || !discountPercent || !startDate || !endDate) {
             this.showNotification('Vui lòng nhập đầy đủ thông tin bắt buộc', 'warning');
             return;
@@ -344,7 +344,7 @@ class CouponsManagement {
     }
     
     /**
-     * Edit coupon
+     * Chỉnh sửa mã giảm giá
      */
     async editCoupon(code) {
         const coupon = this.coupons.find(c => c.code === code);
@@ -368,7 +368,7 @@ class CouponsManagement {
     }
     
     /**
-     * Update coupon
+     * Cập nhật mã giảm giá
      */
     async updateCoupon() {
         const code = document.getElementById('editCouponCode').value;
@@ -378,7 +378,7 @@ class CouponsManagement {
         const minOrderAmount = parseFloat(document.getElementById('editMinOrderAmount').value) || 0;
         const isActive = document.getElementById('editCouponIsActive').checked;
         
-        // Validate
+        // Kiểm tra các trường bắt buộc
         if (!discountPercent || !startDate || !endDate) {
             this.showNotification('Vui lòng nhập đầy đủ thông tin bắt buộc', 'warning');
             return;
@@ -431,7 +431,7 @@ class CouponsManagement {
     }
     
     /**
-     * Toggle coupon status
+     * Thay đổi trạng thái mã giảm giá
      */
     async toggleCouponStatus(code) {
         try {
@@ -464,7 +464,7 @@ class CouponsManagement {
     }
     
     /**
-     * Helper: Show notification
+     * Helper: Hiển thị thông báo
      */
     showNotification(message, type = 'info') {
         if (window.notificationSystem) {
@@ -489,7 +489,7 @@ class CouponsManagement {
     }
     
     /**
-     * Helper: Format date for input
+     * Helper: Format date cho input
      */
     formatDateInput(dateString) {
         const date = new Date(dateString);
@@ -511,10 +511,10 @@ class CouponsManagement {
     }
 }
 
-// Global instance
+// Instance global
 let couponsManagement;
 
-// Initialize Coupons Management
+// Khởi tạo Coupons Management
 function initializeCouponsManagement() {
     if (couponsManagement) {
         delete couponsManagement;
@@ -522,7 +522,7 @@ function initializeCouponsManagement() {
     couponsManagement = new CouponsManagement();
 }
 
-// Global functions for onclick handlers
+// Global functions cho onclick handlers
 function createCoupon() {
     if (couponsManagement) {
         couponsManagement.createCoupon();
@@ -560,6 +560,6 @@ function goToPage(page) {
     }
 }
 
-// Export for admin.js
+// Export cho admin.js
 window.initializeCouponsManagement = initializeCouponsManagement;
 

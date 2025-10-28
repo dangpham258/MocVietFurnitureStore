@@ -1,3 +1,9 @@
+// ========================================
+// NOTIFICATIONS MANAGEMENT JAVASCRIPT
+// ========================================
+
+console.log('Notifications Management JS loaded successfully!');
+
 (function() {
     'use strict';
 
@@ -8,6 +14,8 @@
             this.filteredNotifications = [];
             this.currentFilter = 'all';
             this.searchTerm = '';
+            this.currentPage = 1;
+            this.pageSize = 10;
             this.init();
         }
 
@@ -23,7 +31,8 @@
                 const data = await response.json();
                 this.currentNotifications = data.notifications || [];
                 this.filteredNotifications = [...this.currentNotifications];
-                this.renderNotifications();
+            this.currentPage = 1;
+            this.renderNotifications();
                 this.updateStats();
             } catch (error) {
                 console.error('Error loading notifications:', error);
@@ -45,7 +54,12 @@
                 return;
             }
 
-            container.innerHTML = this.filteredNotifications.map(notif => `
+            // Phân trang slice
+            const start = (this.currentPage - 1) * this.pageSize;
+            const end = start + this.pageSize;
+            const pageItems = this.filteredNotifications.slice(start, end);
+
+            container.innerHTML = pageItems.map(notif => `
                 <div class="d-flex align-items-start p-3 border-bottom ${!notif.isRead ? 'bg-light' : ''}" data-notification-id="${notif.id}">
                     <div class="flex-shrink-0 me-3">
                         <i class="bi ${this.getIconForTitle(notif.title)} ${!notif.isRead ? 'text-primary' : 'text-muted'} fs-4"></i>
@@ -77,9 +91,50 @@
                     </div>
                 </div>
             `).join('');
+
+            // Render controls phân trang
+            this.renderPagination();
         }
 
-        getIconForTitle(title) {
+        renderPagination() {
+            const container = document.getElementById('notificationsList');
+            if (!container) return;
+            const totalPages = Math.ceil(this.filteredNotifications.length / this.pageSize);
+            if (totalPages <= 1) return;
+
+            const pagination = document.createElement('div');
+            pagination.className = 'd-flex justify-content-between align-items-center pt-3';
+
+            const info = document.createElement('small');
+            const start = (this.currentPage - 1) * this.pageSize + 1;
+            const end = Math.min(this.currentPage * this.pageSize, this.filteredNotifications.length);
+            info.className = 'text-muted';
+            info.textContent = `Hiển thị ${start}-${end} / ${this.filteredNotifications.length}`;
+
+            const controls = document.createElement('div');
+            controls.className = 'btn-group';
+            const prevBtn = document.createElement('button');
+            prevBtn.className = 'btn btn-sm btn-outline-secondary';
+            prevBtn.innerHTML = '<i class="bi bi-chevron-left"></i>';
+            prevBtn.disabled = this.currentPage === 1;
+            prevBtn.onclick = () => { this.currentPage--; this.renderNotifications(); };
+
+            const nextBtn = document.createElement('button');
+            nextBtn.className = 'btn btn-sm btn-outline-secondary';
+            nextBtn.innerHTML = '<i class="bi bi-chevron-right"></i>';
+            nextBtn.disabled = this.currentPage >= totalPages;
+            nextBtn.onclick = () => { this.currentPage++; this.renderNotifications(); };
+
+            controls.appendChild(prevBtn);
+            controls.appendChild(nextBtn);
+
+            pagination.appendChild(info);
+            pagination.appendChild(controls);
+
+            container.appendChild(pagination);
+        }
+
+        getIconForTitle(title) { // Lấy icon cho tiêu đề
             if (title.includes('bài viết')) return 'bi-file-text';
             if (title.includes('đơn hàng')) return 'bi-cart';
             if (title.includes('review')) return 'bi-star';
@@ -136,6 +191,7 @@
                 return matchesSearch && matchesStatus;
             });
 
+            this.currentPage = 1;
             this.renderNotifications();
         }
 
@@ -162,7 +218,7 @@
             if (messageTextEl) messageTextEl.textContent = notification.message || 'Không có nội dung';
             if (createdAtTextEl) createdAtTextEl.textContent = this.formatDate(notification.createdAt);
 
-            // Show/hide mark as read button based on isRead status
+            // Hiển thị/ẩn button đánh dấu đã đọc dựa trên trạng thái isRead
             if (markAsReadBtn) {
                 if (notification.isRead) {
                     markAsReadBtn.style.display = 'none';
@@ -171,7 +227,7 @@
                 }
             }
 
-            // Store current notification ID for mark as read
+            // Lưu ID thông báo hiện tại để đánh dấu đã đọc
             this.currentViewingId = id;
 
             const modalEl = document.getElementById('viewNotificationModal');
@@ -191,6 +247,11 @@
 
                 await this.loadNotifications();
                 this.showNotification('Đã đánh dấu đã đọc', 'success');
+                
+                // Refresh header thông báo
+                if (typeof loadHeaderNotifications === 'function') {
+                    loadHeaderNotifications();
+                }
             } catch (error) {
                 console.error('Error marking as read:', error);
                 this.showNotification('Không thể đánh dấu đã đọc', 'danger');
@@ -214,6 +275,11 @@
 
                 await this.loadNotifications();
                 this.showNotification('Đã đánh dấu tất cả đã đọc', 'success');
+                
+                // Refresh header thông báo
+                if (typeof loadHeaderNotifications === 'function') {
+                    loadHeaderNotifications();
+                }
             } catch (error) {
                 console.error('Error marking all as read:', error);
                 this.showNotification('Không thể đánh dấu tất cả đã đọc', 'danger');
@@ -232,6 +298,11 @@
 
                 await this.loadNotifications();
                 this.showNotification('Đã xóa thông báo', 'success');
+                
+                // Refresh header thông báo
+                if (typeof loadHeaderNotifications === 'function') {
+                    loadHeaderNotifications();
+                }
             } catch (error) {
                 console.error('Error deleting notification:', error);
                 this.showNotification('Không thể xóa thông báo', 'danger');
@@ -250,6 +321,11 @@
 
                 await this.loadNotifications();
                 this.showNotification('Đã xóa tất cả thông báo đã đọc', 'success');
+                
+                // Refresh header notifications
+                if (typeof loadHeaderNotifications === 'function') {
+                    loadHeaderNotifications();
+                }
             } catch (error) {
                 console.error('Error deleting all read:', error);
                 this.showNotification('Không thể xóa thông báo', 'danger');
@@ -270,7 +346,7 @@
         }
     }
 
-    // Initialize when DOM is ready
+    // Khởi tạo khi DOM đã tải xong
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', function() {
             window.notificationsManagement = new NotificationsManagement();

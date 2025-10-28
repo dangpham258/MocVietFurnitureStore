@@ -1,14 +1,15 @@
 package mocviet.controller;
 
-import lombok.RequiredArgsConstructor;
-import mocviet.entity.StaticPage;
-import mocviet.service.StaticPageService;
+import java.util.Optional;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-import java.util.Optional;
+import lombok.RequiredArgsConstructor;
+import mocviet.entity.StaticPage;
+import mocviet.service.StaticPageService;
 
 @Controller
 @RequiredArgsConstructor
@@ -17,46 +18,46 @@ public class StaticPageController {
     private final StaticPageService staticPageService;
 
     /**
-     * Render static page by slug
+     * Render static page theo đường dẫn slug
      * Route: /{slug}
      * Example: /chinh-sach-ban-hang
      */
     @GetMapping("/{slug}")
     public String renderPage(@PathVariable String slug, Model model) {
-        // List of reserved paths that should not be handled by static pages
+        // Danh sách các đường dẫn được giữ nguyên bởi các controller khác
         String[] reservedPaths = {
             "login", "register", "logout", "admin", "manager", "delivery", "customer",
             "profile", "orders", "cart", "wishlist", "api", "auth", "css", "js", "images"
         };
-        
-        // Check if slug is a reserved path
+
+        // Kiểm tra xem slug có phải là đường dẫn được giữ nguyên không
         for (String reserved : reservedPaths) {
             if (slug.equals(reserved) || slug.startsWith(reserved + "/")) {
-                // Let other controllers handle this
+                // Cho phép các controller khác xử lý
                 return "forward:/";
             }
         }
-        
+
         Optional<StaticPage> pageOpt = staticPageService.getPageBySlug(slug);
-        
+
         if (pageOpt.isEmpty()) {
-            // Page not found - return home page instead of redirect
+            // Trang không tồn tại - chuyển hướng đến trang chủ thay vì redirect
             return "redirect:/";
         }
-        
+
         StaticPage page = pageOpt.get();
-        
-        // Check if page is active
+
+        // Kiểm tra xem trang có hoạt động không
         if (!page.getIsActive()) {
-            // Page exists but is inactive - return home page instead of redirect
+            // Trang tồn tại nhưng không hoạt động - chuyển hướng đến trang chủ thay vì redirect
             return "redirect:/";
         }
-        
-        // Add page data to model
+
+        // Thêm dữ liệu trang vào model
         model.addAttribute("page", page);
         model.addAttribute("pageTitle", page.getTitle());
-        
-        // Render the static page template
+
+        // Render template trang tĩnh
         return "static-page";
     }
 }

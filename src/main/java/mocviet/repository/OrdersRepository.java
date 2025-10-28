@@ -1,47 +1,45 @@
 package mocviet.repository;
 
-import mocviet.entity.Orders;
+import java.time.LocalDateTime;
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDateTime;
-import java.util.List;
+import mocviet.entity.Orders;
 
 @Repository
 public interface OrdersRepository extends JpaRepository<Orders, Integer> {
-    
-    /**
-     * Count orders by status
-     */
+
     long countByStatus(Orders.OrderStatus status);
-    
+
     /**
-     * Find orders by date range
+     * Tìm đơn hàng theo khoảng thời gian
      */
     List<Orders> findByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
-    
+
     /**
-     * Calculate total revenue from delivered orders
+     * Tính tổng doanh thu từ đơn hàng đã giao
      */
     @Query("SELECT COALESCE(SUM(oi.qty * oi.unitPrice), 0) " +
            "FROM OrderItem oi " +
            "JOIN oi.order o " +
            "WHERE o.status = :status " +
            "AND o.createdAt BETWEEN :start AND :end")
-    Long calculateRevenue(@Param("status") Orders.OrderStatus status, 
-                          @Param("start") LocalDateTime start, 
+    Long calculateRevenue(@Param("status") Orders.OrderStatus status,
+                          @Param("start") LocalDateTime start,
                           @Param("end") LocalDateTime end);
-    
+
     /**
-     * Count total orders
+     * Đếm tổng số đơn hàng
      */
     @Query("SELECT COUNT(o) FROM Orders o WHERE o.createdAt BETWEEN :start AND :end")
     long countOrdersInPeriod(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
-    
+
     /**
-     * Calculate average order value
+     * Tính trung bình giá trị đơn hàng
      */
     @Query("SELECT COALESCE(AVG(oi.qty * oi.unitPrice), 0) " +
            "FROM OrderItem oi " +
@@ -49,11 +47,11 @@ public interface OrdersRepository extends JpaRepository<Orders, Integer> {
            "WHERE o.status = :status " +
            "AND o.createdAt BETWEEN :start AND :end")
     Double calculateAverageOrderValue(@Param("status") Orders.OrderStatus status,
-                                      @Param("start") LocalDateTime start, 
+                                      @Param("start") LocalDateTime start,
                                       @Param("end") LocalDateTime end);
-    
+
     /**
-     * Get revenue by date (for chart) - SQL Server syntax
+     * Lấy doanh thu theo ngày (cho biểu đồ) - cú pháp SQL Server
      */
     @Query("SELECT CAST(o.createdAt AS DATE) as date, " +
            "COALESCE(SUM(oi.qty * oi.unitPrice), 0) as revenue " +
@@ -66,27 +64,27 @@ public interface OrdersRepository extends JpaRepository<Orders, Integer> {
     List<Object[]> getRevenueByDate(@Param("status") Orders.OrderStatus status,
                                     @Param("start") LocalDateTime start,
                                     @Param("end") LocalDateTime end);
-    
+
     /**
-     * Get count of distinct customers who placed orders
+     * Đếm số lượng khách hàng đặt hàng
      */
     @Query("SELECT COUNT(DISTINCT o.user.id) " +
            "FROM Orders o " +
            "WHERE o.createdAt BETWEEN :start AND :end")
-    long countDistinctCustomers(@Param("start") LocalDateTime start, 
+    long countDistinctCustomers(@Param("start") LocalDateTime start,
                                @Param("end") LocalDateTime end);
-    
+
     /**
-     * Count orders by status within date range
+     * Đếm đơn hàng theo trạng thái trong khoảng thời gian
      */
     @Query("SELECT COUNT(o) FROM Orders o " +
            "WHERE o.status = :status AND o.createdAt BETWEEN :start AND :end")
     long countByStatusInPeriod(@Param("status") Orders.OrderStatus status,
                               @Param("start") LocalDateTime start,
                               @Param("end") LocalDateTime end);
-    
+
     /**
-     * Get top products by revenue
+     * Lấy sản phẩm top theo doanh thu
      */
     @Query("SELECT p.id, p.name, " +
            "SUM(oi.qty) as totalSold, " +
@@ -102,9 +100,9 @@ public interface OrdersRepository extends JpaRepository<Orders, Integer> {
     List<Object[]> findTopProductsByRevenue(@Param("status") Orders.OrderStatus status,
                                            @Param("start") LocalDateTime start,
                                            @Param("end") LocalDateTime end);
-    
+
     /**
-     * Get top customers by total spent (only DELIVERED orders)
+     * Lấy khách hàng top theo tổng chi tiêu (chỉ đơn hàng đã giao)
      */
     @Query("SELECT u.id, u.fullName, u.email, " +
            "COUNT(DISTINCT o.id) as orderCount, " +
@@ -119,9 +117,9 @@ public interface OrdersRepository extends JpaRepository<Orders, Integer> {
     List<Object[]> findTopCustomers(@Param("status") Orders.OrderStatus status,
                                     @Param("start") LocalDateTime start,
                                     @Param("end") LocalDateTime end);
-    
+
     /**
-     * Get revenue by category (native SQL for SQL Server)
+     * Lấy doanh thu theo danh mục (cú pháp SQL Server)
      */
     @Query(value = "SELECT c.name, " +
            "COALESCE(SUM(oi.qty * oi.unit_price), 0) as revenue, " +

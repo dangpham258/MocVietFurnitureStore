@@ -12,12 +12,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class FileUploadService {
-    
-    // Use both locations for file serving compatibility
+
+    // Sử dụng cả 2 vị trí cho tương thích với việc phục vụ file
     private static final String SRC_DIR = "src/main/resources/static/images/";
     private static final String TARGET_DIR = "target/classes/static/images/";
     private static final String BANNER_DIR = "banners/";
-    
+
     /**
      * Upload banner image with NN and key
      * Format: NN_<key>.<ext> (e.g., 12_aa.jpg)
@@ -29,69 +29,71 @@ public class FileUploadService {
         if (file == null || file.isEmpty()) {
             throw new IllegalArgumentException("File is empty");
         }
-        
-        // Create upload directories (both src and target for compatibility)
+
+        // Tạo thư mục upload (cả src và target cho tương thích)
         Path srcBannerPath = Paths.get(SRC_DIR + BANNER_DIR);
         Path targetBannerPath = Paths.get(TARGET_DIR + BANNER_DIR);
-        
+
         Files.createDirectories(srcBannerPath);
         Files.createDirectories(targetBannerPath);
-        
-        // Generate filename following the pattern: NN_key.ext
+
+        // Tạo tên file theo pattern: NN_key.ext
         String originalFilename = file.getOriginalFilename();
         String extension = "";
-        
-        // Extract extension safely
+
+        // Lấy extension an toàn
         if (originalFilename != null && originalFilename.contains(".")) {
             extension = originalFilename.substring(originalFilename.lastIndexOf("."));
         }
-        
-        // Default to .jpg if no extension found
+
+        // Mặc định là .jpg nếu không tìm thấy extension
         if (extension.isEmpty()) {
             extension = ".jpg";
         }
-        
-        // Create key-based filename
-        String keySlug = key != null && !key.isEmpty() 
-            ? sanitizeKey(key) 
+
+        // Tạo tên file dựa trên key
+        String keySlug = key != null && !key.isEmpty()
+            ? sanitizeKey(key)
             : UUID.randomUUID().toString().substring(0, 8);
-        
+
         String filename = String.format("%s_%s%s", nn, keySlug, extension);
-        
-        // Save file to both locations
+
+        // Lưu file vào cả 2 vị trí
         Path srcFilePath = srcBannerPath.resolve(filename);
         Path targetFilePath = targetBannerPath.resolve(filename);
-        
+
         Files.copy(file.getInputStream(), srcFilePath, StandardCopyOption.REPLACE_EXISTING);
         Files.copy(file.getInputStream(), targetFilePath, StandardCopyOption.REPLACE_EXISTING);
-        
-        // Return URL path
+
+        // Trả về đường dẫn URL
         return "/static/images/banners/" + filename;
     }
-    
-    
+
+
     /**
-     * Sanitize key to be URL-friendly (lowercase, convert spaces to dashes)
+     * Sanitize key để trở thành URL-friendly (chữ thường, chuyển khoảng trắng thành dấu gạch ngang)
      * Vietnamese characters are preserved
      */
     private String sanitizeKey(String key) {
-        // Remove Vietnamese accents first
+        // Xóa dấu tiếng Việt trước
         String withoutAccents = removeVietnameseAccents(key);
-        
+
         return withoutAccents.trim()
                   .toLowerCase()
-                  .replaceAll("\\s+", "-")  // Convert spaces to dashes
-                  .replaceAll("[^a-z0-9\\-]", "")  // Remove special chars except dashes
-                  .replaceAll("-+", "-")  // Replace multiple dashes with single dash
-                  .replaceAll("^-|-$", "");  // Remove leading/trailing dashes
+                  .replaceAll("\\s+", "-")  // Chuyển khoảng trắng thành dấu gạch ngang
+                  .replaceAll("[^a-z0-9\\-]", "")  // Xóa các ký tự đặc biệt ngoại trừ dấu gạch ngang
+                  .replaceAll("-+", "-")  // Thay thế nhiều dấu gạch ngang bằng một dấu gạch ngang
+                  .replaceAll("^-|-$", "");  // Xóa dấu gạch ngang đầu/cuối
     }
-    
+
     /**
-     * Remove Vietnamese accents/diacritics
+     * Xóa dấu tiếng Việt/dấu mũ
      */
     private String removeVietnameseAccents(String str) {
-        if (str == null) return "";
-        
+        if (str == null) {
+			return "";
+		}
+
         return str
             .replace("à", "a").replace("á", "a").replace("ả", "a").replace("ã", "a").replace("ạ", "a")
             .replace("â", "a").replace("ầ", "a").replace("ấ", "a").replace("ẩ", "a").replace("ẫ", "a").replace("ậ", "a")
@@ -120,42 +122,42 @@ public class FileUploadService {
             .replace("Ư", "U").replace("Ừ", "U").replace("Ứ", "U").replace("Ử", "U").replace("Ữ", "U").replace("Ự", "U")
             .replace("Ỳ", "Y").replace("Ý", "Y").replace("Ỷ", "Y").replace("Ỹ", "Y").replace("Ỵ", "Y");
     }
-    
+
     /**
-     * Delete banner image from both locations
+     * Xóa ảnh banner từ cả 2 vị trí
      */
     public void deleteBannerImage(String imageUrl) {
         if (imageUrl == null || imageUrl.isEmpty()) {
             return;
         }
-        
+
         try {
-            // Extract filename from URL
+            // Lấy tên file từ URL
             int lastIndex = imageUrl.lastIndexOf("/");
             if (lastIndex == -1) {
                 return;
             }
-            
+
             String filename = imageUrl.substring(lastIndex + 1);
-            
-            // Delete from both locations
+
+            // Xóa từ cả 2 vị trí
             Path srcFilePath = Paths.get(SRC_DIR + BANNER_DIR + filename);
             if (Files.exists(srcFilePath)) {
                 Files.delete(srcFilePath);
             }
-            
+
             Path targetFilePath = Paths.get(TARGET_DIR + BANNER_DIR + filename);
             if (Files.exists(targetFilePath)) {
                 Files.delete(targetFilePath);
             }
         } catch (IOException e) {
-            // Log error but don't throw (silent fail for deletion)
+            // Log lỗi nhưng không ném (silent fail cho việc xóa)
             System.err.println("Failed to delete banner image: " + imageUrl);
         }
     }
-    
+
     /**
-     * Check if file is an image
+     * Kiểm tra xem file có phải là ảnh không
      */
     public boolean isImage(MultipartFile file) {
         if (file == null) {
@@ -164,9 +166,9 @@ public class FileUploadService {
         String contentType = file.getContentType();
         return contentType != null && contentType.startsWith("image/");
     }
-    
+
     /**
-     * Validate file size (max 10MB)
+     * Kiểm tra kích thước file (tối đa 10MB)
      */
     public boolean isValidSize(MultipartFile file) {
         if (file == null) {

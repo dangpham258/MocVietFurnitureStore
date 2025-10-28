@@ -1,7 +1,8 @@
 package mocviet.dto.admin;
 
-import lombok.Data;
 import java.util.List;
+
+import lombok.Data;
 
 @Data
 public class DeliveryTeamResponse {
@@ -13,7 +14,7 @@ public class DeliveryTeamResponse {
     private String userName;
     private String userEmail;
     private List<ZoneInfo> zones;
-    
+
     @Data
     public static class ZoneInfo {
         private Integer id;

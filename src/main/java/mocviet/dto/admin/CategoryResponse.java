@@ -11,7 +11,7 @@ public class CategoryResponse {
     private String slug;
     private String type;
     private Boolean isActive;
-    private Boolean hasProducts; // Indicates if this category has associated products
-    private Boolean hasChildren; // Indicates if this category has child categories
+    private Boolean hasProducts; // Xác định xem danh mục có sản phẩm hay không
+    private Boolean hasChildren; // Xác định xem danh mục có danh mục con hay không
 }
 

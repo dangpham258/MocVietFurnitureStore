@@ -27,30 +27,30 @@ import mocviet.service.admin.AdminUserService;
 @RequestMapping("/admin/users/api")
 @RequiredArgsConstructor
 public class UsersApiController {
-    
+
     private final AdminUserService adminUserService;
-    
+
     @GetMapping("/list")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<UserResponse>> getAllUsers() {
         List<UserResponse> users = adminUserService.getAllUsers();
         return ResponseEntity.ok(users);
     }
-    
+
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserResponse> getUserById(@PathVariable Integer id) {
         UserResponse user = adminUserService.getUserById(id);
         return ResponseEntity.ok(user);
     }
-    
+
     @GetMapping("/search")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<UserResponse>> searchUsers(@RequestParam String keyword) {
         List<UserResponse> users = adminUserService.searchUsers(keyword);
         return ResponseEntity.ok(users);
     }
-    
+
     @PostMapping("/create")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> createUser(@Valid @RequestBody UserCreateRequest request) {
@@ -64,30 +64,30 @@ public class UsersApiController {
             return ResponseEntity.badRequest().body(response);
         }
     }
-    
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidationExceptions(MethodArgumentNotValidException ex) {
         Map<String, Object> response = new HashMap<>();
         response.put("success", false);
-        
+
         Map<String, String> errors = new HashMap<>();
         List<String> errorMessages = new java.util.ArrayList<>();
-        
+
         ex.getBindingResult().getAllErrors().forEach((error) -> {
             String fieldName = ((FieldError) error).getField();
             String errorMsg = error.getDefaultMessage();
             errors.put(fieldName, errorMsg);
             errorMessages.add(errorMsg);
         });
-        
+
         // Sử dụng message đầu tiên làm message chính
         String mainMessage = errorMessages.isEmpty() ? "Validation failed" : errorMessages.get(0);
         response.put("message", mainMessage);
         response.put("errors", errors);
-        
+
         return ResponseEntity.badRequest().body(response);
     }
-    
+
     @PostMapping("/{id}/toggle-status")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> toggleUserStatus(@PathVariable Integer id) {

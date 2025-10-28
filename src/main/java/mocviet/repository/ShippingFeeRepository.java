@@ -1,10 +1,11 @@
 package mocviet.repository;
 
-import mocviet.entity.ShippingFee;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
+import mocviet.entity.ShippingFee;
 
 @Repository
 public interface ShippingFeeRepository extends JpaRepository<ShippingFee, Integer> {

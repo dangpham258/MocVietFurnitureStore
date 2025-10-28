@@ -114,39 +114,39 @@ class OTPVerification {
      * Bind events
      */
     bindEvents() {
-        // Profile form submit - Force override
+        // Gửi form profile - Force override
         const profileForm = document.querySelector('form[action*="/admin/profile/update"]');
         if (profileForm) {
-            // Remove all existing event listeners by cloning
+            // Xóa tất cả các event listeners hiện có bằng cách clone
             const newProfileForm = profileForm.cloneNode(true);
             profileForm.parentNode.replaceChild(newProfileForm, profileForm);
             
-            // Add our event listener with capture=true to ensure it runs first
+            // Thêm event listener với capture=true để đảm bảo nó chạy đầu tiên
             newProfileForm.addEventListener('submit', (e) => this.handleProfileSubmit(e), true);
             console.log('Profile form event listener bound (OTP override)');
         }
         
-        // Password form submit - Force override
+        // Gửi form password - Force override
         const passwordForm = document.querySelector('form[action*="/admin/profile/change-password"]');
         if (passwordForm) {
-            // Remove all existing event listeners by cloning
+            // Xóa tất cả các event listeners hiện có bằng cách clone
             const newPasswordForm = passwordForm.cloneNode(true);
             passwordForm.parentNode.replaceChild(newPasswordForm, passwordForm);
             
-            // Add our event listener with capture=true to ensure it runs first
+            // Thêm event listener với capture=true để đảm bảo nó chạy đầu tiên
             newPasswordForm.addEventListener('submit', (e) => this.handlePasswordSubmit(e), true);
             console.log('Password form event listener bound (OTP override)');
         }
         
-        // OTP form events will be bound when modal is created
+        // Event form OTP sẽ được bind khi modal được tạo
         this.bindOTPEvents();
     }
     
     /**
-     * Bind OTP modal events
+     * Bind event form OTP modal
      */
     bindOTPEvents() {
-        // Wait for modal to be created
+        // Chờ modal được tạo
         setTimeout(() => {
             const verifyBtn = document.getElementById('verifyOtpBtn');
             const resendBtn = document.getElementById('resendOtpBtn');
@@ -164,7 +164,7 @@ class OTPVerification {
     }
     
     /**
-     * Handle profile form submission
+     * Xử lý gửi form profile
      */
     async handleProfileSubmit(event) {
         console.log('OTP: Profile form submit intercepted!');
@@ -182,16 +182,16 @@ class OTPVerification {
         
         console.log('OTP: Form data:', data);
         
-        // Convert date string to proper format if exists
+        // Chuyển đổi chuỗi ngày thành định dạng chuẩn nếu có
         if (data.dob) {
             const date = new Date(data.dob);
             data.dob = date.toISOString().split('T')[0];
         }
         
-        // Loại bỏ OTP field khi gửi request send-otp
+        // Loại bỏ trường OTP khi gửi request send-otp
         delete data.otpCode;
         
-        // Kiểm tra xem có thay đổi gì không
+        // Kiểm tra xem có thay đổi gì không (so sánh dữ liệu ban đầu và dữ liệu mới)
         if (this.originalFormData) {
             const hasChanges = this.hasChanges(data, this.originalFormData);
             
@@ -202,13 +202,13 @@ class OTPVerification {
             }
         }
         
-        // Hiển thị notification đang xử lý
+        // Hiển thị thông báo đang xử lý
         this.showNotification('Đang xử lý thông tin...', 'info');
         
-        // Bỏ qua HTML5 validation, để backend DTO handle
+        // Bỏ qua validation HTML5, để backend DTO handle
         console.log('OTP: Form data collected, sending to backend for validation');
         
-        // Store form data and show OTP modal
+        // Lưu dữ liệu form và hiển thị modal OTP
         this.currentForm = form;
         this.currentFormData = data;
         this.otpEndpoint = '/admin/profile/send-otp';
@@ -239,14 +239,14 @@ class OTPVerification {
     }
     
     /**
-     * Handle password form submission
+     * Xử lý gửi form password
      */
     async handlePasswordSubmit(event) {
         event.preventDefault();
         
         if (this.isProcessing) return;
         
-        // Hiển thị notification đang xử lý
+        // Hiển thị thông báo đang xử lý
         this.showNotification('Đang xử lý mật khẩu...', 'info');
         
         const form = event.target;
@@ -255,17 +255,17 @@ class OTPVerification {
         
         console.log('OTP: Password form data:', data);
         
-        // Loại bỏ OTP field khi gửi request send-password-otp
+        // Loại bỏ trường OTP khi gửi request send-password-otp
         delete data.otpCode;
         
-        // Bỏ qua HTML5 validation, để backend DTO handle
+        // Bỏ qua validation HTML5, để backend DTO handle
         console.log('OTP: Password form data collected, sending to backend for validation');
         
-        // Validate password confirmation (chỉ check cơ bản)
+        // Validate password confirmation (chỉ kiểm tra cơ bản)
         if (data.newPassword !== data.confirmPassword) {
             console.log('OTP: Password confirmation mismatch');
             
-            // Highlight confirm password field
+            // Highlight trường password xác nhận
             const confirmPasswordField = form.querySelector('input[name="confirmPassword"]');
             if (confirmPasswordField) {
                 confirmPasswordField.classList.add('is-invalid');
@@ -278,7 +278,7 @@ class OTPVerification {
         
         console.log('OTP: Password form data collected, sending to backend for validation');
         
-        // Store form data and show OTP modal
+        // Lưu dữ liệu form và hiển thị modal OTP
         this.currentForm = form;
         this.currentFormData = data;
         this.otpEndpoint = '/admin/profile/send-password-otp';
@@ -288,16 +288,16 @@ class OTPVerification {
     }
     
     /**
-     * Show OTP modal and send OTP
+     * Hiển thị modal OTP và gửi OTP
      */
     async showOTPModal(type) {
         try {
             this.isProcessing = true;
             
-            // Reset form trước
+            // Reset form trước (làm mới form)
             this.resetOTPForm();
             
-            // Get CSRF token
+            // Lấy CSRF token
             const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
             const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content');
             
@@ -310,7 +310,7 @@ class OTPVerification {
                 headers[csrfHeader] = csrfToken;
             }
             
-            // Send OTP với form data để backend validate
+            // Gửi OTP với dữ liệu form để backend validate
             const response = await fetch(this.otpEndpoint, {
                 method: 'POST',
                 headers: headers,
@@ -320,7 +320,7 @@ class OTPVerification {
             const result = await response.json();
             
             if (result.success) {
-                // Chỉ hiển thị modal khi validation thành công
+                // Chỉ hiển thị modal khi validation thành công (khi mã OTP hợp lệ)
                 this.otpModal.show();
                 
                 this.showNotification(result.message, 'success');
@@ -341,7 +341,7 @@ class OTPVerification {
     }
     
     /**
-     * Verify OTP and submit form
+     * Xác thực OTP và gửi form
      */
     async verifyOTP() {
         const otpCode = document.getElementById('otpCode').value.trim();
@@ -354,10 +354,10 @@ class OTPVerification {
         try {
             this.isProcessing = true;
             
-            // Add OTP to form data
+            // Thêm OTP vào dữ liệu form
             this.currentFormData.otpCode = otpCode;
             
-            // Get CSRF token
+            // Lấy CSRF token
             const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
             const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content');
             
@@ -374,7 +374,7 @@ class OTPVerification {
             const submitData = { ...this.currentFormData };
             submitData.otpCode = otpCode;
             
-            // Submit form with OTP
+            // Gửi form với OTP
             const response = await fetch(this.submitEndpoint, {
                 method: 'POST',
                 headers: headers,
@@ -384,27 +384,27 @@ class OTPVerification {
             const result = await response.json();
             
             if (result.success) {
-                // Show notification với fallback
+                // Hiển thị thông báo với fallback
                 this.showNotification(result.message, 'success');
                 
                 this.otpModal.hide();
                 
-                // Handle redirect for password change
+                // Xử lý chuyển hướng cho đổi mật khẩu
                 if (result.redirect) {
                     setTimeout(() => {
                         window.location.href = result.redirect;
                     }, 2000);
                 } else {
-                    // Reload page for profile update - delay để user thấy notification
+                    // Reload page cho cập nhật profile - delay để user thấy thông báo
                     setTimeout(() => {
                         window.location.reload();
-                    }, 3000); // Tăng từ 1500ms lên 3000ms
+                    }, 3000); // 3000ms (3 giây)
                 }
             } else {
-                // Handle validation errors từ DTO
+                // Xử lý lỗi validation từ DTO
                 this.showNotification(result.message, 'danger');
                 
-                // Highlight fields có lỗi nếu có
+                // Highlight trường có lỗi nếu có
                 if (result.errors) {
                     Object.keys(result.errors).forEach(fieldName => {
                         const field = this.currentForm.querySelector(`[name="${fieldName}"]`);
@@ -415,21 +415,21 @@ class OTPVerification {
                     });
                 }
                 
-                // Highlight OTP field và hủy timer
+                // Highlight trường OTP và hủy timer
                 document.getElementById('otpCode').classList.add('is-invalid');
                 if (this.otpTimer) {
                     clearInterval(this.otpTimer);
                     this.otpTimer = null;
                 }
                 
-                // Nếu OTP sai hoặc hết hạn, đóng modal và reset form
+                // Nếu OTP sai hoặc hết hạn, đóng modal và reset form (làm mới form)
                 if (result.message.includes('không hợp lệ') || result.message.includes('hết hạn')) {
                     this.otpModal.hide();
                     this.resetOTPForm();
                     this.currentForm = null;
                     this.currentFormData = null;
                     
-                    // Thông báo user cần gửi OTP mới
+                    // Thông báo cho user cần gửi OTP mới
                     setTimeout(() => {
                         this.showNotification('Mã OTP đã bị hủy. Vui lòng thử lại để nhận mã OTP mới.', 'warning');
                     }, 500);
@@ -445,7 +445,7 @@ class OTPVerification {
     }
     
     /**
-     * Resend OTP
+     * Gửi lại OTP
      */
     async resendOTP() {
         if (this.isProcessing) return;
@@ -453,7 +453,7 @@ class OTPVerification {
         try {
             this.isProcessing = true;
             
-            // Get CSRF token
+            // Lấy CSRF token
             const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
             const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content');
             
@@ -490,29 +490,29 @@ class OTPVerification {
     }
     
     /**
-     * Cancel OTP verification
+     * Hủy xác thực OTP
      */
     async cancelOTP() {
         console.log('OTP verification cancelled by user');
         
-        // Clear timer if exists
+        // Xóa timer nếu có
         if (this.otpTimer) {
             clearInterval(this.otpTimer);
             this.otpTimer = null;
         }
         
-        // Gọi API để xóa OTP cũ trong database
+        // Gọi API để xóa OTP cũ trong database (xóa OTP cũ trong database)
         await this.cancelOTPInBackend();
         
         this.otpModal.hide();
         this.resetOTPForm();
         
-        // Clear form data để force user phải nhập lại
+        // Xóa dữ liệu form để force user phải nhập lại
         this.currentForm = null;
         this.currentFormData = null;
         
-        // Show message để user biết OTP đã bị hủy
-            this.showNotification('OTP đã được hủy. Khi bạn thử lại, mã OTP mới sẽ được gửi.', 'info');
+        // Hiển thị thông báo cho user biết OTP đã bị hủy
+        this.showNotification('OTP đã được hủy. Khi bạn thử lại, mã OTP mới sẽ được gửi.', 'info');
     }
     
     /**
@@ -569,7 +569,7 @@ class OTPVerification {
     }
     
     /**
-     * Format OTP input (only numbers)
+     * Format OTP input (chỉ cho phép nhập số)
      */
     formatOTPInput(event) {
         const input = event.target;
@@ -584,7 +584,7 @@ class OTPVerification {
     }
     
     /**
-     * Handle OTP input keypress
+     * Xử lý nhập keypress OTP input
      */
     handleOTPKeypress(event) {
         // Only allow numbers
@@ -592,17 +592,17 @@ class OTPVerification {
             event.preventDefault();
         }
         
-        // Auto submit when 6 digits entered
+        // Tự động gửi khi nhập 6 chữ số
         if (event.key === 'Enter' && event.target.value.length === 6) {
             this.verifyOTP();
         }
     }
     
     /**
-     * Start OTP countdown timer
+     * Bắt đầu timer OTP countdown
      */
     startOTPTimer() {
-        let timeLeft = 300; // 5 minutes in seconds
+        let timeLeft = 300; // 300 giây (5 phút)
         const timerElement = document.getElementById('otpTimer');
         const resendBtn = document.getElementById('resendOtpBtn');
         
@@ -624,7 +624,7 @@ class OTPVerification {
             timeLeft--;
         }, 1000);
         
-        // Store timer reference for cleanup
+        // Lưu tham chiếu timer để dọn dẹp
         this.otpTimer = timer;
     }
 }
@@ -633,25 +633,25 @@ class OTPVerification {
 // INITIALIZE OTP VERIFICATION
 // ========================================
 
-// Global function to force override form submissions
+// Hàm global để force override gửi form
 window.forceOTPOverride = function() {
     console.log('Force OTP Override called');
     
-    // Profile form submit - Force override
+    // Gửi form profile - Force override
     const profileForm = document.querySelector('form[action*="/admin/profile/update"]');
     if (profileForm) {
-        // Remove all existing event listeners by cloning
+        // Xóa tất cả các event listeners hiện có bằng cách clone
         const newProfileForm = profileForm.cloneNode(true);
         profileForm.parentNode.replaceChild(newProfileForm, profileForm);
         
-        // Add our event listener with capture=true to ensure it runs first
+        // Thêm event listener với capture=true để đảm bảo nó chạy đầu tiên
         newProfileForm.addEventListener('submit', (e) => {
             console.log('FORCE OVERRIDE: Profile form submit intercepted!');
             e.preventDefault();
             e.stopPropagation();
             e.stopImmediatePropagation();
             
-            // Call OTP handler if available
+            // Gọi OTP handler nếu có
             if (window.otpVerificationInstance) {
                 window.otpVerificationInstance.handleProfileSubmit(e);
             }
@@ -660,21 +660,21 @@ window.forceOTPOverride = function() {
         console.log('FORCE OVERRIDE: Profile form event listener bound');
     }
     
-    // Password form submit - Force override
+    // Gửi form password - Force override
     const passwordForm = document.querySelector('form[action*="/admin/profile/change-password"]');
     if (passwordForm) {
-        // Remove all existing event listeners by cloning
+        // Xóa tất cả các event listeners hiện có bằng cách clone
         const newPasswordForm = passwordForm.cloneNode(true);
         passwordForm.parentNode.replaceChild(newPasswordForm, passwordForm);
         
-        // Add our event listener with capture=true to ensure it runs first
+        // Thêm event listener với capture=true để đảm bảo nó chạy đầu tiên
         newPasswordForm.addEventListener('submit', (e) => {
             console.log('FORCE OVERRIDE: Password form submit intercepted!');
             e.preventDefault();
             e.stopPropagation();
             e.stopImmediatePropagation();
             
-            // Call OTP handler if available
+            // Gọi OTP handler nếu có
             if (window.otpVerificationInstance) {
                 window.otpVerificationInstance.handlePasswordSubmit(e);
             }
@@ -684,33 +684,33 @@ window.forceOTPOverride = function() {
     }
 };
 
-// Initialize when DOM is loaded
+// Khởi tạo khi DOM đã tải xong
 document.addEventListener('DOMContentLoaded', function() {
-    // Only initialize on profile page
+    // Chỉ khởi tạo trên trang profile
     if (window.location.pathname.includes('/admin/profile')) {
-        // Wait a bit to ensure admin.js has loaded first
+        // Chờ một chút để đảm bảo admin.js đã tải xong đầu tiên
         setTimeout(() => {
             window.otpVerificationInstance = new OTPVerification();
             console.log('OTP Verification system initialized');
             
-            // Lưu trữ dữ liệu ban đầu của profile form
+            // Lưu trữ dữ liệu ban đầu của form profile
             const profileForm = document.querySelector('form[action*="/admin/profile/update"]');
             if (profileForm) {
                 const formData = new FormData(profileForm);
                 const data = Object.fromEntries(formData.entries());
                 
-                // Convert date string to proper format if exists
+                // Chuyển đổi chuỗi ngày thành định dạng chuẩn nếu có
                 if (data.dob) {
                     const date = new Date(data.dob);
                     data.dob = date.toISOString().split('T')[0];
                 }
                 
-                // Lưu dữ liệu ban đầu
+                // Lưu dữ liệu ban đầu (dữ liệu ban đầu của form profile)
                 window.otpVerificationInstance.originalFormData = data;
                 console.log('Original form data saved:', data);
             }
             
-            // Force override after initialization
+            // Force override sau khi khởi tạo
             setTimeout(() => {
                 window.forceOTPOverride();
             }, 100);
@@ -718,5 +718,5 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Export for global access
+// Export để sử dụng trong admin.js
 window.OTPVerification = OTPVerification;

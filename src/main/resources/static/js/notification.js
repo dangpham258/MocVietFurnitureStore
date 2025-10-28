@@ -303,10 +303,10 @@ class NotificationSystem {
     }
 }
 
-// Initialize notification system
+// Khởi tạo notification system
 window.notificationSystem = new NotificationSystem();
 
-// Global function để tương thích với code cũ
+// Functions global cho tương thích với code cũ
 window.showNotification = function(message, type = 'info', duration = 4000) {
     window.notificationSystem.show(message, type, duration);
 };

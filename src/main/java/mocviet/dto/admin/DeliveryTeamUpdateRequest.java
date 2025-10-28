@@ -6,15 +6,15 @@ import lombok.Data;
 
 @Data
 public class DeliveryTeamUpdateRequest {
-    
+
     @NotBlank(message = "Tên đội không được để trống")
     private String name;
-    
+
     private String phone;
-    
+
     @NotNull(message = "User ID không được để trống")
     private Integer userId;
-    
+
     private Boolean isActive;
 }
 

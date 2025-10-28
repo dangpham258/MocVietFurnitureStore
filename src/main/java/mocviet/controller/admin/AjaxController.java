@@ -11,14 +11,14 @@ import jakarta.servlet.http.HttpServletRequest;
 @RequestMapping("/admin")
 @PreAuthorize("hasRole('ADMIN')")
 public class AjaxController {
-    
+
     @GetMapping("/ajax/**")
     public String handleAjaxRequest(HttpServletRequest request) {
-        // Extract the actual path from /admin/ajax/...
+        // Lấy đường dẫn thực tế từ /admin/ajax/...
         String requestURI = request.getRequestURI();
         String actualPath = requestURI.replace("/admin/ajax", "/admin");
-        
-        // Redirect to actual controller
+
+        // Chuyển hướng đến controller thực tế
         return "forward:" + actualPath;
     }
 }

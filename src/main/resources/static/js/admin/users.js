@@ -93,7 +93,7 @@ class UsersManagement {
             return;
         }
         
-        // Pagination logic
+        // Logic phân trang
         const startIndex = (this.currentPage - 1) * this.pageSize;
         const endIndex = startIndex + this.pageSize;
         const paginatedUsers = this.filteredUsers.slice(startIndex, endIndex);
@@ -137,14 +137,14 @@ class UsersManagement {
     }
     
     /**
-     * View user details
+     * Xem chi tiết user
      */
     async viewUser(userId) {
         try {
             const response = await fetch(`${this.apiEndpoint}/${userId}`);
             const user = await response.json();
             
-            // Populate modal
+            // Điền modal
             const modal = document.getElementById('viewUserModal');
             if (!modal) {
                 console.error('Modal không tồn tại');
@@ -201,7 +201,7 @@ class UsersManagement {
     }
     
     /**
-     * Toggle user status (lock/unlock)
+     * Thay đổi trạng thái user (khóa/mở khóa)
      */
     async toggleStatus(userId) {
         if (!confirm('Bạn có chắc muốn thay đổi trạng thái user này?')) {
@@ -228,7 +228,7 @@ class UsersManagement {
     }
     
     /**
-     * Get role badge class
+     * Lấy class badge vai trò
      */
     getRoleBadgeClass(roleName) {
         const classes = {
@@ -241,7 +241,7 @@ class UsersManagement {
     }
     
     /**
-     * Format date
+     * Định dạng ngày
      */
     formatDate(dateString) {
         if (!dateString) return 'N/A';
@@ -250,7 +250,7 @@ class UsersManagement {
     }
     
     /**
-     * Create user
+     * Tạo user
      */
     async createUser() {
         const username = document.getElementById('username').value;
@@ -318,7 +318,7 @@ class UsersManagement {
     }
     
     /**
-     * Update stats
+     * Cập nhật stats
      */
     updateStats() {
         const totalUsers = this.filteredUsers.length;
@@ -326,7 +326,7 @@ class UsersManagement {
         const managerCount = this.filteredUsers.filter(u => u.roleName === 'MANAGER').length;
         const deliveryCount = this.filteredUsers.filter(u => u.roleName === 'DELIVERY').length;
         
-        // Update stats cards
+        // Cập nhật stats cards
         const statsRow = document.getElementById('statsRow');
         if (!statsRow) return;
         
@@ -339,7 +339,7 @@ class UsersManagement {
     }
     
     /**
-     * Helper method để hiển thị notification
+     * Helper method để hiển thị thông báo
      */
     showNotification(message, type = 'info') {
         if (window.notificationSystem) {
@@ -350,10 +350,10 @@ class UsersManagement {
     }
     
     /**
-     * Bind events
+     * Bind events (kết nối events)
      */
     bindEvents() {
-        // Search functionality
+        // Tìm kiếm
         const searchInput = document.querySelector('.search-input');
         if (searchInput) {
             searchInput.addEventListener('input', (e) => {
@@ -362,7 +362,7 @@ class UsersManagement {
             });
         }
         
-        // Role filter
+        // Filter vai trò
         const roleFilter = document.getElementById('filterRole');
         if (roleFilter) {
             roleFilter.addEventListener('change', (e) => {
@@ -371,7 +371,7 @@ class UsersManagement {
             });
         }
         
-        // Status filter
+        // Filter trạng thái
         const statusFilter = document.getElementById('filterStatus');
         if (statusFilter) {
             statusFilter.addEventListener('change', (e) => {
@@ -382,18 +382,21 @@ class UsersManagement {
     }
     
     /**
-     * Reset all filters
+     * Reset tất cả filters
      */
     resetFilters() {
         this.activeFilters = { search: '', role: '', status: '' };
-        document.querySelector('.search-input').value = '';
-        document.getElementById('filterRole').value = '';
-        document.getElementById('filterStatus').value = '';
+        const searchEl = document.querySelector('.search-input');
+        if (searchEl) searchEl.value = '';
+        const roleEl = document.getElementById('filterRole');
+        if (roleEl) roleEl.value = '';
+        const statusEl = document.getElementById('filterStatus');
+        if (statusEl) statusEl.value = '';
         this.applyFilters();
     }
     
     /**
-     * Render pagination
+     * Render phân trang
      */
     renderPagination() {
         const pagination = document.getElementById('pagination');
@@ -408,7 +411,7 @@ class UsersManagement {
         
         let paginationHtml = '';
         
-        // Previous button
+        // Button Previous
         paginationHtml += `
             <li class="page-item ${this.currentPage === 1 ? 'disabled' : ''}">
                 <a class="page-link" href="#" onclick="usersManagement.goToPage(${this.currentPage - 1}); return false;">
@@ -417,7 +420,7 @@ class UsersManagement {
             </li>
         `;
         
-        // Page numbers
+        // Số trang
         for (let i = 1; i <= totalPages; i++) {
             if (i === 1 || i === totalPages || (i >= this.currentPage - 2 && i <= this.currentPage + 2)) {
                 paginationHtml += `
@@ -430,7 +433,7 @@ class UsersManagement {
             }
         }
         
-        // Next button
+        // Button Next
         paginationHtml += `
             <li class="page-item ${this.currentPage === totalPages ? 'disabled' : ''}">
                 <a class="page-link" href="#" onclick="usersManagement.goToPage(${this.currentPage + 1}); return false;">
@@ -443,7 +446,7 @@ class UsersManagement {
     }
     
     /**
-     * Go to specific page
+     * Chuyển đến trang cụ thể
      */
     goToPage(page) {
         const totalPages = Math.ceil(this.filteredUsers.length / this.pageSize);
@@ -456,10 +459,10 @@ class UsersManagement {
     
 }
 
-// Function to initialize users management
+// Function khởi tạo users management
 function initializeUsersManagement() {
     if (window.location.pathname.includes('/admin/users')) {
-        // Destroy existing instance if it exists
+        // Xóa instance hiện có nếu tồn tại
         if (window.usersManagement) {
             delete window.usersManagement;
         }
@@ -472,15 +475,15 @@ function initializeUsersManagement() {
     }
 }
 
-// Initialize when DOM is loaded
+// Khởi tạo khi DOM đã tải xong
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initializeUsersManagement);
 } else {
-    // DOM is already ready
+    // DOM đã tải xong
     initializeUsersManagement();
 }
 
-// Export for global access
+// Xuất ra global access
 window.UsersManagement = UsersManagement;
 window.initializeUsersManagement = initializeUsersManagement;
 

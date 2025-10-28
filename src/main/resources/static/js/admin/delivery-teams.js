@@ -19,21 +19,21 @@ class DeliveryTeamsManagement {
     }
     
     /**
-     * Load all data (teams, zones, users)
+     * Tải tất cả dữ liệu (teams, zones, users)
      */
     async loadData() {
         try {
-            // Load teams
+            // Tải teams
             const teamsResponse = await fetch(`${this.apiEndpoint}/teams`);
             if (!teamsResponse.ok) throw new Error('Failed to load teams');
             this.teams = await teamsResponse.json();
             
-            // Load zones
+            // Tải zones
             const zonesResponse = await fetch(`${this.apiEndpoint}/zones`);
             if (!zonesResponse.ok) throw new Error('Failed to load zones');
             this.zones = await zonesResponse.json();
             
-            // Load available users
+            // Tải users có sẵn
             const usersResponse = await fetch(`${this.apiEndpoint}/users`);
             if (!usersResponse.ok) throw new Error('Failed to load users');
             this.availableUsers = await usersResponse.json();
@@ -48,7 +48,7 @@ class DeliveryTeamsManagement {
     }
     
     /**
-     * Render teams
+     * Render teams (render lại teams)
      */
     renderTeams() {
         const container = document.getElementById('teamsContainer');
@@ -68,7 +68,7 @@ class DeliveryTeamsManagement {
     }
     
     /**
-     * Render individual team card
+     * Render card team riêng lẻ
      */
     renderTeamCard(team) {
         const statusBadge = team.isActive 
@@ -130,7 +130,7 @@ class DeliveryTeamsManagement {
     }
     
     /**
-     * Render zones preview
+     * Render preview zones
      */
     renderZonesPreview(zones) {
         return `
@@ -144,7 +144,7 @@ class DeliveryTeamsManagement {
     }
     
     /**
-     * Render no zones state
+     * Render trạng thái không có zones
      */
     renderNoZones() {
         return `
@@ -156,7 +156,7 @@ class DeliveryTeamsManagement {
     }
     
     /**
-     * Update stats
+     * Cập nhật stats
      */
     updateStats() {
         const totalTeams = this.teams.length;
@@ -169,7 +169,7 @@ class DeliveryTeamsManagement {
     }
     
     /**
-     * Populate user dropdowns
+     * Populate dropdown users
      */
     populateUserDropdowns() {
         const addDropdown = document.getElementById('addTeamUserId');
@@ -191,7 +191,7 @@ class DeliveryTeamsManagement {
     }
     
     /**
-     * Create new team
+     * Tạo team mới
      */
     async createTeam() {
         const name = document.getElementById('addTeamName').value.trim();
@@ -238,7 +238,7 @@ class DeliveryTeamsManagement {
     }
     
     /**
-     * Edit team
+     * Sửa team
      */
     async editTeam(teamId) {
         const team = this.teams.find(t => t.id === teamId);
@@ -260,7 +260,7 @@ class DeliveryTeamsManagement {
     }
     
     /**
-     * Update team
+     * Cập nhật team
      */
     async updateTeam() {
         const teamId = parseInt(document.getElementById('editTeamId').value);
@@ -307,7 +307,7 @@ class DeliveryTeamsManagement {
     }
     
     /**
-     * Toggle team status
+     * Chuyển đổi trạng thái team
      */
     async toggleTeamStatus(teamId) {
         const team = this.teams.find(t => t.id === teamId);
@@ -336,7 +336,7 @@ class DeliveryTeamsManagement {
     }
     
     /**
-     * Manage zones for a team
+     * Quản lý zones cho một team
      */
     async manageZones(teamId) {
         const team = this.teams.find(t => t.id === teamId);
@@ -345,11 +345,11 @@ class DeliveryTeamsManagement {
             return;
         }
         
-        // Set team info
+        // Đặt thông tin team
         document.getElementById('manageZonesTeamId').value = team.id;
         document.getElementById('manageZonesTeamName').textContent = team.name;
         
-        // Populate available zones
+        // Populate zones có sẵn
         const teamZoneIds = team.zones ? team.zones.map(z => z.id) : [];
         const availableZones = this.zones.filter(z => !teamZoneIds.includes(z.id));
         
@@ -359,16 +359,16 @@ class DeliveryTeamsManagement {
                 `<option value="${zone.id}">${this.escapeHtml(zone.name)}</option>`
             ).join('');
         
-        // Render current zones
+        // Render zones hiện tại
         this.renderCurrentZones(team.zones || []);
         
-        // Show modal
+        // Hiển thị modal
         const modal = new bootstrap.Modal(document.getElementById('manageZonesModal'));
         modal.show();
     }
     
     /**
-     * Render current zones
+     * Render zones hiện tại
      */
     renderCurrentZones(zones) {
         const container = document.getElementById('currentZonesList');
@@ -393,7 +393,7 @@ class DeliveryTeamsManagement {
     }
     
     /**
-     * Add zone to team
+     * Thêm zone vào team
      */
     async addZoneToTeam() {
         const teamId = parseInt(document.getElementById('manageZonesTeamId').value);
@@ -418,7 +418,7 @@ class DeliveryTeamsManagement {
             if (response.ok && result.success !== false) {
                 this.showNotification('Thêm khu vực thành công', 'success');
                 this.loadData();
-                this.manageZones(teamId); // Refresh modal
+                this.manageZones(teamId); // Refresh modal (làm mới modal)
             } else {
                 this.showNotification(result.message || 'Thêm khu vực thất bại', 'danger');
             }
@@ -429,7 +429,7 @@ class DeliveryTeamsManagement {
     }
     
     /**
-     * Remove zone from team
+     * Xóa zone từ team
      */
     async removeZoneFromTeam(mappingId, zoneName) {
         if (!confirm(`Xóa khu vực "${zoneName}" khỏi đội?`)) return;
@@ -445,7 +445,7 @@ class DeliveryTeamsManagement {
                 this.showNotification('Xóa khu vực thành công', 'success');
                 const teamId = parseInt(document.getElementById('manageZonesTeamId').value);
                 this.loadData();
-                this.manageZones(teamId); // Refresh modal
+                this.manageZones(teamId); // Refresh modal (làm mới modal)
             } else {
                 this.showNotification(result.message || 'Xóa khu vực thất bại', 'danger');
             }
@@ -456,7 +456,7 @@ class DeliveryTeamsManagement {
     }
     
     /**
-     * Helper: Show notification
+     * Helper: Hiển thị thông báo
      */
     showNotification(message, type = 'info') {
         if (window.notificationSystem) {
@@ -467,7 +467,7 @@ class DeliveryTeamsManagement {
     }
     
     /**
-     * Helper: Escape HTML
+     * Helper: Escape HTML (chuyển đổi HTML thành text)
      */
     escapeHtml(text) {
         const div = document.createElement('div');
@@ -476,10 +476,10 @@ class DeliveryTeamsManagement {
     }
 }
 
-// Global instance
+// Instance global
 let deliveryTeamsManagement;
 
-// Initialize Delivery Teams Management
+// Khởi tạo Delivery Teams Management
 function initializeDeliveryTeamsManagement() {
     if (deliveryTeamsManagement) {
         delete deliveryTeamsManagement;
@@ -487,7 +487,7 @@ function initializeDeliveryTeamsManagement() {
     deliveryTeamsManagement = new DeliveryTeamsManagement();
 }
 
-// Global functions for onclick handlers
+// Functions global cho onclick handlers
 function createTeam() {
     if (deliveryTeamsManagement) {
         deliveryTeamsManagement.createTeam();
@@ -530,6 +530,6 @@ function removeZoneFromTeam(mappingId, zoneName) {
     }
 }
 
-// Export for admin.js
+// Export để sử dụng trong admin.js
 window.initializeDeliveryTeamsManagement = initializeDeliveryTeamsManagement;
 

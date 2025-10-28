@@ -6,11 +6,11 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
-    
+
     // NOTE: Sitemesh 3.0.1 is not compatible with Spring Boot 3 (jakarta.servlet vs javax.servlet)
     // TODO: Update to Sitemesh 4 or use Thymeleaf Layout Dialect instead
     // For now, decorators are disabled
-    
+
     /*
     @Bean
     public FilterRegistrationBean<SitemeshConfig> sitemeshFilter() {
@@ -21,7 +21,7 @@ public class WebConfig implements WebMvcConfigurer {
         return filterRegistrationBean;
     }
     */
-    
+
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/css/**")

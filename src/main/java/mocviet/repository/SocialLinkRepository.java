@@ -1,10 +1,11 @@
 package mocviet.repository;
 
-import mocviet.entity.SocialLink;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
+import mocviet.entity.SocialLink;
 
 @Repository
 public interface SocialLinkRepository extends JpaRepository<SocialLink, Integer> {

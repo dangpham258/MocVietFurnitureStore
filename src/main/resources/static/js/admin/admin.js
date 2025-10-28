@@ -4,7 +4,6 @@
 // File này chứa tất cả JavaScript cho admin panel
 // Bao gồm: sidebar toggle, form validation, search, modal, etc.
 
-    console.log('Admin JS loaded successfully!');
     
 // ========================================
 // KHỞI TẠO CÁC TÍNH NĂNG ADMIN
@@ -157,11 +156,11 @@ function updateActiveMenu(url) {
         
         // Logic chính xác: chỉ match exact
         if (href) {
-            // Exact match only
+            // Chỉ match exact
             if (url === href) {
                 link.classList.add('active');
             }
-            // Special case: Dashboard (/admin) should match dashboard URLs
+            // Trường hợp đặc biệt: Dashboard (/admin) phải match dashboard URLs
             else if (href === '/admin' && (url === '/admin' || url === '/admin/' || url === '/admin/dashboard' || url === '/admin/dashboard/' || url === '/admin/dashboard/home')) {
                 link.classList.add('active');
             }
@@ -412,7 +411,7 @@ function initializeBootstrapComponents() {
             // Nếu sidebar đang mở và click không phải vào sidebar/toggle
             if (sidebar && sidebar.classList.contains('show') && 
                 !sidebar.contains(event.target) && 
-                !sidebarToggle.contains(event.target)) {
+                (!sidebarToggle || !sidebarToggle.contains(event.target))) {
                 sidebar.classList.remove('show');
                 toggleHamburgerVisibility(false); // Hiện lại hamburger header
             }
@@ -515,7 +514,7 @@ function initializeBootstrapComponents() {
             return;
         }
         
-        // Basic HTML5 validation
+        // Validation HTML5 cơ bản
         form.addEventListener('submit', function(event) {
             if (!form.checkValidity()) {
                 event.preventDefault();
@@ -524,7 +523,7 @@ function initializeBootstrapComponents() {
             form.classList.add('was-validated');
         });
         
-        // Real-time validation
+        // Validation thời gian thực
         const fields = form.querySelectorAll('.form-control, .form-select');
         fields.forEach(function(field) {
             field.addEventListener('blur', function() {
@@ -652,35 +651,35 @@ function initializeBootstrapComponents() {
             return response.text();
         })
         .then(html => {
-            // Parse HTML và extract content
+            // Phân tích HTML và trích xuất nội dung
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
             const newContent = doc.querySelector('.main-content');
             
             if (newContent && mainContent) {
-                // Update content
+                // Cập nhật nội dung
                 mainContent.innerHTML = newContent.innerHTML;
                 
-                // Update page title
+                // Cập nhật tiêu đề trang
                 const newTitle = doc.querySelector('title');
                 if (newTitle) {
                     document.title = newTitle.textContent;
                 }
                 
-                // Update active menu (luôn update)
+                // Cập nhật menu hoạt động (luôn cập nhật)
                 updateActiveMenu(url);
                 
-                // Update header and breadcrumb (luôn update)
+                // Cập nhật header và breadcrumb (luôn cập nhật)
                 updateHeaderAndBreadcrumb(url);
                 
-                // Re-initialize components
+                // Khởi tạo lại các thành phần
                 initializePageComponents();
                 
-                // Special handling for dashboard - trigger chart render after content loads
+                // Xử lý đặc biệt cho dashboard - kích hoạt render biểu đồ sau khi nội dung tải xong
                 if (url === '/admin' || url === '/admin/' || url === '/admin/dashboard' || url === '/admin/dashboard/' || url === '/admin/dashboard/home') {
                     setTimeout(() => {
                         if (window.dashboardManagement) {
-                            // Fetch fresh data from API and render chart
+                            // Lấy dữ liệu mới từ API và render biểu đồ
                             fetch('/admin/dashboard/api')
                                 .then(response => response.json())
                                 .then(data => {
@@ -711,19 +710,19 @@ function initializeBootstrapComponents() {
     
     // Hàm khởi tạo components cho trang mới
     function initializePageComponents() {
-        // Re-initialize tooltips
+        // Khởi tạo lại các tooltip
         const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
         tooltipTriggerList.forEach(function (tooltipTriggerEl) {
             new bootstrap.Tooltip(tooltipTriggerEl);
         });
         
-        // Re-initialize modals
+        // Khởi tạo lại các modal
         const modalTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="modal"]'));
         modalTriggerList.forEach(function(modalTriggerEl) {
             new bootstrap.Modal(modalTriggerEl);
         });
         
-        // Re-initialize forms
+        // Khởi tạo lại các form
         const forms = document.querySelectorAll('.needs-validation');
         forms.forEach(function(form) {
             form.addEventListener('submit', function(event) {
@@ -735,7 +734,7 @@ function initializeBootstrapComponents() {
             });
         });
         
-        // Re-initialize search inputs
+        // Khởi tạo lại các input tìm kiếm
         const searchInputs = document.querySelectorAll('.search-input');
         searchInputs.forEach(function(input) {
             input.addEventListener('input', function() {
@@ -756,10 +755,10 @@ function initializeBootstrapComponents() {
             });
         });
         
-        // Initialize page-specific components based on current URL
+        // Khởi tạo các thành phần cụ thể cho trang hiện tại dựa trên URL hiện tại
         const currentUrl = window.location.pathname;
         
-        // Define module configurations
+        // Định nghĩa cấu hình module
         const modules = [
             {
                 urlPattern: '/admin/users',
@@ -861,26 +860,24 @@ function initializeBootstrapComponents() {
             }
         ];
         
-        // Initialize modules that match current URL
+        // Khởi tạo các module phù hợp với URL hiện tại
         modules.forEach(module => {
             if (currentUrl.includes(module.urlPattern)) {
                 initModule(module);
             }
         });
-        
-        // Special handling for dashboard at /admin - no need, already handled above
     }
     
     /**
-     * Initialize a module dynamically
+     * Khởi tạo một module theo cách động
      * @param {Object} module - Module configuration
      */
     function initModule(module) {
         const { scriptPath, classRef, instanceName, initFunction } = module;
         
-        // Check if already initialized and exists
+        // Kiểm tra nếu đã khởi tạo và tồn tại
         if (window[instanceName] && typeof window[instanceName] !== 'undefined') {
-            // Re-initialize data by calling loadData, loadPages, loadBanners, etc.
+            // Khởi tạo lại dữ liệu bằng cách gọi loadData, loadPages, loadBanners, etc.
             const methodsToTry = ['loadData', 'loadPages', 'loadBanners', 'loadColors', 'loadCategories', 'loadCoupons', 'loadShipping', 'loadShowrooms', 'loadUsers', 'loadSocialLinks', 'loadDeliveryTeams', 'loadReports', 'loadNotifications'];
             
             for (const methodName of methodsToTry) {
@@ -894,11 +891,11 @@ function initializeBootstrapComponents() {
                 }
             }
             
-            // Special case: Dashboard needs to re-render chart when content is reloaded
+            // Trường hợp đặc biệt: Dashboard cần render lại biểu đồ khi nội dung được tải lại
             if (instanceName === 'dashboardManagement') {
                 setTimeout(() => {
                     if (window.dashboardManagement) {
-                        // Fetch fresh data from API and update chart
+                        // Lấy dữ liệu mới từ API và cập nhật biểu đồ
                         fetch('/admin/dashboard/api')
                             .then(response => response.json())
                             .then(data => {
@@ -915,13 +912,13 @@ function initializeBootstrapComponents() {
             return;
         }
         
-        // Check if init function exists
+        // Kiểm tra nếu hàm init tồn tại
         if (typeof window[initFunction] === 'function') {
             window[initFunction]();
             return;
         }
         
-        // Check if class exists
+        // Kiểm tra nếu class tồn tại
         if (typeof window[classRef] !== 'undefined') {
             if (window[instanceName]) {
                 delete window[instanceName];
@@ -934,7 +931,7 @@ function initializeBootstrapComponents() {
             return;
         }
         
-        // Load script dynamically if not loaded
+        // Tải script theo cách động nếu chưa tải
         loadScript(scriptPath, () => {
             if (typeof window[initFunction] === 'function') {
                 window[initFunction]();
@@ -952,12 +949,12 @@ function initializeBootstrapComponents() {
     }
     
     /**
-     * Load script dynamically
+     * Tải script theo cách động
      * @param {string} src - Script source path
      * @param {Function} callback - Callback after load
      */
     function loadScript(src, callback) {
-        // Check if script is already loaded
+        // Kiểm tra nếu script đã được tải
         const existingScript = document.querySelector(`script[src="${src}"]`);
         if (existingScript) {
             if (callback) callback();
@@ -973,35 +970,35 @@ function initializeBootstrapComponents() {
         document.body.appendChild(script);
     }
     
-    // Intercept sidebar navigation clicks
+    // Chặn click trên sidebar navigation
     const sidebarLinks = document.querySelectorAll('.admin-sidebar .nav-link');
     sidebarLinks.forEach(function(link) {
         link.addEventListener('click', function(event) {
             const href = this.getAttribute('href');
             
-            // Skip external links và logout
+            // Bỏ qua liên kết ngoài và logout
             if (href === '/' || href === '/logout' || href.startsWith('http')) {
-                return; // Let normal navigation handle these
+                return; // Cho phép xử lý bằng navigation thông thường
             }
             
-            // Prevent default navigation
+            // Ngăn chặn navigation mặc định
             event.preventDefault();
             
-            // Update URL first
+            // Cập nhật URL trước
             history.pushState({ url: href }, '', href);
             
-            // Load content via AJAX
+            // Tải nội dung via AJAX
             loadPageContent(href);
         });
     });
     
-    // Handle browser back/forward buttons
+    // Xử lý nút back/forward của trình duyệt
     window.addEventListener('popstate', function(event) {
         const url = window.location.pathname;
         loadPageContent(url);
     });
     
-    // PERSIST SIDEBAR STATE ACROSS NAVIGATION
+    // LƯU TRỮ TRẠNG THÁI SIDEBAR TRONG TOÀN BỘ NAVIGATION
     window.addEventListener('beforeunload', function() {
         const sidebar = document.querySelector('.admin-sidebar');
         if (sidebar) {
@@ -1010,23 +1007,21 @@ function initializeBootstrapComponents() {
         }
     });
 
-    // Initialize page-specific components on initial load (non-AJAX)
-    // This ensures modules are initialized when page is loaded directly (F5/reload)
+    // Khởi tạo các thành phần cụ thể cho trang đầu tiên (không phải AJAX)
+    // Đảm bảo modules được khởi tạo khi trang được tải trực tiếp (F5/reload)
     initializePageComponents();
     
-    console.log('Admin panel initialized successfully!');
-    
-    // Load header notifications
+    // Tải thông báo header
     loadHeaderNotifications();
     
-    // Auto refresh header notifications every 30 seconds
+    // Tự động làm mới thông báo header mỗi 30 giây
     setInterval(loadHeaderNotifications, 30000);
 }
 
-// Track previous unread count to detect new notifications
+// Theo dõi số thông báo chưa đọc để phát hiện thông báo mới
 let previousUnreadCount = 0;
 
-// Load header notifications
+// Tải thông báo header
 async function loadHeaderNotifications() {
     try {
         const response = await fetch('/admin/notifications/api');
@@ -1036,7 +1031,7 @@ async function loadHeaderNotifications() {
         const unreadCount = data.unreadCount || 0;
         const notifications = data.notifications || [];
         
-        // Check if there are new notifications
+        // Kiểm tra nếu có thông báo mới
         if (unreadCount > previousUnreadCount && previousUnreadCount > 0) {
             const newCount = unreadCount - previousUnreadCount;
             window.notificationSystem.show(
@@ -1047,7 +1042,7 @@ async function loadHeaderNotifications() {
         
         previousUnreadCount = unreadCount;
         
-        // Update badge
+        // Cập nhật badge
         const badge = document.getElementById('notificationBadge');
         const unreadCountEl = document.getElementById('headerUnreadCount');
         const listEl = document.getElementById('headerNotificationsList');
@@ -1089,7 +1084,7 @@ async function loadHeaderNotifications() {
     }
 }
 
-// Format datetime helper
+// Hàm hỗ trợ định dạng datetime
 function formatDateTime(dateString) {
     if (!dateString) return '';
     const date = new Date(dateString);

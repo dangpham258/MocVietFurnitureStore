@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 public class ZoneMappingRequest {
-    
+
     @NotNull(message = "Zone ID không được để trống")
     private Integer zoneId;
 }

@@ -1,5 +1,13 @@
 package mocviet.service.admin.impl;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import lombok.RequiredArgsConstructor;
 import mocviet.dto.admin.StaticPageCreateRequest;
 import mocviet.dto.admin.StaticPageResponse;
@@ -7,13 +15,6 @@ import mocviet.dto.admin.StaticPageUpdateRequest;
 import mocviet.entity.StaticPage;
 import mocviet.repository.StaticPageRepository;
 import mocviet.service.admin.AdminStaticPageService;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -40,24 +41,24 @@ public class AdminStaticPageServiceImpl implements AdminStaticPageService {
     @Override
     @Transactional
     public StaticPageResponse createPage(StaticPageCreateRequest request) {
-        // Validate slug against reserved paths
+        // Kiểm tra slug đối với đường dẫn đã đặt
         validateSlug(request.getSlug());
-        
-        // Check if slug already exists
+
+        // Kiểm tra xem slug đã tồn tại
         if (staticPageRepository.existsBySlugIgnoreCase(request.getSlug())) {
             throw new RuntimeException("Slug đã tồn tại");
         }
 
-        // Create new static page
+        // Tạo trang tĩnh mới
         StaticPage page = new StaticPage();
         page.setSlug(request.getSlug());
         page.setTitle(request.getTitle());
         page.setContent(request.getContent());
-        
-        // Set isActive with null check
+
+        // Đặt isActive với kiểm tra null
         Boolean isActive = request.getIsActive();
         page.setIsActive(isActive != null ? isActive : true);
-        
+
         page.setUpdatedAt(LocalDateTime.now());
 
         page = staticPageRepository.save(page);
@@ -70,26 +71,26 @@ public class AdminStaticPageServiceImpl implements AdminStaticPageService {
         StaticPage page = staticPageRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Trang tĩnh không tồn tại"));
 
-        // Validate slug against reserved paths
+        // Kiểm tra slug đối với đường dẫn đã đặt
         validateSlug(request.getSlug());
-        
-        // Check if slug already exists (excluding current page)
+
+        // Kiểm tra xem slug đã tồn tại (loại trừ trang tĩnh hiện tại)
         if (!page.getSlug().equalsIgnoreCase(request.getSlug())) {
             if (staticPageRepository.existsBySlugIgnoreCaseAndIdNot(request.getSlug(), id)) {
                 throw new RuntimeException("Slug đã tồn tại");
             }
         }
 
-        // Update fields
+        // Cập nhật trường
         page.setSlug(request.getSlug());
         page.setTitle(request.getTitle());
         page.setContent(request.getContent());
-        
-        // Update isActive if provided
+
+        // Cập nhật isActive nếu có
         if (request.getIsActive() != null) {
             page.setIsActive(request.getIsActive());
         }
-        
+
         page.setUpdatedAt(LocalDateTime.now());
 
         page = staticPageRepository.save(page);
@@ -110,14 +111,14 @@ public class AdminStaticPageServiceImpl implements AdminStaticPageService {
     public void togglePageStatus(Integer id) {
         StaticPage page = staticPageRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Trang tĩnh không tồn tại"));
-        
+
         page.setIsActive(!page.getIsActive());
         page.setUpdatedAt(LocalDateTime.now());
         staticPageRepository.save(page);
     }
 
     /**
-     * Convert StaticPage entity to StaticPageResponse DTO
+     * Chuyển đổi StaticPage thành StaticPageResponse DTO
      */
     private StaticPageResponse convertToResponse(StaticPage page) {
         StaticPageResponse response = new StaticPageResponse();
@@ -137,9 +138,9 @@ public class AdminStaticPageServiceImpl implements AdminStaticPageService {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
         return dateTime.format(formatter);
     }
-    
+
     /**
-     * Validate slug against reserved paths
+     * Kiểm tra slug đối với đường dẫn đã đặt
      */
     private void validateSlug(String slug) {
         String[] reservedPaths = {
@@ -147,7 +148,7 @@ public class AdminStaticPageServiceImpl implements AdminStaticPageService {
             "profile", "orders", "cart", "wishlist", "api", "auth", "css", "js", "images",
             "dashboard", "home"
         };
-        
+
         String lowerSlug = slug.toLowerCase();
         for (String reserved : reservedPaths) {
             if (lowerSlug.equals(reserved) || lowerSlug.startsWith(reserved + "-")) {

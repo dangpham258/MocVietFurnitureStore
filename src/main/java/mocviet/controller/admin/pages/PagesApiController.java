@@ -1,18 +1,26 @@
 package mocviet.controller.admin.pages;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import mocviet.dto.admin.StaticPageCreateRequest;
 import mocviet.dto.admin.StaticPageResponse;
 import mocviet.dto.admin.StaticPageUpdateRequest;
 import mocviet.service.admin.AdminStaticPageService;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
-
-import jakarta.validation.Valid;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/admin/pages/api")
@@ -21,9 +29,6 @@ public class PagesApiController {
 
     private final AdminStaticPageService adminStaticPageService;
 
-    /**
-     * Get all static pages
-     */
     @GetMapping("/list")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<StaticPageResponse>> getAllPages() {
@@ -31,9 +36,6 @@ public class PagesApiController {
         return ResponseEntity.ok(pages);
     }
 
-    /**
-     * Get static page by ID
-     */
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<StaticPageResponse> getPageById(@PathVariable Integer id) {
@@ -41,9 +43,6 @@ public class PagesApiController {
         return ResponseEntity.ok(page);
     }
 
-    /**
-     * Create new static page
-     */
     @PostMapping("/create")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> createPage(@Valid @RequestBody StaticPageCreateRequest request) {
@@ -62,9 +61,6 @@ public class PagesApiController {
         }
     }
 
-    /**
-     * Update existing static page
-     */
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> updatePage(
@@ -85,9 +81,6 @@ public class PagesApiController {
         }
     }
 
-    /**
-     * Delete static page
-     */
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deletePage(@PathVariable Integer id) {
@@ -106,9 +99,6 @@ public class PagesApiController {
         }
     }
 
-    /**
-     * Toggle page status (active/inactive)
-     */
     @PutMapping("/{id}/toggle")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> togglePageStatus(@PathVariable Integer id) {

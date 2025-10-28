@@ -16,10 +16,35 @@
                     Sản phẩm gỗ tự nhiên, an toàn, thân thiện môi trường.
                 </p>
                 <div class="mt-3">
-                    <a href="#" class="text-white me-3"><i class="bi bi-facebook"></i></a>
-                    <a href="#" class="text-white me-3"><i class="bi bi-instagram"></i></a>
-                    <a href="#" class="text-white me-3"><i class="bi bi-youtube"></i></a>
-                    <a href="#" class="text-white"><i class="bi bi-tiktok"></i></a>
+                    <!-- Facebook -->
+                    <a th:if="${socialLinks != null and socialLinks['facebook'] != null}"
+                       th:href="${socialLinks['facebook']}" class="text-white me-3" title="Facebook" target="_blank" rel="noopener">
+                        <i class="bi bi-facebook"></i>
+                    </a>
+                    <a th:unless="${socialLinks != null and socialLinks['facebook'] != null}"
+                       href="#" class="text-white me-3" title="Facebook">
+                        <i class="bi bi-facebook"></i>
+                    </a>
+
+                    <!-- Zalo -->
+                    <a th:if="${socialLinks != null and socialLinks['zalo'] != null}"
+                       th:href="${socialLinks['zalo']}" class="text-white me-3" title="Zalo" target="_blank" rel="noopener">
+                        <i class="bi bi-chat-dots"></i>
+                    </a>
+                    <a th:unless="${socialLinks != null and socialLinks['zalo'] != null}"
+                       href="#" class="text-white me-3" title="Zalo">
+                        <i class="bi bi-chat-dots"></i>
+                    </a>
+
+                    <!-- Youtube -->
+                    <a th:if="${socialLinks != null and socialLinks['youtube'] != null}"
+                       th:href="${socialLinks['youtube']}" class="text-white" title="Youtube" target="_blank" rel="noopener">
+                        <i class="bi bi-youtube"></i>
+                    </a>
+                    <a th:unless="${socialLinks != null and socialLinks['youtube'] != null}"
+                       href="#" class="text-white" title="Youtube">
+                        <i class="bi bi-youtube"></i>
+                    </a>
                 </div>
             </div>
             

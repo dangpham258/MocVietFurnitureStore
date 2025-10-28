@@ -1,3 +1,9 @@
+// ========================================
+// DASHBOARD MANAGEMENT JAVASCRIPT
+// ========================================
+
+console.log('Dashboard Management JS loaded successfully!');
+
 (function() {
     'use strict';
 
@@ -10,16 +16,16 @@
         }
 
         init() {
-            // Don't call renderRevenueChart() here - let inline script trigger it
-            // This ensures window.revenueChartData is already set
+            // Không gọi renderRevenueChart() ở đây - để inline script trigger nó
+            // Đảm bảo window.revenueChartData đã được đặt
             this.startAutoRefresh();
         }
 
         startAutoRefresh() {
-            // Auto-refresh every 1 minute
+            // Tự động refresh mỗi 1 phút
             this.refreshInterval = setInterval(() => {
                 this.refreshDashboard();
-            }, 60000); // 60000ms = 1 minute
+            }, 60000); // 60000ms = 1 phút
         }
 
         stopAutoRefresh() {
@@ -42,24 +48,47 @@
         }
 
         updateDashboardUI(stats) {
-            // Update all stat cards (4 cards in first row)
-            const cards = document.querySelectorAll('.main-content .row:nth-child(2) .card-body h5');
-            if (cards.length >= 4) {
-                cards[0].textContent = stats.totalUsers;
-                cards[1].textContent = stats.totalCategories;
-                cards[2].textContent = stats.totalCoupons;
-                cards[3].innerHTML = '<span>' + this.formatNumber(stats.revenueThisMonth) + '</span>đ';
+            // Cập nhật bằng IDs nếu có (preferred, an toàn hơn)
+            const idTotalUsers = document.getElementById('totalUsers');
+            const idTotalCategories = document.getElementById('totalCategories');
+            const idTotalCoupons = document.getElementById('totalCoupons');
+            const idRevenueThisMonth = document.getElementById('revenueThisMonth');
+
+            if (idTotalUsers) idTotalUsers.textContent = stats.totalUsers;
+            if (idTotalCategories) idTotalCategories.textContent = stats.totalCategories;
+            if (idTotalCoupons) idTotalCoupons.textContent = stats.totalCoupons;
+            if (idRevenueThisMonth) idRevenueThisMonth.textContent = this.formatNumber(stats.revenueThisMonth) + 'đ';
+
+            // Fallback to layout selectors cũ nếu IDs không có
+            if (!idTotalUsers || !idTotalCategories || !idTotalCoupons || !idRevenueThisMonth) {
+                const cards = document.querySelectorAll('.main-content .row:nth-child(2) .card-body h5');
+                if (cards.length >= 4) {
+                    cards[0].textContent = stats.totalUsers;
+                    cards[1].textContent = stats.totalCategories;
+                    cards[2].textContent = stats.totalCoupons;
+                    cards[3].innerHTML = '<span>' + this.formatNumber(stats.revenueThisMonth) + '</span>đ';
+                }
             }
 
-            // Update order counts (in the right card)
-            const orderCounts = document.querySelectorAll('.main-content .row:nth-child(3) strong');
-            if (orderCounts.length >= 3) {
-                orderCounts[0].textContent = stats.ordersToday;
-                orderCounts[1].textContent = stats.ordersThisWeek;
-                orderCounts[2].textContent = stats.ordersThisMonth;
+            // Cập nhật số đơn hàng
+            const idOrdersToday = document.getElementById('ordersToday');
+            const idOrdersThisWeek = document.getElementById('ordersThisWeek');
+            const idOrdersThisMonth = document.getElementById('ordersThisMonth');
+            if (idOrdersToday) idOrdersToday.textContent = stats.ordersToday;
+            if (idOrdersThisWeek) idOrdersThisWeek.textContent = stats.ordersThisWeek;
+            if (idOrdersThisMonth) idOrdersThisMonth.textContent = stats.ordersThisMonth;
+
+            // Fallback selectors cũ
+            if (!idOrdersToday || !idOrdersThisWeek || !idOrdersThisMonth) {
+                const orderCounts = document.querySelectorAll('.main-content .row:nth-child(3) strong');
+                if (orderCounts.length >= 3) {
+                    orderCounts[0].textContent = stats.ordersToday;
+                    orderCounts[1].textContent = stats.ordersThisWeek;
+                    orderCounts[2].textContent = stats.ordersThisMonth;
+                }
             }
 
-            // Update chart
+            // Cập nhật biểu đồ
             if (stats.revenueChart) {
                 window.revenueChartData = stats.revenueChart;
                 this.renderRevenueChart();
@@ -88,7 +117,7 @@
             const chartData = window.revenueChartData;
             
             if (chartData.length === 0) {
-                // Show empty state
+                // Hiển thị trạng thái trống
                 const emptyDiv = document.createElement('div');
                 emptyDiv.className = 'text-center text-muted py-5';
                 emptyDiv.innerHTML = '<i class="bi bi-graph-up fs-1 opacity-25 mb-2"></i><p>Chưa có dữ liệu doanh thu</p>';
@@ -96,7 +125,7 @@
                 return;
             }
             
-            // Remove empty state if exists
+            // Xóa trạng thái trống nếu có
             const emptyDiv = ctx.parentElement.querySelector('.text-center.text-muted');
             if (emptyDiv) {
                 emptyDiv.remove();
@@ -138,7 +167,7 @@
 
     }
 
-    // Initialize when DOM is ready
+    // Khởi tạo khi DOM đã tải xong
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', () => {
             window.dashboardManagement = new DashboardManagement();

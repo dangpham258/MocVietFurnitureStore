@@ -1,4 +1,9 @@
-// Colors Management System
+// ========================================
+// COLORS MANAGEMENT JAVASCRIPT
+// ========================================
+
+console.log('Colors Management JS loaded successfully!');
+
 class ColorsManagement {
     constructor() {
         this.colors = [];
@@ -29,12 +34,12 @@ class ColorsManagement {
     }
     
     /**
-     * Apply filters
+     * Áp dụng filters
      */
     applyFilters() {
         let filtered = [...this.colors];
         
-        // Search filter
+        // Search filter (tìm kiếm)
         const searchTerm = document.getElementById('searchInput')?.value.toLowerCase() || '';
         if (searchTerm) {
             filtered = filtered.filter(color => 
@@ -43,7 +48,7 @@ class ColorsManagement {
             );
         }
         
-        // Status filter
+        // Status filter (trạng thái filter)
         const statusFilter = document.getElementById('filterStatus')?.value || '';
         if (statusFilter === 'active') {
             filtered = filtered.filter(color => color.isActive);
@@ -57,7 +62,7 @@ class ColorsManagement {
     }
     
     /**
-     * Render colors
+     * Render colors (render lại colors)
      */
     renderColors() {
         const grid = document.getElementById('colorsGrid');
@@ -80,7 +85,8 @@ class ColorsManagement {
     
     /**
      * Create color card HTML
-     */
+     * Tạo HTML cho card màu sắc
+    */
     createColorCard(color) {
         const hexColor = color.hex || '#cccccc';
         const statusBadge = color.isActive 
@@ -129,7 +135,7 @@ class ColorsManagement {
     }
     
     /**
-     * Update stats
+     * Update stats (cập nhật stats)
      */
     updateStats() {
         const totalColors = this.filteredColors.length;
@@ -146,7 +152,7 @@ class ColorsManagement {
     }
     
     /**
-     * Create color
+     * Create color (tạo màu sắc)
      */
     async createColor() {
         const name = document.getElementById('colorName').value;
@@ -196,7 +202,7 @@ class ColorsManagement {
     }
     
     /**
-     * Edit color
+     * Edit color (chỉnh sửa màu sắc)
      */
     async editColor(id) {
         const color = this.colors.find(c => c.id === id);
@@ -211,7 +217,7 @@ class ColorsManagement {
         document.getElementById('editColorHex').value = color.hex || '';
         document.getElementById('editColorIsActive').checked = color.isActive;
         
-        // Disable slug field if color has images (slug is used in image paths)
+        // Disable slug field if color has images (slug được sử dụng trong đường dẫn ảnh)
         const slugInput = document.getElementById('editColorSlug');
         const slugHelpText = slugInput.parentElement.querySelector('.form-text');
         if (color.hasImages) {
@@ -235,7 +241,7 @@ class ColorsManagement {
     }
     
     /**
-     * Update color
+     * Cập nhật màu sắc
      */
     async updateColor() {
         const id = document.getElementById('editColorId').value;
@@ -282,7 +288,7 @@ class ColorsManagement {
     }
     
     /**
-     * Toggle color status
+     * Toggle color status (thay đổi trạng thái màu sắc)
      */
     async toggleColorStatus(id) {
         if (!confirm('Bạn có chắc muốn thay đổi trạng thái màu sắc này?')) {
@@ -309,7 +315,7 @@ class ColorsManagement {
     }
     
     /**
-     * Reset filters
+     * Reset filters (reset filters)
      */
     resetFilters() {
         document.getElementById('searchInput').value = '';
@@ -318,28 +324,29 @@ class ColorsManagement {
     }
     
     /**
-     * Bind events
+     * Bind events (xử lý sự kiện) 
      */
     bindEvents() {
-        // Search input
+        // Search input (tìm kiếm)
         const searchInput = document.getElementById('searchInput');
         if (searchInput) {
             searchInput.addEventListener('input', () => this.applyFilters());
         }
         
-        // Status filter
+        // Status filter (trạng thái filter)
         const statusFilter = document.getElementById('filterStatus');
         if (statusFilter) {
             statusFilter.addEventListener('change', () => this.applyFilters());
         }
         
-        // Auto-generate slug from name
+        // Auto-generate slug from name (tự động tạo slug từ tên)
         const colorName = document.getElementById('colorName');
         const colorSlug = document.getElementById('colorSlug');
         if (colorName && colorSlug) {
+            const self = this;
             colorName.addEventListener('input', function() {
                 if (!colorSlug.dataset.edited) {
-                    const slug = colorsManagement.sanitizeTitle(this.value);
+                    const slug = self.sanitizeTitle(this.value);
                     colorSlug.value = slug;
                 }
             });
@@ -351,12 +358,13 @@ class ColorsManagement {
     }
     
     /**
-     * Sanitize title to slug (same logic as banners)
+     * Sanitize title to slug (cùng logic với banners)
+     * Chuyển đổi ký tự tiếng Việt sang ASCII
      */
     sanitizeTitle(title) {
         if (!title) return "";
         
-        // Remove Vietnamese accents first
+        // Remove Vietnamese accents first (loại bỏ dấu tiếng Việt trước)
         const withoutAccents = this.removeVietnameseAccents(title);
         
         return withoutAccents
@@ -368,7 +376,7 @@ class ColorsManagement {
     }
     
     /**
-     * Remove Vietnamese accents/diacritics
+     * Remove Vietnamese accents/diacritics (loại bỏ dấu tiếng Việt/dấu thanh)
      */
     removeVietnameseAccents(str) {
         if (!str) return "";
@@ -403,7 +411,7 @@ class ColorsManagement {
     }
     
     /**
-     * Show notification
+     * Show notification (hiển thị thông báo)
      */
     showNotification(message, type) {
         if (window.showNotification) {
@@ -414,7 +422,7 @@ class ColorsManagement {
     }
     
     /**
-     * Escape HTML
+     * Escape HTML (escape HTML)
      */
     escapeHtml(text) {
         const map = {
@@ -428,7 +436,7 @@ class ColorsManagement {
     }
 }
 
-// Global functions for onclick handlers
+// Global functions for onclick handlers (xử lý sự kiện click)
 let colorsManagement;
 
 function createColor() {
@@ -461,7 +469,7 @@ function resetFilters() {
     }
 }
 
-// Function to initialize colors management
+// Function to initialize colors management (hàm khởi tạo Colors Management)
 function initializeColorsManagement() {
     if (window.location.pathname.includes('/admin/colors')) {
         if (colorsManagement) {
@@ -476,14 +484,14 @@ function initializeColorsManagement() {
     }
 }
 
-// Initialize when DOM is loaded
+// Initialize when DOM is loaded (khởi tạo khi DOM đã tải xong)
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initializeColorsManagement);
 } else {
     initializeColorsManagement();
 }
 
-// Export for global access
+// Export for global access (export để sử dụng trong admin.js)
 window.ColorsManagement = ColorsManagement;
 window.initializeColorsManagement = initializeColorsManagement;
 

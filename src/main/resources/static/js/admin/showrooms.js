@@ -21,10 +21,10 @@ class ShowroomsManagement {
     }
     
     /**
-     * Bind events
+     * Bind events (lắng nghe sự kiện)
      */
     bindEvents() {
-        // Search input with debounce
+        // Search input với debounce
         const searchInput = document.getElementById('searchInput');
         if (searchInput) {
             let timeout;
@@ -36,7 +36,7 @@ class ShowroomsManagement {
             });
         }
         
-        // Filter dropdowns
+        // Filter dropdowns (lọc dropdown)
         const filterCity = document.getElementById('filterCity');
         const filterStatus = document.getElementById('filterStatus');
         
@@ -50,10 +50,10 @@ class ShowroomsManagement {
     }
     
     /**
-     * Set default view
+     * Set default view (set view mặc định)
      */
     setDefaultView() {
-        // Set grid view as default
+        // Set view grid làm mặc định
         if (this.currentView === 'grid') {
             document.getElementById('gridViewBtn').classList.add('active');
             document.getElementById('listViewBtn').classList.remove('active');
@@ -61,7 +61,7 @@ class ShowroomsManagement {
     }
     
     /**
-     * Load showrooms from API
+     * Tải showrooms từ API
      */
     async loadShowrooms() {
         try {
@@ -81,12 +81,12 @@ class ShowroomsManagement {
     }
     
     /**
-     * Apply filters
+     * Áp dụng filters
      */
     applyFilters() {
         let filtered = [...this.showrooms];
         
-        // Search filter
+        // Search filter (lọc tìm kiếm)
         const searchKeyword = document.getElementById('searchInput')?.value.toLowerCase() || '';
         if (searchKeyword) {
             filtered = filtered.filter(showroom => 
@@ -97,13 +97,13 @@ class ShowroomsManagement {
             );
         }
         
-        // City filter
+        // City filter (lọc thành phố)
         const filterCity = document.getElementById('filterCity')?.value || '';
         if (filterCity) {
             filtered = filtered.filter(showroom => showroom.city === filterCity);
         }
         
-        // Status filter
+        // Status filter (lọc trạng thái)
         const filterStatus = document.getElementById('filterStatus')?.value || '';
         if (filterStatus) {
             const isActive = filterStatus === 'active';
@@ -114,12 +114,12 @@ class ShowroomsManagement {
         this.renderShowrooms();
         this.updateStats();
         
-        // Update city filter options
+        // Update city filter options (cập nhật options thành phố)
         this.updateCityFilterOptions();
     }
     
     /**
-     * Update city filter options based on loaded showrooms
+     * Cập nhật options thành phố dựa trên showrooms đã tải
      */
     updateCityFilterOptions() {
         const cities = [...new Set(this.showrooms.map(s => s.city).filter(Boolean))].sort();
@@ -138,29 +138,29 @@ class ShowroomsManagement {
             filterCitySelect.appendChild(option);
         });
         
-        // Restore previous selection
+        // Restore previous selection (khôi phục lựa chọn trước đó)
         filterCitySelect.value = currentValue;
     }
     
     /**
-     * Render showrooms
+     * Render showrooms (render showroom)
      */
     renderShowrooms() {
         this.hideAllStates();
         
-        // Check if no showrooms at all
+        // Kiểm tra nếu không có showroom nào
         if (this.showrooms.length === 0) {
             this.showEmptyStateWithMessage(true, 'Chưa có showroom nào', 'Hãy thêm showroom đầu tiên của bạn');
             return;
         }
         
-        // Check if filtered results are empty
+        // Kiểm tra nếu kết quả lọc là trống
         if (this.filteredShowrooms.length === 0) {
             this.showEmptyStateWithMessage(true, 'Không có kết quả phù hợp', 'Thử thay đổi bộ lọc hoặc tìm kiếm');
             return;
         }
         
-        // Show showroomContainer
+        // Hiển thị showroomContainer
         const container = document.getElementById('showroomContainer');
         if (container) {
             container.style.display = 'block';
@@ -174,7 +174,7 @@ class ShowroomsManagement {
     }
     
     /**
-     * Render grid view
+     * Render grid view (render view grid)
      */
     renderGridView() {
         const container = document.getElementById('showroomGrid');
@@ -182,7 +182,7 @@ class ShowroomsManagement {
         
         if (!container) return;
         
-        // Show grid (with Bootstrap row class)
+        // Hiển thị grid (với class row của Bootstrap)
         container.style.display = '';
         if (listView) listView.style.display = 'none';
         
@@ -192,7 +192,7 @@ class ShowroomsManagement {
     }
     
     /**
-     * Render list view
+     * Render list view (render view list)
      */
     renderListView() {
         const container = document.getElementById('showroomList');
@@ -226,14 +226,14 @@ class ShowroomsManagement {
     }
     
     /**
-     * Render showroom card (Grid view)
+     * Render showroom card (view grid)
      */
     renderShowroomCard(showroom) {
         const statusBadge = showroom.isActive 
             ? '<span class="badge bg-success">Đang hoạt động</span>'
             : '<span class="badge bg-secondary">Đã tắt</span>';
         
-        // Generate map preview if mapEmbed exists
+        // Generate map preview nếu mapEmbed tồn tại
         let mapPreview = '';
         if (showroom.mapEmbed) {
             mapPreview = `
@@ -336,7 +336,7 @@ class ShowroomsManagement {
     }
     
     /**
-     * Render showroom row (List view)
+     * Render showroom row (view list)
      */
     renderShowroomRow(showroom) {
         const statusBadge = showroom.isActive 
@@ -377,7 +377,7 @@ class ShowroomsManagement {
     }
     
     /**
-     * Update stats
+     * Cập nhật stats
      */
     updateStats() {
         const total = this.filteredShowrooms.length;
@@ -392,7 +392,7 @@ class ShowroomsManagement {
     }
     
     /**
-     * Show add modal
+     * Hiển thị modal thêm
      */
     showAddModal() {
         const modal = new bootstrap.Modal(document.getElementById('addShowroomModal'));
@@ -400,7 +400,7 @@ class ShowroomsManagement {
     }
     
     /**
-     * Create showroom
+     * Tạo showroom
      */
     async createShowroom() {
         const name = document.getElementById('showroomName').value.trim();
@@ -413,7 +413,7 @@ class ShowroomsManagement {
         const mapEmbed = document.getElementById('showroomMapEmbed').value.trim();
         const isActive = document.getElementById('showroomIsActive').checked;
         
-        // Validate required fields
+        // Validate required fields (kiểm tra các trường bắt buộc)
         if (!name) {
             this.showNotification('Vui lòng nhập tên showroom', 'warning');
             return;
@@ -429,13 +429,13 @@ class ShowroomsManagement {
             return;
         }
         
-        // Validate email if provided
+        // Validate email nếu có
         if (email && !this.isValidEmail(email)) {
             this.showNotification('Email không hợp lệ', 'warning');
             return;
         }
         
-        // Validate phone if provided
+        // Validate phone nếu có
         if (phone && !this.isValidPhone(phone)) {
             const cleaned = phone.replace(/\s/g, '');
             if (cleaned.length < 9 || cleaned.length > 20) {
@@ -485,7 +485,7 @@ class ShowroomsManagement {
     }
     
     /**
-     * Edit showroom
+     * Sửa showroom
      */
     async editShowroom(showroomId) {
         const showroom = this.showrooms.find(s => s.id === showroomId);
@@ -494,7 +494,7 @@ class ShowroomsManagement {
             return;
         }
         
-        // Populate edit modal
+        // Populate edit modal (điền dữ liệu vào modal sửa)
         document.getElementById('editShowroomId').value = showroom.id;
         document.getElementById('editShowroomName').value = showroom.name || '';
         document.getElementById('editShowroomAddress').value = showroom.address || '';
@@ -511,7 +511,7 @@ class ShowroomsManagement {
     }
     
     /**
-     * Update showroom
+     * Cập nhật showroom
      */
     async updateShowroom() {
         const showroomId = document.getElementById('editShowroomId').value;
@@ -525,7 +525,7 @@ class ShowroomsManagement {
         const mapEmbed = document.getElementById('editShowroomMapEmbed').value.trim();
         const isActive = document.getElementById('editShowroomIsActive').checked;
         
-        // Validate required fields
+        // Validate required fields (kiểm tra các trường bắt buộc)
         if (!name) {
             this.showNotification('Vui lòng nhập tên showroom', 'warning');
             return;
@@ -541,13 +541,13 @@ class ShowroomsManagement {
             return;
         }
         
-        // Validate email if provided
+        // Validate email nếu có
         if (email && !this.isValidEmail(email)) {
             this.showNotification('Email không hợp lệ', 'warning');
             return;
         }
         
-        // Validate phone if provided
+        // Validate phone nếu có
         if (phone && !this.isValidPhone(phone)) {
             const cleaned = phone.replace(/\s/g, '');
             if (cleaned.length < 9 || cleaned.length > 20) {
@@ -596,7 +596,7 @@ class ShowroomsManagement {
     }
     
     /**
-     * Delete showroom
+     * Xóa showroom
      */
     async deleteShowroom(showroomId) {
         if (!confirm('Bạn có chắc chắn muốn xóa showroom này?')) {
@@ -623,7 +623,7 @@ class ShowroomsManagement {
     }
     
     /**
-     * View showroom details
+     * Xem chi tiết showroom
      */
     async viewShowroom(showroomId) {
         const showroom = this.showrooms.find(s => s.id === showroomId);
@@ -632,7 +632,7 @@ class ShowroomsManagement {
             return;
         }
         
-        // Generate view content
+        // Generate view content (tạo nội dung xem)
         const statusBadge = showroom.isActive 
             ? '<span class="badge bg-success">Đang hoạt động</span>'
             : '<span class="badge bg-secondary">Đã tắt</span>';
@@ -702,14 +702,14 @@ class ShowroomsManagement {
     }
     
     /**
-     * Reset add form
+     * Reset add form (reset form thêm)
      */
     resetAddForm() {
         document.getElementById('addShowroomForm').reset();
     }
     
     /**
-     * Reset filters
+     * Reset filters (reset filters)
      */
     resetFilters() {
         document.getElementById('searchInput').value = '';
@@ -719,7 +719,7 @@ class ShowroomsManagement {
     }
     
     /**
-     * Hide all states
+     * Hide all states (ẩn tất cả trạng thái)
      */
     hideAllStates() {
         document.getElementById('loadingState').style.display = 'none';
@@ -728,21 +728,21 @@ class ShowroomsManagement {
     }
     
     /**
-     * Show loading state
+     * Hiển thị trạng thái loading
      */
     showLoading(show) {
         document.getElementById('loadingState').style.display = show ? 'block' : 'none';
     }
     
     /**
-     * Show empty state
+     * Hiển thị trạng thái trống
      */
     showEmptyState(show) {
         document.getElementById('emptyState').style.display = show ? 'block' : 'none';
     }
     
     /**
-     * Show empty state with custom message
+     * Hiển thị trạng thái trống với message tùy chỉnh
      */
     showEmptyStateWithMessage(show, title, message) {
         const emptyState = document.getElementById('emptyState');
@@ -758,7 +758,7 @@ class ShowroomsManagement {
     }
     
     /**
-     * Validates email format
+     * Validates email format (kiểm tra định dạng email)
      */
     isValidEmail(email) {
         const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -766,41 +766,40 @@ class ShowroomsManagement {
     }
     
     /**
-     * Validates phone format
+     * Validates phone format (kiểm tra định dạng số điện thoại)
      */
     isValidPhone(phone) {
         if (!phone || phone.trim().length === 0) {
-            return true; // Allow empty (optional field)
+            return true; // Cho phép trống (trường tùy chọn)
         }
         
-        // Check length (9-20 characters after removing spaces)
+        // Kiểm tra độ dài (9-20 ký tự sau khi xóa khoảng trắng)
         const cleaned = phone.replace(/\s/g, '');
         if (cleaned.length < 9 || cleaned.length > 20) {
             return false;
         }
         
-        // Allow numbers, +, -, (), and spaces
+        // Cho phép số, +, -, (), và khoảng trắng
         const re = /^[0-9+\-()\s]*$/;
         return re.test(phone);
     }
     
     /**
-     * Format date
+     * Format date (định dạng ngày)
      */
     formatDate(dateString) {
         if (!dateString) return '';
         
-        // Backend already returns formatted date (dd/MM/yyyy)
-        // So just return it as is, or try to parse if needed
+        // Backend đã trả về ngày định dạng (dd/MM/yyyy)
         if (dateString.includes('/')) {
-            // Already in dd/MM/yyyy format
+            // Đã ở định dạng dd/MM/yyyy
             return dateString;
         }
         
-        // Try to parse if it's in ISO format or other format
+        // Thử phân tích nếu nó ở định dạng ISO hoặc định dạng khác
         const date = new Date(dateString);
         if (isNaN(date.getTime())) {
-            return dateString; // Return as is if can't parse
+            return dateString; // Trả về như là nếu không thể phân tích
         }
         
         const day = String(date.getDate()).padStart(2, '0');
@@ -810,7 +809,7 @@ class ShowroomsManagement {
     }
     
     /**
-     * Show notification
+     * Hiển thị thông báo
      */
     showNotification(message, type = 'info') {
         if (window.notificationSystem) {
@@ -821,10 +820,10 @@ class ShowroomsManagement {
     }
 }
 
-// Global instance
+// Instance global
 let showroomsManagement;
 
-// Initialize on page load
+// Khởi tạo khi script tải xong
 function initializeShowroomsManagement() {
     if (showroomsManagement) {
         delete showroomsManagement;
@@ -832,13 +831,13 @@ function initializeShowroomsManagement() {
     showroomsManagement = new ShowroomsManagement();
 }
 
-// Global function for toggle view
+// Functions global cho onclick handlers
 function toggleView(view) {
     if (showroomsManagement) {
         showroomsManagement.currentView = view;
         showroomsManagement.renderShowrooms();
         
-        // Update button states
+        // Cập nhật trạng thái button
         if (view === 'grid') {
             document.getElementById('gridViewBtn').classList.add('active');
             document.getElementById('listViewBtn').classList.remove('active');
@@ -868,10 +867,10 @@ function resetFilters() {
     }
 }
 
-// Export for admin.js
+// Xuất ra admin.js
 window.initializeShowroomsManagement = initializeShowroomsManagement;
 
-// Auto-initialize if this is the showrooms page
+// Khởi tạo tự động khi script tải xong
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function() {
         if (window.location.pathname.includes('/admin/showrooms')) {
@@ -879,7 +878,7 @@ if (document.readyState === 'loading') {
         }
     });
 } else {
-    // DOM already loaded
+    // DOM đã tải xong
     if (window.location.pathname.includes('/admin/showrooms')) {
         initializeShowroomsManagement();
     }

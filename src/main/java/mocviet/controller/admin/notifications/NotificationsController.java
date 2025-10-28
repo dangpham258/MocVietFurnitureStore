@@ -7,25 +7,24 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import jakarta.servlet.http.HttpServletRequest;
-
 import lombok.RequiredArgsConstructor;
 
 @Controller
 @RequestMapping("/admin/notifications")
 @RequiredArgsConstructor
 public class NotificationsController {
-    
+
     @GetMapping({"", "/"})
     @PreAuthorize("hasRole('ADMIN')")
     public String notifications(Model model, HttpServletRequest request) {
         model.addAttribute("pageTitle", "Thông báo");
         model.addAttribute("activeMenu", "notifications");
-        
-        // Check if it's an AJAX request
+
+        // Kiểm tra có phải là request của AJAX
         if ("XMLHttpRequest".equals(request.getHeader("X-Requested-With"))) {
             return "admin/notifications/admin_notifications ::content";
         }
-        
+
         return "admin/notifications/admin_notifications";
     }
 }

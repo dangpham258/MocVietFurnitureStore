@@ -21,10 +21,10 @@ class BannersManagement {
     }
     
     /**
-     * Setup filename preview
+     * Khởi tạo filename preview
      */
     setupFilenamePreview() {
-        // Add modal
+        // Thêm modal
         const bannerTitleInput = document.getElementById('bannerTitle');
         if (bannerTitleInput) {
             bannerTitleInput.addEventListener('input', () => {
@@ -32,7 +32,7 @@ class BannersManagement {
             });
         }
         
-        // Edit modal
+        // Thêm modal edit
         const editBannerTitleInput = document.getElementById('editBannerTitle');
         const editBannerOrderInput = document.getElementById('editBannerOrderNumber');
         if (editBannerTitleInput) {
@@ -48,7 +48,7 @@ class BannersManagement {
     }
     
     /**
-     * Update filename preview (Add modal)
+     * Cập nhật filename preview (Thêm modal)
      */
     updateFilenamePreview() {
         const titleInput = document.getElementById('bannerTitle');
@@ -74,7 +74,7 @@ class BannersManagement {
             return;
         }
         
-        // Sanitize title similar to backend
+        // Sanitize title giống như backend
         const sanitized = this.sanitizeTitle(title);
         const filename = `${orderNumber}_${sanitized}.jpg`;
         
@@ -83,7 +83,7 @@ class BannersManagement {
     }
     
     /**
-     * Update filename preview (Edit modal)
+     * Cập nhật filename preview (Thêm modal edit)
      */
     updateEditFilenamePreview() {
         const titleInput = document.getElementById('editBannerTitle');
@@ -109,7 +109,7 @@ class BannersManagement {
             return;
         }
         
-        // Sanitize title similar to backend
+        // Sanitize title giống như backend
         const sanitized = this.sanitizeTitle(title);
         const filename = orderNumber ? `${orderNumber}_${sanitized}.jpg` : `${sanitized}.jpg`;
         
@@ -118,11 +118,11 @@ class BannersManagement {
     }
     
     /**
-     * Sanitize title (same logic as backend)
-     * Convert Vietnamese characters to ASCII
+     * Sanitize title (giống như backend)
+     * Chuyển đổi ký tự tiếng Việt sang ASCII
      */
     sanitizeTitle(title) {
-        // First remove Vietnamese accents/diacritics
+        // Đầu tiên xóa dấu tiếng Việt/diacritics
         const withoutAccents = this.removeVietnameseAccents(title.trim());
         
         return withoutAccents.toLowerCase()
@@ -133,8 +133,8 @@ class BannersManagement {
     }
     
     /**
-     * Remove Vietnamese accents/diacritics
-     * Same logic as backend FileUploadService
+     * Xóa dấu tiếng Việt/diacritics
+     * Giống như backend FileUploadService
      */
     removeVietnameseAccents(str) {
         if (!str) return "";
@@ -169,7 +169,7 @@ class BannersManagement {
     }
     
     /**
-     * Setup upload area
+     * Tạo upload area
      */
     setupUploadArea() {
         const uploadArea = document.getElementById('uploadArea');
@@ -190,7 +190,7 @@ class BannersManagement {
             uploadArea.classList.remove('dragover');
             const files = e.dataTransfer.files;
             if (files.length > 0) {
-                // Validate file size (10MB = 10485760 bytes)
+                // Kiểm tra kích thước file (10MB = 10485760 bytes)
                 if (files[0].size > 10485760) {
                     this.showNotification('Kích thước ảnh vượt quá 10MB!', 'danger');
                     return;
@@ -203,15 +203,15 @@ class BannersManagement {
         fileInput.addEventListener('change', (e) => {
             if (e.target.files.length > 0) {
                 const file = e.target.files[0];
-                // Validate file size (10MB = 10485760 bytes)
+                // Kiểm tra kích thước file (10MB = 10485760 bytes)
                 if (file.size > 10485760) {
                     this.showNotification('Kích thước ảnh vượt quá 10MB!', 'danger');
-                    fileInput.value = ''; // Clear the input
+                    fileInput.value = ''; // Xóa input
                     return;
                 }
                 this.handleImagePreview(file, 'previewImg');
             } else {
-                // User canceled file selection - hide preview
+                // Người dùng hủy chọn file - ẩn preview
                 const preview = document.getElementById('imagePreview');
                 const previewImg = document.getElementById('previewImg');
                 if (preview) preview.style.display = 'none';
@@ -221,7 +221,7 @@ class BannersManagement {
     }
     
     /**
-     * Setup edit image input
+     * Khởi tạo input ảnh edit
      */
     setupEditImageInput() {
         const editImageInput = document.getElementById('editBannerImageInput');
@@ -230,10 +230,10 @@ class BannersManagement {
         editImageInput.addEventListener('change', (e) => {
             if (e.target.files.length > 0) {
                 const file = e.target.files[0];
-                // Validate file size (10MB = 10485760 bytes)
+                // Kiểm tra kích thước file (10MB = 10485760 bytes)
                 if (file.size > 10485760) {
                     this.showNotification('Kích thước ảnh vượt quá 10MB!', 'danger');
-                    editImageInput.value = ''; // Clear the input
+                    editImageInput.value = ''; // Xóa input
                     return;
                 }
                 const reader = new FileReader();
@@ -242,7 +242,7 @@ class BannersManagement {
                 };
                 reader.readAsDataURL(file);
             } else {
-                // User canceled file selection - restore original image
+                // Người dùng hủy chọn file - khôi phục ảnh gốc
                 const banner = this.banners[this.currentEditingIndex];
                 if (banner && document.getElementById('currentImg')) {
                     document.getElementById('currentImg').src = banner.imageUrl;
@@ -252,7 +252,7 @@ class BannersManagement {
     }
     
     /**
-     * Handle image preview
+     * Xử lý preview ảnh
      */
     handleImagePreview(file, previewId) {
         const preview = document.getElementById('imagePreview');
@@ -269,7 +269,7 @@ class BannersManagement {
     }
     
     /**
-     * Load banners
+     * Tải banners
      */
     async loadBanners() {
         try {
@@ -286,7 +286,8 @@ class BannersManagement {
     }
     
     /**
-     * Render banners
+     * Render banners (render lại banners)
+     * Render lại banners theo thứ tự được trả về từ backend (sắp xếp theo số thứ tự)
      */
     renderBanners() {
         const container = document.getElementById('bannersContainer');
@@ -306,14 +307,15 @@ class BannersManagement {
             return;
         }
         
-        // Display banners in the order returned by backend (sorted by order number)
+        // Hiển thị banners theo thứ tự được trả về từ backend (sắp xếp theo số thứ tự)
         container.innerHTML = this.banners.map((banner, index) => 
             this.renderBannerCard(banner, index)
         ).join('');
     }
     
     /**
-     * Render banner card
+     * Render banner card (render lại banner card)
+     * Render lại banner card theo thứ tự được trả về từ backend (sắp xếp theo số thứ tự)
      */
     renderBannerCard(banner, index) {
         const statusBadge = banner.isActive 
@@ -324,7 +326,7 @@ class BannersManagement {
             ? `<span class="badge bg-info ms-1"><i class="bi bi-link-45deg"></i> Có liên kết</span>`
             : '';
         
-        // Extract order number from imageUrl (e.g., "/static/images/banners/12_aa.jpg" -> "12")
+        // Lấy số thứ tự từ imageUrl (ví dụ: "/static/images/banners/12_aa.jpg" -> "12")
         let orderNumber = 'N/A';
         if (banner.imageUrl) {
             const match = banner.imageUrl.match(/(\d{2})_/);
@@ -387,7 +389,7 @@ class BannersManagement {
     }
     
     /**
-     * Update stats
+     * Cập nhật stats
      */
     updateStats() {
         const total = this.banners.length;
@@ -402,7 +404,7 @@ class BannersManagement {
     }
     
     /**
-     * Show edit modal
+     * Hiển thị modal edit
      */
     showEditModal(index) {
         const banner = this.banners[index];
@@ -410,7 +412,7 @@ class BannersManagement {
         
         this.currentEditingIndex = index;
         
-        // Extract order number from imageUrl (e.g., "/static/images/banners/00_title.jpg" -> "00")
+        // Lấy số thứ tự từ imageUrl (ví dụ: "/static/images/banners/00_title.jpg" -> "00")
         let orderNumber = '00';
         if (banner.imageUrl) {
             const match = banner.imageUrl.match(/(\d{2})_/);
@@ -435,7 +437,7 @@ class BannersManagement {
     }
     
     /**
-     * Create banner
+     * Tạo banner
      */
     async createBanner() {
         const imageInput = document.getElementById('bannerImageInput');
@@ -444,26 +446,26 @@ class BannersManagement {
         const link = document.getElementById('bannerLink').value.trim();
         const active = document.getElementById('bannerActive').checked;
         
-        // Validate image
+        // Kiểm tra ảnh
         if (!imageInput.files || imageInput.files.length === 0) {
             this.showNotification('Vui lòng chọn ảnh banner', 'warning');
             return;
         }
         
-        // Validate title (required for filename generation)
+        // Kiểm tra tiêu đề (yêu cầu để tạo tên file)
         if (!title) {
             this.showNotification('Vui lòng nhập tiêu đề banner', 'warning');
             return;
         }
         
-        // Validate order number (00-99)
+        // Kiểm tra số thứ tự (00-99)
         const orderNum = parseInt(orderNumber);
         if (isNaN(orderNum) || orderNum < 0 || orderNum > 99) {
             this.showNotification('Số thứ tự phải từ 00 đến 99', 'warning');
             return;
         }
         
-        // Check if order number already exists (for create only)
+        // Kiểm tra nếu số thứ tự đã tồn tại (chỉ dùng cho tạo)
         const orderStr = orderNumber.padStart(2, '0');
         const existingBanner = this.banners.find(b => {
             if (b.imageUrl) {
@@ -508,7 +510,7 @@ class BannersManagement {
     }
     
     /**
-     * Update banner
+     * Cập nhật banner
      */
     async updateBanner() {
         const bannerId = document.getElementById('editBannerId').value;
@@ -518,20 +520,20 @@ class BannersManagement {
         const active = document.getElementById('editBannerActive').checked;
         const imageInput = document.getElementById('editBannerImageInput');
         
-        // Validate title (required for filename generation)
+        // Kiểm tra tiêu đề (yêu cầu để tạo tên file)
         if (!title) {
             this.showNotification('Vui lòng nhập tiêu đề banner', 'warning');
             return;
         }
         
-        // Validate order number (00-99)
+        // Kiểm tra số thứ tự (00-99)
         const orderNum = parseInt(orderNumber);
         if (isNaN(orderNum) || orderNum < 0 || orderNum > 99) {
             this.showNotification('Số thứ tự phải từ 00 đến 99', 'warning');
             return;
         }
         
-        // Check if order number already exists (for update - excluding current banner)
+        // Kiểm tra nếu số thứ tự đã tồn tại (cập nhật - loại trừ banner hiện tại)
         const orderStr = orderNumber.padStart(2, '0');
         const existingBanner = this.banners.find(b => {
             if (b.id.toString() !== bannerId && b.imageUrl) {
@@ -580,7 +582,7 @@ class BannersManagement {
     }
     
     /**
-     * Delete banner
+     * Xóa banner
      */
     async deleteBanner(bannerId) {
         if (!confirm('Bạn có chắc chắn muốn xóa banner này?')) {
@@ -596,7 +598,7 @@ class BannersManagement {
             
             if (response.ok && result.success !== false) {
                 this.showNotification('Xóa banner thành công', 'success');
-                this.loadBanners(); // Reload from server
+                this.loadBanners(); // Tải lại từ server
             } else {
                 this.showNotification(result.message || 'Xóa banner thất bại', 'danger');
             }
@@ -607,33 +609,33 @@ class BannersManagement {
     }
     
     /**
-     * Reset add form
+     * Reset form thêm
      */
     resetAddForm() {
         document.getElementById('addBannerForm').reset();
         
-        // Reset specific inputs
+        // Reset các input cụ thể
         document.getElementById('bannerOrderNumber').value = '';
         document.getElementById('bannerTitle').value = '';
         document.getElementById('bannerLink').value = '';
         document.getElementById('bannerActive').checked = true;
         document.getElementById('bannerImageInput').value = '';
         
-        // Reset image preview
+        // Reset preview ảnh
         document.getElementById('imagePreview').style.display = 'none';
         document.getElementById('previewImg').src = '';
         
-        // Update filename preview
+        // Cập nhật filename preview
         document.getElementById('filenamePreview').textContent = 'chưa có';
         document.getElementById('filenamePreview').className = 'fw-bold text-muted';
     }
     
     /**
-     * Helper: Normalize URL - Add protocol if missing
+     * Hỗ trợ: Normalize URL - Thêm protocol nếu thiếu
      */
     normalizeUrl(url) {
         if (!url) return '';
-        // If URL doesn't start with http:// or https://, add http://
+        // Nếu URL không bắt đầu với http:// hoặc https://, thêm http://
         if (!url.match(/^https?:\/\//i)) {
             return 'http://' + url;
         }
@@ -641,7 +643,7 @@ class BannersManagement {
     }
     
     /**
-     * Reset edit form
+     * Reset form edit
      */
     resetEditForm() {
         document.getElementById('editBannerForm').reset();
@@ -657,7 +659,7 @@ class BannersManagement {
     }
     
     /**
-     * Helper: Truncate URL
+     * Hỗ trợ: Cắt URL
      */
     truncateUrl(url, maxLength) {
         if (!url) return '';
@@ -665,7 +667,7 @@ class BannersManagement {
     }
     
     /**
-     * Helper: Format date
+     * Hỗ trợ: Định dạng ngày
      */
     formatDate(dateString) {
         if (!dateString) return '';
@@ -677,7 +679,7 @@ class BannersManagement {
     }
     
     /**
-     * Helper: Show notification
+     * Hỗ trợ: Hiển thị thông báo
      */
     showNotification(message, type = 'info') {
         if (window.notificationSystem) {
@@ -688,10 +690,10 @@ class BannersManagement {
     }
 }
 
-// Global instance
+// Global instance (khởi tạo instance)
 let bannersManagement;
 
-// Initialize Banners Management
+// Khởi tạo Banners Management
 function initializeBannersManagement() {
     if (bannersManagement) {
         delete bannersManagement;
@@ -699,44 +701,48 @@ function initializeBannersManagement() {
     bannersManagement = new BannersManagement();
 }
 
-// Global functions for filename preview
+// Global functions cho filename preview (cập nhật filename preview)
 function updateFilenamePreview() {
     if (bannersManagement) {
         bannersManagement.updateFilenamePreview();
     }
 }
 
+// Global functions cho filename preview edit (cập nhật filename preview edit)
 function updateEditFilenamePreview() {
     if (bannersManagement) {
         bannersManagement.updateEditFilenamePreview();
     }
 }
 
-// Global functions for onclick handlers
+// Global functions cho onclick handlers (xử lý sự kiện click)
 function editBanner(index) {
     if (bannersManagement) {
         bannersManagement.showEditModal(index);
     }
 }
 
+// Global functions cho xóa banner (xóa banner theo id)
 function deleteBannerId(bannerId) {
     if (bannersManagement) {
         bannersManagement.deleteBanner(bannerId);
     }
 }
 
+// Global functions cho tạo banner (tạo banner)
 function createBanner() {
     if (bannersManagement) {
         bannersManagement.createBanner();
     }
 }
 
+// Global functions cho cập nhật banner (cập nhật banner)
 function updateBanner() {
     if (bannersManagement) {
         bannersManagement.updateBanner();
     }
 }
 
-// Export for admin.js
+// Export cho admin.js (export để sử dụng trong admin.js)
 window.initializeBannersManagement = initializeBannersManagement;
 

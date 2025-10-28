@@ -8,7 +8,7 @@ import mocviet.entity.Banner;
 
 @Repository
 public interface BannerRepository extends JpaRepository<Banner, Integer> {
-    
+
     @Query("SELECT COUNT(b) FROM Banner b")
     long countAllBanners();
 }

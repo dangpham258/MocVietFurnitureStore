@@ -1,29 +1,29 @@
 package mocviet.dto.admin;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class DashboardStatsDTO {
-    // Overview stats
+    // Thống kê tổng quan
     private long totalUsers;
     private long totalCategories;
     private long totalCoupons;
     private long revenueThisMonth;
-    
-    // Order counts
+
+    // Số lượng đơn hàng
     private long ordersToday;
     private long ordersThisWeek;
     private long ordersThisMonth;
-    
-    // Revenue chart (7 days or current month by day)
+
+    // Biểu đồ doanh thu (7 ngày hoặc tháng hiện tại theo ngày)
     private List<RevenueDataDTO> revenueChart;
 }
 

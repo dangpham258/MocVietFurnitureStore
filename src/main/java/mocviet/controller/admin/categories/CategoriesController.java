@@ -13,18 +13,18 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/admin/categories")
 @RequiredArgsConstructor
 public class CategoriesController {
-    
+
     @GetMapping({"", "/"})
     @PreAuthorize("hasRole('ADMIN')")
     public String categories(Model model, HttpServletRequest request) {
         model.addAttribute("pageTitle", "Quản lý danh mục");
         model.addAttribute("activeMenu", "categories");
-        
-        // Check if it's an AJAX request
+
+        // Kiểm tra có phải là request của AJAX
         if ("XMLHttpRequest".equals(request.getHeader("X-Requested-With"))) {
             return "admin/categories/admin_categories ::content";
         }
-        
+
         return "admin/categories/admin_categories";
     }
 }

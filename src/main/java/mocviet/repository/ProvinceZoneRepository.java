@@ -1,11 +1,12 @@
 package mocviet.repository;
 
-import mocviet.entity.ProvinceZone;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Optional;
+import mocviet.entity.ProvinceZone;
 
 @Repository
 public interface ProvinceZoneRepository extends JpaRepository<ProvinceZone, Integer> {

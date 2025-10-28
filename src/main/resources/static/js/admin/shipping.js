@@ -19,21 +19,21 @@ class ShippingManagement {
     }
     
     /**
-     * Load all data (zones, provinces, mappings)
+     * Tải tất cả dữ liệu (zones, provinces, mappings)
      */
     async loadData() {
         try {
-            // Load zones with shipping fees
+            // Tải zones với phí vận chuyển
             const zonesResponse = await fetch(`${this.apiEndpoint}/zones`);
             if (!zonesResponse.ok) throw new Error('Failed to load zones');
             this.zones = await zonesResponse.json();
             
-            // Load provinces
+            // Tải provinces
             const provincesResponse = await fetch(`${this.apiEndpoint}/provinces`);
             if (!provincesResponse.ok) throw new Error('Failed to load provinces');
             this.provinces = await provincesResponse.json();
             
-            // Load mappings
+            // Tải mappings
             const mappingsResponse = await fetch(`${this.apiEndpoint}/mappings`);
             if (!mappingsResponse.ok) throw new Error('Failed to load mappings');
             this.mappings = await mappingsResponse.json();
@@ -47,7 +47,7 @@ class ShippingManagement {
     }
     
     /**
-     * Render zones with provinces
+     * Render zones với provinces
      */
     renderZones() {
         const container = document.getElementById('zonesContainer');
@@ -67,10 +67,10 @@ class ShippingManagement {
     }
     
     /**
-     * Render individual zone card
+     * Render card zone riêng lẻ
      */
     renderZoneCard(zone) {
-        // Get provinces for this zone
+        // Lấy provinces cho zone này
         const zoneProvinces = this.mappings
             .filter(m => m.zoneId === zone.id)
             .map(m => {
@@ -123,7 +123,7 @@ class ShippingManagement {
     }
     
     /**
-     * Render provinces list for a zone
+     * Render danh sách provinces cho một zone
      */
     renderProvincesList(zoneProvinces, zoneId) {
         return `
@@ -144,7 +144,7 @@ class ShippingManagement {
     }
     
     /**
-     * Render empty state for a zone
+     * Render trạng thái trống cho một zone
      */
     renderEmptyState(zoneId) {
         return `
@@ -156,24 +156,27 @@ class ShippingManagement {
     }
     
     /**
-     * Update stats
+     * Cập nhật stats
      */
     updateStats() {
         const totalZones = this.zones.length;
         const totalProvinces = this.provinces.length;
         
-        // Calculate average shipping fee
+        // Tính trung bình phí vận chuyển
         const totalFees = this.zones.reduce((sum, zone) => sum + (zone.baseFee || 0), 0);
         const avgFee = totalZones > 0 ? Math.round(totalFees / totalZones) : 0;
         const avgFeeFormatted = new Intl.NumberFormat('vi-VN').format(avgFee);
         
-        document.getElementById('totalZones').textContent = totalZones;
-        document.getElementById('totalProvinces').textContent = totalProvinces;
-        document.getElementById('avgShippingFee').textContent = `${avgFeeFormatted} đ`;
+        const totalZonesEl = document.getElementById('totalZones');
+        const totalProvincesEl = document.getElementById('totalProvinces');
+        const avgFeeEl = document.getElementById('avgShippingFee');
+        if (totalZonesEl) totalZonesEl.textContent = totalZones;
+        if (totalProvincesEl) totalProvincesEl.textContent = totalProvinces;
+        if (avgFeeEl) avgFeeEl.textContent = `${avgFeeFormatted} đ`;
     }
     
     /**
-     * Edit shipping fee for a zone
+     * Sửa phí vận chuyển cho một zone
      */
     async editShippingFee(zoneId) {
         const zone = this.zones.find(z => z.id === zoneId);
@@ -193,7 +196,7 @@ class ShippingManagement {
     }
     
     /**
-     * Update shipping fee
+     * Cập nhật phí vận chuyển
      */
     async updateShippingFee() {
         const zoneId = parseInt(document.getElementById('editZoneId').value);
@@ -234,7 +237,7 @@ class ShippingManagement {
     }
     
     /**
-     * Show add province modal
+     * Hiển thị modal thêm province
      */
     showAddProvinceModal(zoneId) {
         const zone = this.zones.find(z => z.id === zoneId);
@@ -252,7 +255,7 @@ class ShippingManagement {
     }
     
     /**
-     * Add province to zone
+     * Thêm province vào zone
      */
     async addProvinceToZone() {
         const zoneId = parseInt(document.getElementById('addProvinceZoneId').value);
@@ -295,7 +298,7 @@ class ShippingManagement {
     }
     
     /**
-     * Show remove province modal
+     * Hiển thị modal xóa province
      */
     showRemoveProvinceModal(mappingId, provinceName, zoneId) {
         const zone = this.zones.find(z => z.id === zoneId);
@@ -313,14 +316,14 @@ class ShippingManagement {
     }
     
     /**
-     * Remove province from zone
+     * Xóa province từ zone
      */
     async removeProvinceFromZone(mappingId, provinceName, zoneId) {
         this.showRemoveProvinceModal(mappingId, provinceName, zoneId);
     }
     
     /**
-     * Confirm remove province
+     * Xác nhận xóa province
      */
     async confirmRemoveProvince() {
         const mappingId = document.getElementById('removeProvinceId').value;
@@ -348,7 +351,7 @@ class ShippingManagement {
     }
     
     /**
-     * Helper: Show notification
+     * Helper: Hiển thị thông báo
      */
     showNotification(message, type = 'info') {
         if (window.notificationSystem) {
@@ -359,7 +362,7 @@ class ShippingManagement {
     }
     
     /**
-     * Helper: Escape HTML
+     * Helper: Loại bỏ HTML
      */
     escapeHtml(text) {
         const div = document.createElement('div');
@@ -368,10 +371,10 @@ class ShippingManagement {
     }
 }
 
-// Global instance
+// Instance global
 let shippingManagement;
 
-// Initialize Shipping Management
+// Khởi tạo Shipping Management
 function initializeShippingManagement() {
     if (shippingManagement) {
         delete shippingManagement;
@@ -379,7 +382,7 @@ function initializeShippingManagement() {
     shippingManagement = new ShippingManagement();
 }
 
-// Global functions for onclick handlers
+// Functions global cho onclick handlers
 function editShippingFee(zoneId) {
     if (shippingManagement) {
         shippingManagement.editShippingFee(zoneId);
@@ -416,6 +419,6 @@ function confirmRemoveProvince() {
     }
 }
 
-// Export for admin.js
+// Xuất ra admin.js
 window.initializeShippingManagement = initializeShippingManagement;
 
