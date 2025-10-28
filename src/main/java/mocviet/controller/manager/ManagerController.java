@@ -3,8 +3,8 @@ package mocviet.controller.manager;
 import lombok.RequiredArgsConstructor;
 import mocviet.dto.manager.ChangePasswordRequest;
 import mocviet.dto.manager.UpdateProfileRequest;
-import mocviet.service.manager.ManagerAccountService;
-import mocviet.service.manager.DashboardService;
+import mocviet.service.manager.IManagerAccountService;
+import mocviet.service.manager.IDashboardService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -20,15 +20,15 @@ import jakarta.validation.Valid;
 @RequiredArgsConstructor
 public class ManagerController {
     
-    private final ManagerAccountService managerAccountService;
-    private final DashboardService dashboardService;
+    private final IManagerAccountService managerAccountService;
+    private final IDashboardService dashboardService;
     
     @GetMapping({"", "/"})
     @PreAuthorize("hasRole('MANAGER')")
     public String dashboard(Model model, Authentication authentication) {
         try {
             // Lấy thống kê dashboard
-            DashboardService.DashboardStats stats = dashboardService.getDashboardStats();
+            mocviet.service.manager.DashboardService.DashboardStats stats = dashboardService.getDashboardStats();
             model.addAttribute("stats", stats);
             
             // Lấy đơn hàng gần đây

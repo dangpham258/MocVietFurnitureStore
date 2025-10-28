@@ -6,7 +6,7 @@ import mocviet.dto.manager.*;
 import mocviet.entity.Category;
 import mocviet.entity.User;
 import mocviet.repository.CategoryRepository;
-import mocviet.service.manager.InventoryManagementService;
+import mocviet.service.manager.IInventoryManagementService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -33,7 +33,7 @@ import java.util.Map;
 @PreAuthorize("hasRole('MANAGER')")
 public class InventoryManagementController {
     
-    private final InventoryManagementService inventoryService;
+    private final IInventoryManagementService inventoryService;
     private final CategoryRepository categoryRepository;
     
     // ===== TRANG CHỦ QUẢN LÝ TỒN KHO =====

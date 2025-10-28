@@ -3,7 +3,7 @@ package mocviet.controller.manager;
 import lombok.RequiredArgsConstructor;
 import mocviet.entity.User;
 import mocviet.repository.UserRepository;
-import mocviet.service.manager.NotificationService;
+import mocviet.service.manager.INotificationService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class ManagerNotificationController {
     
-    private final NotificationService notificationService;
+    private final INotificationService notificationService;
     private final UserRepository userRepository;
     
     /**

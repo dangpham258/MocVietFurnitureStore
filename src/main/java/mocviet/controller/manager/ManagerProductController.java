@@ -3,8 +3,8 @@ package mocviet.controller.manager;
 import lombok.RequiredArgsConstructor;
 import mocviet.dto.manager.*;
 import mocviet.entity.*;
-import mocviet.service.manager.ProductService;
-import mocviet.service.manager.ImageService;
+import mocviet.service.manager.IProductService;
+import mocviet.service.manager.IImageService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -28,8 +28,8 @@ import java.util.Optional;
 @PreAuthorize("hasRole('MANAGER')")
 public class ManagerProductController {
     
-    private final ProductService productService;
-    private final ImageService imageService;
+    private final IProductService productService;
+    private final IImageService imageService;
     
     // ===== PRODUCT LIST =====
     

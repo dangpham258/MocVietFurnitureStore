@@ -2,6 +2,7 @@ package mocviet.repository;
 
 import mocviet.entity.ProductImage;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -42,12 +43,14 @@ public interface ProductImageRepository extends JpaRepository<ProductImage, Inte
     /**
      * Xóa ảnh theo product ID và color ID
      */
+    @Modifying
     @Query("DELETE FROM ProductImage pi WHERE pi.product.id = :productId AND pi.color.id = :colorId")
     void deleteByProductIdAndColorId(@Param("productId") Integer productId, @Param("colorId") Integer colorId);
     
     /**
      * Xóa tất cả ảnh theo product ID
      */
+    @Modifying
     @Query("DELETE FROM ProductImage pi WHERE pi.product.id = :productId")
     void deleteByProductId(@Param("productId") Integer productId);
 }

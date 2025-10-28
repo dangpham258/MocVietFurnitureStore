@@ -4,14 +4,12 @@ import lombok.RequiredArgsConstructor;
 import mocviet.dto.ProductCardDTO;
 import mocviet.dto.ProductCriteriaDTO;
 import mocviet.dto.ProductDetailDTO;
-import mocviet.entity.Color; // Thêm import
 import mocviet.entity.Product;
 import mocviet.entity.ProductImage;
 import mocviet.entity.ProductVariant;
 import mocviet.repository.ProductImageRepository;
 import mocviet.repository.ProductRepository;
 import mocviet.repository.ProductVariantRepository;
-import mocviet.service.ProductSpecification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -19,7 +17,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.fasterxml.jackson.databind.ObjectMapper; // Thêm import nếu dùng ObjectMapper
 
 import java.math.BigDecimal;
 import java.util.Comparator; // Thêm import
@@ -135,16 +132,16 @@ public class ProductServiceImpl implements ProductService {
                  .findFirst();
          }
 
-         // Nếu có ảnh, tạo URL placeholder, nếu không, dùng placeholder mặc định
+        // Nếu có ảnh, dùng URL đã lưu; nếu không, dùng placeholder mặc định
          if (targetImage.isPresent()) {
-            return getPlaceholderImageUrl(targetImage.get()); // Dùng hàm tạo ảnh tạm
+           return targetImage.get().getUrl();
          } else {
              return "https://via.placeholder.com/400x400.png?text=" + product.getSlug().replace("-", "+");
          }
      }
 
     // --- findProductDetailBySlug và các hàm helper khác ---
-    // (Giữ nguyên hoặc chỉnh sửa nhỏ nếu cần, đảm bảo import đầy đủ)
+    // (Giữ nguyên hoặc chỉnh sửa nhỏ nếu cần)
 
      @Override
     @Transactional(readOnly = true)
@@ -163,7 +160,7 @@ public class ProductServiceImpl implements ProductService {
                 .filter(img -> img.getColor() != null) // Bỏ qua ảnh không có màu (nếu có)
                 .collect(Collectors.groupingBy(
                         img -> img.getColor().getId(),
-                        Collectors.mapping(this::getPlaceholderImageUrl, Collectors.toList())
+                        Collectors.mapping(ProductImage::getUrl, Collectors.toList())
                 ));
         dto.setImagesByColor(imagesByColor);
 
@@ -208,14 +205,5 @@ public class ProductServiceImpl implements ProductService {
         return dto;
     }
 
-     // Hàm tạo ảnh tạm (giữ nguyên)
-    private String getPlaceholderImageUrl(ProductImage image) {
-        if (image == null || image.getProduct() == null || image.getColor() == null) {
-            return "https://via.placeholder.com/800x800.png?text=Invalid+Image+Data";
-        }
-        String text = image.getProduct().getSlug().replace("-", "+");
-        String color = image.getColor().getSlug();
-        // Có thể thay đổi kích thước nếu cần
-        return "https://via.placeholder.com/800x800.png?text=" + text + "+(Mau:+" + color + ")";
-    }
+    // (placeholder helpers removed; using actual stored URLs)
 }

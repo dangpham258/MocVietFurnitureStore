@@ -3,7 +3,7 @@ package mocviet.controller.manager;
 import lombok.RequiredArgsConstructor;
 import mocviet.dto.manager.*;
 import mocviet.entity.User;
-import mocviet.service.manager.OrderManagementService;
+import mocviet.service.manager.IOrderManagementService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -23,7 +23,7 @@ import java.time.format.DateTimeFormatter;
 @PreAuthorize("hasRole('MANAGER')")
 public class OrderManagementController {
     
-    private final OrderManagementService orderManagementService;
+    private final IOrderManagementService orderManagementService;
     
     // ===== TRANG CHỦ QUẢN LÝ ĐƠN HÀNG =====
     

@@ -3,7 +3,7 @@ package mocviet.controller.manager;
 import lombok.RequiredArgsConstructor;
 import mocviet.dto.manager.*;
 import mocviet.entity.User;
-import mocviet.service.manager.DeliveryAssignmentService;
+import mocviet.service.manager.IDeliveryAssignmentService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -25,7 +25,7 @@ import java.util.List;
 @PreAuthorize("hasRole('MANAGER')")
 public class DeliveryAssignmentController {
     
-    private final DeliveryAssignmentService deliveryAssignmentService;
+    private final IDeliveryAssignmentService deliveryAssignmentService;
     
     // ===== PENDING ORDERS LIST =====
     

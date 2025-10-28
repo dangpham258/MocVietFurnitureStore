@@ -31,10 +31,18 @@ public class WebConfig implements WebMvcConfigurer {
                 .addResourceLocations("classpath:/static/js/")
                 .setCachePeriod(3600);
         registry.addResourceHandler("/images/**")
-                .addResourceLocations("classpath:/static/images/")
+                .addResourceLocations(
+                        "classpath:/static/images/",
+                        // Dev fallback: serve images written to source resources during runtime
+                        "file:src/main/resources/static/images/"
+                )
                 .setCachePeriod(3600);
         registry.addResourceHandler("/static/**")
-                .addResourceLocations("classpath:/static/")
+                .addResourceLocations(
+                        "classpath:/static/",
+                        // Dev fallback: serve files written to source resources during runtime
+                        "file:src/main/resources/static/"
+                )
                 .setCachePeriod(3600);
     }
 }

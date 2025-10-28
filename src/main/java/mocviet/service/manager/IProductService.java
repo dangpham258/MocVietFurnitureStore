@@ -8,8 +8,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.Optional;
 
-@Deprecated
-public interface ProductService {
+public interface IProductService {
 
     // PRODUCT MANAGEMENT
     Product createProduct(CreateProductRequest request);
@@ -46,3 +45,5 @@ public interface ProductService {
     List<ProductImage> getProductImages(Integer productId);
     List<ProductImage> getProductImagesByColor(Integer productId, Integer colorId);
 }
+
+

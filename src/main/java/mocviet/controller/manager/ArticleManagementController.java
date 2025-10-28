@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import mocviet.dto.manager.*;
 import mocviet.entity.Article;
 import mocviet.service.manager.ArticleImageService;
-import mocviet.service.manager.ArticleService;
+import mocviet.service.manager.IArticleService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -28,7 +28,7 @@ import java.util.List;
 @PreAuthorize("hasRole('MANAGER')")
 public class ArticleManagementController {
     
-    private final ArticleService articleService;
+    private final IArticleService articleService;
     private final ArticleImageService articleImageService;
     
     // ===== ARTICLE LIST (Danh sách bài viết đã đăng) =====

@@ -6,7 +6,7 @@ import mocviet.dto.manager.*;
 import mocviet.entity.Product;
 import mocviet.entity.User;
 import mocviet.repository.ProductRepository;
-import mocviet.service.manager.ReviewManagementService;
+import mocviet.service.manager.IReviewManagementService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -31,7 +31,7 @@ import java.util.List;
 @PreAuthorize("hasRole('MANAGER')")
 public class ReviewManagementController {
     
-    private final ReviewManagementService reviewService;
+    private final IReviewManagementService reviewService;
     private final ProductRepository productRepository;
     
     // ===== TRANG CHỦ QUẢN LÝ ĐÁNH GIÁ =====
