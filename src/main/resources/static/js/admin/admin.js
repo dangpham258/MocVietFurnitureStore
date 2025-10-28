@@ -677,10 +677,10 @@ function initializeBootstrapComponents() {
                 initializePageComponents();
                 
                 // Special handling for dashboard - trigger chart render after content loads
-                if (url === '/admin' || url === '/admin/' || url === '/admin/dashboard' || url === '/admin/dashboard/') {
+                if (url === '/admin' || url === '/admin/' || url === '/admin/dashboard' || url === '/admin/dashboard/' || url === '/admin/dashboard/home') {
                     setTimeout(() => {
                         if (window.dashboardManagement) {
-                            // Fetch fresh data from API
+                            // Fetch fresh data from API and render chart
                             fetch('/admin/dashboard/api')
                                 .then(response => response.json())
                                 .then(data => {
@@ -844,6 +844,20 @@ function initializeBootstrapComponents() {
                 classRef: 'DashboardManagement',
                 instanceName: 'dashboardManagement',
                 initFunction: 'initializeDashboardManagement'
+            },
+            {
+                urlPattern: '/admin',
+                scriptPath: '/js/admin/dashboard.js',
+                classRef: 'DashboardManagement',
+                instanceName: 'dashboardManagement',
+                initFunction: 'initializeDashboardManagement'
+            },
+            {
+                urlPattern: '/admin/notifications',
+                scriptPath: '/js/admin/notifications.js',
+                classRef: 'NotificationsManagement',
+                instanceName: 'notificationsManagement',
+                initFunction: 'initializeNotificationsManagement'
             }
         ];
         
@@ -853,6 +867,8 @@ function initializeBootstrapComponents() {
                 initModule(module);
             }
         });
+        
+        // Special handling for dashboard at /admin - no need, already handled above
     }
     
     /**
@@ -865,7 +881,7 @@ function initializeBootstrapComponents() {
         // Check if already initialized and exists
         if (window[instanceName] && typeof window[instanceName] !== 'undefined') {
             // Re-initialize data by calling loadData, loadPages, loadBanners, etc.
-            const methodsToTry = ['loadData', 'loadPages', 'loadBanners', 'loadColors', 'loadCategories', 'loadCoupons', 'loadShipping', 'loadShowrooms', 'loadUsers'];
+            const methodsToTry = ['loadData', 'loadPages', 'loadBanners', 'loadColors', 'loadCategories', 'loadCoupons', 'loadShipping', 'loadShowrooms', 'loadUsers', 'loadSocialLinks', 'loadDeliveryTeams', 'loadReports', 'loadNotifications'];
             
             for (const methodName of methodsToTry) {
                 if (typeof window[instanceName][methodName] === 'function') {
@@ -999,4 +1015,90 @@ function initializeBootstrapComponents() {
     initializePageComponents();
     
     console.log('Admin panel initialized successfully!');
+    
+    // Load header notifications
+    loadHeaderNotifications();
+    
+    // Auto refresh header notifications every 30 seconds
+    setInterval(loadHeaderNotifications, 30000);
+}
+
+// Track previous unread count to detect new notifications
+let previousUnreadCount = 0;
+
+// Load header notifications
+async function loadHeaderNotifications() {
+    try {
+        const response = await fetch('/admin/notifications/api');
+        if (!response.ok) throw new Error('Failed to fetch notifications');
+        
+        const data = await response.json();
+        const unreadCount = data.unreadCount || 0;
+        const notifications = data.notifications || [];
+        
+        // Check if there are new notifications
+        if (unreadCount > previousUnreadCount && previousUnreadCount > 0) {
+            const newCount = unreadCount - previousUnreadCount;
+            window.notificationSystem.show(
+                `Bạn có ${newCount} thông báo mới!`,
+                'success'
+            );
+        }
+        
+        previousUnreadCount = unreadCount;
+        
+        // Update badge
+        const badge = document.getElementById('notificationBadge');
+        const unreadCountEl = document.getElementById('headerUnreadCount');
+        const listEl = document.getElementById('headerNotificationsList');
+        
+        if (badge) {
+            if (unreadCount > 0) {
+                badge.textContent = unreadCount > 99 ? '99+' : unreadCount;
+                badge.style.display = 'inline-block';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+        
+        if (unreadCountEl) {
+            unreadCountEl.textContent = unreadCount;
+        }
+        
+        if (listEl && notifications.length > 0) {
+            listEl.innerHTML = notifications.slice(0, 5).map(n => `
+                <li>
+                    <a class="dropdown-item ${n.isRead ? '' : 'bg-light'}" href="/admin/notifications">
+                        <div class="d-flex w-100 justify-content-between">
+                            <strong class="mb-1">${n.title}</strong>
+                            <small>${formatDateTime(n.createdAt)}</small>
+                        </div>
+                        <p class="mb-1 small text-truncate">${n.message || ''}</p>
+                    </a>
+                </li>
+            `).join('');
+            
+            if (notifications.length > 5) {
+                listEl.innerHTML += '<li><hr class="dropdown-divider"></li>';
+            }
+        } else if (listEl) {
+            listEl.innerHTML = '<li class="px-3 py-2 text-center text-muted"><small>Không có thông báo mới</small></li>';
+        }
+    } catch (error) {
+        console.error('Error loading header notifications:', error);
+    }
+}
+
+// Format datetime helper
+function formatDateTime(dateString) {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now - date;
+    const diffMins = Math.floor(diffMs / 60000);
+    
+    if (diffMins < 1) return 'Vừa xong';
+    if (diffMins < 60) return `${diffMins} phút trước`;
+    if (diffMins < 1440) return `${Math.floor(diffMins / 60)} giờ trước`;
+    return `${Math.floor(diffMins / 1440)} ngày trước`;
 }

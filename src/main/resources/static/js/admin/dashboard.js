@@ -42,23 +42,17 @@
         }
 
         updateDashboardUI(stats) {
-            // Update delicate stats
-            const totalUsersElement = document.querySelector('.card-body h5');
-            if (totalUsersElement && document.querySelector('.card-body small').textContent.includes('Users')) {
-                totalUsersElement.textContent = stats.totalUsers;
-            }
-
-            // Update all stat cards
-            const cards = document.querySelectorAll('.card-body');
+            // Update all stat cards (4 cards in first row)
+            const cards = document.querySelectorAll('.main-content .row:nth-child(2) .card-body h5');
             if (cards.length >= 4) {
-                cards[0].querySelector('h5').textContent = stats.totalUsers;
-                cards[1].querySelector('h5').textContent = stats.totalCategories;
-                cards[2].querySelector('h5').textContent = stats.totalCoupons;
-                cards[3].querySelector('h5').textContent = this.formatNumber(stats.revenueThisMonth);
+                cards[0].textContent = stats.totalUsers;
+                cards[1].textContent = stats.totalCategories;
+                cards[2].textContent = stats.totalCoupons;
+                cards[3].innerHTML = '<span>' + this.formatNumber(stats.revenueThisMonth) + '</span>đ';
             }
 
-            // Update order counts
-            const orderCounts = document.querySelectorAll('.card-body strong');
+            // Update order counts (in the right card)
+            const orderCounts = document.querySelectorAll('.main-content .row:nth-child(3) strong');
             if (orderCounts.length >= 3) {
                 orderCounts[0].textContent = stats.ordersToday;
                 orderCounts[1].textContent = stats.ordersThisWeek;
@@ -66,10 +60,9 @@
             }
 
             // Update chart
-            if (stats.revenueChart && this.revenueChart) {
-                this.revenueChart.data.labels = stats.revenueChart.map(d => d.date);
-                this.revenueChart.data.datasets[0].data = stats.revenueChart.map(d => d.revenue);
-                this.revenueChart.update();
+            if (stats.revenueChart) {
+                window.revenueChartData = stats.revenueChart;
+                this.renderRevenueChart();
             }
         }
 
@@ -95,8 +88,18 @@
             const chartData = window.revenueChartData;
             
             if (chartData.length === 0) {
-                ctx.parentElement.innerHTML = '<div class="text-center text-muted py-5"><i class="bi bi-graph-up fs-1 opacity-25 mb-2"></i><p>Chưa có dữ liệu doanh thu</p></div>';
+                // Show empty state
+                const emptyDiv = document.createElement('div');
+                emptyDiv.className = 'text-center text-muted py-5';
+                emptyDiv.innerHTML = '<i class="bi bi-graph-up fs-1 opacity-25 mb-2"></i><p>Chưa có dữ liệu doanh thu</p>';
+                ctx.parentElement.appendChild(emptyDiv);
                 return;
+            }
+            
+            // Remove empty state if exists
+            const emptyDiv = ctx.parentElement.querySelector('.text-center.text-muted');
+            if (emptyDiv) {
+                emptyDiv.remove();
             }
             
             if (this.revenueChart) {
@@ -133,12 +136,6 @@
             });
         }
 
-        formatCurrency(amount) {
-            return new Intl.NumberFormat('vi-VN', {
-                style: 'currency',
-                currency: 'VND'
-            }).format(amount).replace('₫', 'đ');
-        }
     }
 
     // Initialize when DOM is ready
@@ -150,4 +147,3 @@
         window.dashboardManagement = new DashboardManagement();
     }
 })();
-
