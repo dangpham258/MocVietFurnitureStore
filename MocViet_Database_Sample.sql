@@ -1251,7 +1251,7 @@ VALUES
 -- Review cho kệ tivi 2m (cust_b) — order B2 có item 'KETIVI2M_BE'
 INSERT INTO dbo.Review(product_id, user_id, order_item_id, rating, content, image_url)
 SELECT p.id, u.id, oi.id, 4, N'Kệ đẹp, chất lượng tốt.',
-       N'/static/images/reviews/3105/00_review_3105.jpg'
+       N'/static/images/reviews/1/00_review_1.jpg'
 FROM dbo.Product p
 JOIN dbo.Users u ON u.username = N'cust_b'
 JOIN dbo.OrderItems oi ON oi.order_id = @orderB2
@@ -1261,7 +1261,7 @@ WHERE p.slug = N'ke-tivi-2m';
 -- Review cho bàn ăn 6 ghế (cust_a) — order A1 có 'BANOC6_DEN'
 INSERT INTO dbo.Review(product_id, user_id, order_item_id, rating, content, image_url)
 SELECT p.id, u.id, oi.id, 5, N'Rất chắc chắn.',
-       N'/static/images/reviews/3106/00_review_3106.jpg'
+       N'/static/images/reviews/2/00_review_2.jpg'
 FROM dbo.Product p
 JOIN dbo.Users u ON u.username = N'cust_a'
 JOIN dbo.OrderItems oi ON oi.order_id = @orderA1
@@ -1271,7 +1271,7 @@ WHERE p.slug = N'ban-an-go-oc-cho-6-ghe';
 -- Review cho ghế ăn bọc nỉ (cust_a) — order A1 có 'GA_NI_BE' (cùng đơn với bàn ăn)
 INSERT INTO dbo.Review(product_id, user_id, order_item_id, rating, content, image_url)
 SELECT p.id, u.id, oi.id, 4, N'Ghế êm, ngồi thoải mái.',
-       N'/static/images/reviews/3107/00_review_3107.jpg'
+       N'/static/images/reviews/3/00_review_3.jpg'
 FROM dbo.Product p
 JOIN dbo.Users u ON u.username = N'cust_a'
 JOIN dbo.OrderItems oi ON oi.order_id = @orderA1
