@@ -1,4 +1,4 @@
-# 3.1. PHÂN TÍCH CHỨC NĂNG HỆ THỐNG MỘC VIỆT
+﻿# 3.1. PHÂN TÍCH CHỨC NĂNG HỆ THỐNG MỘC VIỆT
 
 ## 3.1.1. Phía Khách (Guest)
 
@@ -82,23 +82,6 @@
 
 ## 3.1.6. Hệ thống thông báo tự động
 
-| STT | Loại thông báo               | Người nhận | Điều kiện kích hoạt                                             |
-| --- | ---------------------------- | ---------- | --------------------------------------------------------------- |
-| 1   | Đặt hàng thành công          | Customer   | Khi tạo đơn hàng mới                                            |
-| 2   | Thay đổi trạng thái đơn hàng | Customer   | Khi đơn hàng chuyển trạng thái                                  |
-| 3   | Sản phẩm có hàng trở lại     | Customer   | Khi sản phẩm yêu thích từ hết hàng → có hàng                    |
-| 4   | Phản hồi từ cửa hàng         | Customer   | Khi manager trả lời đánh giá                                    |
-| 5   | Yêu cầu trả hàng được duyệt  | Customer   | Khi manager duyệt yêu cầu trả hàng                              |
-| 6   | Đơn hàng đã được trả         | Customer   | Khi hoàn tất quy trình trả hàng & hoàn tiền (từ sp_ReturnOrder) |
-| 7   | Yêu cầu trả hàng bị từ chối  | Customer   | Khi manager từ chối yêu cầu trả hàng                            |
-| 8   | Đơn hàng mới cần xử lý       | Manager    | Khi có đơn hàng mới                                             |
-| 9   | Yêu cầu trả hàng mới         | Manager    | Khi customer gửi yêu cầu trả hàng                               |
-| 10  | Đánh giá mới                 | Manager    | Khi có đánh giá mới từ khách hàng                               |
-| 11  | Tồn kho thấp/Hết hàng        | Manager    | Khi tồn kho xuống thấp hoặc hết                                 |
-| 12  | Tin nhắn mới từ khách        | Manager    | Khi có tin nhắn từ guest/customer                               |
-| 13  | Bài viết mới                 | Admin      | Khi manager tạo bài viết mới                                    |
-| 14  | Phân công đơn giao           | Delivery   | Khi được phân công đơn hàng mới                                 |
-| 15  | Yêu cầu thu hồi              | Delivery   | Khi đơn hàng cần thu hồi                                        |
 
 **Lưu ý:** Trigger `TR_Orders_NotifyStatusChange` hiện không bắn cho `RETURNED` (đã loại trừ), nên thông báo "Đơn hàng đã được trả" đến Customer sẽ đến từ `sp_ReturnOrder` (INSERT thẳng vào UserNotification), không phải trigger đổi trạng thái đơn.
 

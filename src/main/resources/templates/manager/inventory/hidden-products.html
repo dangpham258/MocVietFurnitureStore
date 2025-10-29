@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" layout:decorate="~{manager/fragments/manager_layout}">
+<head>
+    <title>Sản phẩm đã ẩn - Mộc Việt</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="container-fluid">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="mb-1">
+                        <i class="fas fa-eye-slash text-warning me-2"></i>Sản phẩm đã ẩn
+                    </h2>
+                    <p class="text-muted mb-0">Quản lý các sản phẩm đã được ẩn tạm thời</p>
+                </div>
+                <div>
+                    <a href="/manager/inventory/alerts" class="btn btn-outline-primary me-2">
+                        <i class="fas fa-bell me-2"></i>Cảnh báo tồn kho
+                    </a>
+                    <a href="/manager/inventory/report" class="btn btn-outline-info me-2">
+                        <i class="fas fa-chart-bar me-2"></i>Báo cáo tồn kho
+                    </a>
+                    <a href="/manager/inventory/low-stock" class="btn btn-outline-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Tồn kho thấp
+                    </a>
+                </div>
+            </div>
+
+            <!-- Summary Cards -->
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="card bg-warning text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="card-title mb-1">Tổng sản phẩm ẩn</h6>
+                                    <h3 class="mb-0" th:text="${summary?.totalHiddenProducts ?: 0}">0</h3>
+                                </div>
+                                <i class="fas fa-eye-slash fa-2x opacity-75"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-danger text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="card-title mb-1">Hết hàng</h6>
+                                    <h3 class="mb-0" th:text="${summary?.outOfStockCount ?: 0}">0</h3>
+                                </div>
+                                <i class="fas fa-times-circle fa-2x opacity-75"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-info text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="card-title mb-1">Tồn kho thấp</h6>
+                                    <h3 class="mb-0" th:text="${summary?.lowStockCount ?: 0}">0</h3>
+                                </div>
+                                <i class="fas fa-exclamation-triangle fa-2x opacity-75"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search and Filters -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form th:action="@{/manager/inventory/hidden-products}" method="get" class="row g-3">
+                        <div class="col-md-4">
+                            <label for="keyword" class="form-label">Tìm kiếm</label>
+                            <input type="text" class="form-control" id="keyword" name="keyword" 
+                                   th:value="${keyword}" 
+                                   placeholder="Tên sản phẩm, SKU, màu sắc, loại..."
+                                   maxlength="100">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="categoryId" class="form-label">Danh mục</label>
+                            <select class="form-select" id="categoryId" name="categoryId">
+                                <option value="">Tất cả danh mục</option>
+                                <option th:each="category : ${categories}" 
+                                        th:value="${category.id}" 
+                                        th:text="${category.name}"
+                                        th:selected="${category.id == categoryId}">
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="stockLevel" class="form-label">Mức tồn kho</label>
+                            <select class="form-select" id="stockLevel" name="stockLevel">
+                                <option value="">Tất cả</option>
+                                <option value="out_of_stock" th:selected="${stockLevel == 'out_of_stock'}">Hết hàng (0)</option>
+                                <option value="low_stock" th:selected="${stockLevel == 'low_stock'}">Tồn kho thấp (1-5)</option>
+                                <option value="good_stock" th:selected="${stockLevel == 'good_stock'}">Tồn kho tốt (6+)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">&nbsp;</label>
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search me-2"></i>Tìm kiếm
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Hidden Products List -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-list me-2"></i>Danh sách sản phẩm đã ẩn 
+                        <span class="badge bg-warning" th:text="${totalElements}">0</span>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div th:if="${hiddenProducts.empty}" class="text-center py-5">
+                        <i class="fas fa-eye-slash fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">Không có sản phẩm nào đã ẩn</h5>
+                        <p class="text-muted">Tất cả sản phẩm đang hiển thị bình thường</p>
+                    </div>
+
+                    <div th:unless="${hiddenProducts.empty}" class="row">
+                        <div th:each="product : ${hiddenProducts}" class="col-md-6 col-lg-4 mb-4">
+                            <div class="card h-100 priority-card">
+                                <div class="card-body">
+                                    <!-- Product Info -->
+                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <div class="flex-grow-1">
+                                            <h6 class="card-title mb-1" th:text="${product.productName}">Tên sản phẩm</h6>
+                                            <p class="text-muted mb-1">
+                                                <strong>SKU:</strong> <span th:text="${product.sku}">SKU123</span>
+                                            </p>
+                                            <p class="text-muted mb-1">
+                                                <strong>Màu sắc:</strong> <span th:text="${product.colorName}">Nâu</span>
+                                            </p>
+                                            <p class="text-muted mb-0">
+                                                <strong>Loại:</strong> <span th:text="${product.typeName}">3-chỗ</span>
+                                            </p>
+                                        </div>
+                                        <div class="text-end">
+                                            <span class="badge bg-warning">Đã ẩn</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Price and Stock -->
+                                    <div class="row mb-3">
+                                        <div class="col-6">
+                                            <small class="text-muted">Giá bán</small>
+                                            <div class="fw-bold text-primary" th:text="${#numbers.formatDecimal(product.salePrice, 0, 'COMMA', 0, 'POINT')} + '₫'">0₫</div>
+                                        </div>
+                                        <div class="col-6">
+                                            <small class="text-muted">Tồn kho</small>
+                                            <div class="fw-bold" th:class="${product.stockQty == 0} ? 'text-danger' : (${product.stockQty <= 5} ? 'text-warning' : 'text-success')" 
+                                                 th:text="${product.stockQty}">0</div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Sales Info -->
+                                    <div class="row mb-3">
+                                        <div class="col-6">
+                                            <small class="text-muted">Bán tháng trước</small>
+                                            <div th:text="${product.soldLastMonth}">0</div>
+                                        </div>
+                                        <div class="col-6">
+                                            <small class="text-muted">TB mỗi ngày</small>
+                                            <div th:text="${#numbers.formatDecimal(product.avgDailySales, 1, 'COMMA', 1, 'POINT')}">0.0</div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Actions -->
+                                    <div class="d-grid gap-2">
+                                        <button type="button" class="btn btn-success btn-sm"
+                                                th:data-product-id="${product.variantId}"
+                                                th:data-product-name="${product.productName}"
+                                                onclick="showShowProductModal(this)">
+                                            <i class="fas fa-eye me-2"></i>Hiện sản phẩm
+                                        </button>
+                                        <a th:href="@{/products/{slug}(slug=${product.productSlug})}" 
+                                           target="_blank" class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-external-link-alt me-2"></i>Xem chi tiết
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pagination -->
+                    <nav th:if="${totalPages > 1}" aria-label="Pagination">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item" th:classappend="${!hasPrevious} ? 'disabled'">
+                                <a class="page-link" 
+                                   th:href="@{/manager/inventory/hidden-products(page=${currentPage - 1}, size=${size}, keyword=${keyword}, categoryId=${categoryId}, stockLevel=${stockLevel})}">
+                                    Trước
+                                </a>
+                            </li>
+                            <li th:each="pageNum : ${#numbers.sequence(1, totalPages)}" 
+                                class="page-item" 
+                                th:classappend="${pageNum == currentPage + 1} ? 'active'">
+                                <a class="page-link" 
+                                   th:href="@{/manager/inventory/hidden-products(page=${pageNum - 1}, size=${size}, keyword=${keyword}, categoryId=${categoryId}, stockLevel=${stockLevel})}"
+                                   th:text="${pageNum}">1</a>
+                            </li>
+                            <li class="page-item" th:classappend="${!hasNext} ? 'disabled'">
+                                <a class="page-link" 
+                                   th:href="@{/manager/inventory/hidden-products(page=${currentPage + 1}, size=${size}, keyword=${keyword}, categoryId=${categoryId}, stockLevel=${stockLevel})}">
+                                    Sau
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

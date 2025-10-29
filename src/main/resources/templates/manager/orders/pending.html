@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{manager/fragments/manager_layout}">
+
+<head>
+    <title th:text="${pageTitle}">Đơn hàng chờ xác nhận</title>
+    <style>
+        .order-card {
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            transition: box-shadow 0.3s;
+        }
+        .order-card:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .order-header {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .order-body {
+            padding: 15px;
+        }
+        .status-badge {
+            font-size: 0.875rem;
+            padding: 0.375rem 0.75rem;
+        }
+        .payment-status {
+            font-size: 0.8rem;
+        }
+        .bulk-actions {
+            background-color: #e9ecef;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .order-actions {
+            margin-top: 10px;
+        }
+        .order-actions .btn {
+            margin-right: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div layout:fragment="content">
+        <div class="container-fluid">
+            <!-- Header with Tabs -->
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2><i class="fas fa-shopping-cart"></i> Quản lý đơn hàng</h2>
+                <button type="button" class="btn btn-outline-primary" onclick="toggleBulkActions()">
+                    <i class="fas fa-check-square"></i> Thao tác hàng loạt
+                </button>
+            </div>
+            
+            <!-- Navigation Tabs -->
+            <ul class="nav nav-tabs mb-4">
+                <li class="nav-item">
+                    <a class="nav-link active" th:href="@{/manager/orders/pending}">
+                        <i class="fas fa-clock"></i> Chờ xác nhận
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/manager/orders/in-delivery}">
+                        <i class="fas fa-shipping-fast"></i> Đang giao
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/manager/orders/completed}">
+                        <i class="fas fa-check-circle"></i> Đã hoàn thành
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/manager/orders/returns}">
+                        <i class="fas fa-undo"></i> Yêu cầu hoàn trả
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/manager/orders/returned}">
+                        <i class="fas fa-box-open"></i> Đã hoàn trả
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/manager/orders/cancelled}">
+                        <i class="fas fa-times-circle"></i> Đã hủy
+                    </a>
+                </li>
+            </ul>
+
+            <!-- Bulk Actions -->
+            <div id="bulkActions" class="bulk-actions" style="display: none;">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="selectAll">
+                            <label class="form-check-label" for="selectAll">
+                                Chọn tất cả
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <button type="button" class="btn btn-success btn-sm" onclick="bulkConfirm()">
+                            <i class="fas fa-check"></i> Xác nhận hàng loạt
+                        </button>
+                        <button type="button" class="btn btn-danger btn-sm" onclick="bulkCancel()">
+                            <i class="fas fa-times"></i> Hủy hàng loạt
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form method="get" th:action="@{/manager/orders/pending}">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <input type="text" class="form-control" name="keyword" 
+                                       th:value="${keyword}" placeholder="Tìm kiếm theo mã đơn, tên khách...">
+                            </div>
+                            <div class="col-md-2">
+                                <select class="form-select" name="sortBy">
+                                    <option value="createdAt" th:selected="${sortBy == 'createdAt'}">Ngày tạo</option>
+                                    <option value="updatedAt" th:selected="${sortBy == 'updatedAt'}">Ngày cập nhật</option>
+                                    <option value="totalAmount" th:selected="${sortBy == 'totalAmount'}">Tổng tiền</option>
+                                    <option value="id" th:selected="${sortBy == 'id'}">Mã đơn</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <select class="form-select" name="sortDir">
+                                    <option value="desc" th:selected="${sortDir == 'desc'}">Mới nhất</option>
+                                    <option value="asc" th:selected="${sortDir == 'asc'}">Cũ nhất</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <select class="form-select" name="size">
+                                    <option value="10" th:selected="${size == 10}">10/trang</option>
+                                    <option value="20" th:selected="${size == 20}">20/trang</option>
+                                    <option value="50" th:selected="${size == 50}">50/trang</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-search"></i> Tìm kiếm
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Orders List -->
+            <div class="row">
+                <div class="col-12">
+                    <div th:if="${orders.empty}" class="text-center py-5">
+                        <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">Không có đơn hàng chờ xác nhận</h5>
+                    </div>
+
+                    <div th:each="order : ${orders}" class="order-card">
+                        <div class="order-header">
+                            <div class="row align-items-center">
+                                <div class="col-md-1">
+                                    <div class="form-check">
+                                        <input class="form-check-input order-checkbox" type="checkbox" 
+                                               th:value="${order.id}">
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <strong>#<span th:text="${order.id}"></span></strong>
+                                </div>
+                                <div class="col-md-3">
+                                    <span th:text="${order.customerName}"></span><br>
+                                    <small class="text-muted" th:text="${order.customerPhone}"></small>
+                                </div>
+                                <div class="col-md-3">
+                                    <span th:text="${order.deliveryAddress}"></span><br>
+                                    <small class="text-muted" th:text="${order.city}"></small>
+                                </div>
+                                <div class="col-md-2">
+                                    <span class="badge bg-warning status-badge" th:text="${order.statusDisplay}"></span><br>
+                                    <small class="payment-status" th:text="${order.paymentStatusDisplay}"></small>
+                                </div>
+                                <div class="col-md-1 text-end">
+                                    <strong class="text-success" th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT')} + '₫'"></strong>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="order-body">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <small class="text-muted">
+                                        <i class="fas fa-calendar"></i> 
+                                        <span th:text="${#temporals.format(order.createdAt, 'dd/MM/yyyy HH:mm')}"></span>
+                                        | <i class="fas fa-box"></i> 
+                                        <span th:text="${order.itemCount} + ' sản phẩm'"></span>
+                                    </small>
+                                </div>
+                                <div class="col-md-4 text-end order-actions">
+                                    <a th:href="@{/manager/orders/pending/{id}(id=${order.id})}" 
+                                       class="btn btn-outline-primary btn-sm">
+                                        <i class="fas fa-eye"></i> Chi tiết
+                                    </a>
+                                    <button type="button" class="btn btn-success btn-sm" 
+                                            th:onclick="|confirmOrder(${order.id})|">
+                                        <i class="fas fa-check"></i> Xác nhận
+                                    </button>
+                                    <button type="button" class="btn btn-danger btn-sm" 
+                                            th:onclick="|cancelOrder(${order.id})|">
+                                        <i class="fas fa-times"></i> Hủy
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <nav th:if="${orders.totalPages > 1}" aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                        <a class="page-link" th:href="@{/manager/orders/pending(page=${currentPage - 1}, size=${size}, sortBy=${sortBy}, sortDir=${sortDir}, keyword=${keyword})}">Trước</a>
+                    </li>
+                    <li th:each="pageNum : ${#numbers.sequence(0, orders.totalPages - 1)}" 
+                        class="page-item" th:classappend="${pageNum == currentPage} ? 'active'">
+                        <a class="page-link" th:href="@{/manager/orders/pending(page=${pageNum}, size=${size}, sortBy=${sortBy}, sortDir=${sortDir}, keyword=${keyword})}" 
+                           th:text="${pageNum + 1}"></a>
+                    </li>
+                    <li class="page-item" th:classappend="${currentPage == orders.totalPages - 1} ? 'disabled'">
+                        <a class="page-link" th:href="@{/manager/orders/pending(page=${currentPage + 1}, size=${size}, sortBy=${sortBy}, sortDir=${sortDir}, keyword=${keyword})}">Sau</a>
+                    </li>
+                </ul>
+            </nav>
+
+        <!-- Confirm Order Modal -->
+        <div class="modal fade" id="confirmModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Xác nhận đơn hàng</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <form id="confirmForm" method="post">
+                        <div class="modal-body">
+                            <p>Bạn có chắc chắn muốn xác nhận đơn hàng này?</p>
+                            <div class="mb-3">
+                                <label for="confirmNote" class="form-label">Ghi chú (tùy chọn)</label>
+                                <textarea class="form-control" id="confirmNote" name="note" rows="3"></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                            <button type="submit" class="btn btn-success">Xác nhận</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cancel Order Modal -->
+        <div class="modal fade" id="cancelModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Hủy đơn hàng</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <form id="cancelForm" method="post">
+                        <div class="modal-body">
+                            <p>Bạn có chắc chắn muốn hủy đơn hàng này?</p>
+                            <div class="mb-3">
+                                <label for="cancelReason" class="form-label">Lý do hủy <span class="text-danger">*</span></label>
+                                <textarea class="form-control" id="cancelReason" name="reason" rows="3" required></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                            <button type="submit" class="btn btn-danger">Hủy đơn hàng</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bulk Cancel Modal -->
+        <div class="modal fade" id="bulkCancelModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Hủy đơn hàng hàng loạt</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <form id="bulkCancelForm" method="post" th:action="@{/manager/orders/pending/bulk-cancel}">
+                        <div class="modal-body">
+                            <p>Bạn có chắc chắn muốn hủy các đơn hàng đã chọn?</p>
+                            <div class="mb-3">
+                                <label for="bulkCancelReason" class="form-label">Lý do hủy <span class="text-danger">*</span></label>
+                                <textarea class="form-control" id="bulkCancelReason" name="reason" rows="3" required></textarea>
+                            </div>
+                            <input type="hidden" id="bulkCancelOrderIds" name="orderIds">
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                            <button type="submit" class="btn btn-danger">Hủy đơn hàng</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <script th:inline="javascript">
+            let currentOrderId = null;
+
+            function toggleBulkActions() {
+                const bulkActions = document.getElementById('bulkActions');
+                bulkActions.style.display = bulkActions.style.display === 'none' ? 'block' : 'none';
+            }
+
+            function cleanupModalBackdrops() {
+                document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+                document.body.classList.remove('modal-open');
+                document.body.style.removeProperty('overflow');
+                document.body.style.removeProperty('paddingRight');
+            }
+
+            function ensureModalInBody(modalId) {
+                const el = document.getElementById(modalId);
+                if (el && el.parentElement !== document.body) {
+                    document.body.appendChild(el);
+                }
+                return el;
+            }
+
+            function confirmOrder(orderId) {
+                currentOrderId = orderId;
+                const form = document.getElementById('confirmForm');
+                form.action = `/manager/orders/pending/${orderId}/confirm`;
+                cleanupModalBackdrops();
+                const el = ensureModalInBody('confirmModal');
+                const modal = new bootstrap.Modal(el);
+                modal.show();
+            }
+
+            function cancelOrder(orderId) {
+                currentOrderId = orderId;
+                const form = document.getElementById('cancelForm');
+                form.action = `/manager/orders/pending/${orderId}/cancel`;
+                cleanupModalBackdrops();
+                const el = ensureModalInBody('cancelModal');
+                const modal = new bootstrap.Modal(el);
+                modal.show();
+            }
+
+            // Ensure functions are accessible from inline onclick handlers
+            window.confirmOrder = confirmOrder;
+            window.cancelOrder = cancelOrder;
+
+            function bulkConfirm() {
+                const selectedIds = getSelectedOrderIds();
+                if (selectedIds.length === 0) {
+                    alert('Vui lòng chọn ít nhất một đơn hàng');
+                    return;
+                }
+                
+                const form = document.createElement('form');
+                form.method = 'post';
+                form.action = '/manager/orders/pending/bulk-confirm';
+                
+                const orderIdsInput = document.createElement('input');
+                orderIdsInput.type = 'hidden';
+                orderIdsInput.name = 'orderIds';
+                orderIdsInput.value = selectedIds.join(',');
+                form.appendChild(orderIdsInput);
+                
+                document.body.appendChild(form);
+                form.submit();
+            }
+
+            function bulkCancel() {
+                const selectedIds = getSelectedOrderIds();
+                if (selectedIds.length === 0) {
+                    alert('Vui lòng chọn ít nhất một đơn hàng');
+                    return;
+                }
+                
+                document.getElementById('bulkCancelOrderIds').value = selectedIds.join(',');
+                const modal = new bootstrap.Modal(document.getElementById('bulkCancelModal'));
+                modal.show();
+            }
+
+            function getSelectedOrderIds() {
+                const checkboxes = document.querySelectorAll('.order-checkbox:checked');
+                return Array.from(checkboxes).map(cb => cb.value);
+            }
+
+            // Select all functionality
+            document.addEventListener('DOMContentLoaded', function() {
+                const selectAllCheckbox = document.getElementById('selectAll');
+                if (selectAllCheckbox) {
+                    selectAllCheckbox.addEventListener('change', function() {
+                        const checkboxes = document.querySelectorAll('.order-checkbox');
+                        checkboxes.forEach(cb => cb.checked = this.checked);
+                    });
+                }
+
+                // Individual checkbox change
+                document.querySelectorAll('.order-checkbox').forEach(checkbox => {
+                    checkbox.addEventListener('change', function() {
+                        const allCheckboxes = document.querySelectorAll('.order-checkbox');
+                        const checkedCheckboxes = document.querySelectorAll('.order-checkbox:checked');
+                        const selectAll = document.getElementById('selectAll');
+                        if (selectAll) {
+                            selectAll.checked = allCheckboxes.length === checkedCheckboxes.length;
+                        }
+                    });
+                });
+            });
+        </script>
+    </div>
+</body>
+</html>

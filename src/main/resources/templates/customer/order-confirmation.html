@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xác nhận đơn hàng - Mộc Việt</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link th:href="@{/css/customer.css}" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <div th:replace="fragments/header :: header"></div>
+
+    <div class="container my-5">
+        <!-- Success Message -->
+        <div class="text-center mb-5">
+            <div class="success-icon mb-3">
+                <i class="fas fa-check-circle fa-4x text-success"></i>
+            </div>
+            <h2 class="text-success">Đặt hàng thành công!</h2>
+            <p class="text-muted" th:text="${orderDetail.id} != null ? 'Đơn hàng #' + ${orderDetail.id} + ' đã được tạo' : 'Cảm ơn bạn đã đặt hàng'">
+                Đơn hàng #123 đã được tạo
+            </p>
+        </div>
+
+        <!-- Order Info -->
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- Order Items -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-boxes me-2"></i>Chi tiết đơn hàng</h5>
+                    </div>
+                    <div class="card-body">
+                        <div th:if="${orderDetail.items != null}" th:each="item : ${orderDetail.items}" class="d-flex align-items-center mb-3 pb-3 border-bottom">
+                            <img src="/images/products/placeholder.jpg" alt="Product" class="img-thumbnail me-3" style="width: 80px; height: 80px;">
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1" th:text="${item.productName}">Tên sản phẩm</h6>
+                                <small class="text-muted" th:text="${item.colorName} + ' - ' + ${item.typeName}">Color - Type</small>
+                                <div class="mt-1">
+                                    <small class="text-muted">SL: <span th:text="${item.qty}">1</span></small>
+                                    <span class="mx-2">|</span>
+                                    <strong th:text="${#numbers.formatDecimal(item.unitPrice, 0, 'COMMA', 0, 'POINT')} + ' ₫'">0 ₫</strong>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <strong class="text-danger" th:text="${#numbers.formatDecimal(item.totalPrice, 0, 'COMMA', 0, 'POINT')} + ' ₫'">0 ₫</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Delivery Address -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-map-marker-alt me-2"></i>Địa chỉ giao hàng</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-1" th:text="${orderDetail.receiverName}">Tên người nhận</p>
+                        <p class="mb-1 text-muted" th:text="${orderDetail.phone}">Số điện thoại</p>
+                        <p class="mb-0 text-muted" th:text="${orderDetail.addressLine} + ', ' + ${orderDetail.district} + ', ' + ${orderDetail.city}">Địa chỉ</p>
+                    </div>
+                </div>
+
+                <!-- Payment Info -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-credit-card me-2"></i>Phương thức thanh toán</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong th:if="${orderDetail.paymentMethod} == 'COD'">
+                                    <i class="fas fa-money-bill-wave text-success me-2"></i>Thanh toán khi nhận hàng
+                                </strong>
+                                <strong th:if="${orderDetail.paymentMethod} == 'VNPAY'">
+                                    <i class="fas fa-qrcode text-info me-2"></i>VNPay
+                                </strong>
+                                <strong th:if="${orderDetail.paymentMethod} == 'MOMO'">
+                                    <i class="fas fa-mobile-alt text-primary me-2"></i>MoMo
+                                </strong>
+                            </div>
+                            <span class="badge bg-secondary" th:text="${orderDetail.paymentStatus}">UNPAID</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Thông tin đơn hàng</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <small class="text-muted">Mã đơn hàng</small>
+                            <p class="fw-bold mb-0" th:text="'#' + ${orderDetail.id}">#123</p>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <small class="text-muted">Trạng thái</small>
+                            <div>
+                                <span class="badge bg-warning" th:if="${orderDetail.status} == 'PENDING'">Chờ xác nhận</span>
+                                <span class="badge bg-info" th:if="${orderDetail.status} == 'CONFIRMED'">Đã xác nhận</span>
+                                <span class="badge bg-primary" th:if="${orderDetail.status} == 'DISPATCHED'">Đang giao</span>
+                                <span class="badge bg-success" th:if="${orderDetail.status} == 'DELIVERED'">Đã giao</span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <small class="text-muted">Tạm tính</small>
+                            <p class="fw-bold mb-0" th:text="${#numbers.formatDecimal(orderDetail.subtotal, 0, 'COMMA', 0, 'POINT')} + ' ₫'">0 ₫</p>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <small class="text-muted">Phí vận chuyển</small>
+                            <p class="fw-bold mb-0" th:text="${#numbers.formatDecimal(orderDetail.shippingFee, 0, 'COMMA', 0, 'POINT')} + ' ₫'">0 ₫</p>
+                        </div>
+                        
+                        <hr>
+                        
+                        <div class="mb-3">
+                            <small class="text-muted">Tổng tiền</small>
+                            <p class="fw-bold text-danger fs-5 mb-0" th:text="${#numbers.formatDecimal(orderDetail.total, 0, 'COMMA', 0, 'POINT')} + ' ₫'">0 ₫</p>
+                        </div>
+
+                        <!-- Actions -->
+                        <div th:if="${orderDetail.status == 'PENDING'}">
+                            <button class="btn btn-danger w-100 mb-2" onclick="cancelOrder()">
+                                <i class="fas fa-times-circle me-2"></i>Hủy đơn hàng
+                            </button>
+                        </div>
+                        
+                        <a href="/customer/orders" class="btn btn-outline-secondary w-100">
+                            <i class="fas fa-list me-2"></i>Xem tất cả đơn hàng
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div th:replace="fragments/footer :: footer"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function cancelOrder() {
+            if (!confirm('Bạn có chắc chắn muốn hủy đơn hàng này?')) {
+                return;
+            }
+            
+            const orderId = document.querySelector('[data-order-id]')?.getAttribute('data-order-id');
+            if (!orderId) {
+                alert('Không tìm thấy mã đơn hàng');
+                return;
+            }
+            
+            fetch(`/customer/orders/${orderId}/cancel`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `reason=Khách hàng hủy`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Đã hủy đơn hàng');
+                    location.reload();
+                } else {
+                    alert(data.message || 'Có lỗi xảy ra');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra khi hủy đơn hàng');
+            });
+        }
+    </script>
+</body>
+</html>
+

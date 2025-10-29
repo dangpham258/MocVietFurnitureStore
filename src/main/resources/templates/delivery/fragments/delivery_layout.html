@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title layout:title-pattern="$CONTENT_TITLE - $LAYOUT_TITLE">Delivery Panel - Mộc Việt</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+    <link rel="stylesheet" th:href="@{/css/delivery.css}">
+
+</head>
+<body>
+    <div class="d-flex">
+
+        <div th:replace="~{delivery/fragments/delivery_sidebar :: sidebar}"></div>
+
+        <div class="main-content w-100">
+
+            <div th:replace="~{delivery/fragments/delivery_header :: header}"></div>
+
+            <main class="p-4" layout:fragment="content">
+
+                <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+                     <i class="bi bi-check-circle-fill me-2"></i> <span th:text="${successMessage}"></span>
+                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                 <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                     <i class="bi bi-exclamation-triangle-fill me-2"></i> <span th:text="${errorMessage}"></span>
+                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+
+                </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <th:block layout:fragment="scripts">
+        <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            const notificationBadge = document.getElementById('notificationBadge');
+            const notificationList = document.getElementById('notificationList');
+            const notificationPlaceholder = document.getElementById('notificationPlaceholder'); // Mục "Đang tải..." / "Không có..."
+
+            // --- Hàm lấy và cập nhật thông báo ---
+            function fetchNotifications() {
+                fetch('/delivery/api/notifications') // Đảm bảo URL này đúng
+                    .then(response => {
+                        if (!response.ok) { throw new Error('Network response was not ok'); }
+                        return response.json();
+                     })
+                    .then(data => {
+                        updateNotificationUI(data);
+                    })
+                    .catch(error => {
+                        console.error('Error fetching notifications:', error);
+                         if (notificationPlaceholder) notificationPlaceholder.textContent = "Lỗi tải thông báo";
+                         if (notificationBadge) notificationBadge.style.display = 'none';
+                    });
+            }
+
+            // --- Hàm cập nhật giao diện thông báo ---
+            function updateNotificationUI(notifications) {
+                let unreadCount = Array.isArray(notifications) ? notifications.length : 0;
+
+                // Cập nhật badge
+                if (notificationBadge) {
+                    notificationBadge.textContent = unreadCount;
+                    notificationBadge.style.display = unreadCount > 0 ? 'block' : 'none';
+                }
+
+                // Cập nhật dropdown list
+                if (notificationList) {
+                    // Xóa các thông báo cũ (li.notification-item)
+                    const items = notificationList.querySelectorAll('li.notification-item');
+                    items.forEach(item => item.remove());
+
+                    const divider = notificationList.querySelector('.dropdown-divider');
+
+                    if (unreadCount > 0) {
+                         if(notificationPlaceholder) notificationPlaceholder.style.display = 'none'; // Ẩn placeholder
+
+                        notifications.slice(0, 7).forEach(noti => { // Hiển thị tối đa 7
+                            const listItem = document.createElement('li');
+                            listItem.classList.add('notification-item');
+                            listItem.innerHTML = `
+                                <a class="dropdown-item small ${noti.isRead ? 'text-muted' : ''}" href="#" onclick="markNotificationRead(event, ${noti.id})">
+                                    <div class="fw-bold">${noti.title || 'Thông báo'}</div>
+                                    <div class="message-preview text-wrap" style="font-size: 0.9em;">${noti.message ? noti.message.substring(0, 100) + (noti.message.length > 100 ? '...' : '') : ''}</div>
+                                    <div class="text-muted" style="font-size: 0.8em;">${formatTimeAgo(noti.createdAt)}</div>
+                                </a>`;
+                             if (divider) {
+                                notificationList.insertBefore(listItem, divider);
+                            } else {
+                                 notificationList.appendChild(listItem);
+                             }
+                        });
+                    } else {
+                         if(notificationPlaceholder) {
+                            notificationPlaceholder.textContent = "Không có thông báo mới";
+                            notificationPlaceholder.style.display = 'block'; // Hiện placeholder
+                            notificationPlaceholder.classList.remove('disabled'); // Cho phép click (nếu có link)
+                        }
+                    }
+                }
+            }
+
+            // --- Hàm đánh dấu đã đọc một thông báo ---
+            window.markNotificationRead = function(event, notificationId) {
+                 event.preventDefault();
+                 event.stopPropagation();
+
+                console.log(`Marking notification ${notificationId} as read`);
+                const targetElement = event.currentTarget;
+                if (!targetElement.classList.contains('text-muted')) { // Chỉ xử lý nếu chưa đọc
+                    targetElement.classList.add('text-muted'); // Đánh dấu đã đọc tạm thời
+
+                    fetch(`/delivery/api/notifications/${notificationId}/mark-read`, { method: 'POST' })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                let currentCount = parseInt(notificationBadge.textContent || '0');
+                                if (currentCount > 0) {
+                                     currentCount--;
+                                     notificationBadge.textContent = currentCount;
+                                     if (currentCount === 0) {
+                                        notificationBadge.style.display = 'none';
+                                        if (notificationPlaceholder) {
+                                             notificationPlaceholder.textContent = "Không có thông báo mới";
+                                             notificationPlaceholder.style.display = 'block';
+                                        }
+                                    }
+                                }
+                            } else {
+                                 console.error("Failed to mark notification as read");
+                                 targetElement.classList.remove('text-muted'); // Hoàn tác nếu lỗi
+                            }
+                        })
+                         .catch(error => {
+                             console.error('Error marking notification read:', error);
+                             targetElement.classList.remove('text-muted'); // Hoàn tác nếu lỗi
+                         });
+                }
+                // Optional: Chuyển hướng đến trang chi tiết đơn hàng nếu cần
+                // let orderIdMatch = targetElement.querySelector('.message-preview').textContent.match(/#(\d+)/);
+                // if(orderIdMatch && orderIdMatch[1]) {
+                //     window.location.href = `/delivery/orders/${orderIdMatch[1]}`; // Cần lấy orderDeliveryId thay vì orderId
+                // }
+            }
+
+            // --- Hàm đánh dấu TẤT CẢ đã đọc ---
+            window.markAllNotificationsRead = function(event) {
+                event.preventDefault();
+                console.log('Marking all notifications as read');
+
+                fetch('/delivery/api/notifications/mark-all-read', { method: 'POST' })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success && data.updatedCount > 0) { // Chỉ cập nhật UI nếu thực sự có thay đổi
+                            notificationBadge.textContent = '0';
+                            notificationBadge.style.display = 'none';
+                            notificationList.querySelectorAll('.notification-item a:not(.text-muted)').forEach(link => {
+                                link.classList.add('text-muted');
+                            });
+                             if (notificationPlaceholder) {
+                                 notificationPlaceholder.textContent = "Không có thông báo mới";
+                                 notificationPlaceholder.style.display = 'block';
+                             }
+                        } else if (!data.success) {
+                            alert('Lỗi khi đánh dấu tất cả đã đọc.');
+                        }
+                    })
+                    .catch(error => {
+                         console.error('Error marking all read:', error);
+                         alert('Lỗi khi đánh dấu tất cả đã đọc.');
+                    });
+            }
+
+            // --- Hàm tạo thông báo test ---
+            window.createTestNotification = function(event) {
+                event.preventDefault();
+                console.log('Creating test notification');
+
+                fetch('/delivery/api/notifications/test', { method: 'POST' })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('Đã tạo thông báo test thành công!');
+                            // Refresh notifications
+                            fetchNotifications();
+                        } else {
+                            alert('Lỗi khi tạo thông báo test: ' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                         console.error('Error creating test notification:', error);
+                         alert('Lỗi khi tạo thông báo test.');
+                    });
+            }
+
+
+            // --- Hàm định dạng thời gian ---
+            function formatTimeAgo(dateString) {
+                if (!dateString) return '';
+                try {
+                    const date = new Date(dateString);
+                     if (isNaN(date.getTime())) return ''; // Kiểm tra ngày hợp lệ
+
+                    const now = new Date();
+                    const seconds = Math.round((now - date) / 1000);
+                    const minutes = Math.round(seconds / 60);
+                    const hours = Math.round(minutes / 60);
+                    const days = Math.round(hours / 24);
+
+                    if (seconds < 60) return `${seconds} giây trước`;
+                    if (minutes < 60) return `${minutes} phút trước`;
+                    if (hours < 24) return `${hours} giờ trước`;
+                    if (days === 1) return `hôm qua`;
+                    if (days < 7) return `${days} ngày trước`;
+                    return date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                } catch (e) {
+                    console.error("Error formatting date:", dateString, e);
+                    return ''; // Trả về chuỗi rỗng nếu có lỗi
+                }
+            }
+
+            // --- Khởi chạy ---
+            fetchNotifications(); // Lấy thông báo lần đầu
+            setInterval(fetchNotifications, 1 * 60 * 1000); // Lấy lại mỗi 1 phút
+        });
+        </script>
+    </th:block>
+    </body>
+</html>

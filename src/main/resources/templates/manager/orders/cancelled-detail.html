@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{manager/fragments/manager_layout}">
+
+<head>
+    <title th:text="${pageTitle}">Chi tiết đơn hàng</title>
+    <style>
+        .order-detail-card {
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .order-detail-header {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .order-detail-body {
+            padding: 20px;
+        }
+        .info-row {
+            margin-bottom: 15px;
+        }
+        .info-label {
+            font-weight: 600;
+            color: #495057;
+        }
+        .info-value {
+            color: #212529;
+        }
+        .status-badge {
+            font-size: 0.875rem;
+            padding: 0.5rem 1rem;
+        }
+        .order-item {
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+        .product-image {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background-color: #dee2e6;
+        }
+        .timeline-item {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -22px;
+            top: 5px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #007bff;
+            border: 2px solid #fff;
+            box-shadow: 0 0 0 2px #007bff;
+        }
+        .timeline-item:last-child::before {
+            background-color: #28a745;
+            box-shadow: 0 0 0 2px #28a745;
+        }
+    </style>
+</head>
+
+<body>
+    <div layout:fragment="content">
+        <div class="container-fluid">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-file-invoice text-primary"></i> Chi tiết đơn hàng #<span th:text="${order.id}"></span></h2>
+                <div class="d-flex gap-2">
+                    <a th:href="@{/manager/orders/cancelled}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> Quay lại
+                    </a>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Order Information -->
+                <div class="col-md-8">
+                    <!-- Customer Information -->
+                    <div class="order-detail-card">
+                        <div class="order-detail-header">
+                            <h5 class="mb-0"><i class="fas fa-user"></i> Thông tin khách hàng</h5>
+                        </div>
+                        <div class="order-detail-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="info-row">
+                                        <div class="info-label">Họ và tên:</div>
+                                        <div class="info-value" th:text="${order.customerName}"></div>
+                                    </div>
+                                    <div class="info-row">
+                                        <div class="info-label">Số điện thoại:</div>
+                                        <div class="info-value" th:text="${order.customerPhone}"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="info-row">
+                                        <div class="info-label">Email:</div>
+                                        <div class="info-value" th:text="${order.customerEmail}"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Delivery Address -->
+                    <div class="order-detail-card">
+                        <div class="order-detail-header">
+                            <h5 class="mb-0"><i class="fas fa-map-marker-alt"></i> Địa chỉ giao hàng</h5>
+                        </div>
+                        <div class="order-detail-body">
+                            <div class="info-row">
+                                <div class="info-label">Địa chỉ:</div>
+                                <div class="info-value" th:text="${order.deliveryAddress}"></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Tỉnh/Thành phố:</div>
+                                <div class="info-value" th:text="${order.city}"></div>
+                            </div>
+                            <div class="info-row" th:if="${order.district}">
+                                <div class="info-label">Quận/Huyện:</div>
+                                <div class="info-value" th:text="${order.district}"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Order Items -->
+                    <div class="order-detail-card">
+                        <div class="order-detail-header">
+                            <h5 class="mb-0"><i class="fas fa-box"></i> Sản phẩm đặt mua</h5>
+                        </div>
+                        <div class="order-detail-body">
+                            <div th:each="item : ${order.orderItems}" class="order-item">
+                                <div class="row align-items-center">
+                                    <div class="col-md-2">
+                                        <img th:src="${item.productImageUrl}" th:alt="${item.productName}" 
+                                             class="product-image" th:onerror="this.onerror=null; this.style.display='none'">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <h6 class="mb-1" th:text="${item.productName}"></h6>
+                                        <small class="text-muted">
+                                            SKU: <span th:text="${item.variantSku}"></span><br>
+                                            Màu: <span th:text="${item.colorName}"></span><br>
+                                            Loại: <span th:text="${item.typeName}"></span>
+                                        </small>
+                                    </div>
+                                    <div class="col-md-2 text-center">
+                                        <span class="badge bg-secondary" th:text="${item.quantity}"></span>
+                                    </div>
+                                    <div class="col-md-2 text-end">
+                                        <div th:text="${#numbers.formatDecimal(item.unitPrice, 0, 'COMMA', 0, 'POINT')} + '₫'"></div>
+                                    </div>
+                                    <div class="col-md-2 text-end">
+                                        <strong class="text-success" th:text="${#numbers.formatDecimal(item.totalPrice, 0, 'COMMA', 0, 'POINT')} + '₫'"></strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Order Status History -->
+                    <div class="order-detail-card">
+                        <div class="order-detail-header">
+                            <h5 class="mb-0"><i class="fas fa-history"></i> Lịch sử trạng thái</h5>
+                        </div>
+                        <div class="order-detail-body">
+                            <div class="timeline">
+                                <div th:each="history : ${order.statusHistories}" class="timeline-item">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <h6 class="mb-1" th:text="${history.status}"></h6>
+                                            <p class="mb-1" th:text="${history.note}"></p>
+                                            <small class="text-muted" th:text="${history.changedBy}"></small>
+                                        </div>
+                                        <small class="text-muted" th:text="${#temporals.format(history.changedAt, 'dd/MM/yyyy HH:mm')}"></small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Order Summary -->
+                <div class="col-md-4">
+                    <!-- Order Status -->
+                    <div class="order-detail-card">
+                        <div class="order-detail-header">
+                            <h5 class="mb-0"><i class="fas fa-info-circle"></i> Trạng thái đơn hàng</h5>
+                        </div>
+                        <div class="order-detail-body">
+                            <div class="info-row">
+                                <div class="info-label">Trạng thái:</div>
+                                <div class="info-value">
+                                    <span class="badge bg-danger status-badge">ĐÃ HỦY</span>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Phương thức thanh toán:</div>
+                                <div class="info-value" th:text="${order.paymentMethod}"></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Trạng thái thanh toán:</div>
+                                <div class="info-value" th:text="${order.paymentStatus}"></div>
+                            </div>
+                            <div class="info-row" th:if="${order.couponCode}">
+                                <div class="info-label">Mã giảm giá:</div>
+                                <div class="info-value" th:text="${order.couponCode}"></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Ngày tạo:</div>
+                                <div class="info-value" th:text="${#temporals.format(order.createdAt, 'dd/MM/yyyy HH:mm')}"></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Cập nhật lần cuối:</div>
+                                <div class="info-value" th:text="${#temporals.format(order.updatedAt, 'dd/MM/yyyy HH:mm')}"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Order Summary -->
+                    <div class="order-detail-card">
+                        <div class="order-detail-header">
+                            <h5 class="mb-0"><i class="fas fa-calculator"></i> Tổng kết đơn hàng</h5>
+                        </div>
+                        <div class="order-detail-body">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Tạm tính:</span>
+                                <span th:text="${#numbers.formatDecimal(order.subtotal, 0, 'COMMA', 0, 'POINT')} + '₫'"></span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2" th:if="${order.discountAmount > 0}">
+                                <span>Giảm giá:</span>
+                                <span class="text-success" th:text="'-' + ${#numbers.formatDecimal(order.discountAmount, 0, 'COMMA', 0, 'POINT')} + '₫'"></span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Phí vận chuyển:</span>
+                                <span th:text="${#numbers.formatDecimal(order.shippingFee, 0, 'COMMA', 0, 'POINT')} + '₫'"></span>
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between">
+                                <strong>Tổng cộng:</strong>
+                                <strong class="text-success" th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT')} + '₫'"></strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Delivery Information -->
+                    <div class="order-detail-card" th:if="${order.deliveryTeamName}">
+                        <div class="order-detail-header">
+                            <h5 class="mb-0"><i class="fas fa-truck"></i> Thông tin giao hàng</h5>
+                        </div>
+                        <div class="order-detail-body">
+                            <div class="info-row">
+                                <div class="info-label">Đội giao hàng:</div>
+                                <div class="info-value" th:text="${order.deliveryTeamName}"></div>
+                            </div>
+                            <div class="info-row" th:if="${order.deliveryTeamPhone}">
+                                <div class="info-label">Số điện thoại:</div>
+                                <div class="info-value" th:text="${order.deliveryTeamPhone}"></div>
+                            </div>
+                            <div class="info-row" th:if="${order.deliveryStatus}">
+                                <div class="info-label">Trạng thái giao:</div>
+                                <div class="info-value" th:text="${order.deliveryStatus}"></div>
+                            </div>
+                            <div class="info-row" th:if="${order.deliveryNote}">
+                                <div class="info-label">Ghi chú:</div>
+                                <div class="info-value" th:text="${order.deliveryNote}"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

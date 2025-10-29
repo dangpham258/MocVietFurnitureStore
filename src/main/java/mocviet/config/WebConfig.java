@@ -1,4 +1,4 @@
-package mocviet.config;
+﻿package mocviet.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -6,11 +6,11 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
-
+    
     // NOTE: Sitemesh 3.0.1 is not compatible with Spring Boot 3 (jakarta.servlet vs javax.servlet)
     // TODO: Update to Sitemesh 4 or use Thymeleaf Layout Dialect instead
     // For now, decorators are disabled
-
+    
     /*
     @Bean
     public FilterRegistrationBean<SitemeshConfig> sitemeshFilter() {
@@ -21,8 +21,8 @@ public class WebConfig implements WebMvcConfigurer {
         return filterRegistrationBean;
     }
     */
-
-    @Override
+    
+	@Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/css/**")
                 .addResourceLocations("classpath:/static/css/")
@@ -31,10 +31,18 @@ public class WebConfig implements WebMvcConfigurer {
                 .addResourceLocations("classpath:/static/js/")
                 .setCachePeriod(3600);
         registry.addResourceHandler("/images/**")
-                .addResourceLocations("classpath:/static/images/")
+                .addResourceLocations(
+                        "classpath:/static/images/",
+                        // Dev fallback: serve images written to source resources during runtime
+                        "file:src/main/resources/static/images/"
+                )
                 .setCachePeriod(3600);
         registry.addResourceHandler("/static/**")
-                .addResourceLocations("classpath:/static/")
+                .addResourceLocations(
+                        "classpath:/static/",
+                        // Dev fallback: serve files written to source resources during runtime
+                        "file:src/main/resources/static/"
+                )
                 .setCachePeriod(3600);
     }
 }

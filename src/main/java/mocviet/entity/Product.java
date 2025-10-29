@@ -1,24 +1,13 @@
-package mocviet.entity;
+﻿package mocviet.entity;
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal; // Import BigDecimal
 import java.time.LocalDateTime;
 import java.util.List; // Import List
-
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "Product") // Sửa tên bảng nếu cần
@@ -68,23 +57,23 @@ public class Product {
 
     // ===== THÊM MỐI QUAN HỆ OneToMany VÀO ĐÂY =====
     @OneToMany(mappedBy = "product", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<ProductImage> images;
-
+    private List<ProductImage> productImages;
+    
     @OneToMany(mappedBy = "product", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<ProductVariant> variants;
-
+    
     @OneToMany(mappedBy = "product", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Review> reviews;
-
+    
     @OneToMany(mappedBy = "product", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Wishlist> wishlists;
-
+    
     @OneToMany(mappedBy = "product", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Viewed> viewedBy;
-
+    
     @OneToMany(mappedBy = "linkedProduct", fetch = FetchType.LAZY)
     private List<Article> linkedArticles;
-
+    
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();

@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{manager/fragments/manager_layout}">
+<head>
+    <title>Quản lý tin tức - Mộc Việt</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <!-- Dashboard Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-subtitle mb-2">Tổng bài viết</h6>
+                            <h2 class="card-title mb-0" th:text="${dashboard.totalArticles}">0</h2>
+                        </div>
+                        <i class="fas fa-newspaper fa-3x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-subtitle mb-2">Đã xuất bản</h6>
+                            <h2 class="card-title mb-0" th:text="${dashboard.publishedArticles}">0</h2>
+                        </div>
+                        <i class="fas fa-check-circle fa-3x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-subtitle mb-2">Bài viết nháp</h6>
+                            <h2 class="card-title mb-0" th:text="${dashboard.draftArticles}">0</h2>
+                        </div>
+                        <i class="fas fa-file fa-3x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-subtitle mb-2">Tổng lượt xem</h6>
+                            <h2 class="card-title mb-0" th:text="${dashboard.totalViews}">0</h2>
+                        </div>
+                        <i class="fas fa-eye fa-3x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="mb-1">Quản lý tin tức</h2>
+                    <p class="text-muted mb-0">Danh sách bài viết của bạn</p>
+                </div>
+                <a href="/manager/articles/create" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Tạo bài viết mới
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Success/Error Messages -->
+    <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i><span th:text="${successMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i><span th:text="${errorMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    
+    <!-- Search and Filter -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form method="get" action="/manager/articles">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label for="keyword" class="form-label">Tìm kiếm</label>
+                                <input type="text" class="form-control" id="keyword" name="keyword" 
+                                       th:value="${keyword}" placeholder="Tiêu đề, tóm tắt...">
+                            </div>
+                            <div class="col-md-2">
+                                <label for="articleType" class="form-label">Loại bài viết</label>
+                                <select class="form-select" id="articleType" name="articleType">
+                                    <option value="">Tất cả</option>
+                                    <option value="MEDIA" th:selected="${articleType == 'MEDIA'}">MEDIA (Phong cách)</option>
+                                    <option value="NEWS" th:selected="${articleType == 'NEWS'}">NEWS (Tin tức)</option>
+                                    <option value="PEOPLE" th:selected="${articleType == 'PEOPLE'}">PEOPLE (Nghệ nhân)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label for="status" class="form-label">Trạng thái</label>
+                                <select class="form-select" id="status" name="status">
+                                    <option value="">Tất cả</option>
+                                    <option value="true" th:selected="${status != null && status == true}">Đã xuất bản</option>
+                                    <option value="false" th:selected="${status != null && status == false}">Nháp</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label for="sortBy" class="form-label">Sắp xếp</label>
+                                <select class="form-select" id="sortBy" name="sortBy">
+                                    <option value="createdAt" th:selected="${sortBy == 'createdAt'}">Ngày tạo</option>
+                                    <option value="publishedAt" th:selected="${sortBy == 'publishedAt'}">Ngày xuất bản</option>
+                                    <option value="views" th:selected="${sortBy == 'views'}">Lượt xem</option>
+                                </select>
+                            </div>
+                            <div class="col-md-1">
+                                <label for="sortDir" class="form-label">Thứ tự</label>
+                                <select class="form-select" id="sortDir" name="sortDir">
+                                    <option value="desc" th:selected="${sortDir == 'desc'}">Giảm dần</option>
+                                    <option value="asc" th:selected="${sortDir == 'asc'}">Tăng dần</option>
+                                </select>
+                            </div>
+                            <div class="col-md-1">
+                                <label class="form-label">&nbsp;</label>
+                                <button type="submit" class="btn btn-outline-primary d-block w-100">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Articles Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Danh sách bài viết</h5>
+                </div>
+                <div class="card-body">
+                    <div th:if="${articles.isEmpty()}" class="text-center py-5">
+                        <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">Chưa có bài viết nào</p>
+                        <a href="/manager/articles/create" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>Tạo bài viết đầu tiên
+                        </a>
+                    </div>
+                    
+                    <div th:if="${!articles.isEmpty()}" class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Ảnh</th>
+                                    <th>Tiêu đề</th>
+                                    <th>Loại</th>
+                                    <th>Trạng thái</th>
+                                    <th>Lượt xem</th>
+                                    <th>Ngày tạo</th>
+                                    <th>Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="article : ${articles.content}">
+                                    <td>
+                                        <img th:if="${article.thumbnail}" 
+                                             th:src="${article.thumbnail}" 
+                                             alt="Thumbnail" 
+                                             class="img-thumbnail" 
+                                             style="width: 80px; height: 60px; object-fit: cover;">
+                                        <div th:unless="${article.thumbnail}" 
+                                             class="bg-secondary d-flex align-items-center justify-content-center" 
+                                             style="width: 80px; height: 60px;">
+                                            <i class="fas fa-image text-white"></i>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="fw-bold" th:text="${article.title}">Tiêu đề</div>
+                                        <small class="text-muted" th:text="${#strings.abbreviate(article.summary, 50)}">Tóm tắt...</small>
+                                        <div th:if="${article.isFeatured}">
+                                            <span class="badge bg-warning text-dark">
+                                                <i class="fas fa-star me-1"></i>Nổi bật
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge" 
+                                              th:classappend="${article.articleType == 'MEDIA'} ? 'bg-info' : (${article.articleType == 'NEWS'} ? 'bg-primary' : 'bg-success')"
+                                              th:text="${article.articleType == 'MEDIA'} ? 'Phong cách' : (${article.articleType == 'NEWS'} ? 'Tin tức' : 'Nghệ nhân')">
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span th:if="${article.status}" class="badge bg-success">
+                                            <i class="fas fa-check-circle me-1"></i>Đã xuất bản
+                                        </span>
+                                        <span th:unless="${article.status}" class="badge bg-secondary">
+                                            <i class="fas fa-file me-1"></i>Nháp
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <i class="fas fa-eye me-1"></i>
+                                        <span th:text="${article.views}">0</span>
+                                    </td>
+                                    <td>
+                                        <small th:text="${#temporals.format(article.createdAt, 'dd/MM/yyyy HH:mm')}">01/01/2024</small>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a th:href="@{/manager/articles/{id}(id=${article.id})}" 
+                                               class="btn btn-sm btn-outline-info" 
+                                               title="Xem chi tiết">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a th:href="@{/manager/articles/{id}/edit(id=${article.id})}" 
+                                               class="btn btn-sm btn-outline-primary" 
+                                               title="Chỉnh sửa">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Pagination -->
+                    <div th:if="${!articles.isEmpty() && articles.totalPages > 1}" class="d-flex justify-content-between align-items-center mt-4">
+                        <div>
+                            Hiển thị <span th:text="${articles.numberOfElements}">0</span> / 
+                            <span th:text="${articles.totalElements}">0</span> bài viết
+                        </div>
+                        <nav>
+                            <ul class="pagination mb-0">
+                                <li class="page-item" th:classappend="${articles.first} ? 'disabled'">
+                                    <a class="page-link" 
+                                       th:href="@{/manager/articles(page=${currentPage - 1}, size=${articles.size}, sortBy=${sortBy}, sortDir=${sortDir}, articleType=${articleType}, status=${status}, keyword=${keyword})}">
+                                        Trước
+                                    </a>
+                                </li>
+                                <li class="page-item" 
+                                    th:each="i : ${#numbers.sequence(0, articles.totalPages - 1)}"
+                                    th:classappend="${i == currentPage} ? 'active'">
+                                    <a class="page-link" 
+                                       th:href="@{/manager/articles(page=${i}, size=${articles.size}, sortBy=${sortBy}, sortDir=${sortDir}, articleType=${articleType}, status=${status}, keyword=${keyword})}"
+                                       th:text="${i + 1}">1</a>
+                                </li>
+                                <li class="page-item" th:classappend="${articles.last} ? 'disabled'">
+                                    <a class="page-link" 
+                                       th:href="@{/manager/articles(page=${currentPage + 1}, size=${articles.size}, sortBy=${sortBy}, sortDir=${sortDir}, articleType=${articleType}, status=${status}, keyword=${keyword})}">
+                                        Sau
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+

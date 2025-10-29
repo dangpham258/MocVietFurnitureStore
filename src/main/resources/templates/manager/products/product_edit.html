@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{manager/fragments/manager_layout}">
+<head>
+    <title>Chỉnh sửa sản phẩm - Mộc Việt</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="mb-1">Chỉnh sửa sản phẩm</h2>
+                    <p class="text-muted mb-0">Cập nhật thông tin sản phẩm</p>
+                </div>
+                <a th:href="@{/manager/products}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Quay lại
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <form th:action="@{/manager/products/{id}/edit(id=${product.id})}" th:object="${updateProductRequest}" method="post">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Thông tin sản phẩm</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label for="name" class="form-label">Tên sản phẩm <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="name" th:field="*{name}"
+                                       th:class="${#fields.hasErrors('name')} ? 'form-control is-invalid' : 'form-control'"
+                                       placeholder="Nhập tên sản phẩm">
+                                <div th:if="${#fields.hasErrors('name')}" class="invalid-feedback">
+                                    <span th:errors="*{name}"></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label for="description" class="form-label">Mô tả sản phẩm</label>
+                                <textarea class="form-control" id="description" th:field="*{description}" rows="4"
+                                          th:class="${#fields.hasErrors('description')} ? 'form-control is-invalid' : 'form-control'"
+                                          placeholder="Nhập mô tả sản phẩm"></textarea>
+                                <div th:if="${#fields.hasErrors('description')}" class="invalid-feedback">
+                                    <span th:errors="*{description}"></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="categoryId" class="form-label">Danh mục <span class="text-danger">*</span></label>
+                                <select class="form-select" id="categoryId" th:field="*{categoryId}"
+                                        th:class="${#fields.hasErrors('categoryId')} ? 'form-select is-invalid' : 'form-select'">
+                                    <option value="">Chọn danh mục</option>
+                                    <option th:each="category : ${categories}" 
+                                            th:value="${category.id}" 
+                                            th:text="${category.name}"></option>
+                                </select>
+                                <div th:if="${#fields.hasErrors('categoryId')}" class="invalid-feedback">
+                                    <span th:errors="*{categoryId}"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="collectionId" class="form-label">Bộ sưu tập</label>
+                                <select class="form-select" id="collectionId" th:field="*{collectionId}"
+                                        th:class="${#fields.hasErrors('collectionId')} ? 'form-select is-invalid' : 'form-select'">
+                                    <option value="">Chọn bộ sưu tập (tùy chọn)</option>
+                                    <option th:each="collection : ${collections}" 
+                                            th:value="${collection.id}" 
+                                            th:text="${collection.name}"></option>
+                                </select>
+                                <div th:if="${#fields.hasErrors('collectionId')}" class="invalid-feedback">
+                                    <span th:errors="*{collectionId}"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Thông tin hiện tại</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">ID:</label>
+                            <p class="mb-0" th:text="${product.id}"></p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Slug:</label>
+                            <p class="mb-0" th:text="${product.slug}"></p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Trạng thái:</label>
+                            <p class="mb-0">
+                                <span th:if="${product.isActive}" class="badge bg-success">Hoạt động</span>
+                                <span th:unless="${product.isActive}" class="badge bg-danger">Ẩn</span>
+                            </p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Đã bán:</label>
+                            <p class="mb-0" th:text="${product.soldQty}"></p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Ngày tạo:</label>
+                            <p class="mb-0" th:text="${#temporals.format(product.createdAt, 'dd/MM/yyyy HH:mm')}"></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Hành động</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Lưu thay đổi
+                            </button>
+                            <a th:href="@{/manager/products}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-2"></i>Hủy bỏ
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+</body>
+</html>
