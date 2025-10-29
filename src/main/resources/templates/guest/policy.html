@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <title th:text="${page.title} + ' - Mộc Việt'">Chính sách</title>
+    <style>
+        .policy-content {
+            line-height: 1.8;
+        }
+        .policy-content h2, .policy-content h3 {
+            color: #8B4513;
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+            font-weight: bold;
+        }
+        .policy-content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .policy-content ul {
+            padding-left: 20px;
+        }
+        .policy-content li {
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+
+<div layout:fragment="content">
+    <div class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-9 col-md-10">
+
+                <nav aria-label="breadcrumb" class="mb-4">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+                        <li class="breadcrumb-item active" aria-current="page" th:text="${page.title}">Chính sách</li>
+                    </ol>
+                </nav>
+
+                <h1 class="mb-4" th:text="${page.title}">Tiêu đề trang chính sách</h1>
+                <hr>
+
+                <div class="policy-content" th:utext="${page.content}">
+                    <h2>Đây là tiêu đề mẫu</h2>
+                    <p>Đây là đoạn văn bản mẫu. Nội dung thực tế sẽ được tải từ cơ sở dữ liệu.</p>
+                    <img src="https://via.placeholder.com/800x400.png?text=Hinh+Anh+Minh+Hoa" alt="Ảnh minh họa">
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

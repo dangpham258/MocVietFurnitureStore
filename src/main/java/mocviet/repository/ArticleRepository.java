@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -20,9 +21,32 @@ public interface ArticleRepository extends JpaRepository<Article, Integer> {
     Optional<Article> findBySlug(String slug);
     
     /**
+     * Tìm bài viết theo slug và status = true (cho guest xem)
+     */
+    Optional<Article> findBySlugAndStatusTrue(String slug);
+    
+    /**
      * Kiểm tra slug đã tồn tại
      */
     boolean existsBySlug(String slug);
+    
+    /**
+     * Tìm bài viết đã xuất bản có sắp xếp (cho guest xem)
+     */
+    @Query("SELECT a FROM Article a WHERE a.status = true ORDER BY a.publishedAt DESC, a.id ASC")
+    Page<Article> findByStatusTrue(Pageable pageable);
+    
+    /**
+     * Tìm bài viết theo loại và status = true có sắp xếp (cho guest xem)
+     */
+    @Query("SELECT a FROM Article a WHERE a.articleType = :articleType AND a.status = true ORDER BY a.publishedAt DESC, a.id ASC")
+    Page<Article> findByArticleTypeAndStatusTrue(@Param("articleType") ArticleType articleType, Pageable pageable);
+    
+    /**
+     * Lấy danh sách các loại bài viết distinct (cho guest xem)
+     */
+    @Query("SELECT DISTINCT a.articleType FROM Article a WHERE a.status = true")
+    List<ArticleType> findDistinctArticleTypes();
     
     /**
      * Tìm bài viết theo tác giả và trạng thái (cho manager xem bài viết của mình)
@@ -85,4 +109,3 @@ public interface ArticleRepository extends JpaRepository<Article, Integer> {
     @Query("SELECT SUM(a.views) FROM Article a WHERE a.author = :author")
     Long sumViewsByAuthor(@Param("author") String author);
 }
-

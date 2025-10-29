@@ -1,6 +1,7 @@
 package mocviet.service.customer.impl;
 
 import lombok.RequiredArgsConstructor;
+import mocviet.dto.customer.CartItemDTO;
 import mocviet.entity.Cart;
 import mocviet.entity.CartItem;
 import mocviet.entity.ProductVariant;
@@ -11,6 +12,7 @@ import mocviet.repository.ProductVariantRepository;
 import mocviet.service.UserDetailsServiceImpl;
 import mocviet.service.customer.ICartService;
 import org.springframework.stereotype.Service;
+import org.hibernate.Hibernate;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -28,35 +30,33 @@ public class CartServiceImpl implements ICartService {
     private final ProductVariantRepository productVariantRepository;
     private final UserDetailsServiceImpl userDetailsService;
     
-    @Override
-    public Cart getCurrentUserCart() {
+    private Cart getCurrentUserCart() {
         User currentUser = userDetailsService.getCurrentUser();
         if (currentUser == null) {
             return null;
         }
-        
         return cartRepository.findByUserId(currentUser.getId()).orElse(null);
     }
     
     @Override
-    public List<CartItem> getCurrentUserCartItems() {
+    public List<CartItemDTO> getCurrentUserCartItems() {
         Cart cart = getCurrentUserCart();
         if (cart == null) {
             return List.of();
         }
-        
-        return cartItemRepository.findByCartIdOrderByIdAsc(cart.getId());
+        return cartItemRepository.findByCartIdOrderByIdAsc(cart.getId())
+                .stream().map(this::mapToDTO).toList();
     }
     
     @Override
     @Transactional(readOnly = true)
-    public List<CartItem> getCurrentUserCartItemsWithImages() {
+    public List<CartItemDTO> getCurrentUserCartItemsWithImages() {
         Cart cart = getCurrentUserCart();
         if (cart == null) {
             return List.of();
         }
-        
-        return cartItemRepository.findByCartIdWithProductImages(cart.getId());
+        return cartItemRepository.findByCartIdWithProductImages(cart.getId())
+                .stream().map(this::mapToDTO).toList();
     }
     
     @Override
@@ -68,7 +68,6 @@ public class CartServiceImpl implements ICartService {
                 return false;
             }
             
-            // Kiểm tra ProductVariant có tồn tại và còn hàng không
             Optional<ProductVariant> variantOpt = productVariantRepository.findById(variantId);
             if (variantOpt.isEmpty() || !variantOpt.get().getIsActive()) {
                 return false;
@@ -79,7 +78,6 @@ public class CartServiceImpl implements ICartService {
                 return false;
             }
             
-            // Lấy hoặc tạo Cart
             Cart cart = cartRepository.findByUserId(currentUser.getId())
                     .orElseGet(() -> {
                         Cart newCart = new Cart();
@@ -87,14 +85,11 @@ public class CartServiceImpl implements ICartService {
                         return cartRepository.save(newCart);
                     });
             
-            // Kiểm tra sản phẩm đã có trong giỏ hàng chưa
             Optional<CartItem> existingItem = cartItemRepository.findByCartIdAndVariantId(cart.getId(), variantId);
             
             if (existingItem.isPresent()) {
-                // Sản phẩm đã có trong giỏ hàng, không thêm nữa
                 return false;
             } else {
-                // Thêm mới
                 CartItem newItem = new CartItem();
                 newItem.setCart(cart);
                 newItem.setVariant(variant);
@@ -123,18 +118,15 @@ public class CartServiceImpl implements ICartService {
             
             CartItem item = itemOpt.get();
             
-            // Kiểm tra quyền sở hữu
             if (!item.getCart().getUser().getId().equals(currentUser.getId())) {
                 return false;
             }
             
-            // Kiểm tra tồn kho
             if (quantity > item.getVariant().getStockQty()) {
                 return false;
             }
             
             if (quantity <= 0) {
-                // Xóa sản phẩm khỏi giỏ hàng
                 cartItemRepository.delete(item);
             } else {
                 item.setQty(quantity);
@@ -163,7 +155,6 @@ public class CartServiceImpl implements ICartService {
             
             CartItem item = itemOpt.get();
             
-            // Kiểm tra quyền sở hữu
             if (!item.getCart().getUser().getId().equals(currentUser.getId())) {
                 return false;
             }
@@ -181,7 +172,7 @@ public class CartServiceImpl implements ICartService {
         try {
             Cart cart = getCurrentUserCart();
             if (cart == null) {
-                return true; // Giỏ hàng đã trống
+                return true;
             }
             
             cartItemRepository.deleteByCartId(cart.getId());
@@ -192,13 +183,14 @@ public class CartServiceImpl implements ICartService {
     }
     
     @Override
-    public CartItem findCartItemByVariantId(Integer variantId) {
+    public CartItemDTO findCartItemByVariantId(Integer variantId) {
         Cart cart = getCurrentUserCart();
         if (cart == null) {
             return null;
         }
         
-        return cartItemRepository.findByCartIdAndVariantId(cart.getId(), variantId).orElse(null);
+        return cartItemRepository.findByCartIdAndVariantId(cart.getId(), variantId)
+                .map(this::mapToDTO).orElse(null);
     }
     
     @Override
@@ -221,11 +213,15 @@ public class CartServiceImpl implements ICartService {
     }
     
     @Override
-    public Map<Integer, String> validateStockAvailability(List<CartItem> cartItems) {
+    public Map<Integer, String> validateStockAvailability(List<CartItemDTO> cartItems) {
         Map<Integer, String> errors = new HashMap<>();
         
-        for (CartItem item : cartItems) {
-            ProductVariant variant = item.getVariant();
+        for (CartItemDTO item : cartItems) {
+            ProductVariant variant = productVariantRepository.findById(item.getVariantId()).orElse(null);
+            if (variant == null) {
+                errors.put(item.getId(), "Sản phẩm không tồn tại");
+                continue;
+            }
             
             if (!variant.getIsActive()) {
                 errors.put(item.getId(), "Sản phẩm không còn được bán");
@@ -247,5 +243,34 @@ public class CartServiceImpl implements ICartService {
         }
         
         return cartItemRepository.countByCartId(cart.getId());
+    }
+
+    private CartItemDTO mapToDTO(CartItem item) {
+        CartItemDTO dto = new CartItemDTO();
+        dto.setId(item.getId());
+        dto.setVariantId(item.getVariant().getId());
+        dto.setSku(item.getVariant().getSku());
+        if (item.getVariant().getProduct() != null) {
+            var product = item.getVariant().getProduct();
+            dto.setProductName(product.getName());
+            dto.setProductSlug(product.getSlug());
+            // Chỉ truy cập images nếu collection đã được initialize để tránh LazyInitializationException
+            if (Hibernate.isInitialized(product.getProductImages())
+                && product.getProductImages() != null
+                && !product.getProductImages().isEmpty()) {
+                dto.setImageUrl(product.getProductImages().get(0).getUrl());
+            }
+        }
+        if (item.getVariant().getColor() != null) {
+            dto.setColorName(item.getVariant().getColor().getName());
+        }
+        dto.setTypeName(item.getVariant().getTypeName());
+        dto.setUnitPrice(item.getVariant().getSalePrice());
+        dto.setStockQty(item.getVariant().getStockQty());
+        dto.setQty(item.getQty());
+        if (item.getVariant().getSalePrice() != null) {
+            dto.setTotalPrice(item.getVariant().getSalePrice().multiply(BigDecimal.valueOf(item.getQty())));
+        }
+        return dto;
     }
 }

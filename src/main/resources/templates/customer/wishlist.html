@@ -10,7 +10,7 @@
 </head>
 <body>
     <!-- Header -->
-    <div th:replace="fragments/header :: header"></div>
+    <div th:replace="~{fragments/header :: header}"></div>
 
     <!-- Main Content -->
     <div class="container my-5">
@@ -63,12 +63,12 @@
                             <div class="row align-items-center">
                                 <!-- Product Image -->
                                 <div class="col-md-2">
-                                    <a th:href="@{/products/{slug}(slug=${item.product.slug})}" class="text-decoration-none">
-                                        <img th:if="${item.product.productImages != null and !item.product.productImages.empty}"
-                                             th:src="${item.product.productImages[0].url}"
-                                             th:alt="${item.product.name}"
+                                    <a th:href="@{/products/{slug}(slug=${item.productSlug})}" class="text-decoration-none">
+                                        <img th:if="${item.imageUrl != null}"
+                                             th:src="${item.imageUrl}"
+                                             th:alt="${item.productName}"
                                              class="img-fluid rounded product-thumbnail">
-                                        <div th:unless="${item.product.productImages != null and !item.product.productImages.empty}"
+                                        <div th:unless="${item.imageUrl != null}"
                                              class="bg-light d-flex align-items-center justify-content-center rounded"
                                              style="width: 120px; height: 120px;">
                                             <i class="bi bi-image text-muted" style="font-size: 2rem;"></i>
@@ -78,27 +78,14 @@
 
                                 <!-- Product Info -->
                                 <div class="col-md-6">
-                                    <a th:href="@{/products/{slug}(slug=${item.product.slug})}" class="text-decoration-none text-dark">
-                                        <h5 class="card-title mb-2" th:text="${item.product.name}">Tên sản phẩm</h5>
+                                    <a th:href="@{/products/{slug}(slug=${item.productSlug})}" class="text-decoration-none text-dark">
+                                        <h5 class="card-title mb-2" th:text="${item.productName}">Tên sản phẩm</h5>
                                     </a>
                                     <div class="product-info mb-2">
-                                        <span class="badge bg-secondary me-2" th:text="${item.product.category.name}">Danh mục</span>
-                                        <span th:if="${item.product.collection != null}" 
-                                              class="badge bg-info" th:text="${item.product.collection.name}">Collection</span>
+                                        <!-- DTO mức đơn giản: không hiển thị category/collection nếu không có -->
                                     </div>
-                                    <div class="rating-info mb-2">
-                                        <span th:if="${item.product.avgRating != null}">
-                                            <i class="bi bi-star-fill text-warning"></i>
-                                            <span th:text="${item.product.avgRating}">4.5</span>
-                                            <span class="text-muted">(<span th:text="${item.product.totalReviews}">10</span> đánh giá)</span>
-                                        </span>
-                                        <span th:unless="${item.product.avgRating != null}" class="text-muted">
-                                            Chưa có đánh giá
-                                        </span>
-                                    </div>
-                                    <div class="sold-info">
-                                        <i class="bi bi-cart-check"></i>
-                                        <small class="text-muted">Đã bán: <span th:text="${item.product.soldQty}">0</span></small>
+                                    <div class="rating-info mb-2 text-muted">
+                                        Chưa có đánh giá
                                     </div>
                                 </div>
 
@@ -106,13 +93,11 @@
                                 <div class="col-md-3">
                                     <div class="variant-info mb-2">
                                         <h6 class="text-muted">Biến thể có sẵn:</h6>
-                                        <div th:each="variant : ${item.product.variants}" 
-                                             th:if="${variant.isActive and variant.stockQty > 0}"
-                                             class="mb-1">
+                                        <div class="mb-1">
                                             <small>
-                                                <span th:text="${variant.color.name} + ' - ' + ${variant.typeName}">Màu - Loại</span>
-                                                <span class="text-success fw-bold">
-                                                    • <span th:text="${#numbers.formatDecimal(variant.salePrice, 0, 'COMMA', 0, 'POINT')} + ' ₫'">0 ₫</span>
+                                                <span th:text="${item.inStock != null && item.inStock ? 'Còn hàng' : 'Hết hàng'}"></span>
+                                                <span class="text-success fw-bold" th:if="${item.price != null}">
+                                                    • <span th:text="${#numbers.formatDecimal(item.price, 0, 'COMMA', 0, 'POINT')} + ' ₫'">0 ₫</span>
                                                 </span>
                                             </small>
                                         </div>
@@ -122,7 +107,7 @@
                                 <!-- Actions -->
                                 <div class="col-md-1 text-end">
                                     <button class="btn btn-sm btn-outline-danger" 
-                                            th:onclick="'removeFromWishlist(' + ${item.id} + ', ' + ${item.product.id} + ')'"
+                                            th:onclick="'removeFromWishlist(' + ${item.id} + ', ' + ${item.productId} + ')'"
                                             title="Xóa khỏi danh sách yêu thích">
                                         <i class="bi bi-trash"></i>
                                     </button>

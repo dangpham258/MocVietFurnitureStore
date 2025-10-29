@@ -64,6 +64,15 @@ class CustomerCart {
         document.querySelectorAll('.btn-quantity').forEach(button => {
             button.addEventListener('click', (e) => {
                 e.stopPropagation();
+                const idMatch = e.currentTarget.closest('.cart-item')?.id?.match(/cart-item-(\d+)/);
+                const cartItemId = idMatch ? parseInt(idMatch[1]) : null;
+                if (!cartItemId) return;
+                // Determine increase or decrease by icon class
+                if (e.currentTarget.querySelector('.fa-plus')) {
+                    increaseQuantity(cartItemId);
+                } else if (e.currentTarget.querySelector('.fa-minus')) {
+                    decreaseQuantity(cartItemId);
+                }
             });
         });
     }
@@ -246,7 +255,7 @@ class CustomerCart {
             
             if (data.success) {
                 // Update total price for this item
-                updateItemTotal(cartItemId);
+    updateItemTotal(cartItemId);
                 this.updateCartTotal();
                 
                 // Show stock errors if any
@@ -413,9 +422,8 @@ window.updateItemTotal = function(cartItemId) {
     // Get price from the price display
     const priceElement = document.querySelector(`#cart-item-${cartItemId} .price-info span`);
     if (!priceElement) return;
-    
-    const priceText = priceElement.textContent.replace(/[^\d]/g, '');
-    const price = parseInt(priceText);
+    const dataUnit = priceElement.getAttribute('data-unit');
+    const price = dataUnit ? parseInt(dataUnit) : parseInt(priceElement.textContent.replace(/[^\d]/g, ''));
     
     const total = price * quantity;
     const totalElement = document.getElementById(`total-${cartItemId}`);

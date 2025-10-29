@@ -1,8 +1,8 @@
 package mocviet.service.customer;
 
-import mocviet.dto.PaymentRequestDTO;
-import mocviet.dto.PaymentWebhookDTO;
-import mocviet.entity.Orders;
+import mocviet.dto.customer.PaymentRequestDTO;
+import mocviet.dto.customer.PaymentWebhookDTO;
+import mocviet.dto.customer.OrderDetailDTO;
 
 /**
  * Interface cho Payment Service
@@ -29,4 +29,9 @@ public interface IPaymentService {
      * @return true nếu checksum hợp lệ
      */
     boolean verifyChecksum(PaymentWebhookDTO webhookDto);
+
+    /**
+     * Lấy chi tiết đơn hàng phục vụ trang kết quả thanh toán
+     */
+    OrderDetailDTO getOrderDetailForPayment(Integer orderId);
 }

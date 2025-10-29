@@ -1,9 +1,9 @@
 package mocviet.controller.customer;
 
 import lombok.RequiredArgsConstructor;
-import mocviet.entity.User;
-import mocviet.entity.UserNotification;
-import mocviet.entity.Wishlist;
+import mocviet.dto.customer.UserDTO;
+import mocviet.dto.customer.UserNotificationDTO;
+import mocviet.dto.customer.WishlistItemDTO;
 import mocviet.repository.UserNotificationRepository;
 import mocviet.service.UserDetailsServiceImpl;
 import mocviet.service.customer.IWishlistService;
@@ -31,21 +31,30 @@ public class WishlistController {
      */
     @GetMapping
     public String wishlistPage(Model model) {
-        User currentUser = userDetailsService.getCurrentUser();
-        List<Wishlist> wishlist = wishlistService.getCurrentUserWishlist();
+        var currentUser = userDetailsService.getCurrentUser();
+        List<WishlistItemDTO> wishlist = wishlistService.getCurrentUserWishlist();
         
-        // Lấy notifications về sản phẩm có hàng trở lại
-        List<UserNotification> backInStockNotifications = List.of();
+        // Lấy notifications về sản phẩm có hàng trở lại (DTO)
+        List<UserNotificationDTO> backInStockNotifications = List.of();
         if (currentUser != null) {
-            backInStockNotifications = notificationRepository
+            var notifications = notificationRepository
                 .findByUserAndTitleAndIsReadFalseOrderByCreatedAtDesc(currentUser, "Sản phẩm có hàng trở lại")
                 .stream()
                 .limit(5) // Chỉ hiển thị 5 notification mới nhất
                 .collect(Collectors.toList());
+            backInStockNotifications = notifications.stream().map(notif -> {
+                UserNotificationDTO dto = new UserNotificationDTO();
+                dto.setId(notif.getId());
+                dto.setTitle(notif.getTitle());
+                dto.setContent(notif.getMessage());
+                dto.setIsRead(notif.getIsRead());
+                dto.setCreatedAt(notif.getCreatedAt());
+                return dto;
+            }).collect(Collectors.toList());
             
             // Đánh dấu các notification này là đã đọc (chỉ lần đầu tiên vào trang)
             if (!backInStockNotifications.isEmpty()) {
-                backInStockNotifications.forEach(notif -> {
+                notifications.forEach(notif -> {
                     notif.setIsRead(true);
                     notificationRepository.save(notif);
                 });
@@ -192,9 +201,9 @@ public class WishlistController {
         Map<String, Object> response = new HashMap<>();
         
         try {
-            User currentUser = userDetailsService.getCurrentUser();
+            var currentUser = userDetailsService.getCurrentUser();
             if (currentUser != null) {
-                Long count = notificationRepository.countByUserAndIsReadFalse(currentUser);
+                Long count = notificationRepository.countByUserIdAndIsReadFalse(currentUser.getId());
                 response.put("success", true);
                 response.put("count", count.intValue());
             } else {

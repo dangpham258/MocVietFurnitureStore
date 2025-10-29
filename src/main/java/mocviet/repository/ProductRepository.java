@@ -58,4 +58,29 @@ public interface ProductRepository extends JpaRepository<Product, Integer>, JpaS
     
     @Query("SELECT DISTINCT p FROM Product p JOIN p.variants v WHERE v.stockQty = 0")
     List<Product> findOutOfStockProducts();
+
+    // BỎ @EntityGraph ở đây vì fetch sẽ làm riêng
+    @Query("SELECT p FROM Product p WHERE p.isActive = true")
+    Page<Product> findAllActive(Pageable pageable); // Đổi tên thành findAllActive cho rõ ràng
+
+    /**
+     * Lấy danh sách Product theo IDs với fetch eager variants và color (KHÔNG fetch images)
+     */
+    @EntityGraph(attributePaths = {"variants", "variants.color", "category", "collection"}) // Fetch thêm category, collection nếu cần cho DTO
+    @Query("SELECT p FROM Product p WHERE p.id IN :ids AND p.isActive = true")
+    List<Product> findByIdInWithVariants(@Param("ids") List<Integer> ids);
+
+    /**
+     * Lấy danh sách Product theo IDs với fetch eager productImages và color của image
+     */
+    @EntityGraph(attributePaths = {"productImages", "productImages.color"}) // Chỉ fetch images và color
+    @Query("SELECT p FROM Product p WHERE p.id IN :ids AND p.isActive = true")
+    List<Product> findByIdInWithImages(@Param("ids") List<Integer> ids); // <<<--- TÊN ĐÚNG LÀ findByIdInWithImages
+
+    // Phương thức gây lỗi MultipleBagFetchException (ĐẢM BẢO ĐÃ XÓA HOẶC COMMENT)
+    /*
+    @EntityGraph(attributePaths = {"variants", "variants.color", "productImages", "productImages.color"})
+    @Query("SELECT p FROM Product p WHERE p.id IN :ids AND p.isActive = true")
+    List<Product> findByIdInWithVariantsAndImages(@Param("ids") List<Integer> ids);
+    */
 }

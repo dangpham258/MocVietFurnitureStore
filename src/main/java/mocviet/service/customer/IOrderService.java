@@ -1,9 +1,7 @@
 package mocviet.service.customer;
 
-import mocviet.dto.CreateOrderRequest;
-import mocviet.dto.CreateOrderResponse;
-import mocviet.entity.Orders;
-import mocviet.entity.OrderItem;
+import mocviet.dto.customer.*;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -12,88 +10,37 @@ import java.util.Map;
 
 public interface IOrderService {
     
-    /**
-     * Lấy danh sách đơn hàng của user hiện tại với phân trang
-     */
-    Page<Orders> getCurrentUserOrders(Pageable pageable);
+    Page<OrderSummaryDTO> getCurrentUserOrders(Pageable pageable);
     
-    /**
-     * Lấy danh sách đơn hàng theo trạng thái của user hiện tại
-     */
-    List<Orders> getCurrentUserOrdersByStatus(Orders.OrderStatus status);
+    List<OrderSummaryDTO> getCurrentUserOrdersByStatus(String status);
     
-    /**
-     * Lấy danh sách đơn hàng theo return status của user hiện tại
-     */
-    List<Orders> getCurrentUserOrdersByReturnStatus(Orders.ReturnStatus returnStatus);
+    List<OrderSummaryDTO> getCurrentUserOrdersByReturnStatus(String returnStatus);
     
-    /**
-     * Lấy chi tiết đơn hàng theo ID (chỉ của user hiện tại)
-     */
-    Orders getOrderDetail(Integer orderId);
+    OrderDetailDTO getOrderDetail(Integer orderId);
     
-    /**
-     * Lấy danh sách OrderItem của đơn hàng
-     */
-    List<OrderItem> getOrderItems(Integer orderId);
+    List<OrderItemDTO> getOrderItems(Integer orderId);
     
-    /**
-     * Kiểm tra đơn hàng có thể hủy không
-     */
     boolean canCancelOrder(Integer orderId);
     
-    /**
-     * Hủy đơn hàng
-     */
     boolean cancelOrder(Integer orderId, String reason);
     
-    /**
-     * Kiểm tra đơn hàng có thể yêu cầu trả không
-     */
     boolean canRequestReturn(Integer orderId);
     
-    /**
-     * Yêu cầu trả hàng
-     */
     boolean requestReturn(Integer orderId, String reason);
     
-    /**
-     * Lấy danh sách đơn hàng có thể đánh giá
-     */
-    List<Orders> getOrdersCanReview();
+    List<OrderSummaryDTO> getOrdersCanReview();
     
-    /**
-     * Lấy danh sách OrderItem chưa đánh giá trong đơn hàng
-     */
-    List<OrderItem> getUnreviewedOrderItems(Integer orderId);
+    List<OrderItemDTO> getUnreviewedOrderItems(Integer orderId);
     
-    /**
-     * Lấy danh sách đơn hàng có thể mua lại
-     */
-    List<Orders> getOrdersCanReorder();
+    List<OrderSummaryDTO> getOrdersCanReorder();
     
-    /**
-     * Mua lại đơn hàng (thêm sản phẩm vào giỏ hàng)
-     */
     Map<String, Object> reorderProducts(Integer orderId);
     
-    /**
-     * Đếm số đơn hàng theo trạng thái
-     */
     Map<String, Long> getOrderCountsByStatus();
     
-    /**
-     * Đếm số đơn hàng theo return status
-     */
     Map<String, Long> getOrderCountsByReturnStatus();
     
-    /**
-     * Tính tổng tiền đơn hàng (từ OrderItems)
-     */
     Map<String, Object> calculateOrderTotal(Integer orderId);
     
-    /**
-     * Tạo đơn hàng mới từ giỏ hàng
-     */
     CreateOrderResponse createOrder(CreateOrderRequest request);
 }

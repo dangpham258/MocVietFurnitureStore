@@ -1,11 +1,12 @@
 package mocviet.service.customer.impl;
 
 import lombok.RequiredArgsConstructor;
-import mocviet.dto.CreateOrderRequest;
-import mocviet.dto.CreateOrderResponse;
-import mocviet.dto.OrderDetailDTO;
-import mocviet.dto.OrderItemDTO;
-import mocviet.dto.StatusHistoryDTO;
+import mocviet.dto.customer.CreateOrderRequest;
+import mocviet.dto.customer.CreateOrderResponse;
+import mocviet.dto.customer.OrderDetailDTO;
+import mocviet.dto.customer.OrderItemDTO;
+import mocviet.dto.customer.OrderSummaryDTO;
+import mocviet.dto.customer.StatusHistoryDTO;
 import mocviet.entity.*;
 import mocviet.repository.*;
 import mocviet.service.UserDetailsServiceImpl;
@@ -39,7 +40,7 @@ public class OrderServiceImpl implements IOrderService {
     
     @Override
     @Transactional
-    public Page<Orders> getCurrentUserOrders(Pageable pageable) {
+    public Page<OrderSummaryDTO> getCurrentUserOrders(Pageable pageable) {
         User currentUser = userDetailsService.getCurrentUser();
         if (currentUser == null) {
             return Page.empty();
@@ -49,7 +50,7 @@ public class OrderServiceImpl implements IOrderService {
         Page<Orders> ordersPage = orderRepository.findByUserId(currentUser.getId(), pageable);
         
         if (ordersPage.isEmpty()) {
-            return ordersPage;
+            return Page.empty();
         }
         
         // Fetch orderItems riêng cho các orders trong page
@@ -98,71 +99,52 @@ public class OrderServiceImpl implements IOrderService {
             });
         }
         
-        return ordersPage;
+        // Map Page<Orders> -> Page<OrderSummaryDTO>
+        return ordersPage.map(this::mapToOrderSummaryDTO);
     }
     
     @Override
     @Transactional
-    public List<Orders> getCurrentUserOrdersByStatus(Orders.OrderStatus status) {
+    public List<OrderSummaryDTO> getCurrentUserOrdersByStatus(String status) {
         User currentUser = userDetailsService.getCurrentUser();
         if (currentUser == null) {
             return List.of();
         }
-        return orderRepository.findByUserIdAndStatusOrderByCreatedAtDesc(currentUser.getId(), status);
-    }
-    
-    @Override
-    @Transactional
-    public List<Orders> getCurrentUserOrdersByReturnStatus(Orders.ReturnStatus returnStatus) {
-        User currentUser = userDetailsService.getCurrentUser();
-        if (currentUser == null) {
-            return List.of();
-        }
-        return orderRepository.findByUserIdAndReturnStatusOrderByCreatedAtDesc(currentUser.getId(), returnStatus);
-    }
-    
-    @Override
-    @Transactional
-    public Orders getOrderDetail(Integer orderId) {
-        User currentUser = userDetailsService.getCurrentUser();
-        if (currentUser == null) {
-            return null;
-        }
-        
-        Orders order = orderRepository.findByIdAndUserId(orderId, currentUser.getId()).orElse(null);
-        if (order == null) {
-            return null;
-        }
-        
-        // Fetch orderItems với ProductVariant và Color
-        List<OrderItem> orderItems = orderItemRepository.findByOrderIdWithVariantAndColor(orderId);
-        order.setOrderItems(orderItems);
-        
-        // Fetch Product cho tất cả ProductVariant trong orderItems
-        List<Integer> productIds = orderItems.stream()
-                .map(item -> item.getVariant().getProduct().getId())
-                .distinct()
+        try {
+            Orders.OrderStatus enumStatus = Orders.OrderStatus.valueOf(status);
+            return orderRepository
+                .findByUserIdAndStatusOrderByCreatedAtDesc(currentUser.getId(), enumStatus)
+                .stream()
+                .map(this::mapToOrderSummaryDTO)
                 .toList();
-        
-        if (!productIds.isEmpty()) {
-            List<Product> productsWithImages = productRepository.findByIdsWithImages(productIds);
-            Map<Integer, Product> productsMap = productsWithImages.stream()
-                    .collect(Collectors.toMap(Product::getId, product -> product));
-            
-            // Map Product vào ProductVariant
-            orderItems.forEach(item -> {
-                if (item.getVariant() != null && 
-                    item.getVariant().getProduct() != null) {
-                    
-                    Product productWithImages = productsMap.get(item.getVariant().getProduct().getId());
-                    if (productWithImages != null) {
-                        item.getVariant().setProduct(productWithImages);
-                    }
-                }
-            });
+        } catch (IllegalArgumentException e) {
+            return List.of();
         }
-        
-        return order;
+    }
+    
+    @Override
+    @Transactional
+    public List<OrderSummaryDTO> getCurrentUserOrdersByReturnStatus(String returnStatus) {
+        User currentUser = userDetailsService.getCurrentUser();
+        if (currentUser == null) {
+            return List.of();
+        }
+        try {
+            Orders.ReturnStatus enumStatus = Orders.ReturnStatus.valueOf(returnStatus);
+            return orderRepository
+                .findByUserIdAndReturnStatusOrderByCreatedAtDesc(currentUser.getId(), enumStatus)
+                .stream()
+                .map(this::mapToOrderSummaryDTO)
+                .toList();
+        } catch (IllegalArgumentException e) {
+            return List.of();
+        }
+    }
+    
+    @Override
+    @Transactional
+    public OrderDetailDTO getOrderDetail(Integer orderId) {
+        return getOrderDetailDTO(orderId);
     }
     
     /**
@@ -191,8 +173,11 @@ public class OrderServiceImpl implements IOrderService {
     }
     
     @Override
-    public List<OrderItem> getOrderItems(Integer orderId) {
-        return orderItemRepository.findByOrderIdOrderByIdAsc(orderId);
+    public List<OrderItemDTO> getOrderItems(Integer orderId) {
+        return orderItemRepository.findByOrderIdOrderByIdAsc(orderId)
+                .stream()
+                .map(this::mapToOrderItemDTO)
+                .toList();
     }
     
     @Override
@@ -306,21 +291,27 @@ public class OrderServiceImpl implements IOrderService {
     }
     
     @Override
-    public List<Orders> getOrdersCanReview() {
+    public List<OrderSummaryDTO> getOrdersCanReview() {
         User currentUser = userDetailsService.getCurrentUser();
         if (currentUser == null) {
             return List.of();
         }
-        return orderRepository.findOrdersCanReview(currentUser.getId());
+        return orderRepository.findOrdersCanReview(currentUser.getId())
+                .stream()
+                .map(this::mapToOrderSummaryDTO)
+                .toList();
     }
     
     @Override
-    public List<OrderItem> getUnreviewedOrderItems(Integer orderId) {
-        return orderItemRepository.findUnreviewedItemsByOrderId(orderId);
+    public List<OrderItemDTO> getUnreviewedOrderItems(Integer orderId) {
+        return orderItemRepository.findUnreviewedItemsByOrderId(orderId)
+                .stream()
+                .map(this::mapToOrderItemDTO)
+                .toList();
     }
     
     @Override
-    public List<Orders> getOrdersCanReorder() {
+    public List<OrderSummaryDTO> getOrdersCanReorder() {
         User currentUser = userDetailsService.getCurrentUser();
         if (currentUser == null) {
             return List.of();
@@ -329,7 +320,10 @@ public class OrderServiceImpl implements IOrderService {
             Orders.OrderStatus.CANCELLED, 
             Orders.OrderStatus.RETURNED
         );
-        return orderRepository.findByUserIdAndStatusInOrderByCreatedAtDesc(currentUser.getId(), statuses);
+        return orderRepository.findByUserIdAndStatusInOrderByCreatedAtDesc(currentUser.getId(), statuses)
+                .stream()
+                .map(this::mapToOrderSummaryDTO)
+                .toList();
     }
     
     @Override
@@ -486,7 +480,14 @@ public class OrderServiceImpl implements IOrderService {
         dto.setQty(item.getQty());
         dto.setUnitPrice(item.getUnitPrice());
         dto.setTotalPrice(item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQty())));
-        dto.setProductSlug(item.getVariant().getProduct().getSlug());
+        if (item.getVariant().getProduct() != null) {
+            dto.setProductSlug(item.getVariant().getProduct().getSlug());
+            dto.setProductName(item.getVariant().getProduct().getName());
+            if (item.getVariant().getProduct().getProductImages() != null &&
+                !item.getVariant().getProduct().getProductImages().isEmpty()) {
+                dto.setImageUrl(item.getVariant().getProduct().getProductImages().get(0).getUrl());
+            }
+        }
         return dto;
     }
     
@@ -499,6 +500,34 @@ public class OrderServiceImpl implements IOrderService {
         dto.setStatus(history.getStatus());
         dto.setNote(history.getNote());
         dto.setChangedAt(history.getChangedAt());
+        return dto;
+    }
+
+    private OrderSummaryDTO mapToOrderSummaryDTO(Orders order) {
+        // Map items nếu đã được nạp trong order (getCurrentUserOrders đã gắn orderItems)
+        java.util.List<OrderItemDTO> itemDTOs = java.util.Collections.emptyList();
+        BigDecimal subtotal = BigDecimal.ZERO;
+        if (order.getOrderItems() != null && !order.getOrderItems().isEmpty()) {
+            itemDTOs = order.getOrderItems().stream()
+                    .map(this::mapToOrderItemDTO)
+                    .toList();
+            subtotal = itemDTOs.stream()
+                    .map(OrderItemDTO::getTotalPrice)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+        }
+
+        OrderSummaryDTO dto = OrderSummaryDTO.builder()
+                .id(order.getId())
+                .status(order.getStatus() != null ? order.getStatus().name() : null)
+                .returnStatus(order.getReturnStatus() != null ? order.getReturnStatus().name() : null)
+                .paymentStatus(order.getPaymentStatus() != null ? order.getPaymentStatus().name() : null)
+                .paymentMethod(order.getPaymentMethod() != null ? order.getPaymentMethod().name() : null)
+                .shippingFee(order.getShippingFee())
+                .createdAt(order.getCreatedAt())
+                .updatedAt(order.getUpdatedAt())
+                .subtotal(subtotal)
+                .build();
+        dto.setItems(itemDTOs);
         return dto;
     }
     

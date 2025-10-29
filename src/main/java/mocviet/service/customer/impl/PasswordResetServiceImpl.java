@@ -1,10 +1,10 @@
 package mocviet.service.customer.impl;
 
 import lombok.RequiredArgsConstructor;
-import mocviet.dto.ForgotPasswordRequest;
+import mocviet.dto.customer.ForgotPasswordRequest;
 import mocviet.dto.MessageResponse;
-import mocviet.dto.ResetPasswordRequest;
-import mocviet.dto.VerifyOTPRequest;
+import mocviet.dto.customer.ResetPasswordRequest;
+import mocviet.dto.customer.VerifyOTPRequest;
 import mocviet.entity.OTP;
 import mocviet.entity.User;
 import mocviet.repository.OTPRepository;

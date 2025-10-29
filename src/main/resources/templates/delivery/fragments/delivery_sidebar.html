@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head><meta charset="UTF-8"></head>
+<body>
+
+<nav th:fragment="sidebar" class="sidebar">
+    
+    <div class="text-center mb-4 border-bottom pb-3 border-secondary p-3">
+        <h3 class="text-white fw-bold mt-2"><i class="bi bi-truck"></i> Mộc Việt Delivery</h3>
+    </div>
+    
+    <ul class="nav flex-column sidebar-nav">
+        <li class="nav-item">
+            <a class="sidebar-item" th:href="@{/delivery}" th:classappend="${activeMenu == 'dashboard'} ? 'active'">
+                <i class="bi bi-box-seam sidebar-icon"></i>
+                <span class="sidebar-text">Đơn hàng cần xử lý</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="sidebar-item" th:href="@{/delivery/history}" th:classappend="${activeMenu == 'history'} ? 'active'">
+                <i class="bi bi-calendar-check sidebar-icon"></i>
+                <span class="sidebar-text">Lịch sử giao hàng</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="sidebar-item" th:href="@{/delivery/profile}" th:classappend="${activeMenu == 'profile'} ? 'active'">
+                <i class="bi bi-person-circle sidebar-icon"></i>
+                <span class="sidebar-text">Tài khoản</span>
+            </a>
+        </li>
+    </ul>
+    
+    <div class="mt-auto p-3 border-top border-secondary">
+        <ul class="nav flex-column sidebar-nav" style="padding: 0;">
+             <li class="nav-item">
+                <a class="sidebar-item" href="/">
+                    <i class="bi bi-house sidebar-icon"></i>
+                    <span class="sidebar-text">Về Trang chủ</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="sidebar-item" href="/logout" style="color: #ffc107;"> <i class="bi bi-box-arrow-left sidebar-icon"></i>
+                    <span class="sidebar-text">Đăng xuất</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+</body>
+</html>

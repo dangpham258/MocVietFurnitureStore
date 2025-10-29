@@ -2,9 +2,9 @@ package mocviet.controller.customer;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import mocviet.dto.PaymentRequestDTO;
-import mocviet.dto.PaymentWebhookDTO;
-import mocviet.entity.Orders;
+import mocviet.dto.customer.PaymentRequestDTO;
+import mocviet.dto.customer.PaymentWebhookDTO;
+import mocviet.dto.customer.OrderDetailDTO;
 import mocviet.repository.OrderRepository;
 import mocviet.service.customer.IPaymentService;
 import mocviet.service.UserDetailsServiceImpl;
@@ -93,27 +93,10 @@ public class PaymentController {
         
         // Lấy thông tin order nếu có
         if (orderId != null) {
-            // Lấy order với eager fetch cho orderItems
-            java.util.Optional<Orders> orderOpt = orderRepository.findById(orderId);
-            Orders order = orderOpt.orElse(null);
-            
+            OrderDetailDTO order = paymentService.getOrderDetailForPayment(orderId);
             if (order != null) {
                 model.addAttribute("order", order);
-                
-                // Tính tổng tiền đơn hàng (từ order items + shipping fee)
-                java.math.BigDecimal grandTotal = java.math.BigDecimal.ZERO;
-                try {
-                    if (order.getOrderItems() != null && !order.getOrderItems().isEmpty()) {
-                        for (mocviet.entity.OrderItem item : order.getOrderItems()) {
-                            grandTotal = grandTotal.add(item.getUnitPrice().multiply(java.math.BigDecimal.valueOf(item.getQty())));
-                        }
-                    }
-                    grandTotal = grandTotal.add(order.getShippingFee());
-                } catch (Exception e) {
-                    // Nếu không load được orderItems (lazy), skip tính grandTotal
-                    grandTotal = null;
-                }
-                model.addAttribute("grandTotal", grandTotal);
+                model.addAttribute("grandTotal", order.getTotal());
             }
         }
         
@@ -186,19 +169,19 @@ public class PaymentController {
             }
             
             // Dùng query với @EntityGraph để eager fetch orderItems
-            Orders order = orderRepository.findByIdAndUserId(orderId, currentUser.getId()).orElse(null);
+            var order = orderRepository.findByIdAndUserId(orderId, currentUser.getId()).orElse(null);
             if (order == null) {
                 return "redirect:/customer/orders?error=Order not found";
             }
             
             // Kiểm tra payment status phải là UNPAID
-            if (order.getPaymentStatus() != Orders.PaymentStatus.UNPAID) {
+            if (order.getPaymentStatus() != mocviet.entity.Orders.PaymentStatus.UNPAID) {
                 return "redirect:/customer/orders?error=Cannot pay for this order";
             }
             
             // Kiểm tra payment method phải là VNPAY hoặc MoMo
-            if (order.getPaymentMethod() != Orders.PaymentMethod.VNPAY && 
-                order.getPaymentMethod() != Orders.PaymentMethod.MOMO) {
+            if (order.getPaymentMethod() != mocviet.entity.Orders.PaymentMethod.VNPAY && 
+                order.getPaymentMethod() != mocviet.entity.Orders.PaymentMethod.MOMO) {
                 return "redirect:/customer/orders?error=Invalid payment method";
             }
             

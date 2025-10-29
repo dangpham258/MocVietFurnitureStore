@@ -1,7 +1,7 @@
 package mocviet.controller.customer;
 
 import lombok.RequiredArgsConstructor;
-import mocviet.entity.CartItem;
+import mocviet.dto.customer.CartItemDTO;
 import mocviet.service.customer.ICartService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -21,10 +21,9 @@ public class CartController {
     
     @GetMapping
     public String cartPage(@RequestParam(required = false) String error, Model model) {
-        List<CartItem> cartItems = cartService.getCurrentUserCartItems();
+        List<CartItemDTO> cartItems = cartService.getCurrentUserCartItems();
         Map<Integer, String> stockErrors = cartService.validateStockAvailability(cartItems);
         
-        // Parse error message
         String errorMessage = null;
         if (error != null) {
             switch (error) {
@@ -57,8 +56,7 @@ public class CartController {
         Map<String, Object> response = new HashMap<>();
         
         try {
-            // Kiểm tra sản phẩm đã có trong giỏ hàng chưa
-            CartItem existingItem = cartService.findCartItemByVariantId(variantId);
+            CartItemDTO existingItem = cartService.findCartItemByVariantId(variantId);
             if (existingItem != null) {
                 response.put("success", false);
                 response.put("message", "Sản phẩm này đã có trong giỏ hàng của bạn");
@@ -93,8 +91,7 @@ public class CartController {
                 response.put("success", true);
                 response.put("message", "Đã cập nhật số lượng");
                 
-                // Tính lại tổng tiền nếu cần
-                List<CartItem> cartItems = cartService.getCurrentUserCartItems();
+                List<CartItemDTO> cartItems = cartService.getCurrentUserCartItems();
                 Map<Integer, String> stockErrors = cartService.validateStockAvailability(cartItems);
                 response.put("stockErrors", stockErrors);
             } else {

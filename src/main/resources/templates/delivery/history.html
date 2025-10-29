@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{delivery/fragments/delivery_layout}">
+<head>
+    <title>Lịch sử giao hàng</title>
+    <style>
+        .stat-card {
+            background: #ffffff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            padding: 1.25rem;
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        .stat-card-icon {
+            font-size: 2.5rem;
+            padding: 1rem;
+            border-radius: 50%;
+            margin-right: 1rem;
+        }
+        .stat-card-icon.bg-today { background-color: #e6f7ff; color: #096dd9; }
+        .stat-card-icon.bg-week { background-color: #f6ffed; color: #52c41a; }
+        .stat-card-icon.bg-month { background-color: #fffbe6; color: #faad14; }
+        .stat-card-info h5 { font-size: 1.75rem; font-weight: 700; color: #333; margin: 0;}
+        .stat-card-info p { font-size: 0.9rem; color: #666; margin: 0;}
+
+        /* Thêm CSS cho badge trạng thái OrderStatus */
+        .badge-delivered { background-color: #28a745; color: white; }
+        .badge-returned { background-color: #fd7e14; color: white; }
+        /* Bạn có thể thêm các màu khác cho các trạng thái khác nếu cần */
+
+    </style>
+</head>
+<body>
+
+<div layout:fragment="content">
+    <div th:if="${param.error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle"></i> <span th:text="${param.error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    
+    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle"></i> <span th:text="${errorMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div class="row" th:if="${stats != null}">
+        <div class="col-md-4">
+            <div class="stat-card">
+                <div class="stat-card-icon bg-today">
+                    <i class="bi bi-calendar-day"></i>
+                </div>
+                <div class="stat-card-info">
+                    <h5 th:text="${stats.totalDoneToday}">0</h5>
+                    <p>Hoàn thành hôm nay</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+             <div class="stat-card">
+                <div class="stat-card-icon bg-week">
+                    <i class="bi bi-calendar-week"></i>
+                </div>
+                <div class="stat-card-info">
+                    <h5 th:text="${stats.totalDoneThisWeek}">0</h5>
+                    <p>Hoàn thành tuần này</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+             <div class="stat-card">
+                <div class="stat-card-icon bg-month">
+                    <i class="bi bi-calendar-month"></i>
+                </div>
+                <div class="stat-card-info">
+                    <h5 th:text="${stats.totalDoneThisMonth}">0</h5>
+                    <p>Hoàn thành tháng này</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:if="${orderPage == null or orderPage.empty}" class="delivery-empty-state mt-4">
+        <i class="bi bi-calendar-x"></i>
+        <h5>Chưa có đơn hàng nào được hoàn thành</h5>
+        <p>Lịch sử giao hàng của bạn trống.</p>
+    </div>
+
+    <div th:unless="${orderPage == null or orderPage.empty}">
+        <p class="text-muted mb-3">Danh sách các đơn hàng bạn đã giao hoặc thu hồi thành công.</p>
+
+        <div class="card manager-card">
+            <div class="card-header">
+                <i class="bi bi-list-check me-2"></i> Lịch sử đơn hàng (DONE)
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>ID Đơn</th>
+                                <th>Trạng thái Order</th>
+                                <th>Khách hàng</th>
+                                <th>Địa chỉ</th>
+                                <th>Ngày hoàn thành</th>
+                                <th>Chi tiết</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="order : ${orderPage.content}">
+                                <td><strong th:text="'#' + ${order.orderId}">#12345</strong></td>
+                                <td>
+                                    <span class="badge"
+                                          th:classappend="${order.orderStatus.name() == 'DELIVERED'} ? 'badge-delivered' : (${order.orderStatus.name() == 'RETURNED'} ? 'badge-returned' : 'bg-secondary')"
+                                          th:text="${order.orderStatus.name() == 'DELIVERED' ? 'Đã giao' : (order.orderStatus.name() == 'RETURNED' ? 'Đã trả' : order.orderStatus.name())}">
+                                    </span>
+                                </td>
+                                <td>
+                                    <div th:text="${order.customerName}"></div>
+                                    <small class="text-muted" th:text="${order.customerPhone}"></small>
+                                </td>
+                                <td th:text="${order.deliveryAddress}" style="max-width: 250px; white-space: normal;"></td>
+                                <td th:text="${#temporals.format(order.updatedAt, 'dd/MM/yyyy')}"></td>
+                                <td>
+                                    <a th:href="@{/delivery/orders/original/{id}(id=${order.orderId})}" class="btn btn-primary btn-sm" title="Xem chi tiết đơn gốc">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <nav th:if="${totalPages > 1}" aria-label="Page navigation" class="mt-4 d-flex justify-content-center">
+            <ul class="pagination pagination-sm">
+                <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                    <a class="page-link" th:href="@{/delivery/history(page=${currentPage - 1})}">Trước</a>
+                </li>
+                <li th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                    class="page-item" th:classappend="${i == currentPage} ? 'active'">
+                    <a class="page-link" th:href="@{/delivery/history(page=${i})}" th:text="${i + 1}"></a>
+                </li>
+                <li class="page-item" th:classappend="${currentPage >= totalPages - 1} ? 'disabled'">
+                    <a class="page-link" th:href="@{/delivery/history(page=${currentPage + 1})}">Sau</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+</div>
+
+</body>
+</html>

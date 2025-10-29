@@ -1,7 +1,7 @@
 package mocviet.controller.customer;
 
 import lombok.RequiredArgsConstructor;
-import mocviet.entity.CartItem;
+import mocviet.dto.customer.CartItemDTO;
 import mocviet.service.customer.ICartService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -25,7 +25,7 @@ public class CartApiController {
         
         try {
             // Kiểm tra sản phẩm đã có trong giỏ hàng chưa
-            CartItem existingItem = cartService.findCartItemByVariantId(variantId);
+            CartItemDTO existingItem = cartService.findCartItemByVariantId(variantId);
             if (existingItem != null) {
                 response.put("success", false);
                 response.put("message", "Sản phẩm này đã có trong giỏ hàng của bạn");
