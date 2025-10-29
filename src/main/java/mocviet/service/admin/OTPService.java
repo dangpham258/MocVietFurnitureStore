@@ -190,6 +190,7 @@ public class OTPService {
      */
     @Scheduled(fixedRate = 300000) // 5 phút
     @Async
+    @Transactional
     public void cleanupExpiredOTPs() {
         try {
             LocalDateTime now = LocalDateTime.now();

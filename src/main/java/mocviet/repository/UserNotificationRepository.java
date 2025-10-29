@@ -9,34 +9,13 @@ import org.springframework.stereotype.Repository;
 import mocviet.entity.User;
 import mocviet.entity.UserNotification;
 
-import mocviet.entity.User;
-import mocviet.entity.UserNotification;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
-
-@Repository
-public interface UserNotificationRepository extends JpaRepository<UserNotification, Integer> {
-
-    List<UserNotification> findByUserOrderByCreatedAtDesc(User user);
-
-    List<UserNotification> findByUserAndIsReadOrderByCreatedAtDesc(User user, Boolean isRead);
-
-    long countByUser(User user);
-
-    long countByUserAndIsRead(User user, Boolean isRead);
-
-    Optional<UserNotification> findByIdAndUser(Integer id, User user);
-}
-
 
 
 @Repository
@@ -136,4 +115,12 @@ public interface UserNotificationRepository extends JpaRepository<UserNotificati
      * Tìm thông báo theo ID và user ID để xóa
      */
     void deleteByIdAndUserId(Integer id, Integer userId);
+    
+    List<UserNotification> findByUserAndIsReadOrderByCreatedAtDesc(User user, Boolean isRead);
+
+    long countByUser(User user);
+
+    long countByUserAndIsRead(User user, Boolean isRead);
+
+    Optional<UserNotification> findByIdAndUser(Integer id, User user);
 }

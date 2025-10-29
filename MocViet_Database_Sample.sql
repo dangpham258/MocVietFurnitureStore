@@ -200,7 +200,8 @@ VALUES
     <p><i class="bi bi-telephone"></i> <strong>Hotline:</strong> 0971 141 140</p>
     <p><i class="bi bi-envelope"></i> <strong>Email:</strong> cskh@mocviet.vn</p>
     <p><i class="bi bi-clock"></i> <strong>Giờ làm việc:</strong> 8:00 - 21:00 (Cả tuần)</p>
-  </div>', 1),
+  </div>'
+  , 1),
  
  (N'chinh-sach-bao-hanh', N'Chính sách bảo hành', 
   N'<div class="content-wrapper">
@@ -1326,6 +1327,21 @@ INSERT INTO dbo.Showroom(name, address, city, district, phone, email, open_hours
  (N'Showroom Hà Nội', N'123 Đường Láng, Đống Đa', N'Hà Nội', N'Đống Đa', N'024.1234.5678', N'hn@mocviet.vn', N'8:00 - 22:00', 1),
  (N'Showroom TP.HCM', N'456 Nguyễn Huệ, Quận 1', N'TP.HCM', N'Quận 1', N'028.8765.4321', N'hcm@mocviet.vn', N'8:00 - 22:00', 1),
  (N'Showroom Đà Nẵng', N'789 Lê Duẩn, Hải Châu', N'Đà Nẵng', N'Hải Châu', N'0236.1111.2222', N'dn@mocviet.vn', N'8:00 - 22:00', 1);
+
+-- Cập nhật Google Maps iframe cho Showroom Hà Nội (id = 1)
+UPDATE dbo.Showroom
+SET map_embed = N'<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3724.414482540709!2d105.80169737503108!3d21.016095280630033!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3135ab5e6db3d941%3A0x571f62e3b5a69002!2zMTIzIMSQLiBMw6FuZywgVHJ1bmcgSG_DoCwgxJDhu5FuZyDEkGEsIEjDoCBO4buZaSwgVmlldG5hbQ!5e0!3m2!1sen!2s!4v1761750376622!5m2!1sen!2s" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>'
+WHERE name = N'Showroom Hà Nội';
+
+-- Cập nhật Google Maps iframe cho Showroom TP.HCM (id = 2)
+UPDATE dbo.Showroom
+SET map_embed = N'<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.456663700164!2d106.698383374805!3d10.776293589372532!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752f47975ce55f%3A0x26d4747546784ad5!2zNDU2IE5ndXnDqsyDbiBIdcOqzKMsIELhur9uIE5naMOpLCBRdeG6rW4gMSwgVGjDoG5oIHBo4buRIEjhu5MgQ2jDrSBNaW5oLCBWaWV0bmFt!5e0!3m2!1sen!2s!4v1761750423212!5m2!1sen!2s" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>'
+WHERE name = N'Showroom TP.HCM';
+
+-- Cập nhật Google Maps iframe cho Showroom Đà Nẵng (id = 3)
+UPDATE dbo.Showroom
+SET map_embed = N'<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3833.98124933477!2d108.20450247490396!3d16.06646278461262!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3142184cbc209153%3A0xa10ed2b7170cd131!2zNzg5IEzDqiBEdeG6qW4sIENow61uaCBHacOhbiwgVGhhbmggS2jDqiwgxJDDoCBO4bq1bmcgNTUwMDAwLCBWaWV0bmFt!5e0!3m2!1sen!2s!4v1761750494219!5m2!1sen!2s" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>'
+WHERE name = N'Showroom Đà Nẵng';
 
 ------------------------------------------------------------
 -- 21) SOCIAL LINKS (Liên kết mạng xã hội)

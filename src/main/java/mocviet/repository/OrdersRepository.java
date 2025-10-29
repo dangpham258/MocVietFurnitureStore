@@ -10,16 +10,10 @@ import org.springframework.stereotype.Repository;
 
 import mocviet.entity.Orders;
 
-import mocviet.entity.Orders;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
 
-import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface OrdersRepository extends JpaRepository<Orders, Integer> {
@@ -149,11 +143,7 @@ public interface OrdersRepository extends JpaRepository<Orders, Integer> {
     List<Object[]> findRevenueByCategoryNative(@Param("status") String status,
                                                @Param("start") LocalDateTime start,
                                                @Param("end") LocalDateTime end);
-}
 
-
-@Repository
-public interface OrdersRepository extends JpaRepository<Orders, Integer> {
     
     List<Orders> findByUserId(Integer userId);
     

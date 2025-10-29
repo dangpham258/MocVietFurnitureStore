@@ -24,6 +24,7 @@ public interface OTPRepository extends JpaRepository<OTP, Integer> {
     @Query("DELETE FROM OTP o WHERE o.expiresAt < :currentTime")
     int deleteExpiredOTPs(@Param("currentTime") LocalDateTime currentTime);
     
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
     void deleteByExpiresAtBefore(LocalDateTime currentTime);
 
     void deleteByUserAndPurposeAndIsUsedFalse(User user, OTP.Purpose purpose);

@@ -20,7 +20,7 @@ import mocviet.repository.OrdersRepository;
 import mocviet.repository.UserRepository;
 import mocviet.service.admin.DashboardService;
 
-@Service
+@Service("adminDashboardService")
 @RequiredArgsConstructor
 @Slf4j
 @Transactional(readOnly = true)

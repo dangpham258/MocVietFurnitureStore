@@ -28,12 +28,6 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
     @Override
     @EntityGraph(attributePaths = {"products", "parent"})
     Optional<Category> findById(Integer id);
-
-
-
-
-
-    Optional<Category> findBySlug(String slug);
     
     Boolean existsByName(String name);
     

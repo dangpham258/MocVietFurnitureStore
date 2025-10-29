@@ -1014,8 +1014,8 @@ function initializeBootstrapComponents() {
     // Tải thông báo header
     loadHeaderNotifications();
     
-    // Tự động làm mới thông báo header mỗi 30 giây
-    setInterval(loadHeaderNotifications, 30000);
+    // Tự động làm mới thông báo header mỗi 10 giây
+    setInterval(loadHeaderNotifications, 10000);
 }
 
 // Theo dõi số thông báo chưa đọc để phát hiện thông báo mới

@@ -13,22 +13,6 @@ import mocviet.entity.Color;
 
 @Repository
 public interface ColorRepository extends JpaRepository<Color, Integer> {
-
-    Optional<Color> findByName(String name);
-    Optional<Color> findBySlug(String slug);
-
-    @Override
-    @EntityGraph(attributePaths = {"images"})
-    List<Color> findAll();
-
-    @Override
-    @EntityGraph(attributePaths = {"images"})
-    Optional<Color> findById(Integer id);
-}
-
-
-@Repository
-public interface ColorRepository extends JpaRepository<Color, Integer> {
     
     Optional<Color> findBySlug(String slug);
     
@@ -44,4 +28,14 @@ public interface ColorRepository extends JpaRepository<Color, Integer> {
     List<Color> findActiveColors();
     
     List<Color> findByIsActiveTrue();
+
+    Optional<Color> findByName(String name);
+
+    @Override
+    @EntityGraph(attributePaths = {"images"})
+    List<Color> findAll();
+
+    @Override
+    @EntityGraph(attributePaths = {"images"})
+    Optional<Color> findById(Integer id);
 }

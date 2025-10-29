@@ -12,16 +12,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import java.time.LocalDateTime;
 
+
 @Repository
 public interface CouponRepository extends JpaRepository<Coupon, String> {
+
     Optional<Coupon> findByCode(String code);
-}
 
-
-
-@Repository
-public interface CouponRepository extends JpaRepository<Coupon, String> {
-    
     /**
      * Validate coupon code với điều kiện thời gian và số tiền tối thiểu
      */

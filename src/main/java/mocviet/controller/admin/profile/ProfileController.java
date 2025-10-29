@@ -15,7 +15,7 @@ import mocviet.dto.admin.ProfileUpdateRequest;
 import mocviet.entity.User;
 import mocviet.service.admin.AdminProfileService;
 
-@Controller
+@Controller("adminProfileController")
 @RequestMapping("/admin/profile")
 @RequiredArgsConstructor
 public class ProfileController {
