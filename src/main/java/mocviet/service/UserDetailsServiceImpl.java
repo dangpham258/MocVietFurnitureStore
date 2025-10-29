@@ -27,7 +27,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         if (user.getRole() != null) {
             user.getRole().getName(); // Force lazy loading
         }
-        
         return user;
     }
     

@@ -84,12 +84,16 @@ public class AuthService {
         // Generate JWT token
         String jwt = tokenProvider.generateToken(authentication);
         
-        // Always set JWT as cookie for session management
-        Cookie cookie = new Cookie("JWT_TOKEN", jwt);
-        cookie.setHttpOnly(true);
-        cookie.setPath("/");
-        cookie.setMaxAge(24 * 60 * 60); // 24 hours
-        response.addCookie(cookie);
+
+        // Set JWT as cookie if remember me is true
+        if (Boolean.TRUE.equals(request.getRememberMe())) {
+            Cookie cookie = new Cookie("JWT_TOKEN", jwt);
+            cookie.setHttpOnly(true);
+            cookie.setPath("/");
+            cookie.setMaxAge(24 * 60 * 60); // 24 hours
+            response.addCookie(cookie);
+        }
+
         
         // Get user details
         User user = (User) authentication.getPrincipal();

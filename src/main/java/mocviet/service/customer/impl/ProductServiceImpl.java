@@ -9,6 +9,7 @@ import mocviet.entity.Product;
 import mocviet.entity.ProductImage;
 import mocviet.entity.ProductVariant;
 import mocviet.repository.ProductImageRepository;
+import mocviet.repository.CategoryRepository;
 import mocviet.repository.ProductRepository;
 import mocviet.repository.ProductVariantRepository;
 import mocviet.service.ProductSpecification;
@@ -38,14 +39,24 @@ public class ProductServiceImpl implements IProductService {
     private final ProductRepository productRepository;
     private final ProductVariantRepository variantRepository;
     private final ProductImageRepository imageRepository;
+    private final CategoryRepository categoryRepository;
     // private final ObjectMapper objectMapper; // Bỏ comment nếu dùng
 
     @Override
     @Transactional(readOnly = true)
     public Page<ProductCardDTO> findProducts(ProductCriteriaDTO criteria) {
 
+        // Xác định categoryIds bao gồm cả danh mục con (nếu có)
+        List<Integer> categoryIds = null;
+        if (criteria.getCategorySlug() != null && !criteria.getCategorySlug().isBlank()) {
+            categoryIds = getCategoryIdsIncludingDescendants(criteria.getCategorySlug());
+            if (categoryIds.isEmpty()) {
+                return Page.empty();
+            }
+        }
+
         // 1. Tạo Specification (đã bao gồm orderBy giá nếu cần)
-        Specification<Product> spec = ProductSpecification.findByCriteria(criteria);
+        Specification<Product> spec = ProductSpecification.findByCriteria(criteria, categoryIds);
 
         // 2. Tạo Sort (CHỈ khi KHÔNG sort theo giá)
         Sort sort;
@@ -193,6 +204,26 @@ public class ProductServiceImpl implements IProductService {
                 }).collect(Collectors.toList()));
 
         return dto;
+    }
+
+    // == Helpers cho category descendants ==
+    private List<Integer> getCategoryIdsIncludingDescendants(String slug) {
+        if (slug == null || slug.trim().isEmpty()) return java.util.Collections.emptyList();
+        java.util.Optional<mocviet.entity.Category> parentOpt = categoryRepository.findBySlugAndIsActiveTrue(slug);
+        if (parentOpt.isEmpty()) return java.util.Collections.emptyList();
+        mocviet.entity.Category parent = parentOpt.get();
+        java.util.List<Integer> ids = new java.util.ArrayList<>();
+        collectCategoryIds(parent, ids);
+        return ids;
+    }
+
+    private void collectCategoryIds(mocviet.entity.Category category, java.util.List<Integer> ids) {
+        if (category == null || (category.getIsActive() != null && !category.getIsActive())) return;
+        ids.add(category.getId());
+        java.util.List<mocviet.entity.Category> children = categoryRepository.findByParentIdAndIsActiveTrue(category.getId());
+        for (mocviet.entity.Category child : children) {
+            collectCategoryIds(child, ids);
+        }
     }
 
      private ProductDetailDTO.VariantDTO convertToVariantDTO(ProductVariant v) {

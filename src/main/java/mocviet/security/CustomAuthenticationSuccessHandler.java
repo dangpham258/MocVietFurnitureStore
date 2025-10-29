@@ -55,7 +55,7 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
         response.addCookie(cookie);
         
         System.out.println("JWT Cookie created: " + jwt.substring(0, Math.min(20, jwt.length())) + "...");
-        
+
         switch (role) {
             case "ADMIN":
                 response.sendRedirect("/admin");

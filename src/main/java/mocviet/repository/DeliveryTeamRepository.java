@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface DeliveryTeamRepository extends JpaRepository<DeliveryTeam, Integer> {
@@ -15,4 +16,9 @@ public interface DeliveryTeamRepository extends JpaRepository<DeliveryTeam, Inte
     List<DeliveryTeam> findByZoneAndActive(@Param("zoneId") Integer zoneId);
     
     List<DeliveryTeam> findByIsActiveTrue();
+    
+    /**
+     * Tìm DeliveryTeam theo user ID
+     */
+    Optional<DeliveryTeam> findByUserId(Integer userId);
 }
