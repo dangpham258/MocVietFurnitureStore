@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{delivery/fragments/delivery_layout}">
+<head>
+    <title>Quản lý tài khoản</title>
+</head>
+<body>
+
+<div layout:fragment="content" th:if="${user != null}">
+    <div th:if="${passwordError}" class="alert alert-danger alert-dismissible fade show" role="alert">
+         <i class="bi bi-exclamation-triangle-fill me-2"></i> <span th:text="${passwordError}"></span>
+         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div class="delivery-card">
+        <div class="delivery-card-header">
+            <i class="bi bi-person-lines-fill me-2"></i>Thông tin cá nhân
+        </div>
+        <div class="delivery-card-body">
+             <form th:action="@{/delivery/profile/update}" method="post" th:object="${profileUpdateRequest}" class="needs-validation" novalidate>
+                 <div class="row g-3">
+                     <div class="col-md-6">
+                         <label for="fullName" class="form-label">Họ và tên <span class="text-danger">*</span></label>
+                         <input type="text" class="form-control" id="fullName" th:field="*{fullName}" required>
+                          <div class="invalid-feedback" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}">Vui lòng nhập họ tên.</div>
+                     </div>
+                     <div class="col-md-6">
+                         <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
+                         <input type="email" class="form-control" id="email" th:field="*{email}" required>
+                         <div class="invalid-feedback" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">Email không hợp lệ.</div>
+                     </div>
+                     <div class="col-md-4">
+                         <label for="gender" class="form-label">Giới tính</label>
+                         <select class="form-select" id="gender" th:field="*{gender}">
+                             <option value="">Chọn...</option>
+                             <option value="Nam">Nam</option>
+                             <option value="Nữ">Nữ</option>
+                             <option value="Khác">Khác</option>
+                         </select>
+                     </div>
+                     <div class="col-md-4">
+                         <label for="dob" class="form-label">Ngày sinh</label>
+                         <input type="date" class="form-control" id="dob" name="dob"
+                                th:value="${profileUpdateRequest.dob != null ? #temporals.format(profileUpdateRequest.dob, 'yyyy-MM-dd') : ''}">
+                         <div class="text-danger small" th:if="${#fields.hasErrors('dob')}" th:errors="*{dob}"></div>
+                     </div>
+                     <div class="col-md-4">
+                         <label for="phone" class="form-label">Số điện thoại</label>
+                         <input type="tel" class="form-control" id="phone" th:field="*{phone}">
+                         <div class="text-danger small" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></div>
+                     </div>
+                 </div>
+                 <button type="submit" class="btn btn-primary mt-3"><i class="bi bi-save me-1"></i> Lưu thông tin</button>
+             </form>
+        </div>
+    </div>
+
+    <div class="delivery-card">
+         <div class="delivery-card-header">
+            <i class="bi bi-key-fill me-2"></i>Đổi mật khẩu
+         </div>
+         <div class="delivery-card-body">
+             <form th:action="@{/delivery/profile/change-password}" method="post" th:object="${passwordChangeRequest}" class="needs-validation" novalidate>
+                 <div class="row g-3">
+                     <div class="col-md-4">
+                         <label for="currentPassword" class="form-label">Mật khẩu hiện tại <span class="text-danger">*</span></label>
+                         <input type="password" class="form-control" id="currentPassword" th:field="*{currentPassword}" required>
+                          <div class="invalid-feedback">Vui lòng nhập mật khẩu hiện tại.</div>
+                     </div>
+                     <div class="col-md-4">
+                         <label for="newPassword" class="form-label">Mật khẩu mới <span class="text-danger">*</span></label>
+                         <input type="password" class="form-control" id="newPassword" th:field="*{newPassword}" required minlength="6">
+                          <div class="invalid-feedback" th:if="${#fields.hasErrors('newPassword')}" th:errors="*{newPassword}"></div>
+                          <div class="invalid-feedback" th:unless="${#fields.hasErrors('newPassword')}">Mật khẩu mới phải có ít nhất 6 ký tự.</div>
+                     </div>
+                     <div class="col-md-4">
+                         <label for="confirmPassword" class="form-label">Xác nhận mật khẩu mới <span class="text-danger">*</span></label>
+                         <input type="password" class="form-control" id="confirmPassword" th:field="*{confirmPassword}" required>
+                         <div class="invalid-feedback" th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}"></div>
+                          <div class="invalid-feedback" th:unless="${#fields.hasErrors('confirmPassword')}">Vui lòng nhập lại mật khẩu mới.</div>
+                     </div>
+                 </div>
+                 <button type="submit" class="btn btn-warning mt-3"><i class="bi bi-arrow-repeat me-1"></i> Đổi mật khẩu</button>
+             </form>
+         </div>
+     </div>
+
+</div>
+
+<th:block layout:fragment="scripts">
+<script>
+    // Validation
+    (function () {
+      'use strict'
+      var forms = document.querySelectorAll('.needs-validation')
+      Array.prototype.slice.call(forms)
+        .forEach(function (form) {
+          form.addEventListener('submit', function (event) {
+            if (!form.checkValidity()) {
+              event.preventDefault()
+              event.stopPropagation()
+            }
+            form.classList.add('was-validated')
+          }, false)
+        })
+    })()
+</script>
+</th:block>
+
+</body>
+</html>

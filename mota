@@ -1,0 +1,297 @@
+Phân tích chức năng theo vai trò - Cửa hàng nội thất Mộc Việt:
+Tham khảo chính: https://moho.com.vn/
+Tham khảo phụ: https://jangin.vn/ 
+
+Các sản phẩm nếu không phải là top sản phẩm mà là tất cả sản phẩm thì phải để phân trang. ví  dụ 20 sản phẩm, mỗi dòng 4 sản phẩm
+
+CÁC TRANG THÔNG TIN NGOẠI LỆ KHÁC: NẰM Ở FOOTER hay Header và ai cũng có thể xem
+CHÍNH SÁCH BÁN HÀNG
+CHÍNH SÁCH GIAO HÀNG VÀ LẮP ĐẶT
+CHÍNH SÁCH ĐỔI TRẢ
+CHÍNH SÁCH BẢO HÀNH
+Đường dẫn tới trang fanpage: Facebook, Zalo, Youtube, Instagram, Thread,...
+
+
+
+Guest (Khách vãng lai):
+Trang chủ: Xem banner/ hình ảnh quảng cáo ở trang chủ. 
+Top 10: 
+Sản phẩm nổi bật: xếp dựa trên views - số lượt người dùng click vào xem sản phẩm
+Sản phẩm mới: xếp dựa trên created date của sản phẩm
+Sản phẩm khuyến mãi: Xếp dựa trên % khuyến mãi cao nhất của các sản phẩm
+Sản phẩm bán chạy: Xếp dựa trên lượt mua chỉ tính các đơn Hoàn thành.
+
+Best review (Chọn tối đa 10 review điểm 5 sao, mỗi sản phẩm chỉ lấy 1 review, ưu tiên review mới nhất)
+
+Sản phẩm: Một sản phẩm sẽ thuộc về một danh mục con trong 4 danh mục (Phòng ngủ, khách, ăn, làm việc) VÀ CÓ THỂ THUỘC THÊM một danh mục con trong bộ sưu tập. => Xem tham khảo ở web moho
+Ví dụ: Tủ quần áo + SCARLET
+Xem danh sách theo danh mục (5 danh mục)
+Bộ sưu tập: PREMIUM, SCARLET, SERENA, PLANK, KLINE, DALUMD, HOBRO, VLINE, VIENNA, KOSTER, NARVIK, OSLO, MILAN, FYN
+Phòng ngủ: Combo phòng ngủ, Tủ quần áo, giường ngủ, tủ đầu giường, bàn trang điểm
+Phòng khách: Ghế sofa, bàn sofa - bàn cafe - bàn trà, Tủ kệ tivi, Tủ giày - Tủ trang trí
+Phòng ăn: bàn ăn, ghế ăn, bộ bàn ăn.
+Phòng làm việc: Bàn làm việc, ghế văn phòng, tủ và kệ
+
+      Tìm kiếm và lọc sản phẩm theo: Danh mục, sưu tập Khoảng giá, Màu sắc
+      Sắp xếp theo: Sản phẩm nổi bật, Giá tăng dần, Giá giảm dần, Mới nhất, Bán chạy nhất
+   
+Xem chi tiết sản phẩm
+Các hình ảnh (MỖI MÀU SẮC SẼ CÓ BỘ ẢNH KHÁC NHAU)
+Tên sản phẩm
+Sao đánh giá (thập phân một chữ số từ 1->5)
+Đã bán (số lượng)
+% Khuyến mãi
+Giá khuyến mãi của sản phẩm
+Giá gốc
+Loại khuyến mãi: Ưu đãi hoặc Outlet nếu là hàng khuyến mãi
+Nhãn Màu sắc (nhiều loại tùy sản phẩm, khi chọn màu thì đổi ảnh phù hợp với màu đã chọn)
+Nhãn loại (ví dụ bàn có thể 2 loại 1m2 và 1m4 hay, bộ ghế có 4 hoặc 6 ghế). Không cần đổi ảnh khi chọn loại
+Mô tả sản phẩm
+Số lượng tồn kho (còn lại bao nhiêu)
+SKU
+Biến thể (SKU) theo Màu × Loại
+Mỗi biến thể được xác định bởi Màu và Loại (ví dụ: Nâu × 4 ghế, Xanh × 6 ghế; Đen × 1m2, Trắng × 1m6).
+
+
+Ảnh chỉ đổi theo Màu (không đổi khi đổi Loại).
+
+
+Giá, giá sale/% giảm, tồn kho lưu theo từng biến thể.
+
+
+Khi đặt hàng, bắt buộc chọn Màu + Loại; số lượng không vượt quá tồn kho biến thể.
+
+
+Hiển thị SKU của biến thể đang chọn.
+
+
+=> Người dùng cần đăng nhập ĐỂ THÊM HÀNG VÀO GIỎ HÀNG hoặc MUA NGAY
+=> Đối với chọn số lượng thì nút thêm bớt sao cho không vượt quá giá trị tồn kho
+
+Xem đánh giá/bình luận của khách hàng (sao đánh giá số thập thân 1-> 5, lượng đánh giá)
+
+Đánh giá sẽ có: 1 bức ảnh, tên người đánh giá (Họ và tên tài khoản hoặc Ẩn danh) rating 1 hoặc 2 /3/4/5, lời đánh giá
+=> CHỈ USER ĐÃ MUA XONG SẼ ĐÁNH GIÁ SẢN PHẨM Ở LỊCH SỬ MUA HÀNG CÒN GUEST CHỈ ĐƯỢC XEM ĐÁNH GIÁ 
+Sản phẩm mới: Xem 10 sản phẩm mới nhất có phân trang
+Đây cũng như sản phẩm nhưng lọc dựa trên danh mục: Vị dụ 10 sản phẩm mới nhất của Bộ sưu tập, 10 sp mới nhất của Phòng ăn,..... 
+
+Thiết kế thi công: 
+Là một trang page giới thiệu về dịch vụ thiết kế thi công => Ở dưới cùng sẽ có một nút “Liên hệ tư vấn” sẽ nhảy đến trang liên hệ tư vấn
+
+Khuyến mãi: Xem sản phẩm đang giảm giá
+Khuyến mãi sẽ có 2 danh mục con là Ưu đãi và Outlet (Hàng thanh lý)
+Tra cứu và lọc dựa trên danh mục đã chọn
+
+Tin tức: Đọc bài viết theo 3 danh mục con (Media, News và People)
+Khi chọn vào sẽ hiện ra list danh sách tin tức MỚI NHẤT sắp xếp theo ngày xuất bản (published_at) phân trang bao gồm: Ảnh chính, Tiêu đề, Lời giới thiệu (cắt khoảng 25 từ từ lời giới thiệu chính)
+Tin tức có thể liên kết với 1 sản phẩm được giới thiệu trong tin tức
+=> Chọn vào sẽ đến tin tức chi tiết đó 
+
+
+
+Giới thiệu: Xem thông tin về cửa hàng (Có thể có thêm video hoặc hình ảnh)
+
+Showroom: Tìm kiếm địa chỉ cửa hàng/ showroom để đến - địa chỉ dựa trên khu vực như Hà Nội, Hồ Chí Minh, Đà Nẵng và quận/ huyện. có google map
+
+Bao gồm các thông tin như cửa hàng, địa chỉ, email, sdt, giờ mở cửa
+
+Liên hệ: Nhập các thông tin cần thiết rồi nhấn Gửi sẽ gửi các thông tin đó QUA EMAIL, email này là email liên hệ tư vấn riêng.
+
+
+Chatbox hỏi đáp TRỰC TIẾP: Guest chưa đăng ký vẫn có thể trò chuyện được với cửa hàng và manager sẽ tiếp nhận trả lời
+Nó sẽ dựa trên bảng riêng để lưu thông tin trò chuyện
+
+Bạn muốn tìm gì? Bổ sung nếu làm được
+Sẽ có một hộp thoại duy nhất để người dùng nhập vào mô tả chi tiết mà sản phẩm người dùng hình dung ra như “Tôi muốn cái bàn màu nâu và nó phải mang phong cách hiện đại nhất”
+Nhấn gửi => AI sẽ phân tích từ vựng của người dùng và đối chiếu với bảng sản phẩm để tìm ra 5 SẢN PHẨM ĐANG BÁN phù hợp nhất đối với nhu cầu của khách hàng => Khách chọn vào để đi đến chi tiết sản phẩm đó
+
+
+
+User (Khách hàng đã đăng ký):
+Tất cả quyền của Guest +
+Quản lý tài khoản bản thân:
+Đăng ký (Gửi mã OTP qua email) /Đăng nhập tài khoản của người dùng
+Họ và tên
+Username
+Email
+Mật khẩu (hash Bcrypt )
+Giới tính (Nam/ nữ)
+Ngày tháng năm sinh
+
+Quên mật khẩu : Chức năng reset password, gửi mã OTP xác nhận reset qua email
+
+Thông tin cá nhân: Cập nhật thông tin cá nhân hoặc đổi mật khẩu
+
+Danh sách địa chỉ: Cập nhật xóa địa chỉ hoặc nhập thêm địa chỉ mới
+Quản lý nhiều địa chỉ nhận hàng của bản thân user để chọn khi mà người dùng đặt hàng để cho việc vận chuyển
+
+Bao gồm: 
+Họ và tên, Địa chỉ (mô tả do người dùng nhập), Thành phố (Dropdown), Số điện thoại, check box có đặt làm địa chỉ mặc định
+
+Sản phẩm đã xem: Lịch sử 20 sản phẩm mà người dùng đã xem gần đây nhất
+Sản phẩm yêu thích:  Tất cả sản phẩm (phân trang) người dùng đã thêm vào danh mục yêu thích
+Hệ thống thông báo: Khi đơn hàng mà user mua có sự thay đổi trạng thái, hoặc khi manager trả lời đánh giá reviews sản phẩm của user hoặc khi sản phẩm yêu thích trong danh mục yêu thích có hàng trở lại
+Mua sắm:
+Giỏ hàng: Thêm/cập nhật số lượng sản phẩm mà người dùng mua (lưu trên database). Nếu sản phẩm = 0 thì ẩn khỏi giỏ hàng của người dùng
+
+Thanh toán: Chọn phương thức (COD, VNPAY, MOMO) để thanh toán sản phẩm trong giỏ hàng của người dùng. Người dùng cần chọn địa chỉ mà người dùng đã nhập trong quản lý địa chỉ. Nếu mà chưa có thì nhấn thêm địa chỉ để chuyển hướng đến trang quản lý địa chỉ (hoặc tự thiết kế thêm địa chỉ ở khúc đó)
+Nếu mà qua online thì khi hủy (do người dùng hay manager hủy) phải HOÀN TIỀN về cho đúng tài khoản ngân hàng của người dùng, Hệ thống gọi API refund của VNPAY/MOMO Cổng thanh toán tự động hoàn tiền về đúng tài khoản mà khách đã thanh toán
+=> Trừ đi số lượng hàng khi thanh toán hoàn thành và tăng lại khi hủy đơn (do người dùng hay manager hủy) hoặc trả hàng xong
+Hệ thống không hỗ trợ hủy một phần; chỉ hủy toàn bộ đơn trước khi chuyển sang ‘Đang giao hàng’. Khi hủy/hoàn: hoàn tồn số lượng cho từng SKU.
+=> Ở các website tham khảo thì nó làm thanh toán tất cả sản phẩm trong giỏ hàng, mình có thể thiết kế theo vậy hay là tự chọn sản phẩm để thanh toán thì tùy? Nếu làm cách 1 thì dễ hơn, khi thanh toán xong nhớ đặt số lượng về 0 để ẩn
+
+Mã khuyến mãi: Có 1 ô để nhập mã
+Người dùng nhập mã khuyến mãi tại bước thanh toán
+Hệ thống kiểm tra:
+Mã tồn tại & đang active.
+Trong thời gian hiệu lực (start_date ≤ now ≤ end_date).
+Đơn đạt giá trị tối thiểu (tổng tiền hàng sau sale ≥ min_order_amount).
+Nếu hợp lệ: áp % giảm trên tổng tiền hàng (sau sale, không gồm phí vận chuyển).
+Chỉ 1 mã/lần thanh toán.
+Giá trị tối thiểu = tổng tiền hàng sau khi đã áp sale_price của từng biến thể (không tính phí ship).
+
+
+
+Đơn hàng: Xem lịch sử và theo dõi trạng thái đơn hàng của bản thân đã đặt:
+Chờ xác nhận
+Đã xác nhận
+Đang giao hàng
+Hoàn thành
+Đã hủy Người dùng hủy đơn TRƯỚC KHI ĐANG GIAO HÀNG HOẶC MANAGER XEM XÉT VÀ HỦY YÊU CẦU GIAO HÀNG CỦA NGƯỜI DÙNG
+Trả hàng -  NẾU SẢN PHẨM NẰM TRONG CHÍNH SÁCH TRẢ HÀNG CỦA HỆ THỐNG
+Tương tác sản phẩm:
+Yêu thích: Thêm sản phẩm vào danh sách yêu thích của user
+Nếu đã đăng nhập rồi thì sẽ có một nút Thêm vào danh sách yêu thích khi truy cập một sản phẩm nào đó
+Đánh giá: Đánh giá sản phẩm đã mua (1-5 sao + nội dung + ảnh) của user
+Mỗi OrderItem chỉ 1 đánh giá; cho phép 1 ảnh, dung lượng ≤ 2MB, định dạng: JPG/PNG.
+
+
+
+
+Đội ngũ nhân viên vận chuyển & lắp đặt DeliveryTeam
+ (Phần mới phải tự sáng tạo): KHI ĐĂNG NHẬP VỚI TÀI KHOẢN DeliveryTeam SẼ VÀO TRANG CHỦ RIÊNG CỦA DeliveryTeam)
+Vùng giao hàng (Shipping Zone): nhóm các tỉnh/thành. Ví dụ:
+Miền Bắc
+Miền Trung
+Miền Nam
+Đội vận chuyển (DeliveryTeam): mỗi đội phụ trách một hoặc nhiều Vùng
+Gán đơn tự động: Khi đơn được xác nhận, hệ thống nhìn tỉnh/thành của địa chỉ nhận hàng, tìm Vùng, rồi chọn Đội có coverage vùng đó.
+Nếu có nhiều đội trong cùng vùng → chọn đội ít đơn đang xử lý nhất (cân bằng tải).
+
+
+Manager vẫn có quyền đổi đội thủ công.
+Portal đội vận chuyển: đội xem đơn của vùng mình và cập nhật trạng thái:
+ Đã tiếp nhận → Đang vận chuyển → Hoàn thành / Gặp sự cố (ghi lý do); upload ảnh bàn giao.
+
+Tất cả quyền của Guest (trước khi đăng nhập) +
+Sau khi người dùng phát sinh đơn hàng =>  “CHỜ XÁC NHẬN”
+
+Đơn đó sẽ được manager xác nhận  => "ĐÃ XÁC NHẬN", nhưng nếu mà manager thấy đơn hàng đó set giá nhầm hay hết hàng hay ví dụ như người dùng nhập địa chỉ gì đó không đúng thì sẽ hủy => “ĐÃ HỦY”
+
+Và chuyển giao cho đơn vị vận chuyển, đơn vị vận chuyển truy cập để xem các đơn cần phải giao của các người dùng. Sau khi xem thì sẽ bấm Thực hiện vận chuyển để chuyển sang trạng thái => "ĐANG GIAO HÀNG"
+Cuối cùng là => "HOÀN THÀNH"
+Trường hợp ngoại lệ: Người dùng hủy đơn TRƯỚC KHI ĐANG GIAO HÀNG, thì chuyển sang trạng thái "ĐÃ HỦY"
+NẾU NGƯỜI DÙNG NHẤN TRẢ HÀNG THÌ CHỈ ĐƯỢC ĐỐI VỚI SẢN PHẨM NẰM TRONG CHÍNH SÁCH.  Manager sẽ xem xét kỹ lưỡng, nếu mà manager đồng ý với khách hàng thì sẽ phát sinh một vận chuyển đối với đơn hàng kia cho đơn vị vận chuyển. Chuyển sang trạng thái => “TRẢ HÀNG”
+
+Quản lý đơn hàng được giao:
+Xem danh sách đơn hàng cần được vận chuyển của đơn vị vận chuyển 
+Xem chi tiết đơn hàng (sản phẩm, địa chỉ giao, thông tin khách hàng, ghi chú)
+Cập nhật trạng thái:
+Đã tiếp nhận
+Đang vận chuyển
+Hoàn thành
+Gặp sự cố (kèm lý do) -  nếu có
+Gọi điện cho khách hàng (hiển thị SĐT)
+Xác nhận khách hàng đã nhận hàng và ký xác nhận
+Chụp ảnh bàn giao
+Ghi chú vấn đề phát sinh
+Báo cáo và thống kê:
+Xem lịch sử đơn hàng đã giao/lắp đặt
+Thống kê số đơn hoàn thành trong ngày/tuần/tháng
+
+
+
+Manager (Quản lý cửa hàng): KHI ĐĂNG NHẬP VỚI TÀI KHOẢN MANAGER SẼ VÀO TRANG CHỦ RIÊNG CỦA MANAGER
+Tất cả quyền của Guest (trước khi đăng nhập) +
+Hệ thống thông báo: Khi có đơn hàng phát sinh, sản phẩm nào đó có số lượng bằng 10 (Sắp hết hàng), đánh giá mới của một sản phẩm nào đó, tin nhắn chatbox trực tiếp 
+Quản lý tài khoản bản thân: Cập nhật hồ sơ hoặc đổi mật khẩu tài khoản bản thân
+Quản lý sản phẩm:
+Thêm/sửa/vô hiệu hóa (Ẩn/hiện) sản phẩm đi các sản phẩm của cửa hàng
+Lúc thêm vào sẽ đưa vào các chi tiết như các hình ảnh, mô tả, giá, có giảm giá không……
+Cập nhật thông tin của sản phẩm.
+Cập nhật giá gốc, giá sale - tự động cập nhật khi manager chỉnh mã giảm -, % giảm giá
+Vô hiệu hóa/ ẩn sản phẩm khỏi cửa hàng hệ thống
+Cập nhật số lượng tồn kho của sản phẩm
+…..
+
+Quản lý đơn hàng:
+Xem danh sách đơn hàng theo trạng thái mà User đã đặt hàng
+Xác nhận đơn hàng mà User đặt để bàn giao cho đơn vị vận chuyển, hoặc hủy đơn hàng do users đặt vì lý do nào đó
+Khi Manager xác nhận, hệ thống dựa theo tỉnh/thành của địa chỉ nhận hàng → map Miền Bắc/Trung/Nam → tự gán Đội phụ trách (ưu tiên đội ít đơn đang xử lý); Manager có thể đổi đội thủ công.
+Xem xét việc TRẢ HÀNG mà người dùng tạo, nếu xác nhận thì bàn giao cho đơn vị vận chuyển với trạng thái là TRẢ HÀNG
+
+Quản lý tin tức (chỉ bài viết do tài khoản Manager nào đó tạo):
+Thêm/sửa/ẩn bài viết của chính mình
+Đăng bài vào các danh mục tin tức
+Xem danh sách bài viết đã đăng
+Quản lý đánh giá/bình luận:
+Xem tất cả đánh giá
+Trả lời đánh giá
+Ẩn/hiện đánh giá có ngôn từ hoặc hình ảnh không phù hợp
+
+Trả lời các tin nhắn từ chatbox: Các hội thoại mới sẽ được tạo ra khi guest hoặc user nhắn và manager sẽ trả lời các tin nhắn đó
+
+Báo cáo cơ bản:
+Doanh thu theo ngày/tháng
+Sản phẩm bán chạy
+Dashboard tổng quan:
+Sản phẩm sắp hết hàng
+Lượng đơn hàng cần xử lý
+Số lượng đánh giá mới, Một số đánh giá mới (ví dụ lấy 5 cái đánh giá mới nhất hiện lên khi nhấn vào thì chuyển sang phần trả lời đánh giá)
+
+
+Admin (Quản trị viên cao nhất): KHI ĐĂNG NHẬP VỚI TÀI KHOẢN ADMIN SẼ VÀO TRANG CHỦ RIÊNG CỦA ADMIN
+Tất cả quyền của Guest (trước khi đăng nhập) +
+Quản lý tài khoản bản thân: Cập nhật hồ sơ hoặc đổi mật khẩu tài khoản bản thân
+Quản lý tài khoản hệ thống:
+Tìm kiếm, xem danh sách tất cả User
+Xem chi tiết thông tin User
+Khóa/mở khóa tài khoản
+Tạo tài khoản cho delivery và manager và Phân quyền tài khoản đó
+Quản lý danh mục sản phẩm:
+Thêm/sửa/vô hiệu hóa (ẩn) danh mục cấp 1, 2, 3….
+Tìm kiếm danh mục
+Ẩn/hiện danh mục
+Quản lý vận chuyển:
+Cập nhật phí vận chuyển theo khu vực/quận huyện
+Quản lý danh mục tin tức:
+Quản lý danh mục tin tức (Media, News, People)
+thêm sửa vô hiệu hóa
+Quản lý mã giảm giá:
+Thêm sửa vô hiệu hóa mã giảm giá
+Giá trị đơn hàng tối thiểu để áp mã
+Thời gian hiệu lực của mã
+Chỉ được dùng 1 mã cho một lần thanh toán
+Báo cáo và thống kê chi tiết:
+Doanh thu chi tiết:
+Doanh thu theo ngày/tuần/tháng/năm
+Doanh thu theo danh mục sản phẩm
+Doanh thu theo sản phẩm
+Đơn hàng:
+Tổng số đơn hàng theo trạng thái
+Giá trị đơn hàng trung bình
+Tỷ lệ hủy đơn/trả hàng
+Đơn hàng theo khu vực
+Số đơn giao thành công
+Khách hàng:
+Số lượng khách hàng mới theo thời gian
+Khách hàng mua nhiều nhất (top 10)
+Sản phẩm:
+Sản phẩm bán chạy nhất
+Sản phẩm tồn kho nhiều
+Sản phẩm có đánh giá cao nhất
+Sản phẩm có lượt xem sản phẩm cao nhất
+Export: Xuất báo cáo ra Excel/PDF
+Dashboard tổng quan:
+Biểu đồ doanh thu theo thời gian
+Tổng đơn hàng hôm nay/tuần này/tháng này

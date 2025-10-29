@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+<!-- Admin Sidebar Fragment -->
+<nav th:fragment="sidebar" class="sidebar">
+    <div class="p-3">
+        <!-- Logo -->
+        <div class="text-center mb-4">
+            <h4 class="text-white fw-bold">🛠️ ADMIN</h4>
+            <small class="text-white-50">Mộc Việt Panel</small>
+        </div>
+        
+        <!-- User Info -->
+        <div class="text-center mb-4 p-3 bg-white bg-opacity-10 rounded">
+            <i class="bi bi-person-circle fs-1 text-white"></i>
+            <div class="text-white mt-2">
+                <div class="fw-bold" sec:authentication="name">Admin User</div>
+                <small class="text-white-50">Quản trị viên</small>
+            </div>
+        </div>
+        
+        <!-- Navigation Menu -->
+        <ul class="nav nav-pills flex-column">
+            <!-- Dashboard -->
+            <li class="nav-item">
+                <a class="nav-link" th:classappend="${#httpServletRequest != null and (#httpServletRequest.requestURI == '/admin' or #httpServletRequest.requestURI == '/admin/')} ? 'active'" href="/admin">
+                    <i class="bi bi-speedometer2 me-2"></i>
+                    Dashboard
+                </a>
+            </li>
+            
+            <!-- Quản lý người dùng -->
+            <li class="nav-item">
+                <a class="nav-link" th:classappend="${#httpServletRequest != null and #strings.startsWith(#httpServletRequest.requestURI, '/admin/users')} ? 'active'" href="/admin/users">
+                    <i class="bi bi-people me-2"></i>
+                    Quản lý Users
+                </a>
+            </li>
+            
+            <!-- Quản lý sản phẩm -->
+            <li class="nav-item">
+                <a class="nav-link" th:classappend="${#httpServletRequest != null and #strings.startsWith(#httpServletRequest.requestURI, '/admin/products')} ? 'active'" href="/admin/products">
+                    <i class="bi bi-box-seam me-2"></i>
+                    Sản phẩm
+                </a>
+            </li>
+            
+            <!-- Quản lý danh mục -->
+            <li class="nav-item">
+                <a class="nav-link" th:classappend="${#httpServletRequest != null and #strings.startsWith(#httpServletRequest.requestURI, '/admin/categories')} ? 'active'" href="/admin/categories">
+                    <i class="bi bi-tags me-2"></i>
+                    Danh mục & Bộ sưu tập
+                </a>
+            </li>
+            
+            <!-- Quản lý đơn hàng -->
+            <li class="nav-item">
+                <a class="nav-link" th:classappend="${#httpServletRequest != null and #strings.startsWith(#httpServletRequest.requestURI, '/admin/orders')} ? 'active'" href="/admin/orders">
+                    <i class="bi bi-bag-check me-2"></i>
+                    Đơn hàng
+                </a>
+            </li>
+            
+            <!-- Quản lý mã giảm giá -->
+            <li class="nav-item">
+                <a class="nav-link" th:classappend="${#httpServletRequest != null and #strings.startsWith(#httpServletRequest.requestURI, '/admin/coupons')} ? 'active'" href="/admin/coupons">
+                    <i class="bi bi-percent me-2"></i>
+                    Mã giảm giá
+                </a>
+            </li>
+            
+            <!-- Quản lý vận chuyển -->
+            <li class="nav-item">
+                <a class="nav-link" th:classappend="${#httpServletRequest != null and #strings.startsWith(#httpServletRequest.requestURI, '/admin/shipping')} ? 'active'" href="/admin/shipping">
+                    <i class="bi bi-truck me-2"></i>
+                    Vận chuyển
+                </a>
+            </li>
+            
+            <!-- Quản lý đội giao hàng -->
+            <li class="nav-item">
+                <a class="nav-link" th:classappend="${#httpServletRequest != null and #strings.startsWith(#httpServletRequest.requestURI, '/admin/delivery-teams')} ? 'active'" href="/admin/delivery-teams">
+                    <i class="bi bi-person-workspace me-2"></i>
+                    Đội giao hàng
+                </a>
+            </li>
+            
+            <!-- Quản lý banner -->
+            <li class="nav-item">
+                <a class="nav-link" th:classappend="${#httpServletRequest != null and #strings.startsWith(#httpServletRequest.requestURI, '/admin/banners')} ? 'active'" href="/admin/banners">
+                    <i class="bi bi-image me-2"></i>
+                    Banner
+                </a>
+            </li>
+            
+            <!-- Quản lý trang tĩnh -->
+            <li class="nav-item">
+                <a class="nav-link" th:classappend="${#httpServletRequest != null and #strings.startsWith(#httpServletRequest.requestURI, '/admin/pages')} ? 'active'" href="/admin/pages">
+                    <i class="bi bi-file-text me-2"></i>
+                    Trang tĩnh
+                </a>
+            </li>
+            
+            <!-- Quản lý showroom -->
+            <li class="nav-item">
+                <a class="nav-link" th:classappend="${#httpServletRequest != null and #strings.startsWith(#httpServletRequest.requestURI, '/admin/showrooms')} ? 'active'" href="/admin/showrooms">
+                    <i class="bi bi-geo-alt me-2"></i>
+                    Showroom
+                </a>
+            </li>
+            
+            <!-- Quản lý mạng xã hội -->
+            <li class="nav-item">
+                <a class="nav-link" th:classappend="${#httpServletRequest != null and #strings.startsWith(#httpServletRequest.requestURI, '/admin/social-links')} ? 'active'" href="/admin/social-links">
+                    <i class="bi bi-share me-2"></i>
+                    Mạng xã hội
+                </a>
+            </li>
+            
+            <!-- Báo cáo -->
+            <li class="nav-item">
+                <a class="nav-link" th:classappend="${#httpServletRequest != null and #strings.startsWith(#httpServletRequest.requestURI, '/admin/reports')} ? 'active'" href="/admin/reports">
+                    <i class="bi bi-graph-up me-2"></i>
+                    Báo cáo & Thống kê
+                </a>
+            </li>
+            
+            <!-- Divider -->
+            <hr class="text-white-50 my-3">
+            
+            <!-- Về trang chủ -->
+            <li class="nav-item">
+                <a class="nav-link" href="/">
+                    <i class="bi bi-house me-2"></i>
+                    Về trang chủ
+                </a>
+            </li>
+            
+            <!-- Đăng xuất -->
+            <li class="nav-item">
+                <a class="nav-link text-warning" href="/logout">
+                    <i class="bi bi-box-arrow-right me-2"></i>
+                    Đăng xuất
+                </a>
+            </li>
+        </ul>
+    </div>
+</nav>
+</body>
+</html>

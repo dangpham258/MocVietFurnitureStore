@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+<!-- Admin Breadcrumb Fragment -->
+<nav th:fragment="breadcrumb" aria-label="breadcrumb" class="px-3 py-2 bg-light border-bottom">
+    <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item">
+            <a href="/admin" class="text-decoration-none">
+                <i class="bi bi-house"></i> Admin
+            </a>
+        </li>
+        <li class="breadcrumb-item active" th:if="${breadcrumbItems == null}" aria-current="page">
+            <span th:text="${pageTitle ?: 'Dashboard'}">Dashboard</span>
+        </li>
+        <li th:each="item, iterStat : ${breadcrumbItems}" 
+            th:classappend="${iterStat.last} ? 'active' : ''"
+            th:aria-current="${iterStat.last} ? 'page' : null">
+            <a th:if="${!iterStat.last}" th:href="${item.url}" th:text="${item.name}" class="text-decoration-none"></a>
+            <span th:if="${iterStat.last}" th:text="${item.name}"></span>
+        </li>
+    </ol>
+</nav>
+</body>
+</html>

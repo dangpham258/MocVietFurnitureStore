@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <title th:text="${product.name + ' - Mộc Việt'}">Chi tiết sản phẩm</title>
+    <style>
+        .product-gallery-thumbnail {
+            width: 80px; height: 80px; object-fit: cover; cursor: pointer; border: 2px solid transparent;
+        }
+        .product-gallery-thumbnail.active {
+            border-color: #343a40;
+        }
+        .color-swatch, .type-swatch {
+            cursor: pointer; border: 2px solid #eee; padding: 5px 15px; border-radius: 5px; margin-right: 10px;
+        }
+        .color-swatch.active, .type-swatch.active {
+            border-color: #343a40; background-color: #f8f9fa;
+        }
+        .color-swatch input, .type-swatch input { display: none; }
+    </style>
+</head>
+<body>
+<div layout:fragment="content">
+    
+    <script th:inline="javascript">
+        const allVariants = /*[[${variantsJson}]]*/ '[]';
+        const allImages = /*[[${imagesJson}]]*/ '{}';
+        const parsedVariants = JSON.parse(allVariants);
+        const parsedImages = JSON.parse(allImages);
+    </script>
+    
+    <div class="container my-5">
+        <div class="row">
+            <div class="col-lg-6">
+                <img id="mainImage" src="https://via.placeholder.com/800x800.png?text=Moc+Viet" class="img-fluid w-100 mb-3" alt="Ảnh sản phẩm">
+                <div id="thumbnailGallery" class="d-flex">
+                    </div>
+            </div>
+            
+            <div class="col-lg-6">
+                <h2 id="productName" th:text="${product.name}">Tên sản phẩm</h2>
+                <div class="d-flex align-items-center mb-2">
+                    <span class="text-warning" th:text="${'★ ' + product.avgRating}"></span>
+                    <span class="text-muted ms-2" th:text="${'(' + product.totalReviews + ' đánh giá)'}"></span>
+                    <span class="text-muted ms-3" th:text="${'| Đã bán: ' + product.soldQty}"></span>
+                </div>
+                
+                <div class="fs-3 fw-bold mb-3">
+                    <span id="salePrice" class="text-danger">Vui lòng chọn</span>
+                    <span id="originalPrice" class="text-muted text-decoration-line-through small ms-2"></span>
+                    <span id="discountBadge" class="badge bg-danger ms-2"></span>
+                </div>
+                
+                <p class="text-muted mb-1">SKU: <span id="productSKU" class="fw-bold">N/A</span></p>
+                <p class="text-muted mb-3">Tồn kho: <span id="productStock" class="fw-bold">0</span></p>
+                
+                <div class="mb-3">
+                    <strong>Màu sắc:</strong>
+                    <div id="colorOptions" class="d-flex mt-2">
+                        <label th:each="color : ${product.colorOptions}" class="color-swatch">
+                            <input type="radio" name="colorId" th:value="${color.colorId}" onchange="updateVariantSelection()">
+                            <span th:text="${color.name}"></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <strong>Loại:</strong>
+                    <div id="typeOptions" class="d-flex mt-2">
+                        <label th:each="type : ${product.typeOptions}" class="type-swatch">
+                            <input type="radio" name="typeName" th:value="${type.typeName}" onchange="updateVariantSelection()">
+                            <span th:text="${type.typeName}"></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <strong>Số lượng:</strong>
+                    <div class="input-group" style="width: 150px;">
+                        <button class="btn btn-outline-secondary" type="button" id="btnMinus" disabled>-</button>
+                        <input type="number" id="quantity" class="form-control text-center" value="1" min="1" max="1" disabled>
+                        <button class="btn btn-outline-secondary" type="button" id="btnPlus" disabled>+</button>
+                    </div>
+                </div>
+                
+                <div class="d-grid gap-2">
+                    <a id="btnAddToCart" th:href="@{/login}" class="btn btn-dark btn-lg disabled">
+                        Đăng nhập để thêm vào giỏ
+                    </a>
+                </div>
+                
+                <div class="mt-4">
+                    <h5>Mô tả sản phẩm</h5>
+                    <p th:text="${product.description}">Mô tả chi tiết...</p>
+                </div>
+            </div>
+        </div>
+        
+        </div>
+
+    <script th:inline="javascript">
+        // Lấy các element
+        const mainImage = document.getElementById('mainImage');
+        const thumbnailGallery = document.getElementById('thumbnailGallery');
+        const salePriceEl = document.getElementById('salePrice');
+        const originalPriceEl = document.getElementById('originalPrice');
+        const discountBadgeEl = document.getElementById('discountBadge');
+        const skuEl = document.getElementById('productSKU');
+        const stockEl = document.getElementById('productStock');
+        const quantityInput = document.getElementById('quantity');
+        const btnMinus = document.getElementById('btnMinus');
+        const btnPlus = document.getElementById('btnPlus');
+        const btnAddToCart = document.getElementById('btnAddToCart');
+        
+        let selectedVariant = null;
+
+        // Định dạng tiền tệ
+        const formatter = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' });
+
+        // Hàm cập nhật khi chọn Màu hoặc Loại [cite: 71]
+        function updateVariantSelection() {
+            const selectedColorId = document.querySelector('input[name="colorId"]:checked')?.value;
+            const selectedTypeName = document.querySelector('input[name="typeName"]:checked')?.value;
+            
+            // Cập nhật active UI
+            document.querySelectorAll('.color-swatch').forEach(el => el.classList.remove('active'));
+            document.querySelector('input[name="colorId"]:checked')?.closest('label').classList.add('active');
+            
+            document.querySelectorAll('.type-swatch').forEach(el => el.classList.remove('active'));
+            document.querySelector('input[name="typeName"]:checked')?.closest('label').classList.add('active');
+            
+            // Cập nhật Gallery Ảnh (Chỉ đổi khi chọn màu) [cite: 61, 69, 345]
+            if (selectedColorId) {
+                updateImageGallery(selectedColorId);
+            }
+
+            // Tìm biến thể (variant) khớp [cite: 67, 68]
+            selectedVariant = parsedVariants.find(v => 
+                v.colorId == selectedColorId && v.typeName === selectedTypeName
+            );
+
+            if (selectedVariant) {
+                // Cập nhật thông tin [cite: 70, 73, 346]
+                salePriceEl.textContent = formatter.format(selectedVariant.salePrice);
+                skuEl.textContent = selectedVariant.sku;
+                stockEl.textContent = selectedVariant.stockQty;
+
+                if (selectedVariant.discountPercent > 0) {
+                    originalPriceEl.textContent = formatter.format(selectedVariant.price);
+                    discountBadgeEl.textContent = `-${selectedVariant.discountPercent}%`;
+                } else {
+                    originalPriceEl.textContent = '';
+                    discountBadgeEl.textContent = '';
+                }
+                
+                // Cập nhật số lượng và nút
+                if (selectedVariant.stockQty > 0) {
+                    quantityInput.max = selectedVariant.stockQty;
+                    quantityInput.disabled = false;
+                    btnMinus.disabled = false;
+                    btnPlus.disabled = false;
+                    btnAddToCart.classList.remove('disabled');
+                    btnAddToCart.textContent = 'Thêm vào giỏ hàng';
+                    // Vì là Guest, vẫn giữ link login
+                    // btnAddToCart.href = `/cart/add?variantId=${selectedVariant.variantId}&qty=1`;
+                } else {
+                    resetToOutOfStock();
+                }
+            } else {
+                // Nếu chỉ chọn 1 trong 2, reset
+                if (selectedColorId && selectedTypeName) {
+                    resetToOutOfStock();
+                }
+            }
+        }
+        
+        // Hàm cập nhật gallery ảnh
+        function updateImageGallery(colorId) {
+            const images = parsedImages[colorId] || [];
+            thumbnailGallery.innerHTML = ''; // Xóa ảnh cũ
+            
+            if (images.length > 0) {
+                mainImage.src = images[0]; // Set ảnh chính là ảnh đầu tiên [cite: 53]
+                images.forEach((imgUrl, index) => {
+                    const img = document.createElement('img');
+                    img.src = imgUrl.replace("800x800", "100x100"); // Dùng ảnh thumbnail nhỏ
+                    img.className = 'product-gallery-thumbnail me-2';
+                    if (index === 0) img.classList.add('active');
+                    img.onclick = () => {
+                        mainImage.src = imgUrl;
+                        document.querySelectorAll('.product-gallery-thumbnail').forEach(t => t.classList.remove('active'));
+                        img.classList.add('active');
+                    };
+                    thumbnailGallery.appendChild(img);
+                });
+            } else {
+                // Ảnh tạm nếu không có ảnh cho màu này
+                mainImage.src = `https://via.placeholder.com/800x800.png?text=Moc+Viet+Mau+${colorId}`;
+            }
+        }
+        
+        // Hàm reset về trạng thái hết hàng
+        function resetToOutOfStock() {
+            salePriceEl.textContent = "Hết hàng";
+            originalPriceEl.textContent = '';
+            discountBadgeEl.textContent = '';
+            skuEl.textContent = 'N/A';
+            stockEl.textContent = '0';
+            quantityInput.value = 1;
+            quantityInput.max = 1;
+            quantityInput.disabled = true;
+            btnMinus.disabled = true;
+            btnPlus.disabled = true;
+            btnAddToCart.classList.add('disabled');
+            btnAddToCart.textContent = 'Hết hàng';
+        }
+
+        // Xử lý nút +/- số lượng [cite: 72, 75, 347]
+        btnMinus.addEventListener('click', () => {
+            let qty = parseInt(quantityInput.value);
+            if (qty > 1) quantityInput.value = qty - 1;
+        });
+        
+        btnPlus.addEventListener('click', () => {
+            let qty = parseInt(quantityInput.value);
+            let max = parseInt(quantityInput.max);
+            if (qty < max) quantityInput.value = qty + 1;
+        });
+        
+        quantityInput.addEventListener('change', () => {
+            let qty = parseInt(quantityInput.value);
+            let max = parseInt(quantityInput.max);
+            if (qty > max) quantityInput.value = max;
+            if (qty < 1) quantityInput.value = 1;
+        });
+
+        // Khởi chạy: Chọn màu đầu tiên (nếu có)
+        document.addEventListener('DOMContentLoaded', () => {
+            const firstColorInput = document.querySelector('input[name="colorId"]');
+            if (firstColorInput) {
+                firstColorInput.checked = true;
+                // Nếu chỉ có 1 loại, chọn luôn
+                const typeInputs = document.querySelectorAll('input[name="typeName"]');
+                if(typeInputs.length === 1) {
+                    typeInputs[0].checked = true;
+                }
+                updateVariantSelection();
+            }
+        });
+    </script>
+</div>
+</body>
+</html>
