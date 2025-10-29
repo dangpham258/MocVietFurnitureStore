@@ -48,9 +48,8 @@ public class DashboardService {
         long totalProducts = productRepository.count();
         stats.setTotalProducts((int) totalProducts);
         
-        // Đếm sản phẩm tồn kho thấp (1-5) và hết hàng (0)
-        // LessThan(6) tương đương LessThanEqual(5)
-        List<ProductVariant> lowStockVariants = productVariantRepository.findByStockQtyLessThanAndIsActive(6, true);
+        // Đếm sản phẩm tồn kho thấp (1-5), không bao gồm hết hàng (0)
+        List<ProductVariant> lowStockVariants = productVariantRepository.findByStockQtyBetweenAndIsActive(1, 5, true);
         stats.setLowStockProducts(lowStockVariants.size());
         
         // Đếm đánh giá mới (trong 7 ngày qua)

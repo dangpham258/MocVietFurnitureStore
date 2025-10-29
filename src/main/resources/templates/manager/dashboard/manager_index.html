@@ -24,39 +24,43 @@
         <!-- Stats Cards -->
         <div class="row mb-4" th:if="${stats}">
             <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card border-left-primary shadow h-100 py-2">
-                    <div class="card-body">
-                        <div class="row no-gutters align-items-center">
-                            <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                    Đơn hàng mới (7 ngày)
+                <a href="/manager/orders" class="text-decoration-none">
+                    <div class="card border-left-primary shadow h-100 py-2 hover-shadow">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                        Đơn hàng mới (7 ngày)
+                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800" th:text="${stats.newOrders}">0</div>
                                 </div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800" th:text="${stats.newOrders}">0</div>
-                            </div>
-                            <div class="col-auto">
-                                <i class="fas fa-shopping-cart fa-2x text-gray-300"></i>
+                                <div class="col-auto">
+                                    <i class="fas fa-shopping-cart fa-2x text-gray-300"></i>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                </a>
             </div>
             
             <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card border-left-success shadow h-100 py-2">
-                    <div class="card-body">
-                        <div class="row no-gutters align-items-center">
-                            <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                    Tổng sản phẩm
+                <a href="/manager/products" class="text-decoration-none">
+                    <div class="card border-left-success shadow h-100 py-2 hover-shadow">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                        Tổng sản phẩm
+                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800" th:text="${stats.totalProducts}">0</div>
                                 </div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800" th:text="${stats.totalProducts}">0</div>
-                            </div>
-                            <div class="col-auto">
-                                <i class="fas fa-box fa-2x text-gray-300"></i>
+                                <div class="col-auto">
+                                    <i class="fas fa-box fa-2x text-gray-300"></i>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                </a>
             </div>
             
             <div class="col-xl-3 col-md-6 mb-4">
@@ -80,60 +84,66 @@
             </div>
             
             <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card border-left-info shadow h-100 py-2">
-                    <div class="card-body">
-                        <div class="row no-gutters align-items-center">
-                            <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
-                                    Cần phân công
+                <a href="/manager/delivery/pending" class="text-decoration-none">
+                    <div class="card border-left-info shadow h-100 py-2 hover-shadow">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                        Cần phân công
+                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800" th:text="${stats.pendingAssignment}">0</div>
                                 </div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800" th:text="${stats.pendingAssignment}">0</div>
-                            </div>
-                            <div class="col-auto">
-                                <i class="fas fa-truck fa-2x text-gray-300"></i>
+                                <div class="col-auto">
+                                    <i class="fas fa-truck fa-2x text-gray-300"></i>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                </a>
             </div>
         </div>
 
         <!-- Additional Stats Row -->
         <div class="row mb-4" th:if="${stats}">
             <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card border-left-success shadow h-100 py-2">
-                    <div class="card-body">
-                        <div class="row no-gutters align-items-center">
-                            <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                    Đang giao hàng
+                <a href="/manager/orders/in-delivery" class="text-decoration-none">
+                    <div class="card border-left-success shadow h-100 py-2 hover-shadow">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                        Đang giao hàng
+                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800" th:text="${stats.inDelivery}">0</div>
                                 </div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800" th:text="${stats.inDelivery}">0</div>
-                            </div>
-                            <div class="col-auto">
-                                <i class="fas fa-shipping-fast fa-2x text-gray-300"></i>
+                                <div class="col-auto">
+                                    <i class="fas fa-shipping-fast fa-2x text-gray-300"></i>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                </a>
             </div>
             
             <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card border-left-info shadow h-100 py-2">
-                    <div class="card-body">
-                        <div class="row no-gutters align-items-center">
-                            <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
-                                    Đánh giá mới (7 ngày)
+                <a href="/manager/reviews" class="text-decoration-none">
+                    <div class="card border-left-info shadow h-100 py-2 hover-shadow">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                        Đánh giá mới (7 ngày)
+                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800" th:text="${stats.newReviews}">0</div>
                                 </div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800" th:text="${stats.newReviews}">0</div>
-                            </div>
-                            <div class="col-auto">
-                                <i class="fas fa-star fa-2x text-gray-300"></i>
+                                <div class="col-auto">
+                                    <i class="fas fa-star fa-2x text-gray-300"></i>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                </a>
             </div>
             
             <div class="col-xl-6 col-md-12 mb-4">

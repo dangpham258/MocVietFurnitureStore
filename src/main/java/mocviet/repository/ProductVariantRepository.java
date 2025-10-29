@@ -55,4 +55,10 @@ public interface ProductVariantRepository extends JpaRepository<ProductVariant, 
     List<ProductVariant> findLowStockVariants(@Param("threshold") Integer threshold);
     
     List<ProductVariant> findByStockQtyLessThanAndIsActive(Integer stockQty, Boolean isActive);
+    
+    /**
+     * Tìm ProductVariant có stock trong khoảng từ min đến max và đang active
+     */
+    @Query("SELECT pv FROM ProductVariant pv WHERE pv.stockQty >= :minStock AND pv.stockQty <= :maxStock AND pv.isActive = :isActive")
+    List<ProductVariant> findByStockQtyBetweenAndIsActive(@Param("minStock") Integer minStock, @Param("maxStock") Integer maxStock, @Param("isActive") Boolean isActive);
 }

@@ -40,7 +40,7 @@ public class DashboardServiceImpl implements IDashboardService {
         stats.setNewOrders((int) newOrders);
         long totalProducts = productRepository.count();
         stats.setTotalProducts((int) totalProducts);
-        List<ProductVariant> lowStockVariants = productVariantRepository.findByStockQtyLessThanAndIsActive(6, true);
+        List<ProductVariant> lowStockVariants = productVariantRepository.findByStockQtyBetweenAndIsActive(1, 5, true);
         stats.setLowStockProducts(lowStockVariants.size());
         long newReviews = reviewRepository.countByCreatedAtAfter(sevenDaysAgo);
         stats.setNewReviews((int) newReviews);
