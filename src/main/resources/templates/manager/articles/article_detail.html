@@ -129,13 +129,6 @@
                         <a th:href="@{/manager/articles/{id}/edit(id=${article.id})}" class="btn btn-outline-primary">
                             <i class="fas fa-edit me-2"></i>Chỉnh sửa bài viết
                         </a>
-                        <button type="button" 
-                                class="btn btn-outline-danger" 
-                                th:if="${article.status}"
-                                th:onclick="'hideArticle(' + ${article.id} + ', \'' + ${article.title} + '\')'"
-                                title="Ẩn bài viết">
-                            <i class="fas fa-eye-slash me-2"></i>Ẩn bài viết
-                        </button>
                         <a href="/manager/articles" class="btn btn-outline-secondary">
                             <i class="fas fa-list me-2"></i>Danh sách bài viết
                         </a>

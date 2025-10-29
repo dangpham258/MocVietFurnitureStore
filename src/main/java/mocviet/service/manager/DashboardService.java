@@ -49,8 +49,9 @@ public class DashboardService {
         stats.setTotalProducts((int) totalProducts);
         
         // Đếm sản phẩm tồn kho thấp (1-5), không bao gồm hết hàng (0)
-        List<ProductVariant> lowStockVariants = productVariantRepository.findByStockQtyBetweenAndIsActive(1, 5, true);
-        stats.setLowStockProducts(lowStockVariants.size());
+        List<ProductVariant> lowStockCandidates = productVariantRepository.findByStockQtyLessThanAndIsActive(6, true);
+        int lowStockCount = (int) lowStockCandidates.stream().filter(v -> v.getStockQty() != null && v.getStockQty() > 0 && v.getStockQty() <= 5).count();
+        stats.setLowStockProducts(lowStockCount);
         
         // Đếm đánh giá mới (trong 7 ngày qua)
         long newReviews = reviewRepository.countByCreatedAtAfter(sevenDaysAgo);

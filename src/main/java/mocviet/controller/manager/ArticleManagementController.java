@@ -92,7 +92,6 @@ public class ArticleManagementController {
     }
     
     @PostMapping("/create")
-    @Transactional
     public String createArticle(
             @Valid @ModelAttribute("createArticleRequest") CreateArticleRequest request,
             BindingResult result,
@@ -214,7 +213,6 @@ public class ArticleManagementController {
     }
     
     @PostMapping("/{id}/edit")
-    @Transactional
     public String updateArticle(
             @PathVariable Integer id,
             @Valid @ModelAttribute("updateArticleRequest") UpdateArticleRequest request,
