@@ -417,8 +417,11 @@ class DeliveryTeamsManagement {
             
             if (response.ok && result.success !== false) {
                 this.showNotification('Thêm khu vực thành công', 'success');
+                // Cập nhật danh sách và đóng modal thay vì mở lại
                 this.loadData();
-                this.manageZones(teamId); // Refresh modal (làm mới modal)
+                const modalElement = document.getElementById('manageZonesModal');
+                const modal = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
+                if (modal) modal.hide();
             } else {
                 this.showNotification(result.message || 'Thêm khu vực thất bại', 'danger');
             }
