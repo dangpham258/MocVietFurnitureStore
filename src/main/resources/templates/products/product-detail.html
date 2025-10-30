@@ -97,6 +97,27 @@
                     <h5>Mô tả sản phẩm</h5>
                     <p th:text="${product.description}">Mô tả chi tiết...</p>
                 </div>
+            </div> <!-- col-lg-6 -->
+        </div> <!-- row -->
+
+        <!-- BLOCK ĐÁNH GIÁ SẢN PHẨM BÊN DƯỚI HẾT -->
+        <hr class="mt-5 mb-4">
+        <div class="product-reviews-section mt-4">
+            <h5>Đánh giá sản phẩm</h5>
+
+            <div th:if="${reviews != null and reviews.size() == 0}" class="mb-3 text-muted fst-italic">
+                Chưa có đánh giá nào cho sản phẩm này
+            </div>
+            <div th:if="${reviews != null and reviews.size() > 0}">
+                <div th:each="review : ${reviews}" class="card mb-3 shadow-none border p-3">
+                    <div class="d-flex align-items-center mb-1">
+                        <b th:text="${review.userFullName}" class="me-2">Người dùng</b>
+                        <span class="badge bg-warning text-dark ms-1"><span th:text="${review.rating}"></span> ★</span>
+                        <span class="ms-2 text-muted small" th:text="${#temporals.format(review.createdAt, 'dd/MM/yyyy')}"></span>
+                    </div>
+                    <div th:text="${review.content}" class="mb-1"></div>
+                    <img th:if="${review.imageUrl}" th:src="${review.imageUrl}" class="img-thumbnail" alt="Ảnh đánh giá" style="max-width: 140px">
+                </div>
             </div>
         </div>
         
@@ -244,7 +265,7 @@
         // Xử lý nút "Thêm vào giỏ hàng"
         btnAddToCart.addEventListener('click', async () => {
             if (!selectedVariant) {
-                alert('Vui lòng chọn màu sắc và loại sản phẩm');
+                if (window.showNotification) window.showNotification('Vui lòng chọn màu sắc và loại sản phẩm', 'warning', 3000);
                 return;
             }
             
@@ -270,17 +291,17 @@
                 const data = await response.json();
                 
                 if (data.success) {
-                    alert(data.message || 'Đã thêm sản phẩm vào giỏ hàng');
+                    if (window.showNotification) window.showNotification(data.message || 'Đã thêm sản phẩm vào giỏ hàng', 'success', 2500);
                     // Cập nhật số lượng trong giỏ hàng (nếu có header manager)
                     if (window.customerApp && window.customerApp.headerManager) {
                         window.customerApp.headerManager.updateCartCount(data.cartItemCount);
                     }
                 } else {
-                    alert(data.message || 'Không thể thêm sản phẩm vào giỏ hàng');
+                    if (window.showNotification) window.showNotification(data.message || 'Không thể thêm sản phẩm vào giỏ hàng', 'danger', 4000);
                 }
             } catch (error) {
                 console.error('Error adding to cart:', error);
-                alert('Có lỗi xảy ra. Vui lòng thử lại sau');
+                if (window.showNotification) window.showNotification('Có lỗi xảy ra. Vui lòng thử lại sau', 'danger', 4000);
             }
         });
 
@@ -372,13 +393,13 @@
                 if (data.success) {
                     isInWishlist = !isInWishlist;
                     updateWishlistButton();
-                    alert(data.message || successMsg);
+                    if (window.showNotification) window.showNotification(data.message || successMsg, 'success', 3000);
                 } else {
-                    alert(data.message || failMsg);
+                    if (window.showNotification) window.showNotification(data.message || failMsg, 'danger', 4000);
                 }
             } catch (error) {
                 console.error('Error toggling wishlist:', error);
-                alert('Có lỗi xảy ra. Vui lòng thử lại sau');
+                if (window.showNotification) window.showNotification('Có lỗi xảy ra. Vui lòng thử lại sau', 'danger', 4000);
             }
         });
         

@@ -79,11 +79,16 @@ public class NotificationServiceImpl implements INotificationService {
         }
 
         if (title.contains("đơn hàng") || title.contains("Order") ||
-                title.contains("yêu cầu trả") || title.contains("phân công")) {
-            Pattern orderPattern = Pattern.compile("[Đđ]ơn(?: hàng)? #(\\d+)");
+                title.contains("yêu cầu trả") || title.contains("phân công") || title.contains("Yêu cầu trả hàng")) {
+            // Chặn riêng thông báo "Yêu cầu trả hàng" và cho phép regex linh hoạt hơn (cả "đơn #ID" và "đơn hàng #ID")
+            Pattern orderPattern = Pattern.compile("[Đđ]ơn(?: hàng)? #?(\\d+)");
             Matcher orderMatcher = orderPattern.matcher(message);
             if (orderMatcher.find()) {
                 String orderId = orderMatcher.group(1);
+                // Ưu tiên return link cho thông báo "Yêu cầu trả hàng"
+                if (title.toLowerCase().contains("yêu cầu trả hàng")) {
+                    return "/manager/orders/returns/" + orderId;
+                }
                 try {
                     Orders order = ordersRepository.findById(Integer.parseInt(orderId)).orElse(null);
                     if (order != null) {

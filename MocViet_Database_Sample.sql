@@ -659,10 +659,10 @@ DECLARE @c_xam  INT = (SELECT id FROM dbo.Color WHERE slug=N'xam');
 DECLARE @c_xanh INT = (SELECT id FROM dbo.Color WHERE slug=N'xanh');
 
 -- === Phòng ăn: Bàn ăn ===
-INSERT INTO dbo.Product(name, slug, description, category_id, collection_id)
+INSERT INTO dbo.Product(name, slug, description, category_id, collection_id, sold_qty)
 VALUES
- (N'Bàn ăn gỗ óc chó 6 ghế',    N'ban-an-go-oc-cho-6-ghe', N'Bàn ăn gỗ óc chó...', @cat_ban_an,  @col_premium),
- (N'Bàn ăn mặt đá 4 ghế',       N'ban-an-mat-da-4-ghe',    N'Bàn ăn mặt đá...',    @cat_ban_an,  @col_milan);
+ (N'Bàn ăn gỗ óc chó 6 ghế',    N'ban-an-go-oc-cho-6-ghe', N'Bàn ăn gỗ óc chó...', @cat_ban_an,  @col_premium, 1),
+ (N'Bàn ăn mặt đá 4 ghế',       N'ban-an-mat-da-4-ghe',    N'Bàn ăn mặt đá...',    @cat_ban_an,  @col_milan, 0);
 
 -- Variants (type_name: 4-ghe/6-ghe/8-ghe)
 INSERT INTO dbo.ProductVariant(product_id, color_id, type_name, sku, price, discount_percent, stock_qty, promotion_type)
@@ -693,10 +693,10 @@ INSERT INTO dbo.ProductImage(product_id, color_id, url)
 SELECT p.id, @c_xam,   N'/static/images/products/phong-an/ban-an/ban-an-mat-da-4-ghe/xam/00_ban-an-mat-da-4-ghe_xam.jpg' FROM dbo.Product p WHERE slug=N'ban-an-mat-da-4-ghe';
 
 -- === Phòng ăn: Ghế ăn ===
-INSERT INTO dbo.Product(name, slug, description, category_id, collection_id)
+INSERT INTO dbo.Product(name, slug, description, category_id, collection_id, sold_qty)
 VALUES
- (N'Ghế ăn bọc nỉ',      N'ghe-an-boc-ni',     N'Ghế ăn êm ái...',        @cat_ghe_an, @col_serena),
- (N'Ghế ăn lưng cong',   N'ghe-an-lung-cong',  N'Ghế lưng cong...',       @cat_ghe_an, @col_oslo);
+ (N'Ghế ăn bọc nỉ',      N'ghe-an-boc-ni',     N'Ghế ăn êm ái...',        @cat_ghe_an, @col_serena, 1),
+ (N'Ghế ăn lưng cong',   N'ghe-an-lung-cong',  N'Ghế lưng cong...',       @cat_ghe_an, @col_oslo, 0);
 
 INSERT INTO dbo.ProductVariant(product_id, color_id, type_name, sku, price, discount_percent, stock_qty, promotion_type)
 SELECT p.id, @c_be,  N'standard', N'GA_NI_BE',   1290000, 0, 120, N'OUTLET' FROM dbo.Product p WHERE slug=N'ghe-an-boc-ni';
@@ -878,6 +878,65 @@ VALUES
   N'/static/images/articles/news/go-oc-cho-phoi-noi-that/thumbnail/00_go-oc-cho-phoi-noi-that.jpg', 1, GETDATE()),
  (N'Nghệ nhân ABC', N'nghe-nhan-abc', N'PEOPLE', N'Câu chuyện thương hiệu...', 
   N'/static/images/articles/people/nghe-nhan-abc/thumbnail/00_nghe-nhan-abc.jpg', 1, GETDATE());
+
+-- Phong cách Bắc Âu (Scandinavian)
+UPDATE dbo.Article SET content = N'
+<h2>Giới thiệu chung về phong cách Bắc Âu</h2>
+<p>
+  Phong cách Bắc Âu (Scandinavian) nổi bật với sự tối giản, tinh tế và gần gũi thiên nhiên. Yếu tố đặc trưng dễ nhận biết nhất chính là sự kết hợp giữa màu sắc trung tính, ánh sáng tự nhiên, vật liệu organic và sự tiện nghi hiện đại.
+</p>
+<img src="/static/images/articles/media/phong-cach-bac-au/content/00_phong-cach-bac-au.jpg" alt="Không gian phòng khách Bắc Âu" style="width:100%; margin-bottom:2rem;">
+<h3>Đặc điểm nhận diện</h3>
+<ul>
+  <li><b>Tối giản mà thanh lịch:</b> Không gian gọn gàng, ít chi tiết rườm rà, ưu tiên sự thông thoáng.</li>
+  <li><b>Màu sắc trung tính:</b> Màu trắng, be, xám..., kết hợp điểm nhấn pastel hoặc màu tự nhiên.</li>
+  <li><b>Chất liệu tự nhiên:</b> Gỗ sáng màu, len, da lộn, vải bố, mây tre.</li>
+  <li><b>Ánh sáng tự nhiên tràn ngập:</b> Cửa sổ lớn nhiều ánh sáng trời, sử dụng rèm mỏng, vật dụng tối thiểu hoặc ghép kính.</li>
+  <li><b>Sự tiện nghi giản đơn:</b> Ưu tiên tính năng sử dụng, layout logic, tất cả hướng đến sự thoải mái.</li>
+</ul>
+<img src="/static/images/articles/media/phong-cach-bac-au/content/01_phong-cach-bac-au.jpg" alt="Nội thất Bắc Âu tối giản" style="width:100%; margin-bottom:2rem;">
+<p>
+  <b>Kết luận:</b> Ứng dụng phong cách Bắc Âu cho phép bạn có một không gian sống tối giản mà vẫn gần gũi, tươi sáng và ấm cúng.
+</p>
+' WHERE slug = N'phong-cach-bac-au';
+
+-- Gỗ óc chó phối nội thất
+UPDATE dbo.Article SET content = N'
+<h2>Gỗ óc chó – lựa chọn “vương giả” cho nội thất hiện đại</h2>
+<p>
+  Gỗ óc chó (walnut) nổi bật với vân đẹp, sắc nâu sáng – tối khác nhau cùng độ bền “trứ danh”. Nội thất gỗ óc chó thể hiện đẳng cấp cho căn hộ, biệt thự hoặc phòng làm việc sang trọng. 
+</p>
+<img src="/static/images/articles/news/go-oc-cho-phoi-noi-that/content/00_go-oc-cho-phoi-noi-that.jpg" alt="Bàn ăn mặt veneer óc chó" style="width:100%;margin-bottom:2rem;">
+<h3>Lý do nên dùng gỗ óc chó?</h3>
+<ul>
+  <li><b>Độ bền vượt trội:</b> Gỗ tự nhiên nhập khẩu, kháng cong vênh và chịu lực lớn.</li>
+  <li><b>Vẻ đẹp tự nhiên:</b> Vân gỗ uốn lượn mềm mại, tông màu ấm phù hợp đa phong cách.</li>
+  <li><b>Ưu việt về thi công:</b> Dễ kết hợp sofa, tủ, giường, ốp tường, vách decor...</li>
+  <li><b>Bảo quản dễ dàng:</b> Chỉ cần lau khô là bóng đẹp mãi nhiều năm.</li>
+</ul>
+<p>
+  <b>Kết:</b> Nội thất gỗ óc chó là xu hướng của căn hộ cao cấp, thể hiện cá tính & vị thế chủ nhân.
+</p>
+' WHERE slug = N'go-oc-cho-phoi-noi-that';
+
+-- Nghệ nhân ABC
+UPDATE dbo.Article SET content = N'
+<h2>Chân dung nghệ nhân ABC – Tấm gương gìn giữ tinh hoa thủ công</h2>
+<img src="/static/images/articles/people/nghe-nhan-abc/content/00_nghe-nhan-abc.jpg" alt="Nghệ nhân ABC" style="float:right;width:300px;margin-left:2rem;margin-bottom:1rem">
+<p>
+  Nghệ nhân ABC xuất thân từ làng nghề truyền thống lâu đời, gắn bó cả đời với đồ gỗ thủ công. Gia đình ông 3 đời đều là thợ mộc giỏi, những sản phẩm của ông được nhiều khách “săn lùng” bởi tỉ mỉ và tinh thần nghệ thuật đặc trưng.
+</p>
+<ul>
+  <li><b>Chặng đường sự nghiệp:</b> 35 năm sống cùng nghề, góp phần bảo tồn các kiểu chạm khắc cổ.</li>
+  <li><b>Phát triển sáng tạo:</b> Liên tục sáng tạo, không ngại thử nghiệm chất liệu và kỹ thuật mới trên nền xưa cũ.</li>
+  <li><b>Truyền nghề cho thế hệ trẻ:</b> Đào tạo nhiều thợ trẻ, góp phần lan tỏa giá trị thủ công Việt.</li>
+</ul>
+<p>
+  <b>Kết:</b> Sự tận tâm và sáng tạo của nghệ nhân ABC là minh chứng sống cho tinh thần nghề mộc Việt Nam.
+</p>
+' WHERE slug = N'nghe-nhan-abc';
+
+
 
 -- Lấy id bài
 DECLARE @a_media  INT = (SELECT id FROM dbo.Article WHERE slug=N'phong-cach-bac-au');

@@ -137,7 +137,10 @@
                         <h5><i class="bi bi-box me-2"></i>Danh sách Sản phẩm</h5>
                         <ul class="list-group list-group-flush">
                             <li th:each="item : ${orderDetail.items}" class="list-group-item d-flex align-items-center px-0">
-                                <img src="/static/images/banners/02_black-friday.jpg" class="me-3 item-row-img" alt="Ảnh SP" style="width:60px;height:60px;object-fit:cover;">
+                                <img th:if="${item.imageUrl != null}" th:src="@{${item.imageUrl}}" class="me-3 item-row-img" alt="Ảnh SP" style="width:60px;height:60px;object-fit:cover;border:1px solid #ddd;border-radius:4px;">
+                                <div th:if="${item.imageUrl == null}" class="me-3 d-flex align-items-center justify-content-center" style="width:60px;height:60px;background:#eee;border:1px solid #ddd;border-radius:4px;">
+                                    <i class="bi bi-image text-muted"></i>
+                                </div>
                                 <div class="flex-grow-1">
                                     <div class="fw-bold" th:text="${item.sku}">SKU</div>
                                     <small class="text-muted" th:text="${item.colorName + ' - ' + item.typeName}"></small>

@@ -3,7 +3,7 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{delivery/fragments/delivery_layout}">
 <head>
-    <title th:text="'Chi tiết đơn hàng gốc #' + ${orderDetail != null ? orderDetail.id : ''}">Chi tiết đơn hàng gốc</title>
+    <title th:text="'Chi tiết đơn hàng gốc #' + ${orderDetail != null ? orderDetail.orderId : ''}">Chi tiết đơn hàng gốc</title>
     <link th:href="@{/css/customer.css}" rel="stylesheet">
     <link th:href="@{/css/delivery.css}" rel="stylesheet"> <style>
         /* Add specific styles if needed, or override customer.css styles */
@@ -50,7 +50,7 @@
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a th:href="@{/delivery/history}">Lịch sử giao hàng</a></li>
-            <li class="breadcrumb-item active" aria-current="page" th:text="'Chi tiết đơn hàng gốc #' + ${orderDetail.id}">Chi tiết đơn hàng gốc</li>
+            <li class="breadcrumb-item active" aria-current="page" th:text="'Chi tiết đơn hàng gốc #' + ${orderDetail.orderId}">Chi tiết đơn hàng gốc</li>
         </ol>
     </nav>
 
@@ -67,25 +67,20 @@
     <div class="order-detail-card mb-4">
         <div class="order-header" style="background: linear-gradient(135deg, #444, #222);"> <div class="row align-items-center">
                 <div class="col-md-8">
-                    <h3 class="mb-2 text-white">Đơn hàng gốc #<span th:text="${orderDetail.id}"></span></h3>
+                    <h3 class="mb-2 text-white">Đơn hàng gốc #<span th:text="${orderDetail.orderId}"></span></h3>
                     <p class="mb-0 text-white-50">
                         <i class="bi bi-calendar"></i>
-                        Ngày đặt: <span th:text="${#temporals.format(orderDetail.createdAt, 'dd/MM/yyyy HH:mm')}"></span>
+                        Ngày đặt: <span th:text="${#temporals.format(orderDetail.orderCreatedAt, 'dd/MM/yyyy HH:mm')}"></span>
                     </p>
                     <p class="mb-0 text-white-50">
                         <i class="bi bi-clock"></i>
-                        Cập nhật: <span th:text="${#temporals.format(orderDetail.updatedAt, 'dd/MM/yyyy HH:mm')}"></span>
+                        Cập nhật: <span th:text="${#temporals.format(orderDetail.deliveryUpdatedAt, 'dd/MM/yyyy HH:mm')}"></span>
                     </p>
                 </div>
                 <div class="col-md-4 text-end">
                     <span class="status-badge"
-                          th:classappend="'status-' + ${orderDetail.status.toLowerCase()}"
-                          th:text="${orderDetail.status}"></span>
-                    <div th:if="${orderDetail.returnStatus != null}" class="mt-2">
-                        <span class="status-badge"
-                              th:classappend="'return-status-' + ${orderDetail.returnStatus.toLowerCase()}"
-                              th:text="${orderDetail.returnStatus}"></span>
-                    </div>
+                          th:classappend="'status-' + ${orderDetail.orderStatus != null ? orderDetail.orderStatus.name().toLowerCase() : 'unknown'}"
+                          th:text="${orderDetail.orderStatus}"></span>
                 </div>
             </div>
         </div>
@@ -100,8 +95,13 @@
                     <div th:each="item : ${orderDetail.items}" class="row align-items-center mb-4 pb-3 border-bottom">
                         <div class="col-md-2">
                             <a th:href="@{/products/{slug}(slug=${item.productSlug})}" target="_blank" class="product-image-link" title="Xem sản phẩm">
-                                <div class="product-image">
-                                    <i class="bi bi-image"></i> </div>
+                                <div class="product-image" th:if="${item.imageUrl == null}">
+                                    <i class="bi bi-image"></i>
+                                </div>
+                                <img th:if="${item.imageUrl != null}"
+                                     th:src="@{${item.imageUrl}}"
+                                     th:alt="${item.sku}"
+                                     style="width:60px;height:60px;object-fit:cover;border-radius:4px;border:1px solid #ddd;"/>
                             </a>
                         </div>
                         <div class="col-md-6">
@@ -127,18 +127,12 @@
                     </div>
 
                     <div class="row mt-3">
-                        <div class="col-md-7 text-muted small">
-                            <div>Tạm tính: <span th:text="${#numbers.formatDecimal(orderDetail.subtotal, 0, 'COMMA', 0, 'POINT')} + ' đ'"></span></div>
-                            <div>Phí vận chuyển: <span th:text="${#numbers.formatDecimal(orderDetail.shippingFee, 0, 'COMMA', 0, 'POINT')} + ' đ'"></span></div>
-                            <div th:if="${orderDetail.couponCode != null}">Mã giảm giá (<span th:text="${orderDetail.couponCode}"></span>) áp dụng</div>
-                        </div>
-                        <div class="col-md-5 text-end">
+                        <div class="col-md-12 text-end">
                             <div class="fw-bold fs-5" style="color: #333;">
-                                Tổng cộng: <span th:text="${#numbers.formatDecimal(orderDetail.total, 0, 'COMMA', 0, 'POINT')} + ' đ'"></span>
+                                Tổng cộng: <span th:text="${#numbers.formatDecimal(orderDetail.totalAmount, 0, 'COMMA', 0, 'POINT')} + ' đ'"></span>
                             </div>
                             <div class="small mt-1">
                                 Thanh toán: <span class="fw-bold" th:text="${orderDetail.paymentMethod != null ? orderDetail.paymentMethod : 'N/A'}"></span>
-                                (<span th:text="${orderDetail.paymentStatus != null ? orderDetail.paymentStatus : 'N/A'}"></span>)
                             </div>
                         </div>
                     </div>
@@ -150,20 +144,12 @@
             <div class="info-section">
                 <h6><i class="bi bi-geo-alt me-2"></i> Thông tin giao hàng</h6>
                 <p class="mb-1"><strong>Tên người nhận:</strong> <span th:text="${orderDetail.receiverName}"></span></p>
-                <p class="mb-1"><strong>Số điện thoại:</strong> <a th:href="'tel:' + ${orderDetail.phone}" th:text="${orderDetail.phone}"></a></p>
-                <p class="mb-1"><strong>Địa chỉ:</strong> <span th:text="${orderDetail.addressLine}"></span></p>
-                <p><span th:text="${orderDetail.district + ', ' + orderDetail.city}"></span></p>
-                 <a th:href="'https://www.google.com/maps/search/?api=1&query=' + ${orderDetail.addressLine} + '+' + ${orderDetail.district} + '+' + ${orderDetail.city}"
+                <p class="mb-1"><strong>Số điện thoại:</strong> <a th:href="'tel:' + ${orderDetail.customerPhone}" th:text="${orderDetail.customerPhone}"></a></p>
+                <p class="mb-1"><strong>Địa chỉ:</strong> <span th:text="${orderDetail.deliveryAddress}"></span></p>
+                 <a th:href="'https://www.google.com/maps/search/?api=1&query=' + ${orderDetail.deliveryAddress}"
                    target="_blank" class="btn btn-sm btn-outline-secondary">
                    <i class="bi bi-map me-1"></i> Xem trên bản đồ
                 </a>
-            </div>
-
-            <div th:if="${orderDetail.returnStatus != null}" class="info-section">
-                 <h6><i class="bi bi-arrow-return-left me-2"></i> Thông tin trả hàng</h6>
-                 <p class="mb-1"><strong>Trạng thái:</strong> <span th:text="${orderDetail.returnStatus}"></span></p>
-                 <p class="mb-1" th:if="${orderDetail.returnReason != null}"><strong>Lý do:</strong> <span th:text="${orderDetail.returnReason}"></span></p>
-                 <p class="mb-0" th:if="${orderDetail.returnNote != null}"><strong>Ghi chú cửa hàng:</strong> <span th:text="${orderDetail.returnNote}"></span></p>
             </div>
 
              <div class="action-buttons mt-4">
@@ -181,7 +167,7 @@
         <div class="order-body">
             <h5 class="mb-3"><i class="bi bi-clock-history me-2"></i> Lịch sử trạng thái đơn hàng</h5>
             <div class="timeline">
-                <div th:each="history : ${orderDetail.statusHistories}" class="timeline-item">
+                <div th:each="history : ${orderDetail.orderStatusHistory}" class="timeline-item">
                     <div class="card">
                         <div class="card-body py-2 px-3">
                             <div class="d-flex justify-content-between align-items-start">
@@ -195,7 +181,7 @@
                         </div>
                     </div>
                 </div>
-                 <div th:if="${#lists.isEmpty(orderDetail.statusHistories)}" class="ms-3 text-muted">
+                 <div th:if="${#lists.isEmpty(orderDetail.orderStatusHistory)}" class="ms-3 text-muted">
                      Chưa có lịch sử trạng thái.
                  </div>
             </div>
@@ -205,7 +191,7 @@
 
 <div layout:fragment="scripts">
     <script>
-        console.log("Original Order Detail page loaded for Order ID:", /*[[${orderDetail != null ? orderDetail.id : 'N/A'}]]*/);
+        console.log("Original Order Detail page loaded for Order ID:", /*[[${orderDetail != null ? orderDetail.orderId : 'N/A'}]]*/);
     </script>
 </div>
 

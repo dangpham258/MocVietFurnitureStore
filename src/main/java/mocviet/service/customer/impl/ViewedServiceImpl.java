@@ -79,18 +79,13 @@ public class ViewedServiceImpl implements IViewedService {
                     dto.setProductSlug(v.getProduct().getSlug());
                     dto.setViewedAt(v.getViewedAt());
 
-                    // Lấy thumbnail: ưu tiên ảnh có tên chứa "/00_" nếu có
+                    // Lấy thumbnail thực tế: ưu tiên ảnh có tên chứa "/00_" nếu có, fallback placeholder tĩnh
                     var images = imageRepository.findByProductId(v.getProduct().getId());
                     String thumb = images.stream()
                             .sorted(Comparator.comparing(img -> img.getUrl().contains("/00_") ? 0 : 1))
-                            .map(img -> {
-                                // Tạo URL placeholder tương tự ProductServiceImpl.getPlaceholderImageUrl
-                                String text = v.getProduct().getSlug().replace("-", "+");
-                                String color = (img.getColor() != null) ? img.getColor().getSlug() : "na";
-                                return "https://via.placeholder.com/400x400.png?text=" + text + "+(Mau:+" + color + ")";
-                            })
+                            .map(img -> img.getUrl())
                             .findFirst()
-                            .orElse("https://via.placeholder.com/400x400.png?text=" + v.getProduct().getSlug().replace("-", "+"));
+                            .orElse("/images/products/placeholder.jpg");
                     dto.setThumbnailUrl(thumb);
                     return dto;
                 })

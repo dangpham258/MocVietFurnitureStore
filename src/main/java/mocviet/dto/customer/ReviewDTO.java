@@ -18,6 +18,7 @@ public class ReviewDTO {
     private String content;
     private String imageUrl;
     private LocalDateTime createdAt;
+    private String userFullName;
 }
 
 

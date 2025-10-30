@@ -90,16 +90,36 @@ public class DeliveryOrderDetailDTO {
         // Items
         if (order.getOrderItems() != null) {
             dto.setItems(order.getOrderItems().stream()
-                .map(item -> new OrderItemDTO(
-                        item.getId(),
-                        item.getVariant() != null ? item.getVariant().getSku() : "N/A",
-                        (item.getVariant() != null && item.getVariant().getColor() != null) ? item.getVariant().getColor().getName() : "N/A",
-                        item.getVariant() != null ? item.getVariant().getTypeName() : "N/A",
-                        item.getQty(),
-                        item.getUnitPrice(),
-                        (item.getUnitPrice() != null && item.getQty() != null) ? item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQty())) : BigDecimal.ZERO,
-                        (item.getVariant() != null && item.getVariant().getProduct() != null) ? item.getVariant().getProduct().getSlug() : null
-                ))
+                .map(item -> {
+                    OrderItemDTO itemDto = new OrderItemDTO();
+                    itemDto.setId(item.getId());
+                    itemDto.setSku(item.getVariant() != null ? item.getVariant().getSku() : "N/A");
+                    itemDto.setColorName((item.getVariant() != null && item.getVariant().getColor() != null) ? item.getVariant().getColor().getName() : "N/A");
+                    itemDto.setTypeName(item.getVariant() != null ? item.getVariant().getTypeName() : "N/A");
+                    itemDto.setQty(item.getQty());
+                    itemDto.setUnitPrice(item.getUnitPrice());
+                    itemDto.setTotalPrice((item.getUnitPrice() != null && item.getQty() != null) ? item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQty())) : BigDecimal.ZERO);
+                    if (item.getVariant() != null && item.getVariant().getProduct() != null) {
+                        var product = item.getVariant().getProduct();
+                        itemDto.setProductSlug(product.getSlug());
+                        itemDto.setProductName(product.getName());
+                        if (product.getProductImages() != null && !product.getProductImages().isEmpty()) {
+                            // Ưu tiên ảnh theo màu nếu khớp, nếu không lấy ảnh đầu tiên
+                            String matchedColorUrl = null;
+                            Integer variantColorId = item.getVariant().getColor() != null ? item.getVariant().getColor().getId() : null;
+                            if (variantColorId != null) {
+                                for (var img : product.getProductImages()) {
+                                    if (img.getColor() != null && variantColorId.equals(img.getColor().getId())) {
+                                        matchedColorUrl = img.getUrl();
+                                        break;
+                                    }
+                                }
+                            }
+                            itemDto.setImageUrl(matchedColorUrl != null ? matchedColorUrl : product.getProductImages().get(0).getUrl());
+                        }
+                    }
+                    return itemDto;
+                })
                 .collect(Collectors.toList()));
 
             dto.setTotalAmount(order.getOrderItems().stream()

@@ -326,13 +326,32 @@
         </div>
 
         <script th:inline="javascript">
+            function cleanupModalBackdrops() {
+                document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+                document.body.classList.remove('modal-open');
+                document.body.style.removeProperty('overflow');
+                document.body.style.removeProperty('paddingRight');
+            }
+
+            function ensureModalInBody(modalId) {
+                const el = document.getElementById(modalId);
+                if (el && el.parentElement !== document.body) {
+                    document.body.appendChild(el);
+                }
+                return el;
+            }
+
             function approveReturn() {
-                const modal = new bootstrap.Modal(document.getElementById('approveModal'));
+                cleanupModalBackdrops();
+                const el = ensureModalInBody('approveModal');
+                const modal = new bootstrap.Modal(el);
                 modal.show();
             }
 
             function rejectReturn() {
-                const modal = new bootstrap.Modal(document.getElementById('rejectModal'));
+                cleanupModalBackdrops();
+                const el = ensureModalInBody('rejectModal');
+                const modal = new bootstrap.Modal(el);
                 modal.show();
             }
         </script>

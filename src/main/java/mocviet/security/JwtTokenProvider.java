@@ -43,6 +43,20 @@ public class JwtTokenProvider {
                 .compact();
     }
 
+    public String generateToken(Authentication authentication, long durationMs) {
+        User userPrincipal = (User) authentication.getPrincipal();
+
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + durationMs);
+
+        return Jwts.builder()
+                .subject(userPrincipal.getUsername())
+                .issuedAt(now)
+                .expiration(expiryDate)
+                .signWith(getSigningKey())
+                .compact();
+    }
+
     public String generateTokenFromUsername(String username) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtExpirationMs);

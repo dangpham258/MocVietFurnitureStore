@@ -31,8 +31,11 @@
                         <a href="/customer/wishlist" class="list-group-item list-group-item-action">
                             <i class="bi bi-heart"></i> Danh sách yêu thích
                         </a>
-                        <a href="/customer/profile#address-section" class="list-group-item list-group-item-action">
+                        <a href="/customer/addresses" class="list-group-item list-group-item-action">
                             <i class="bi bi-geo-alt"></i> Địa chỉ nhận hàng
+                        </a>
+                        <a href="/customer/viewed" class="list-group-item list-group-item-action">
+                            <i class="bi bi-clock-history"></i> Lịch sử xem
                         </a>
                     </div>
                 </div>
@@ -360,7 +363,7 @@
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    alert('Không thể tải thông tin địa chỉ');
+                    if (window.showNotification) window.showNotification('Không thể tải thông tin địa chỉ', 'danger', 4000);
                 });
         }
 
@@ -420,7 +423,7 @@
                     
                     if (!fullName || !email) {
                         e.preventDefault();
-                        alert('Vui lòng nhập đầy đủ thông tin bắt buộc');
+                        if (window.showNotification) window.showNotification('Vui lòng nhập đầy đủ thông tin bắt buộc', 'warning', 4000);
                         return false;
                     }
                     
@@ -428,14 +431,14 @@
                     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                     if (!emailRegex.test(email)) {
                         e.preventDefault();
-                        alert('Email không hợp lệ');
+                        if (window.showNotification) window.showNotification('Email không hợp lệ', 'warning', 4000);
                         return false;
                     }
                     
                     // Phone validation
                     if (phone && !/^[0-9]+$/.test(phone)) {
                         e.preventDefault();
-                        alert('Số điện thoại chỉ được chứa số');
+                        if (window.showNotification) window.showNotification('Số điện thoại chỉ được chứa số', 'warning', 4000);
                         return false;
                     }
                     
@@ -452,13 +455,13 @@
                         
                         if (birthDate > today) {
                             e.preventDefault();
-                            alert('Ngày sinh không được lớn hơn ngày hiện tại');
+                            if (window.showNotification) window.showNotification('Ngày sinh không được lớn hơn ngày hiện tại', 'warning', 4000);
                             return false;
                         }
                         
                         if (exactAge < 15) {
                             e.preventDefault();
-                            alert('Tuổi phải từ 15 tuổi trở lên');
+                            if (window.showNotification) window.showNotification('Tuổi phải từ 15 tuổi trở lên', 'warning', 4000);
                             return false;
                         }
                     }
@@ -555,23 +558,7 @@
             
             function showPasswordSuccess(message) {
                 // Create success alert
-                const alertDiv = document.createElement('div');
-                alertDiv.className = 'alert alert-success alert-dismissible fade show';
-                alertDiv.innerHTML = `
-                    <i class="bi bi-check-circle"></i> ${message}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                `;
-                
-                // Insert at the top of the password card
-                const passwordCard = document.querySelector('.card:has(#changePasswordForm)');
-                const cardBody = passwordCard.querySelector('.card-body');
-                cardBody.insertBefore(alertDiv, cardBody.firstChild);
-                
-                // Auto-hide after 5 seconds
-                setTimeout(() => {
-                    const bsAlert = new bootstrap.Alert(alertDiv);
-                    bsAlert.close();
-                }, 5000);
+                if (window.showNotification) window.showNotification(message, 'success', 3000);
             }
 
             // Address form validation
@@ -583,7 +570,7 @@
                         const addressCount = document.querySelectorAll('.address-card').length;
                         if (addressCount >= 5) {
                             e.preventDefault();
-                            alert('Bạn đã có đủ 5 địa chỉ nhận hàng. Để thêm địa chỉ mới, vui lòng xóa một địa chỉ hiện có.');
+                            if (window.showNotification) window.showNotification('Bạn đã có đủ 5 địa chỉ nhận hàng. Để thêm địa chỉ mới, vui lòng xóa một địa chỉ hiện có.', 'warning', 4000);
                             return false;
                         }
                     }
@@ -593,7 +580,7 @@
                         const phone = phoneField.value.trim();
                         if (phone && !/^[0-9]+$/.test(phone)) {
                             e.preventDefault();
-                            alert('Số điện thoại không hợp lệ');
+                            if (window.showNotification) window.showNotification('Số điện thoại không hợp lệ', 'warning', 4000);
                             return false;
                         }
                     }

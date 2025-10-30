@@ -175,25 +175,11 @@ class CustomerCart {
     }
 
     showAlert(message, type = 'info') {
-        const alertContainer = document.getElementById('alertContainer');
-        const alertId = 'alert-' + Date.now();
-        
-        const alertHtml = `
-            <div id="${alertId}" class="alert alert-${type} alert-dismissible fade show alert-custom" role="alert">
-                ${message}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        `;
-        
-        alertContainer.insertAdjacentHTML('beforeend', alertHtml);
-        
-        // Auto remove after 5 seconds
-        setTimeout(() => {
-            const alertElement = document.getElementById(alertId);
-            if (alertElement) {
-                alertElement.remove();
-            }
-        }, 5000);
+        if (typeof window.showNotification === 'function') {
+            window.showNotification(message, type, 4000);
+        } else {
+            console[type === 'danger' ? 'error' : (type === 'warning' ? 'warn' : 'log')](message);
+        }
     }
 
     setLoading(element, loading = true) {
@@ -220,6 +206,9 @@ class CustomerCart {
             if (data.success) {
                 // Update cart count in header
                 customerApp.headerManager.updateCartCount(data.cartItemCount);
+                if (window.showNotification) window.showNotification(data.message || 'Đã thêm vào giỏ hàng', 'success', 2500);
+            } else {
+                if (window.showNotification) window.showNotification(data.message || 'Không thể thêm vào giỏ hàng', 'danger', 4000);
             }
             return data;
         });
@@ -395,7 +384,7 @@ window.updateQuantity = function(cartItemId, quantity) {
                     updateStockErrors(data.stockErrors);
                 }
             } else {
-                alert(data.message || 'Có lỗi xảy ra khi cập nhật số lượng');
+                if (window.showNotification) window.showNotification(data.message || 'Có lỗi xảy ra khi cập nhật số lượng', 'danger', 4000);
                 // Revert input value
                 const input = document.getElementById(`qty-${cartItemId}`);
                 if (input) {
@@ -407,7 +396,7 @@ window.updateQuantity = function(cartItemId, quantity) {
             if (updateBtn) {
                 updateBtn.disabled = false;
             }
-            alert('Có lỗi xảy ra. Vui lòng thử lại sau');
+            if (window.showNotification) window.showNotification('Có lỗi xảy ra. Vui lòng thử lại sau', 'danger', 4000);
             console.error('Error updating quantity:', error);
         });
     }
@@ -474,12 +463,14 @@ window.removeItem = function(cartItemId) {
         }
         
         if (data.success) {
+            // Toast luôn hiển thị
+            if (window.showNotification) window.showNotification(data.message || 'Đã xóa sản phẩm khỏi giỏ hàng', 'success', 2500);
+
             cartItemElement.remove();
             
             if (customerApp && customerApp.cartManager) {
                 customerApp.cartManager.updateCartTotal();
                 customerApp.cartManager.updateSelectAllState();
-                customerApp.cartManager.showAlert(data.message || 'Đã xóa sản phẩm khỏi giỏ hàng', 'success');
                 
                 // Update cart count in header
                 if (customerApp.headerManager) {
@@ -490,13 +481,14 @@ window.removeItem = function(cartItemId) {
             // Check if cart is empty
             const remainingItems = document.querySelectorAll('.cart-item');
             if (remainingItems.length === 0) {
-                location.reload(); // Reload to show empty cart message
+                // Trì hoãn một chút để người dùng thấy toast
+                setTimeout(() => location.reload(), 800);
             }
         } else {
             if (customerApp && customerApp.cartManager) {
                 customerApp.cartManager.showAlert(data.message || 'Không thể xóa sản phẩm khỏi giỏ hàng', 'danger');
-            } else {
-                alert(data.message || 'Không thể xóa sản phẩm khỏi giỏ hàng');
+            } else if (window.showNotification) {
+                window.showNotification(data.message || 'Không thể xóa sản phẩm khỏi giỏ hàng', 'danger', 4000);
             }
         }
     })
@@ -507,6 +499,7 @@ window.removeItem = function(cartItemId) {
         } else if (removeBtn) {
             removeBtn.disabled = false;
         }
+        if (window.showNotification) window.showNotification('Có lỗi xảy ra. Vui lòng thử lại sau', 'danger', 4000);
         console.error('Error removing item:', error);
     });
 };
@@ -527,8 +520,8 @@ window.proceedToCheckout = function() {
     if (selectedItemIds.length === 0) {
         if (customerApp && customerApp.cartManager) {
             customerApp.cartManager.showAlert('Vui lòng chọn ít nhất một sản phẩm để thanh toán', 'warning');
-        } else {
-            alert('Vui lòng chọn ít nhất một sản phẩm để thanh toán');
+        } else if (window.showNotification) {
+            window.showNotification('Vui lòng chọn ít nhất một sản phẩm để thanh toán', 'warning', 4000);
         }
         return;
     }
@@ -538,8 +531,8 @@ window.proceedToCheckout = function() {
     if (stockErrors.length > 0) {
         if (customerApp && customerApp.cartManager) {
             customerApp.cartManager.showAlert('Vui lòng kiểm tra lại tồn kho của các sản phẩm đã chọn', 'warning');
-        } else {
-            alert('Vui lòng kiểm tra lại tồn kho của các sản phẩm đã chọn');
+        } else if (window.showNotification) {
+            window.showNotification('Vui lòng kiểm tra lại tồn kho của các sản phẩm đã chọn', 'warning', 4000);
         }
         return;
     }
@@ -597,7 +590,15 @@ window.addToCart = function(variantId, quantity = 1) {
             },
             body: `variantId=${variantId}&quantity=${quantity}`
         })
-        .then(response => response.json());
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                if (window.showNotification) window.showNotification(data.message || 'Đã thêm vào giỏ hàng', 'success', 2500);
+            } else if (window.showNotification) {
+                window.showNotification(data.message || 'Không thể thêm vào giỏ hàng', 'danger', 4000);
+            }
+            return data;
+        });
     }
 };
 
@@ -637,11 +638,11 @@ window.confirmCancelOrder = function() {
         if (data.success) {
             location.reload();
         } else {
-            alert(data.message);
+            if (window.showNotification) window.showNotification(data.message, 'danger', 4000);
         }
     })
     .catch(error => {
-        alert('Có lỗi xảy ra khi hủy đơn hàng');
+        if (window.showNotification) window.showNotification('Có lỗi xảy ra khi hủy đơn hàng', 'danger', 4000);
     });
 };
 
@@ -655,7 +656,7 @@ window.confirmReturnRequest = function() {
     const reason = document.getElementById('returnReason').value;
     
     if (!reason.trim()) {
-        alert('Vui lòng nhập lý do trả hàng');
+        if (window.showNotification) window.showNotification('Vui lòng nhập lý do trả hàng', 'warning', 4000);
         return;
     }
     
@@ -671,11 +672,11 @@ window.confirmReturnRequest = function() {
         if (data.success) {
             location.reload();
         } else {
-            alert(data.message);
+            if (window.showNotification) window.showNotification(data.message, 'danger', 4000);
         }
     })
     .catch(error => {
-        alert('Có lỗi xảy ra khi gửi yêu cầu trả hàng');
+        if (window.showNotification) window.showNotification('Có lỗi xảy ra khi gửi yêu cầu trả hàng', 'danger', 4000);
     });
 };
 
@@ -687,16 +688,16 @@ window.reorderProducts = function(orderId) {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert(data.message);
+                if (window.showNotification) window.showNotification(data.message, 'success', 3000);
                 if (data.addedCount > 0) {
                     window.location.href = '/customer/cart';
                 }
             } else {
-                alert(data.message);
+                if (window.showNotification) window.showNotification(data.message, 'danger', 4000);
             }
         })
         .catch(error => {
-            alert('Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng');
+            if (window.showNotification) window.showNotification('Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng', 'danger', 4000);
         });
     }
 };

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import mocviet.dto.customer.ProductCardDTO;
 import mocviet.dto.customer.ProductCriteriaDTO;
 import mocviet.dto.customer.ProductDetailDTO;
+import mocviet.dto.customer.ReviewDTO;
 import mocviet.entity.Color; // Thêm import
 import mocviet.entity.Product;
 import mocviet.entity.ProductImage;
@@ -12,6 +13,7 @@ import mocviet.repository.ProductImageRepository;
 import mocviet.repository.CategoryRepository;
 import mocviet.repository.ProductRepository;
 import mocviet.repository.ProductVariantRepository;
+import mocviet.repository.ReviewRepository;
 import mocviet.service.ProductSpecification;
 import mocviet.service.customer.IProductService;
 
@@ -40,6 +42,7 @@ public class ProductServiceImpl implements IProductService {
     private final ProductVariantRepository variantRepository;
     private final ProductImageRepository imageRepository;
     private final CategoryRepository categoryRepository;
+    private final ReviewRepository reviewRepository;
     // private final ObjectMapper objectMapper; // Bỏ comment nếu dùng
 
     @Override
@@ -202,6 +205,33 @@ public class ProductServiceImpl implements IProductService {
                     opt.setTypeName(typeName);
                     return opt;
                 }).collect(Collectors.toList()));
+
+        // Thêm: map reviews công khai
+        List<mocviet.entity.Review> reviews = reviewRepository.findByProductIdAndIsHiddenFalse(product.getId());
+        List<ReviewDTO> reviewDTOs = reviews.stream()
+            .map(r -> {
+                ReviewDTO dtoR = new ReviewDTO();
+                dtoR.setId(r.getId());
+                dtoR.setOrderItemId(r.getOrderItem() != null ? r.getOrderItem().getId() : null);
+                dtoR.setRating(r.getRating());
+                dtoR.setContent(r.getContent());
+                dtoR.setImageUrl(r.getImageUrl());
+                dtoR.setCreatedAt(r.getCreatedAt());
+                // Lấy tên khách đánh giá (ưu tiên User, fallback là receiverName trong Address của Orders)
+                String userName = "Khách";
+                if (r.getUser() != null && r.getUser().getFullName() != null) {
+                    userName = r.getUser().getFullName();
+                } else if (r.getOrderItem() != null
+                        && r.getOrderItem().getOrder() != null
+                        && r.getOrderItem().getOrder().getAddress() != null
+                        && r.getOrderItem().getOrder().getAddress().getReceiverName() != null) {
+                    userName = r.getOrderItem().getOrder().getAddress().getReceiverName();
+                }
+                dtoR.setUserFullName(userName);
+                return dtoR;
+            })
+            .collect(Collectors.toList());
+        dto.setReviews(reviewDTOs);
 
         return dto;
     }

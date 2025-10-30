@@ -79,11 +79,8 @@
                     </ol>
                 </nav>
 
-                <!-- Alert Messages -->
-                <div th:if="${param.error}" class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <i class="bi bi-exclamation-triangle"></i> <span th:text="${param.error}"></span>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
+                <!-- Alert Messages (hidden for toast) -->
+                <div th:if="${param.error}" id="__review_error" class="d-none" th:text="${param.error}"></div>
 
                 <!-- Review Form -->
                 <div class="card">
@@ -320,19 +317,35 @@
             });
         });
 
-        // Show error modal
+        // Show error modal / toast
         function showError(message) {
-            document.getElementById('errorMessage').textContent = message;
-            const errorModal = new bootstrap.Modal(document.getElementById('errorModal'));
-            errorModal.show();
+            if (window.showNotification) {
+                window.showNotification(message, 'danger', 4000);
+            } else {
+                const errorModal = new bootstrap.Modal(document.getElementById('errorModal'));
+                document.getElementById('errorMessage').textContent = message;
+                errorModal.show();
+            }
         }
 
-        // Show success modal
+        // Show success modal / toast
         function showSuccess(message) {
-            document.getElementById('successMessage').textContent = message;
-            const successModal = new bootstrap.Modal(document.getElementById('successModal'));
-            successModal.show();
+            if (window.showNotification) {
+                window.showNotification(message, 'success', 3000);
+            } else {
+                document.getElementById('successMessage').textContent = message;
+                const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+                successModal.show();
+            }
         }
+
+        // Show initial param messages via toast
+        document.addEventListener('DOMContentLoaded', function() {
+            const errEl = document.getElementById('__review_error');
+            if (errEl && errEl.textContent && window.showNotification) {
+                window.showNotification(errEl.textContent, 'danger', 4000);
+            }
+        });
 
         // Redirect to order
         function redirectToOrder() {

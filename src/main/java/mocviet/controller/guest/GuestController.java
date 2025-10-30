@@ -23,6 +23,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import mocviet.repository.ArticleRepository;
+import mocviet.entity.Article;
 
 @Controller
 @RequestMapping("/")
@@ -30,6 +32,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class GuestController {
 
     private final IGuestService guestService;
+    private final ArticleRepository articleRepository;
 
     // Phương thức xử lý trang Chính sách
     @GetMapping("/policy/{slug}")
@@ -83,6 +86,18 @@ public class GuestController {
         model.addAttribute("typeFilter", typeFilterForUrl); // Truyền type lọc cho phân trang
 
         return "guest/news-list";
+    }
+
+    // Trang chi tiết bài viết theo slug
+    @GetMapping("/news/{slug}")
+    public String showNewsDetail(@PathVariable("slug") String slug, Model model) {
+        var articleOpt = articleRepository.findBySlugAndStatusTrue(slug);
+        if (articleOpt.isEmpty()) {
+            return "redirect:/news";
+        }
+        Article article = articleOpt.get();
+        model.addAttribute("article", article);
+        return "guest/news-detail";
     }
 
     // Phương thức hiển thị trang Liên hệ
