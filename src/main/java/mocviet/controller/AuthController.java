@@ -1,4 +1,4 @@
-﻿package mocviet.controller;
+package mocviet.controller;
 
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;

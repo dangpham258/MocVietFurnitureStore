@@ -63,7 +63,7 @@
                     <p class="lead fs-4">Nội thất gỗ tự nhiên - Chất lượng - Uy tín</p>
                 </div>
                 <div class="hero-cta mt-2">
-                    <a href="/products" class="btn btn-dark btn-lg me-3 px-4 py-2">Xem sản phẩm</a>
+                <a href="/products" class="btn btn-dark btn-lg me-3 px-4 py-2">Xem sản phẩm</a>
                     <a href="/about" class="btn btn-hero-secondary btn-lg px-4 py-2">Về chúng tôi</a>
                 </div>
             </div>
@@ -166,7 +166,7 @@
                  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 px-3">
                     <div th:each="review : ${bestReviews}" class="col">
                         <div class="card h-100 review-card shadow-sm border-0"> <div class="card-body">
-                                <div class="d-flex align-items-center mb-3">                                    
+                                <div class="d-flex align-items-center mb-3">
                                     <div>
                                         <h6 class="mb-0 fw-bold" th:text="${review.customerName ?: 'Khách hàng'}"></h6>
                                         <small class="text-muted" th:text="${#temporals.format(review.createdAt, 'dd/MM/yyyy')}"></small>

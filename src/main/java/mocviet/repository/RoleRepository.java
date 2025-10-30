@@ -1,4 +1,4 @@
-﻿package mocviet.repository;
+package mocviet.repository;
 
 import mocviet.entity.Role;
 import org.springframework.data.jpa.repository.JpaRepository;

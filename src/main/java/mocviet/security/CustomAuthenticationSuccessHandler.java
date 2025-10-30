@@ -1,4 +1,4 @@
-﻿package mocviet.security;
+package mocviet.security;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;

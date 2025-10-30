@@ -1,4 +1,4 @@
-﻿package mocviet.security;
+package mocviet.security;
 
 import jakarta.servlet.http.Cookie;
 import lombok.RequiredArgsConstructor;
@@ -98,6 +98,18 @@ public class SecurityConfig {
                     "/js/**",           // Cho phép truy cập JavaScript
                     "/images/**",       // Cho phép truy cập hình ảnh (nếu lưu trong static/images)
                     "/static/**",       // Cho phép truy cập toàn bộ thư mục static
+
+                    // --- Public APIs for chatbox ---
+                    "/api/chat/conversation/open",
+                    "/api/chat/messages",
+                    "/api/chat/conversation/customer-open",
+                    "/api/chat/conversation/info",
+                    "/api/chat/upload-image",
+                    "/api/chat/image/**",
+
+                    // --- WebSocket endpoints ---
+                    "/ws/**",           // WebSocket endpoint cho chat
+                    "/app/**",          // WebSocket message destinations
 
                     // --- API Công khai ---
                     "/api/auth/**",     // API login/register

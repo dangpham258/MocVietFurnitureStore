@@ -1,4 +1,4 @@
-﻿package mocviet.entity;
+package mocviet.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;

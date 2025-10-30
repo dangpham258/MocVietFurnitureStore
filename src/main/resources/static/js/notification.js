@@ -122,18 +122,20 @@ class NotificationSystem {
         };
 
         notification.innerHTML = `
-            <div class="notification-content">
-                <div class="notification-header">
-                    <i class="bi bi-${iconMap[type] || 'info-circle-fill'} notification-icon"></i>
-                    <span class="notification-title">${titleMap[type] || 'Thông báo!'}</span>
-                    <button type="button" class="notification-close" onclick="window.notificationSystem.removeNotification(this.parentElement.parentElement.parentElement)">
+            <div class="notification-content" style="background:#fff; border:1px solid #dee2e6; border-left:4px solid ${this.getBorderColor(type)}; border-radius: 10px; padding:12px 12px 8px 12px;">
+                <div class="notification-header d-flex align-items-start justify-content-between">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-${iconMap[type] || 'info-circle-fill'} me-2" style="color:${this.getBorderColor(type)}"></i>
+                        <span class="notification-title fw-semibold" style="color:#212529;">${titleMap[type] || 'Thông báo!'}</span>
+                    </div>
+                    <button type="button" class="notification-close btn btn-sm btn-light" onclick="window.notificationSystem.removeNotification(this.parentElement.parentElement.parentElement)" style="line-height:1; padding:2px 6px;">
                         <i class="bi bi-x"></i>
                     </button>
                 </div>
-                <div class="notification-body">
+                <div class="notification-body mt-1" style="color:#495057;">
                     ${message}
                 </div>
-                <div class="notification-progress">
+                <div class="notification-progress mt-2">
                     <div class="notification-progress-bar"></div>
                 </div>
             </div>
@@ -141,17 +143,16 @@ class NotificationSystem {
 
         // Add styles
         notification.style.cssText = `
-            background: ${this.getBackgroundColor(type)};
-            border: 1px solid ${this.getBorderColor(type)};
+            background: transparent;
+            border: none;
             border-radius: 12px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
-            margin-bottom: 10px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            margin-bottom: 12px;
             opacity: 0;
             transform: translateX(100%);
-            transition: all 0.3s ease;
+            transition: all 0.25s ease;
             pointer-events: auto;
-            max-width: 350px;
-            overflow: hidden;
+            max-width: 380px;
         `;
 
         return notification;

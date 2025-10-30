@@ -1,4 +1,4 @@
-﻿package mocviet.repository;
+package mocviet.repository;
 
 import java.util.List;
 import java.util.Optional;
@@ -123,4 +123,17 @@ public interface UserNotificationRepository extends JpaRepository<UserNotificati
     long countByUserAndIsRead(User user, Boolean isRead);
 
     Optional<UserNotification> findByIdAndUser(Integer id, User user);
+    
+    /**
+     * Tìm thông báo theo userId, title chứa text, và created_at sau thời gian cụ thể
+     * Dùng để kiểm tra spam (thông báo trong 5 phút gần đây)
+     */
+    @Query("SELECT n FROM UserNotification n WHERE n.user.id = :userId " +
+           "AND n.title LIKE :titlePattern " +
+           "AND n.createdAt > :afterDate")
+    List<UserNotification> findByUserIdAndTitleContainingAndCreatedAtAfter(
+        @Param("userId") Integer userId,
+        @Param("titlePattern") String titlePattern,
+        @Param("afterDate") LocalDateTime afterDate
+    );
 }

@@ -14,8 +14,28 @@ public interface ConversationRepository extends JpaRepository<Conversation, Inte
     // Tìm conversation của guest theo email và còn đang mở (nếu cần)
     Optional<Conversation> findByGuestEmailAndStatus(String guestEmail, Conversation.ConversationStatus status);
 
-    // Tìm conversation của customer (nếu cần sau này)
-    Optional<Conversation> findByUserAndStatus(User user, Conversation.ConversationStatus status);
+    // Trả về tất cả conversations theo email và status, sắp xếp mới nhất trước (tránh NonUniqueResult)
+    List<Conversation> findAllByGuestEmailAndStatusOrderByCreatedAtDesc(
+        String guestEmail,
+        Conversation.ConversationStatus status
+    );
+
+    // Tìm tất cả OPEN của user ngoại trừ 1 id (để đóng bớt)
+    List<Conversation> findAllByUserAndStatusAndIdNotOrderByCreatedAtDesc(
+        User user,
+        Conversation.ConversationStatus status,
+        Integer excludeId
+    );
+
+    // Tìm tất cả OPEN theo email ngoại trừ 1 id (để đóng bớt)
+    List<Conversation> findAllByGuestEmailAndStatusAndIdNotOrderByCreatedAtDesc(
+        String guestEmail,
+        Conversation.ConversationStatus status,
+        Integer excludeId
+    );
+
+    // Tìm conversation của customer (có thể có nhiều) → dùng list để tránh NonUniqueResult
+    List<Conversation> findAllByUserAndStatusOrderByCreatedAtDesc(User user, Conversation.ConversationStatus status);
 
     // Lấy danh sách conversation đang mở (cho manager)
     List<Conversation> findByStatusOrderByCreatedAtDesc(Conversation.ConversationStatus status);
