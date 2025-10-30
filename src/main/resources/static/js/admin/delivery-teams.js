@@ -446,9 +446,10 @@ class DeliveryTeamsManagement {
             
             if (response.ok && result.success !== false) {
                 this.showNotification('Xóa khu vực thành công', 'success');
-                const teamId = parseInt(document.getElementById('manageZonesTeamId').value);
                 this.loadData();
-                this.manageZones(teamId); // Refresh modal (làm mới modal)
+                const modalElement = document.getElementById('manageZonesModal');
+                const modal = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
+                if (modal) modal.hide();
             } else {
                 this.showNotification(result.message || 'Xóa khu vực thất bại', 'danger');
             }
