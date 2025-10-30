@@ -29,9 +29,14 @@ import mocviet.dto.delivery.DeliveryUpdateRequestDTO;
 import mocviet.entity.DeliveryTeam;
 import mocviet.entity.OrderDelivery;
 import mocviet.entity.User;
+import mocviet.entity.Orders;
+import mocviet.entity.OrderItem;
+import mocviet.entity.Product;
 import mocviet.repository.UserRepository;
 import mocviet.repository.DeliveryOrderDeliveryRepository;
 import mocviet.repository.DeliveryTeamRepository;
+import mocviet.repository.OrderRepository;
+import mocviet.repository.ProductRepository;
 
 @Service
 @RequiredArgsConstructor
@@ -39,10 +44,12 @@ public class DeliveryServiceImpl implements IDeliveryService {
 
     private final DeliveryTeamRepository deliveryTeamRepository;
     private final DeliveryOrderDeliveryRepository orderDeliveryRepository;
+    private final OrderRepository orderRepository; // Repo gốc để lấy Orders
     private final UserRepository userRepository; // Repo gốc để lấy User
     private final PasswordEncoder passwordEncoder; // Để đổi mật khẩu
     private final EntityManager entityManager; // Để gọi Stored Procedure
     private final DeliveryFileUploadService fileUploadService; // Để upload ảnh
+    private final ProductRepository productRepository; // Để cập nhật soldQty
 
     /** Helper lấy User entity từ Authentication */
     private User getCurrentUser(Authentication authentication) {
@@ -185,6 +192,20 @@ public class DeliveryServiceImpl implements IDeliveryService {
 
             query.execute();
 
+            // LẤY DANH SÁCH ORDER ITEM VÀ PRODUCT ĐỂ TĂNG soldQty
+            Orders orderGiao = od.getOrder();
+            if (orderGiao != null && orderGiao.getOrderItems() != null) {
+                for (OrderItem item : orderGiao.getOrderItems()) {
+                    Product product = item.getVariant().getProduct();
+                    if (product != null) {
+                        int qty = item.getQty() != null ? item.getQty() : 1;
+                        product.setSoldQty(product.getSoldQty() + qty);
+                        // Lưu lại product
+                        productRepository.save(product);
+                    }
+                }
+            }
+
             // Kiểm tra output parameters hoặc kết quả trả về của SP nếu có
 
             return MessageResponse.success("Xác nhận giao hàng thành công cho đơn #" + orderId);
@@ -257,6 +278,19 @@ public class DeliveryServiceImpl implements IDeliveryService {
                 orderDeliveryRepository.save(od);
             }
 
+            // Sau khi hoàn tất logic thu hồi hàng (gọi xong SP/cập nhật trạng thái), giảm soldQty của sản phẩm
+            Orders orderTra = od.getOrder();
+            if (orderTra != null && orderTra.getOrderItems() != null) {
+                for (OrderItem item : orderTra.getOrderItems()) {
+                    Product product = item.getVariant().getProduct();
+                    if (product != null) {
+                        int qty = item.getQty() != null ? item.getQty() : 1;
+                        product.setSoldQty(Math.max(0, product.getSoldQty() - qty)); // tránh âm
+                        productRepository.save(product);
+                    }
+                }
+            }
+
             return MessageResponse.success("Xử lý thu hồi và hoàn tiền thành công cho đơn #" + orderId);
         } catch (Exception e) {
              String rootCauseMessage = getRootCauseMessage(e); // Lấy lỗi gốc
@@ -308,6 +342,20 @@ public class DeliveryServiceImpl implements IDeliveryService {
 
             query.execute();
 
+            // LẤY DANH SÁCH ORDER ITEM VÀ PRODUCT ĐỂ TĂNG soldQty
+            Orders orderGiao = od.getOrder();
+            if (orderGiao != null && orderGiao.getOrderItems() != null) {
+                for (OrderItem item : orderGiao.getOrderItems()) {
+                    Product product = item.getVariant().getProduct();
+                    if (product != null) {
+                        int qty = item.getQty() != null ? item.getQty() : 1;
+                        product.setSoldQty(product.getSoldQty() + qty);
+                        // Lưu lại product
+                        productRepository.save(product);
+                    }
+                }
+            }
+
             return MessageResponse.success("Xác nhận giao hàng thành công cho đơn #" + orderId);
         } catch (Exception e) {
             String rootCauseMessage = getRootCauseMessage(e); // Lấy lỗi gốc
@@ -357,6 +405,19 @@ public class DeliveryServiceImpl implements IDeliveryService {
 
             query.execute();
 
+            // Sau khi hoàn tất logic thu hồi hàng (gọi xong SP/cập nhật trạng thái), giảm soldQty của sản phẩm
+            Orders orderTra = od.getOrder();
+            if (orderTra != null && orderTra.getOrderItems() != null) {
+                for (OrderItem item : orderTra.getOrderItems()) {
+                    Product product = item.getVariant().getProduct();
+                    if (product != null) {
+                        int qty = item.getQty() != null ? item.getQty() : 1;
+                        product.setSoldQty(Math.max(0, product.getSoldQty() - qty)); // tránh âm
+                        productRepository.save(product);
+                    }
+                }
+            }
+
             return MessageResponse.success("Xử lý thu hồi và hoàn tiền thành công cho đơn #" + orderId);
         } catch (Exception e) {
              String rootCauseMessage = getRootCauseMessage(e); // Lấy lỗi gốc
@@ -373,6 +434,36 @@ public class DeliveryServiceImpl implements IDeliveryService {
                 .findByDeliveryTeamIdAndStatus(teamId, OrderDelivery.DeliveryStatus.DONE, pageable); // <<<--- ĐẢM BẢO GỌI ĐÚNG TÊN NÀY
 
         return deliveryPage.map(DeliveryOrderSummaryDTO::fromEntity);
+    }
+
+    @Override
+    @Transactional
+    public MessageResponse failDeliveryAndCancelOrder(Authentication authentication, Integer orderId, String note) {
+        User currentUser = getCurrentUser(authentication);
+        Integer teamId = getCurrentDeliveryTeamId(authentication);
+        OrderDelivery od = orderDeliveryRepository.findByOrderIdAndDeliveryTeamId(orderId, teamId)
+                .orElseThrow(() -> new RuntimeException("Đơn giao hàng không hợp lệ hoặc không được phân công cho bạn."));
+        if (od.getStatus() != OrderDelivery.DeliveryStatus.IN_TRANSIT) {
+            return MessageResponse.error("Chỉ có thể đánh dấu giao hàng không thành công khi đơn đang IN_TRANSIT.");
+        }
+        // Lưu note lý do giao fail
+        if (note != null && !note.isBlank()) {
+            od.setNote(note);
+        } else {
+            od.setNote("Giao hàng không thành công");
+        }
+        // Huỷ Orders
+        Orders order = od.getOrder();
+        if (order == null) {
+            return MessageResponse.error("Không tìm thấy thông tin đơn hàng gốc.");
+        }
+        order.setStatus(Orders.OrderStatus.CANCELLED);
+        // Chuyển cả OrderDelivery về trạng thái DONE
+        od.setStatus(OrderDelivery.DeliveryStatus.DONE);
+        orderRepository.save(order);
+        orderDeliveryRepository.save(od);
+        // Có thể log thêm vào DeliveryHistory nếu muốn
+        return MessageResponse.success("Đơn hàng đã được chuyển sang trạng thái huỷ và kết thúc đơn giao hàng (DONE).\n" + (note != null ? note : ""));
     }
 
     // --- Chức năng Quản lý tài khoản ---

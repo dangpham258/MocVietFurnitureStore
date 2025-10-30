@@ -117,6 +117,11 @@
                     </div>
                     <div th:text="${review.content}" class="mb-1"></div>
                     <img th:if="${review.imageUrl}" th:src="${review.imageUrl}" class="img-thumbnail" alt="Ảnh đánh giá" style="max-width: 140px">
+                    <div th:if="${review.managerResponse != null}" class="bg-light p-2 rounded mt-2 border ms-4">
+                        <i class="bi bi-shop-window text-primary"></i>
+                        <strong class="text-primary">Phản hồi từ cửa hàng:</strong>
+                        <span th:text="${review.managerResponse}"></span>
+                    </div>
                 </div>
             </div>
         </div>

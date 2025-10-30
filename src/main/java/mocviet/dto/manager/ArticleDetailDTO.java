@@ -26,6 +26,7 @@ public class ArticleDetailDTO {
     private LocalDateTime createdAt;
     private Integer linkedProductId;
     private String linkedProductName;
+    private String linkedProductSlug;
     private List<ArticleImageDTO> images;
     
     @Data

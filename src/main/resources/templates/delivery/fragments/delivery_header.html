@@ -19,7 +19,6 @@
                     <li><a class="dropdown-item text-muted text-center disabled" id="notificationPlaceholder" href="#">Đang tải...</a></li>
                     <li><hr class="dropdown-divider"></li>
                     <li><a class="dropdown-item text-center small text-primary" href="#" onclick="markAllNotificationsRead(event)">Đánh dấu tất cả đã đọc</a></li>
-                    <li><a class="dropdown-item text-center small text-secondary" href="#" onclick="createTestNotification(event)">Tạo thông báo test</a></li>
                     </ul>
             </div>
             <div class="dropdown" sec:authorize="isAuthenticated()">
@@ -35,6 +34,26 @@
             </div>
         </div> </div>
 </header>
+
+<!-- Modal hiển thị chi tiết thông báo -->
+<div class="modal fade" id="notificationDetailModal" tabindex="-1" aria-labelledby="notificationDetailModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="notificationDetailModalLabel">Chi tiết thông báo</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="notificationDetailContent">
+          <!-- Nội dung chi tiết sẽ được render ở đây -->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>

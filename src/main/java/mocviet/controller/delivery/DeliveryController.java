@@ -323,4 +323,25 @@ public class DeliveryController {
          }
      } // <<< Đảm bảo có dấu ngoặc này
 
+    /**
+     * Xử lý giao hàng không thành công: chuyển Orders sang CANCELLED, lưu ghi chú nếu có.
+     */
+    @PostMapping("/orders/{orderId}/fail")
+    public String failDeliveryAction(
+            @PathVariable Integer orderId,
+            @RequestParam(required = false) String note,
+            Authentication authentication,
+            RedirectAttributes redirectAttributes) {
+
+        MessageResponse response = deliveryService.failDeliveryAndCancelOrder(authentication, orderId, note);
+
+        if (response.isSuccess()) {
+            redirectAttributes.addFlashAttribute("successMessage", response.getMessage());
+            return "redirect:/delivery";
+        } else {
+            redirectAttributes.addFlashAttribute("errorMessage", response.getMessage());
+            return "redirect:/delivery/orders/" + orderId;
+        }
+    }
+
 } // <<< Dấu ngoặc đóng cuối cùng của class DeliveryController

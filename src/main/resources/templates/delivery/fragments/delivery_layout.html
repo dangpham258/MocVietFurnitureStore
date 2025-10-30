@@ -46,13 +46,14 @@
 
             // --- Hàm lấy và cập nhật thông báo ---
             function fetchNotifications() {
-                fetch('/delivery/api/notifications') // Đảm bảo URL này đúng
+                fetch('/delivery/api/notifications/unread')
                     .then(response => {
                         if (!response.ok) { throw new Error('Network response was not ok'); }
                         return response.json();
                      })
                     .then(data => {
-                        updateNotificationUI(data);
+                        window._notiCacheArray = (data.notifications||[]); // cache toàn bộ để show detail
+                        updateNotificationUI(window._notiCacheArray || []);
                     })
                     .catch(error => {
                         console.error('Error fetching notifications:', error);
@@ -86,12 +87,12 @@
                             const listItem = document.createElement('li');
                             listItem.classList.add('notification-item');
                             listItem.innerHTML = `
-                                <a class="dropdown-item small ${noti.isRead ? 'text-muted' : ''}" href="#" onclick="markNotificationRead(event, ${noti.id})">
+                                <a class="dropdown-item small ${noti.isRead ? 'text-muted' : ''}" href="#" onclick="showNotificationDetail(event, ${noti.id})">
                                     <div class="fw-bold">${noti.title || 'Thông báo'}</div>
                                     <div class="message-preview text-wrap" style="font-size: 0.9em;">${noti.message ? noti.message.substring(0, 100) + (noti.message.length > 100 ? '...' : '') : ''}</div>
                                     <div class="text-muted" style="font-size: 0.8em;">${formatTimeAgo(noti.createdAt)}</div>
                                 </a>`;
-                             if (divider) {
+                             if (divider && divider.parentNode === notificationList) {
                                 notificationList.insertBefore(listItem, divider);
                             } else {
                                  notificationList.appendChild(listItem);
@@ -178,28 +179,86 @@
                     });
             }
 
-            // --- Hàm tạo thông báo test ---
-            window.createTestNotification = function(event) {
-                event.preventDefault();
-                console.log('Creating test notification');
-
-                fetch('/delivery/api/notifications/test', { method: 'POST' })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            alert('Đã tạo thông báo test thành công!');
-                            // Refresh notifications
-                            fetchNotifications();
-                        } else {
-                            alert('Lỗi khi tạo thông báo test: ' + data.message);
-                        }
-                    })
-                    .catch(error => {
-                         console.error('Error creating test notification:', error);
-                         alert('Lỗi khi tạo thông báo test.');
-                    });
+            // BỔ SUNG KHUNG TOAST THÔNG BÁO nhỏ bên dưới chuông
+            const toastId = 'deliveryNotiToast';
+            if (!document.getElementById(toastId)) {
+              const toastBox = document.createElement('div');
+              toastBox.id = toastId;
+              toastBox.style = 'position: fixed; top: 70px; right: 35px; min-width: 280px; z-index: 1051; display: none;';
+              toastBox.innerHTML = `<div class="toast show" role="alert" aria-live="assertive" aria-atomic="true" style="min-width:280px;">
+                  <div class="toast-header">
+                    <strong class="me-auto">Chi tiết thông báo</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Đóng"></button>
+                  </div>
+                  <div class="toast-body" id="toastDetailContent"></div>
+                </div>`;
+              document.body.appendChild(toastBox);
             }
 
+            // --- TẠO hoặc cập nhật khung TOAST chi tiết ở giữa TOP trang ---
+            function ensureNotificationToastElement() {
+              let toastBox = document.getElementById('deliveryNotiToast');
+              if (!toastBox) {
+                toastBox = document.createElement('div');
+                toastBox.id = 'deliveryNotiToast';
+                toastBox.style = '';
+                document.body.appendChild(toastBox);
+              }
+              toastBox.style = 'position: fixed; left: 50%; transform: translate(-50%, 0); top: 6vh; z-index: 2000; min-width: 340px; max-width:90vw; background: #fff; border-radius: 14px; box-shadow: 0 4px 24px rgba(50,50,50,0.17); display: none;';
+              toastBox.innerHTML = `
+                <div style="padding: 16px 20px 16px 20px; max-width: 420px; min-width: 320px;">
+                  <div style="display: flex; align-items:center; justify-content: space-between; border-bottom: 1px solid #e4e4e4; padding-bottom:8px; margin-bottom:6px;">
+                    <span class="fw-bold" style="font-size: 1.36rem;">Chi tiết thông báo</span>
+                    <button type="button" class="btn-close" aria-label="Đóng" style="font-size:1.3em;"></button>
+                  </div>
+                  <div id="toastDetailContent"></div>
+                </div>`;
+            }
+
+            // --- Hiện chi tiết thông báo ở Toast giữa Top ---
+            window.showNotificationDetail = function(event, notificationId) {
+                if (event && typeof event.preventDefault === 'function') {
+                    event.preventDefault();
+                    if(typeof event.stopPropagation === 'function') event.stopPropagation();
+                }
+                const notiObj = window._notiCacheArray && window._notiCacheArray.find(n => n.id === notificationId);
+                ensureNotificationToastElement();
+                const toastBox = document.getElementById('deliveryNotiToast');
+                const contentNode = document.getElementById('toastDetailContent');
+                if (!notiObj || !toastBox || !contentNode) {
+                    alert('Không tìm thấy đối tượng để hiển thị chi tiết!');
+                    return;
+                }
+                console.log('Chi tiết notification hiển thị:', notiObj, contentNode);
+                let msg = (typeof notiObj.message === 'string' ? notiObj.message : '');
+                if (!msg.trim()) msg = '<i>(Không có nội dung)</i>';
+                let title = notiObj.title || 'Thông báo';
+                contentNode.style.background = '#fff';
+                contentNode.style.border = '1px solid #e54444';
+                contentNode.style.color = '#222';
+                contentNode.style.padding = '6px 0 6px 0';
+                contentNode.innerHTML =
+                    `<div class='fw-bold mb-2' style='font-size: 1.08em;'>${title}</div>`+
+                    `<div style='font-size: 1.08em;'>${msg}</div>`+
+                    `<div class='text-muted mt-2' style='font-size:0.96em;'>${formatTimeAgo(notiObj.createdAt)}</div>`;
+                toastBox.style.display = 'block';
+                toastBox.style.background = '#fff';
+                const btn = toastBox.querySelector('.btn-close');
+                btn.onclick = function() {
+                    window._notiCacheArray = (window._notiCacheArray||[]).filter(n => n.id !== notificationId);
+                    updateNotificationUI(window._notiCacheArray);
+                    fetch(`/delivery/api/notifications/${notificationId}/mark-read`, { method: 'POST' });
+                    toastBox.style.display = 'none';
+                };
+            }
+
+            // --- THÊM CSS badge đỏ nổi bật ---
+            function applyNotificationBadgeStyle() {
+               const style=document.createElement('style');
+               style.innerHTML = `#notificationBadge, .notification-badge { background: #dc3545 !important; color: #fff !important; }`;
+               document.head.appendChild(style);
+            }
+            applyNotificationBadgeStyle();
 
             // --- Hàm định dạng thời gian ---
             function formatTimeAgo(dateString) {

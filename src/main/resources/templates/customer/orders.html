@@ -209,7 +209,7 @@
                                 </button>
                                 
                                 <!-- Pay Now Button - Only for VNPAY/MoMo with UNPAID status -->
-                                <a th:if="${order.paymentStatus == 'UNPAID' and (order.paymentMethod == 'VNPAY' or order.paymentMethod == 'MOMO')}"
+                                <a th:if="${order.paymentStatus == 'UNPAID' and (order.paymentMethod == 'VNPAY' or order.paymentMethod == 'MOMO') and order.status != 'CANCELLED'}"
                                    th:href="@{/payment/retry/{id}(id=${order.id})}"
                                    class="btn btn-primary btn-sm">
                                     <i class="bi bi-credit-card"></i> Thanh toán ngay

@@ -54,4 +54,9 @@ public interface IDeliveryService {
 
     /** Thay đổi mật khẩu */
     MessageResponse changeDeliveryPassword(Authentication authentication, PasswordChangeRequest request); // Tương tự customer
+
+    /**
+     * Đánh dấu giao hàng không thành công, huỷ đơn gốc Orders
+     */
+    MessageResponse failDeliveryAndCancelOrder(Authentication authentication, Integer orderId, String note);
 }

@@ -249,6 +249,7 @@ public class ArticleServiceImpl implements IArticleService {
         if (article.getLinkedProduct() != null) {
             dto.setLinkedProductId(article.getLinkedProduct().getId());
             dto.setLinkedProductName(article.getLinkedProduct().getName());
+            dto.setLinkedProductSlug(article.getLinkedProduct().getSlug());
         }
         return dto;
     }
