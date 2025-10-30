@@ -10,10 +10,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize sidebar submenu
     initializeSidebarSubmenu();
 
-    // Auto-hide alerts after 5 seconds
+    // Auto-hide alerts after 5 seconds (exclude related product alert)
     setTimeout(function() {
         var alerts = document.querySelectorAll('.alert');
         alerts.forEach(function(alert) {
+            if (alert.classList.contains('alert-related-product')) return;
             const card = alert.closest('.review-content-card, .review-original-content');
             if (!card) {
                 var bsAlert = new bootstrap.Alert(alert);

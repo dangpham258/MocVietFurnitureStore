@@ -13,7 +13,6 @@ import mocviet.service.guest.IGuestService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort; // <<< XÓA HOẶC COMMENT DÒNG NÀY
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -24,7 +23,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import mocviet.repository.ArticleRepository;
-import mocviet.entity.Article;
 
 @Controller
 @RequestMapping("/")
@@ -91,7 +89,7 @@ public class GuestController {
     // Trang chi tiết bài viết theo slug
     @GetMapping("/news/{slug}")
     public String showNewsDetail(@PathVariable("slug") String slug, Model model) {
-        var articleOpt = articleRepository.findBySlugAndStatusTrue(slug);
+        var articleOpt = articleRepository.findBySlugAndStatusTrueFetchProduct(slug);
         if (articleOpt.isEmpty()) {
             return "redirect:/news";
         }

@@ -234,9 +234,12 @@
                                 <input type="text" class="form-control" id="receiverName" th:field="*{receiverName}" required>
                             </div>
                             <div class="mb-3">
-                                <label for="phone" class="form-label">Số điện thoại <span class="text-danger">*</span></label>
-                                <input type="tel" class="form-control" id="phone" th:field="*{phone}" 
+                                <label for="addressPhone" class="form-label">Số điện thoại <span class="text-danger">*</span></label>
+                                <input type="tel" class="form-control" id="addressPhone" th:field="*{phone}" 
                                        pattern="[0-9]+" title="Số điện thoại không hợp lệ" required>
+                                <div th:if="${#fields.hasErrors('phone')}" class="text-danger small">
+                                    <span th:errors="*{phone}"></span>
+                                </div>
                             </div>
                             <div class="mb-3">
                                 <label for="addressLine" class="form-label">Địa chỉ <span class="text-danger">*</span></label>
@@ -442,27 +445,20 @@
                         return false;
                     }
                     
-                    // Date of birth validation
+                    // Date of birth validation (client hint only; do not block submit so server can return field errors)
                     if (dob) {
                         const birthDate = new Date(dob);
                         const today = new Date();
                         const age = today.getFullYear() - birthDate.getFullYear();
                         const monthDiff = today.getMonth() - birthDate.getMonth();
-                        
-                        // Calculate exact age
-                        const exactAge = monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate()) 
-                            ? age - 1 : age;
-                        
-                        if (birthDate > today) {
-                            e.preventDefault();
-                            if (window.showNotification) window.showNotification('Ngày sinh không được lớn hơn ngày hiện tại', 'warning', 4000);
-                            return false;
+                        const exactAge = monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate()) ? age - 1 : age;
+
+                        if (birthDate > today && window.showNotification) {
+                            window.showNotification('Ngày sinh không được lớn hơn ngày hiện tại', 'warning', 4000);
                         }
-                        
-                        if (exactAge < 15) {
-                            e.preventDefault();
-                            if (window.showNotification) window.showNotification('Tuổi phải từ 15 tuổi trở lên', 'warning', 4000);
-                            return false;
+
+                        if (exactAge < 15 && window.showNotification) {
+                            window.showNotification('Tuổi phải từ 15 tuổi trở lên', 'warning', 4000);
                         }
                     }
                 });
@@ -557,8 +553,25 @@
             }
             
             function showPasswordSuccess(message) {
-                // Create success alert
-                if (window.showNotification) window.showNotification(message, 'success', 3000);
+                // Hiển thị alert ở trên form
+                const cardBody = document.querySelector('.card-body form#changePasswordForm').parentElement;
+                // Xóa alert cũ (nếu có)
+                const oldAlert = cardBody.querySelector('.alert.alert-success');
+                if (oldAlert) oldAlert.remove();
+                const alertDiv = document.createElement('div');
+                alertDiv.className = 'alert alert-success alert-dismissible fade show';
+                alertDiv.role = 'alert';
+                alertDiv.innerHTML = `
+                    <i class="bi bi-check-circle"></i> ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
+                cardBody.prepend(alertDiv);
+                // Tự động ẩn alert sau 3 giây
+                setTimeout(() => {
+                    alertDiv.classList.remove('show');
+                    alertDiv.classList.add('hide');
+                    if (alertDiv.parentNode) alertDiv.remove();
+                }, 3000);
             }
 
             // Address form validation

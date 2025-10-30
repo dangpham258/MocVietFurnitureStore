@@ -19,7 +19,7 @@ public class ReviewDTO {
     private String imageUrl;
     private LocalDateTime createdAt;
     private String userFullName;
-    private String managerRespone;
+    private String managerResponse;
 }
 
 

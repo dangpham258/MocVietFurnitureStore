@@ -217,7 +217,7 @@ public class ProductServiceImpl implements IProductService {
                 dtoR.setContent(r.getContent());
                 dtoR.setImageUrl(r.getImageUrl());
                 dtoR.setCreatedAt(r.getCreatedAt());
-                dtoR.setManagerRespone(r.getManagerResponse());
+                dtoR.setManagerResponse(r.getManagerResponse());
                 // Lấy tên khách đánh giá (ưu tiên User, fallback là receiverName trong Address của Orders)
                 String userName = "Khách";
                 if (r.getUser() != null && r.getUser().getFullName() != null) {

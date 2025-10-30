@@ -26,6 +26,12 @@ public interface ArticleRepository extends JpaRepository<Article, Integer> {
     Optional<Article> findBySlugAndStatusTrue(String slug);
     
     /**
+     * Tìm bài viết theo slug và status = true, đồng thời fetch linkedProduct để dùng ở view
+     */
+    @Query("SELECT a FROM Article a LEFT JOIN FETCH a.linkedProduct WHERE a.slug = :slug AND a.status = true")
+    Optional<Article> findBySlugAndStatusTrueFetchProduct(@Param("slug") String slug);
+    
+    /**
      * Kiểm tra slug đã tồn tại
      */
     boolean existsBySlug(String slug);
