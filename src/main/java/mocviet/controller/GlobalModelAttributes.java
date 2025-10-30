@@ -11,12 +11,16 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import lombok.RequiredArgsConstructor;
 import mocviet.entity.SocialLink;
 import mocviet.repository.SocialLinkRepository;
+import mocviet.service.customer.ICartService;
+import mocviet.service.customer.IWishlistService;
 
 @ControllerAdvice
 @RequiredArgsConstructor
 public class GlobalModelAttributes {
 
     private final SocialLinkRepository socialLinkRepository;
+    private final ICartService cartService;
+    private final IWishlistService wishlistService;
 
     @ModelAttribute
     public void addGlobalSocialLinks(Model model) {
@@ -32,6 +36,23 @@ public class GlobalModelAttributes {
             }
         }
         model.addAttribute("socialLinks", links);
+    }
+
+    @ModelAttribute
+    public void addGlobalCounts(Model model) {
+        try {
+            int cartCount = cartService.getCartItemCount();
+            model.addAttribute("globalCartCount", cartCount);
+        } catch (Exception e) {
+            model.addAttribute("globalCartCount", 0);
+        }
+
+        try {
+            int wishlistCount = wishlistService.getWishlistCount();
+            model.addAttribute("globalWishlistCount", wishlistCount);
+        } catch (Exception e) {
+            model.addAttribute("globalWishlistCount", 0);
+        }
     }
 
     private String normalizeUrl(String url) {

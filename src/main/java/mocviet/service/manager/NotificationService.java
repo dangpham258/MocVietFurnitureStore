@@ -174,12 +174,7 @@ public class NotificationService {
         
         // Message/Chat notifications
         if (title.contains("Tin nhắn") || title.contains("tin nhắn")) {
-            Pattern convPattern = Pattern.compile("cuộc hội thoại #(\\d+)");
-            Matcher convMatcher = convPattern.matcher(message);
-            if (convMatcher.find()) {
-                String convId = convMatcher.group(1);
-                return "/manager/messages/" + convId;
-            }
+            return "/manager/messages";
         }
         
         return null; // No specific link

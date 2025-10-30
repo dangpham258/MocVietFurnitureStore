@@ -23,6 +23,10 @@
                             <i class="fas fa-store me-2"></i>Manager Panel
                         </h5>
                         <nav class="nav flex-column sidebar-nav">
+                            <a class="nav-link sidebar-item" href="/">
+                                <i class="fas fa-home sidebar-icon"></i>
+                                <span class="sidebar-text">Về trang chủ</span>
+                            </a>
                             <a class="nav-link sidebar-item" th:classappend="${activeMenu == 'dashboard'} ? 'active'" href="/manager">
                                 <i class="fas fa-tachometer-alt sidebar-icon"></i>
                                 <span class="sidebar-text">Dashboard</span>

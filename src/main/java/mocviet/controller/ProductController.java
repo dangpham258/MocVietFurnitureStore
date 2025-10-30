@@ -49,6 +49,7 @@ public class ProductController {
         try {
             ProductDetailDTO productDetail = productService.findProductDetailBySlug(slug);
             model.addAttribute("product", productDetail);
+            model.addAttribute("reviews", productDetail.getReviews());
             
             // Chuyển danh sách variants sang JSON để JavaScript xử lý [cite: 67, 70, 71, 346]
             String variantsJson = objectMapper.writeValueAsString(productDetail.getVariants());

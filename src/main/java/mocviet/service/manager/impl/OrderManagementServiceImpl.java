@@ -301,6 +301,24 @@ public class OrderManagementServiceImpl implements IOrderManagementService {
         dto.setQuantity(item.getQty());
         dto.setUnitPrice(item.getUnitPrice());
         dto.setTotalPrice(item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQty())));
+        // Add logic: set productImageUrl
+        var product = item.getVariant().getProduct();
+        Integer colorId = item.getVariant().getColor() != null ? item.getVariant().getColor().getId() : null;
+        String imageUrl = null;
+        if (product.getProductImages() != null && !product.getProductImages().isEmpty()) {
+            if (colorId != null) {
+                for (var img : product.getProductImages()) {
+                    if (img.getColor() != null && colorId.equals(img.getColor().getId())) {
+                        imageUrl = img.getUrl();
+                        break;
+                    }
+                }
+            }
+            if (imageUrl == null) {
+                imageUrl = product.getProductImages().get(0).getUrl();
+            }
+        }
+        dto.setProductImageUrl(imageUrl);
         return dto;
     }
 
@@ -312,6 +330,25 @@ public class OrderManagementServiceImpl implements IOrderManagementService {
         dto.setColorName(item.getVariant().getColor().getName());
         dto.setTypeName(item.getVariant().getTypeName());
         dto.setQuantity(item.getQty());
+
+        // Thêm logic lấy ảnh đúng màu hoặc ảnh đầu tiên
+        var product = item.getVariant().getProduct();
+        Integer colorId = item.getVariant().getColor() != null ? item.getVariant().getColor().getId() : null;
+        String imageUrl = null;
+        if (product.getProductImages() != null && !product.getProductImages().isEmpty()) {
+            if (colorId != null) {
+                for (var img : product.getProductImages()) {
+                    if (img.getColor() != null && colorId.equals(img.getColor().getId())) {
+                        imageUrl = img.getUrl();
+                        break;
+                    }
+                }
+            }
+            if (imageUrl == null) {
+                imageUrl = product.getProductImages().get(0).getUrl();
+            }
+        }
+        dto.setProductImageUrl(imageUrl);
         return dto;
     }
 

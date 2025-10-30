@@ -1,5 +1,14 @@
 package mocviet.service.customer.impl;
 
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import lombok.RequiredArgsConstructor;
 import mocviet.dto.customer.ViewedItemDTO;
 import mocviet.entity.Product;
@@ -10,14 +19,6 @@ import mocviet.repository.ProductRepository;
 import mocviet.repository.ViewedRepository;
 import mocviet.service.UserDetailsServiceImpl;
 import mocviet.service.customer.IViewedService;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -31,12 +32,18 @@ public class ViewedServiceImpl implements IViewedService {
     @Override
     @Transactional
     public void recordViewBySlug(String productSlug) {
-        User currentUser = userDetailsService.getCurrentUser();
-        if (currentUser == null) return; // chỉ lưu cho user đăng nhập
-
+        // Tìm product trước
         Optional<Product> productOpt = productRepository.findBySlug(productSlug);
         if (productOpt.isEmpty()) return;
         Product product = productOpt.get();
+
+        // Tăng lượt xem cho mọi khách truy cập (kể cả guest)
+        product.setViews(product.getViews() == null ? 1 : product.getViews() + 1);
+        productRepository.save(product);
+
+        // Lưu lịch sử viewed chỉ khi đã đăng nhập
+        User currentUser = userDetailsService.getCurrentUser();
+        if (currentUser == null) return;
 
         // Nếu đã có bản ghi, chỉ cập nhật thời gian để đẩy lên đầu
         Optional<Viewed> existed = viewedRepository.findByUserAndProduct(currentUser, product);
@@ -79,18 +86,13 @@ public class ViewedServiceImpl implements IViewedService {
                     dto.setProductSlug(v.getProduct().getSlug());
                     dto.setViewedAt(v.getViewedAt());
 
-                    // Lấy thumbnail: ưu tiên ảnh có tên chứa "/00_" nếu có
+                    // Lấy thumbnail thực tế: ưu tiên ảnh có tên chứa "/00_" nếu có, fallback placeholder tĩnh
                     var images = imageRepository.findByProductId(v.getProduct().getId());
                     String thumb = images.stream()
                             .sorted(Comparator.comparing(img -> img.getUrl().contains("/00_") ? 0 : 1))
-                            .map(img -> {
-                                // Tạo URL placeholder tương tự ProductServiceImpl.getPlaceholderImageUrl
-                                String text = v.getProduct().getSlug().replace("-", "+");
-                                String color = (img.getColor() != null) ? img.getColor().getSlug() : "na";
-                                return "https://via.placeholder.com/400x400.png?text=" + text + "+(Mau:+" + color + ")";
-                            })
+                            .map(img -> img.getUrl())
                             .findFirst()
-                            .orElse("https://via.placeholder.com/400x400.png?text=" + v.getProduct().getSlug().replace("-", "+"));
+                            .orElse("/images/products/placeholder.jpg");
                     dto.setThumbnailUrl(thumb);
                     return dto;
                 })

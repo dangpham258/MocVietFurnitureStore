@@ -18,4 +18,6 @@ public class OrderItemDTO {
     private BigDecimal unitPrice;
     private BigDecimal totalPrice;
     private String productSlug;
+    private String productName;
+    private String imageUrl;
 }

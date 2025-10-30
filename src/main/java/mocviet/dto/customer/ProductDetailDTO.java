@@ -19,6 +19,7 @@ public class ProductDetailDTO {
     private double avgRating; // [cite: 55]
     private int totalReviews;
     private int soldQty; // [cite: 56]
+    private List<ReviewDTO> reviews;
     
     // DTO cho các biến thể (variants)
     private List<VariantDTO> variants;

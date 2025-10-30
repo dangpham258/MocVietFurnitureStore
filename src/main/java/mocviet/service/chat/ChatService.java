@@ -66,7 +66,7 @@ public class ChatService {
                 } else {
                     // Tạo conversation mới cho customer
                     conversation = new Conversation();
-                    conversation.setUser(customer);
+                conversation.setUser(customer);
                     conversation.setStatus(Conversation.ConversationStatus.OPEN);
                     conversation = conversationRepository.save(conversation);
                 }
@@ -93,10 +93,10 @@ public class ChatService {
                         conversation = openList.get(0); // lấy conversation mới nhất
                     } else {
                         conversation = new Conversation();
-                        conversation.setGuestName(guestName);
-                        conversation.setGuestEmail(guestEmail);
-                        conversation.setStatus(Conversation.ConversationStatus.OPEN);
-                        conversation = conversationRepository.save(conversation);
+                conversation.setGuestName(guestName);
+                conversation.setGuestEmail(guestEmail);
+            conversation.setStatus(Conversation.ConversationStatus.OPEN);
+            conversation = conversationRepository.save(conversation);
                     }
                     // Đóng các conversation OPEN khác cùng email nếu còn tồn tại
                     try {

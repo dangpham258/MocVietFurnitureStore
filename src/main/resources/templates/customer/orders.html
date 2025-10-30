@@ -34,6 +34,9 @@
                         <a href="/customer/profile#address-section" class="list-group-item list-group-item-action">
                             <i class="bi bi-geo-alt"></i> Địa chỉ nhận hàng
                         </a>
+                        <a href="/customer/viewed" class="list-group-item list-group-item-action">
+                            <i class="bi bi-clock-history"></i> Lịch sử xem
+                        </a>
                     </div>
                 </div>
             </div>
@@ -45,15 +48,9 @@
                     <h2><i class="bi bi-box-seam me-2"></i>Đơn hàng của tôi</h2>
                 </div>
 
-                <!-- Alert Messages -->
-                <div th:if="${param.error}" class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <i class="bi bi-exclamation-triangle"></i> <span th:text="${param.error}"></span>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-                <div th:if="${param.success}" class="alert alert-success alert-dismissible fade show" role="alert">
-                    <i class="bi bi-check-circle"></i> <span th:text="${param.success}"></span>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
+                <!-- Alert Messages (hidden, will show via toast) -->
+                <div th:if="${param.error}" class="d-none" id="__orders_error" th:text="${param.error}"></div>
+                <div th:if="${param.success}" class="d-none" id="__orders_success" th:text="${param.success}"></div>
 
                 <!-- Filter Section -->
                 <div class="filter-section">
@@ -212,7 +209,7 @@
                                 </button>
                                 
                                 <!-- Pay Now Button - Only for VNPAY/MoMo with UNPAID status -->
-                                <a th:if="${order.paymentStatus == 'UNPAID' and (order.paymentMethod == 'VNPAY' or order.paymentMethod == 'MOMO')}"
+                                <a th:if="${order.paymentStatus == 'UNPAID' and (order.paymentMethod == 'VNPAY' or order.paymentMethod == 'MOMO') and order.status != 'CANCELLED'}"
                                    th:href="@{/payment/retry/{id}(id=${order.id})}"
                                    class="btn btn-primary btn-sm">
                                     <i class="bi bi-credit-card"></i> Thanh toán ngay
@@ -310,6 +307,18 @@
         if (typeof CustomerApp !== 'undefined' && typeof customerApp === 'undefined') {
             customerApp = new CustomerApp();
         }
+
+        // Show notifications from URL params
+        document.addEventListener('DOMContentLoaded', function() {
+            const errEl = document.getElementById('__orders_error');
+            const okEl = document.getElementById('__orders_success');
+            if (okEl && okEl.textContent && window.showNotification) {
+                window.showNotification(okEl.textContent, 'success', 3000);
+            }
+            if (errEl && errEl.textContent && window.showNotification) {
+                window.showNotification(errEl.textContent, 'danger', 4000);
+            }
+        });
     </script>
 </body>
 </html>

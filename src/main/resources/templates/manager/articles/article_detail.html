@@ -111,7 +111,12 @@
                     <!-- Linked Product -->
                     <div th:if="${article.linkedProductName}" class="alert alert-secondary">
                         <h6 class="fw-bold mb-2"><i class="fas fa-link me-2"></i>Sản phẩm liên quan</h6>
-                        <p class="mb-0" th:text="${article.linkedProductName}">Tên sản phẩm</p>
+                        <p class="mb-0">
+                            <span th:if="${article.linkedProductSlug != null}" >
+                                <a th:href="@{/products/{slug}(slug=${article.linkedProductSlug})}" target="_blank" th:text="${article.linkedProductName}"></a>
+                            </span>
+                            <span th:unless="${article.linkedProductSlug != null}" th:text="${article.linkedProductName}"></span>
+                        </p>
                     </div>
                 </div>
             </div>

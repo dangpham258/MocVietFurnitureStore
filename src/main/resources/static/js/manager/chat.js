@@ -84,7 +84,7 @@ class ManagerChat {
                         const chatMessage = JSON.parse(message.body);
                         this.updateConversationsOnNewMessage(chatMessage);
                     } catch (e) {
-                        this.loadConversations();
+                    this.loadConversations();
                     }
                 });
 

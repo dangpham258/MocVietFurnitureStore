@@ -34,6 +34,9 @@
                         <a href="/customer/profile#address-section" class="list-group-item list-group-item-action">
                             <i class="bi bi-geo-alt"></i> Địa chỉ nhận hàng
                         </a>
+                        <a href="/customer/viewed" class="list-group-item list-group-item-action">
+                            <i class="bi bi-clock-history"></i> Lịch sử xem
+                        </a>
                     </div>
                 </div>
             </div>
@@ -182,6 +185,7 @@
                     modal.hide();
                     
                     // Reload page để cập nhật danh sách
+                    if (window.showNotification) window.showNotification(data.message || 'Đã xóa khỏi danh sách yêu thích', 'success', 3000);
                     location.reload();
                 } else {
                     // Hide modal trước khi hiển thị lỗi
@@ -189,7 +193,7 @@
                     modal.hide();
                     
                     // Show error message
-                    showAlert('error', data.message || 'Có lỗi xảy ra khi xóa sản phẩm');
+                    if (window.showNotification) window.showNotification(data.message || 'Có lỗi xảy ra khi xóa sản phẩm', 'danger', 4000);
                 }
             })
             .catch(error => {
@@ -200,7 +204,7 @@
                 if (modal) modal.hide();
                 
                 // Show error message
-                showAlert('error', 'Có lỗi xảy ra khi xóa sản phẩm');
+                if (window.showNotification) window.showNotification('Có lỗi xảy ra khi xóa sản phẩm', 'danger', 4000);
             });
             
             currentProductId = null;

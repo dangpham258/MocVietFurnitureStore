@@ -34,6 +34,9 @@
                         <a href="/customer/profile#address-section" class="list-group-item list-group-item-action">
                             <i class="bi bi-geo-alt"></i> Địa chỉ nhận hàng
                         </a>
+                        <a href="/customer/viewed" class="list-group-item list-group-item-action">
+                            <i class="bi bi-clock-history"></i> Lịch sử xem
+                        </a>
                     </div>
                 </div>
             </div>
@@ -48,15 +51,9 @@
                     </ol>
                 </nav>
 
-                <!-- Alert Messages -->
-                <div th:if="${param.error}" class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <i class="bi bi-exclamation-triangle"></i> <span th:text="${param.error}"></span>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-                <div th:if="${param.success}" class="alert alert-success alert-dismissible fade show" role="alert">
-                    <i class="bi bi-check-circle"></i> <span th:text="${param.success}"></span>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
+                <!-- Alert Messages (hidden for toast) -->
+                <div th:if="${param.error}" id="__order_detail_error" class="d-none" th:text="${param.error}"></div>
+                <div th:if="${param.success}" id="__order_detail_success" class="d-none" th:text="${param.success}"></div>
 
                 <!-- Return Request Notice -->
                 <div th:if="${orderDetail.returnStatus != null}" class="return-notice">
@@ -118,8 +115,15 @@
                                 
                                 <div th:each="item : ${orderDetail.items}" class="row align-items-center mb-4 pb-3 border-bottom">
                                     <div class="col-md-3">
-                                        <a th:href="@{/products/{slug}(slug=${item.productSlug})}" class="product-image-link">
-                                            <div class="product-image bg-light d-flex align-items-center justify-content-center">
+                                        <a th:href="@{/products/{slug}(slug=${item.productSlug})}" class="product-image-link d-block">
+                                            <img th:if="${item.imageUrl != null}" th:src="${item.imageUrl}"
+                                                 alt="Ảnh sản phẩm" class="img-fluid rounded border" />
+                                            <img th:if="${item.imageUrl == null and item.productImageUrl != null}" th:src="${item.productImageUrl}"
+                                                 alt="Ảnh sản phẩm" class="img-fluid rounded border" />
+                                            <img th:if="${item.imageUrl == null and item.productImageUrl == null and item.firstImageUrl != null}"
+                                                 th:src="${item.firstImageUrl}" alt="Ảnh sản phẩm" class="img-fluid rounded border" />
+                                            <div th:if="${item.imageUrl == null and item.productImageUrl == null and item.firstImageUrl == null}"
+                                                 class="product-image bg-light d-flex align-items-center justify-content-center rounded border" style="height: 120px;">
                                                 <i class="bi bi-image text-muted"></i>
                                             </div>
                                         </a>
@@ -316,6 +320,17 @@
         if (typeof CustomerApp !== 'undefined' && typeof customerApp === 'undefined') {
             customerApp = new CustomerApp();
         }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const okEl = document.getElementById('__order_detail_success');
+            const errEl = document.getElementById('__order_detail_error');
+            if (okEl && okEl.textContent && window.showNotification) {
+                window.showNotification(okEl.textContent, 'success', 3000);
+            }
+            if (errEl && errEl.textContent && window.showNotification) {
+                window.showNotification(errEl.textContent, 'danger', 4000);
+            }
+        });
     </script>
 </body>
 </html>

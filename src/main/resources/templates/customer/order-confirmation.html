@@ -154,7 +154,7 @@
             
             const orderId = document.querySelector('[data-order-id]')?.getAttribute('data-order-id');
             if (!orderId) {
-                alert('Không tìm thấy mã đơn hàng');
+                if (window.showNotification) window.showNotification('Không tìm thấy mã đơn hàng', 'danger', 4000);
                 return;
             }
             
@@ -168,15 +168,15 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert('Đã hủy đơn hàng');
+                    if (window.showNotification) window.showNotification('Đã hủy đơn hàng', 'success', 3000);
                     location.reload();
                 } else {
-                    alert(data.message || 'Có lỗi xảy ra');
+                    if (window.showNotification) window.showNotification(data.message || 'Có lỗi xảy ra', 'danger', 4000);
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Có lỗi xảy ra khi hủy đơn hàng');
+                if (window.showNotification) window.showNotification('Có lỗi xảy ra khi hủy đơn hàng', 'danger', 4000);
             });
         }
     </script>

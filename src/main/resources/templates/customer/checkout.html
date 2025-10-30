@@ -273,7 +273,7 @@
         // Create order
         function createOrder() {
             if (!selectedAddressId) {
-                alert('Vui lòng chọn địa chỉ giao hàng');
+                if (window.showNotification) window.showNotification('Vui lòng chọn địa chỉ giao hàng', 'warning', 4000);
                 return;
             }
 
@@ -295,7 +295,7 @@
             });
 
             if (items.length === 0) {
-                alert('Giỏ hàng trống');
+                if (window.showNotification) window.showNotification('Giỏ hàng trống', 'warning', 4000);
                 return;
             }
 
@@ -330,14 +330,14 @@
                         window.location.href = `/customer/orders/${data.orderId}?success=Đặt hàng thành công`;
                     }
                 } else {
-                    alert(data.message || 'Có lỗi xảy ra khi đặt hàng');
+                    if (window.showNotification) window.showNotification(data.message || 'Có lỗi xảy ra khi đặt hàng', 'danger', 4000);
                     btn.disabled = false;
                     btn.innerHTML = '<i class="fas fa-check-circle me-2"></i>Đặt hàng';
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Có lỗi xảy ra khi đặt hàng');
+                if (window.showNotification) window.showNotification('Có lỗi xảy ra khi đặt hàng', 'danger', 4000);
                 btn.disabled = false;
                 btn.innerHTML = '<i class="fas fa-check-circle me-2"></i>Đặt hàng';
             });

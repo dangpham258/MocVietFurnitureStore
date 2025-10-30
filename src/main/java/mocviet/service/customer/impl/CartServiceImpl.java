@@ -9,6 +9,8 @@ import mocviet.entity.User;
 import mocviet.repository.CartItemRepository;
 import mocviet.repository.CartRepository;
 import mocviet.repository.ProductVariantRepository;
+import mocviet.repository.ProductImageRepository;
+import mocviet.entity.ProductImage;
 import mocviet.service.UserDetailsServiceImpl;
 import mocviet.service.customer.ICartService;
 import org.springframework.stereotype.Service;
@@ -29,6 +31,7 @@ public class CartServiceImpl implements ICartService {
     private final CartItemRepository cartItemRepository;
     private final ProductVariantRepository productVariantRepository;
     private final UserDetailsServiceImpl userDetailsService;
+    private final ProductImageRepository productImageRepository;
     
     private Cart getCurrentUserCart() {
         User currentUser = userDetailsService.getCurrentUser();
@@ -259,6 +262,22 @@ public class CartServiceImpl implements ICartService {
                 && product.getProductImages() != null
                 && !product.getProductImages().isEmpty()) {
                 dto.setImageUrl(product.getProductImages().get(0).getUrl());
+            } else {
+                try {
+                    Integer colorId = item.getVariant().getColor() != null ? item.getVariant().getColor().getId() : null;
+                    if (colorId != null) {
+                        var list = productImageRepository.findFirstByProductIdAndColorId(product.getId(), colorId);
+                        if (list != null && !list.isEmpty()) {
+                            dto.setImageUrl(list.get(0).getUrl());
+                        }
+                    }
+                    if (dto.getImageUrl() == null) {
+                        var listAny = productImageRepository.findByProductId(product.getId());
+                        if (listAny != null && !listAny.isEmpty()) {
+                            dto.setImageUrl(listAny.get(0).getUrl());
+                        }
+                    }
+                } catch (Exception ignored) {}
             }
         }
         if (item.getVariant().getColor() != null) {
