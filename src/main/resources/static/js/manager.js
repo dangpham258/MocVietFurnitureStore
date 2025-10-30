@@ -14,8 +14,11 @@ document.addEventListener('DOMContentLoaded', function() {
     setTimeout(function() {
         var alerts = document.querySelectorAll('.alert');
         alerts.forEach(function(alert) {
-            var bsAlert = new bootstrap.Alert(alert);
-            bsAlert.close();
+            const card = alert.closest('.review-content-card, .review-original-content');
+            if (!card) {
+                var bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            }
         });
     }, 5000);
 
