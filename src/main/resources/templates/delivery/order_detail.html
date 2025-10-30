@@ -137,7 +137,7 @@
                         <h5><i class="bi bi-box me-2"></i>Danh sách Sản phẩm</h5>
                         <ul class="list-group list-group-flush">
                             <li th:each="item : ${orderDetail.items}" class="list-group-item d-flex align-items-center px-0">
-                                <img src="https://via.placeholder.com/60x60/eee/999?text=SP" class="me-3 item-row-img" alt="Ảnh SP">
+                                <img src="/static/images/banners/02_black-friday.jpg" class="me-3 item-row-img" alt="Ảnh SP" style="width:60px;height:60px;object-fit:cover;">
                                 <div class="flex-grow-1">
                                     <div class="fw-bold" th:text="${item.sku}">SKU</div>
                                     <small class="text-muted" th:text="${item.colorName + ' - ' + item.typeName}"></small>

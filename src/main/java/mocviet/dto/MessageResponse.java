@@ -8,22 +8,22 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MessageResponse {
-    
+
     private String message;
     private boolean success;
-    
+
     public MessageResponse(String message) {
         this.message = message;
         this.success = true;
     }
-    
+
     public static MessageResponse success(String message) {
         MessageResponse response = new MessageResponse();
         response.setMessage(message);
         response.setSuccess(true);
         return response;
     }
-    
+
     public static MessageResponse error(String message) {
         MessageResponse response = new MessageResponse();
         response.setMessage(message);

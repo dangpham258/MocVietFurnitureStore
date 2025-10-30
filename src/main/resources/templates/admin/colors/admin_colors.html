@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/fragments/admin_layout}">
+<head>
+    <title>Quản lý Màu sắc - Admin Panel</title>
+</head>
+<body>
+<div layout:fragment="content" th:fragment="content" class="main-content">
+    
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">Quản lý Màu sắc</h2>
+            <p class="text-muted mb-0">Quản lý màu sắc sản phẩm</p>
+        </div>
+        <div>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addColorModal">
+                <i class="bi bi-plus-circle me-1"></i>Thêm màu sắc
+            </button>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <small class="text-muted">
+            <i class="bi bi-info-circle me-1"></i>
+            Thống kê dữ liệu dựa trên bộ lọc
+        </small>
+    </div>
+    <div class="row mb-4" id="statsRow">
+        <div class="col-md-4 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-primary bg-opacity-10 rounded-circle p-3">
+                                <i class="bi bi-palette text-primary fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h5 class="card-title mb-0" id="totalColors">0</h5>
+                            <small class="text-muted">Tổng màu</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-success bg-opacity-10 rounded-circle p-3">
+                                <i class="bi bi-check-circle text-success fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h5 class="card-title mb-0" id="activeColors">0</h5>
+                            <small class="text-muted">Đang kích hoạt</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-danger bg-opacity-10 rounded-circle p-3">
+                                <i class="bi bi-x-circle text-danger fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h5 class="card-title mb-0" id="inactiveColors">0</h5>
+                            <small class="text-muted">Đã vô hiệu hóa</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label">Tìm kiếm</label>
+                    <input type="text" class="form-control" id="searchInput" placeholder="Tìm theo tên màu, slug">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Trạng thái</label>
+                    <select class="form-select" id="filterStatus">
+                        <option value="">Tất cả</option>
+                        <option value="active">Đang kích hoạt</option>
+                        <option value="inactive">Đã vô hiệu hóa</option>
+                    </select>
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="button" class="btn btn-secondary" onclick="resetFilters()">
+                        <i class="bi bi-arrow-clockwise me-1"></i>Reset
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Colors Grid -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">
+                <i class="bi bi-palette me-2"></i>
+                Danh sách Màu sắc
+            </h5>
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-secondary" id="colorsCount">0 màu</span>
+            </div>
+        </div>
+        <div class="card-body">
+            <!-- Grid Layout -->
+            <div class="row g-3" id="colorsGrid">
+                <!-- Color cards will be rendered here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Color Modal -->
+    <div class="modal fade" id="addColorModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Thêm màu sắc mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addColorForm" class="needs-validation" novalidate>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Tên màu *</label>
+                                <input type="text" class="form-control" id="colorName" placeholder="VD: Nâu" required>
+                                <div class="form-text">Ví dụ: Nâu, Xanh, Đen, Trắng, Be, Xám</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Slug *</label>
+                                <input type="text" class="form-control" id="colorSlug" placeholder="nau" required>
+                                <div class="form-text">Tự động tạo từ tên hoặc nhập thủ công</div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Mã màu HEX</label>
+                                <input type="text" class="form-control" id="colorHex" placeholder="#654321" maxlength="7">
+                                <div class="form-text">Mã màu HEX (không bắt buộc)</div>
+                            </div>
+                            <div class="col-md-6 mb-3 d-flex align-items-end">
+                                <div class="form-check form-switch mt-4">
+                                    <input class="form-check-input" type="checkbox" id="colorIsActive" checked>
+                                    <label class="form-check-label" for="colorIsActive">
+                                        <strong>Kích hoạt ngay</strong>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-primary" onclick="createColor()">Thêm màu</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Color Modal -->
+    <div class="modal fade" id="editColorModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Sửa màu sắc</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editColorForm" class="needs-validation" novalidate>
+                        <input type="hidden" id="editColorId">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Tên màu *</label>
+                                <input type="text" class="form-control" id="editColorName" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Slug *</label>
+                                <input type="text" class="form-control" id="editColorSlug" required>
+                                <div class="form-text"></div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Mã màu HEX</label>
+                                <input type="text" class="form-control" id="editColorHex" maxlength="7">
+                            </div>
+                            <div class="col-md-6 mb-3 d-flex align-items-end">
+                                <div class="form-check form-switch mt-4">
+                                    <input class="form-check-input" type="checkbox" id="editColorIsActive">
+                                    <label class="form-check-label" for="editColorIsActive">
+                                        <strong>Kích hoạt</strong>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-primary" onclick="updateColor()">Cập nhật</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>
+

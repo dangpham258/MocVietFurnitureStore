@@ -1,18 +1,21 @@
 package mocviet.repository;
 
-import mocviet.entity.User;
-import mocviet.entity.UserNotification;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import mocviet.entity.User;
+import mocviet.entity.UserNotification;
+
+import java.time.LocalDateTime;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
 
 
 @Repository
@@ -112,4 +115,25 @@ public interface UserNotificationRepository extends JpaRepository<UserNotificati
      * Tìm thông báo theo ID và user ID để xóa
      */
     void deleteByIdAndUserId(Integer id, Integer userId);
+    
+    List<UserNotification> findByUserAndIsReadOrderByCreatedAtDesc(User user, Boolean isRead);
+
+    long countByUser(User user);
+
+    long countByUserAndIsRead(User user, Boolean isRead);
+
+    Optional<UserNotification> findByIdAndUser(Integer id, User user);
+    
+    /**
+     * Tìm thông báo theo userId, title chứa text, và created_at sau thời gian cụ thể
+     * Dùng để kiểm tra spam (thông báo trong 5 phút gần đây)
+     */
+    @Query("SELECT n FROM UserNotification n WHERE n.user.id = :userId " +
+           "AND n.title LIKE :titlePattern " +
+           "AND n.createdAt > :afterDate")
+    List<UserNotification> findByUserIdAndTitleContainingAndCreatedAtAfter(
+        @Param("userId") Integer userId,
+        @Param("titlePattern") String titlePattern,
+        @Param("afterDate") LocalDateTime afterDate
+    );
 }

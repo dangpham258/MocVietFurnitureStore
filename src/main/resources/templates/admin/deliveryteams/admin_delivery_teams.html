@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/fragments/admin_layout}">
+<head>
+    <title>Quản lý Đội Giao Hàng - Admin Panel</title>
+</head>
+<body>
+<div layout:fragment="content" th:fragment="content" class="main-content">
+    
+    <div class="container-fluid p-4">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="mb-1">
+                    <i class="bi bi-people me-2 text-primary"></i>Quản lý Đội Giao Hàng
+                </h3>
+                <p class="text-muted small mb-0">Tạo và quản lý đội giao hàng, phân công theo khu vực</p>
+            </div>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTeamModal">
+                <i class="bi bi-plus-circle me-1"></i>Tạo đội mới
+            </button>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="row mb-4">
+            <div class="col-md-4 mb-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <div class="bg-primary bg-opacity-10 rounded-circle p-3">
+                                    <i class="bi bi-people-fill text-primary fs-4"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h5 class="card-title mb-0" id="totalTeams">0</h5>
+                                <small class="text-muted">Tổng đội</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <div class="bg-success bg-opacity-10 rounded-circle p-3">
+                                    <i class="bi bi-check-circle-fill text-success fs-4"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h5 class="card-title mb-0" id="activeTeams">0</h5>
+                                <small class="text-muted">Đang hoạt động</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <div class="bg-info bg-opacity-10 rounded-circle p-3">
+                                    <i class="bi bi-geo-alt-fill text-info fs-4"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h5 class="card-title mb-0" id="totalZones">0</h5>
+                                <small class="text-muted">Tổng khu vực phục vụ</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Teams Grid -->
+        <div class="row" id="teamsContainer">
+            <div class="text-center py-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Đang tải...</span>
+                </div>
+                <p class="text-muted mt-3 mb-0">Đang tải danh sách đội giao hàng...</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add Team Modal -->
+<div class="modal fade" id="addTeamModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">
+                    <i class="bi bi-plus-circle me-2"></i>Tạo đội giao hàng mới
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <form id="addTeamForm">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Tên đội *</label>
+                            <input type="text" class="form-control" id="addTeamName" 
+                                   placeholder="VD: Đội giao hàng Hà Nội" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Số điện thoại</label>
+                            <input type="text" class="form-control" id="addTeamPhone" 
+                                   placeholder="VD: 0901234567">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">User phụ trách *</label>
+                        <select class="form-select" id="addTeamUserId" required>
+                            <option value="">Chọn user phụ trách</option>
+                        </select>
+                        <small class="text-muted">Chỉ hiển thị users có vai trò DELIVERY và chưa được gán vào đội khác</small>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="addTeamActive" checked>
+                            <label class="form-check-label" for="addTeamActive">
+                                Kích hoạt ngay
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle me-1"></i>Hủy
+                </button>
+                <button type="button" class="btn btn-success" onclick="createTeam()">
+                    <i class="bi bi-check-circle me-1"></i>Tạo đội
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- Edit Team Modal -->
+<div class="modal fade" id="editTeamModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    <i class="bi bi-pencil-square me-2"></i>Cập nhật đội giao hàng
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <form id="editTeamForm">
+                    <input type="hidden" id="editTeamId">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Tên đội *</label>
+                            <input type="text" class="form-control" id="editTeamName" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Số điện thoại</label>
+                            <input type="text" class="form-control" id="editTeamPhone">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">User phụ trách *</label>
+                        <select class="form-select" id="editTeamUserId" required>
+                            <option value="">Chọn user phụ trách</option>
+                        </select>
+                        <small class="text-muted">Chỉ hiển thị users có vai trò DELIVERY</small>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="editTeamActive">
+                            <label class="form-check-label" for="editTeamActive">
+                                Đang hoạt động
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle me-1"></i>Hủy
+                </button>
+                <button type="button" class="btn btn-primary" onclick="updateTeam()">
+                    <i class="bi bi-check-circle me-1"></i>Cập nhật
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- Manage Zones Modal -->
+<div class="modal fade" id="manageZonesModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title">
+                    <i class="bi bi-geo-alt-fill me-2"></i>Quản lý khu vực phục vụ
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="mb-3">
+                    <strong>Đội:</strong> <span id="manageZonesTeamName"></span>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Thêm khu vực phục vụ</label>
+                    <div class="input-group">
+                        <select class="form-select" id="addZoneSelect">
+                            <option value="">Chọn khu vực</option>
+                        </select>
+                        <button class="btn btn-success" type="button" onclick="addZoneToTeam()">
+                            <i class="bi bi-plus-circle me-1"></i>Thêm
+                        </button>
+                    </div>
+                </div>
+                <hr>
+                <div class="mb-2">
+                    <strong>Khu vực hiện tại:</strong>
+                </div>
+                <div id="currentZonesList" class="row g-2">
+                    <!-- Zones will be populated here -->
+                </div>
+                <input type="hidden" id="manageZonesTeamId">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle me-1"></i>Đóng
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+</div>
+
+</body>
+</html>
+

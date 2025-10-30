@@ -1,0 +1,313 @@
+/**
+ * Notification System
+ * Hệ thống thông báo chung cho toàn bộ admin panel
+ * Version: HuynhNgocThang
+ */
+
+console.log('Notification System loaded successfully!');
+
+class NotificationSystem {
+    constructor() {
+        this.notifications = [];
+        this.maxNotifications = 5;
+        this.defaultDuration = 4000;
+        this.debounceMap = new Map(); // Để ngăn spam cùng một message
+        this.debounceTime = 2000; // 2 giây debounce
+        this.init();
+    }
+
+    init() {
+        // Tạo container cho notifications
+        this.createNotificationContainer();
+        console.log('Notification system initialized');
+    }
+
+    /**
+     * Tạo container cho notifications
+     */
+    createNotificationContainer() {
+        if (document.getElementById('notification-container')) {
+            return;
+        }
+
+        const container = document.createElement('div');
+        container.id = 'notification-container';
+        container.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            max-width: 400px;
+            pointer-events: none;
+        `;
+
+        document.body.appendChild(container);
+    }
+
+    /**
+     * Hiển thị notification với debounce để ngăn spam
+     * @param {string} message - Nội dung thông báo
+     * @param {string} type - Loại thông báo: success, danger, warning, info
+     * @param {number} duration - Thời gian hiển thị (ms)
+     */
+    show(message, type = 'info', duration = this.defaultDuration) {
+        // Tạo key để debounce
+        const debounceKey = `${message}-${type}`;
+        const now = Date.now();
+        
+        // Kiểm tra debounce
+        if (this.debounceMap.has(debounceKey)) {
+            const lastShown = this.debounceMap.get(debounceKey);
+            if (now - lastShown < this.debounceTime) {
+                return;
+            }
+        }
+        
+        // Cập nhật thời gian cuối cùng hiển thị
+        this.debounceMap.set(debounceKey, now);
+        
+        // Cleanup debounce map sau 5 phút
+        setTimeout(() => {
+            this.debounceMap.delete(debounceKey);
+        }, 300000);
+        
+        const notification = this.createNotification(message, type);
+        this.addNotification(notification, duration);
+        
+        // Auto remove sau duration
+        setTimeout(() => {
+            this.removeNotification(notification);
+        }, duration);
+
+        console.log(`Notification [${type.toUpperCase()}]: ${message}`);
+    }
+
+    /**
+     * Force hiển thị notification (bỏ qua debounce)
+     * @param {string} message - Nội dung thông báo
+     * @param {string} type - Loại thông báo: success, danger, warning, info
+     * @param {number} duration - Thời gian hiển thị (ms)
+     */
+    forceShow(message, type = 'info', duration = this.defaultDuration) {
+        const notification = this.createNotification(message, type);
+        this.addNotification(notification, duration);
+        
+        // Auto remove sau duration
+        setTimeout(() => {
+            this.removeNotification(notification);
+        }, duration);
+
+        console.log(`Notification [${type.toUpperCase()}] FORCED: ${message}`);
+    }
+
+    /**
+     * Tạo notification element
+     */
+    createNotification(message, type) {
+        const notification = document.createElement('div');
+        notification.className = `notification notification-${type}`;
+        
+        const iconMap = {
+            'success': 'check-circle-fill',
+            'danger': 'exclamation-triangle-fill',
+            'warning': 'exclamation-triangle-fill',
+            'info': 'info-circle-fill'
+        };
+
+        const titleMap = {
+            'success': 'Thành công!',
+            'danger': 'Lỗi!',
+            'warning': 'Cảnh báo!',
+            'info': 'Thông báo!'
+        };
+
+        notification.innerHTML = `
+            <div class="notification-content" style="background:#fff; border:1px solid #dee2e6; border-left:4px solid ${this.getBorderColor(type)}; border-radius: 10px; padding:12px 12px 8px 12px;">
+                <div class="notification-header d-flex align-items-start justify-content-between">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-${iconMap[type] || 'info-circle-fill'} me-2" style="color:${this.getBorderColor(type)}"></i>
+                        <span class="notification-title fw-semibold" style="color:#212529;">${titleMap[type] || 'Thông báo!'}</span>
+                    </div>
+                    <button type="button" class="notification-close btn btn-sm btn-light" onclick="window.notificationSystem.removeNotification(this.parentElement.parentElement.parentElement)" style="line-height:1; padding:2px 6px;">
+                        <i class="bi bi-x"></i>
+                    </button>
+                </div>
+                <div class="notification-body mt-1" style="color:#495057;">
+                    ${message}
+                </div>
+                <div class="notification-progress mt-2">
+                    <div class="notification-progress-bar"></div>
+                </div>
+            </div>
+        `;
+
+        // Add styles
+        notification.style.cssText = `
+            background: transparent;
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            margin-bottom: 12px;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.25s ease;
+            pointer-events: auto;
+            max-width: 380px;
+        `;
+
+        return notification;
+    }
+
+    /**
+     * Thêm notification vào container
+     */
+    addNotification(notification, duration = this.defaultDuration) {
+        const container = document.getElementById('notification-container');
+        container.appendChild(notification);
+
+        // Trigger animation
+        setTimeout(() => {
+            notification.style.opacity = '1';
+            notification.style.transform = 'translateX(0)';
+        }, 10);
+
+        // Start progress bar animation với duration từ parameter
+        this.startProgressBar(notification, duration);
+
+        this.notifications.push(notification);
+
+        // Giới hạn số lượng notifications
+        if (this.notifications.length > this.maxNotifications) {
+            const oldNotification = this.notifications.shift();
+            this.removeNotification(oldNotification);
+        }
+    }
+
+    /**
+     * Bắt đầu animation thanh thời gian
+     */
+    startProgressBar(notification, duration = this.defaultDuration) {
+        const progressBar = notification.querySelector('.notification-progress-bar');
+        if (!progressBar) return;
+
+        // Reset progress bar
+        progressBar.style.width = '100%';
+        progressBar.style.transition = 'none';
+        
+        // Start animation
+        setTimeout(() => {
+            progressBar.style.transition = `width ${duration}ms linear`;
+            progressBar.style.width = '0%';
+        }, 10);
+    }
+
+    /**
+     * Xóa notification
+     */
+    removeNotification(notification) {
+        if (!notification || !notification.parentNode) {
+            return;
+        }
+
+        // Animation out
+        notification.style.opacity = '0';
+        notification.style.transform = 'translateX(100%)';
+
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+            
+            // Remove from array
+            const index = this.notifications.indexOf(notification);
+            if (index > -1) {
+                this.notifications.splice(index, 1);
+            }
+        }, 300);
+    }
+
+    /**
+     * Lấy màu background theo type
+     */
+    getBackgroundColor(type) {
+        const colors = {
+            'success': '#f0f9ff',
+            'danger': '#fef2f2',
+            'warning': '#fffbeb',
+            'info': '#f0f9ff'
+        };
+        return colors[type] || colors['info'];
+    }
+
+    /**
+     * Lấy màu border theo type
+     */
+    getBorderColor(type) {
+        const colors = {
+            'success': '#10b981',
+            'danger': '#ef4444',
+            'warning': '#f59e0b',
+            'info': '#3b82f6'
+        };
+        return colors[type] || colors['info'];
+    }
+
+    /**
+     * Xóa tất cả notifications
+     */
+    clearAll() {
+        this.notifications.forEach(notification => {
+            this.removeNotification(notification);
+        });
+    }
+
+    /**
+     * Success notification
+     */
+    success(message, duration) {
+        this.show(message, 'success', duration);
+    }
+
+    /**
+     * Error notification
+     */
+    error(message, duration) {
+        this.show(message, 'danger', duration);
+    }
+
+    /**
+     * Warning notification
+     */
+    warning(message, duration) {
+        this.show(message, 'warning', duration);
+    }
+
+    /**
+     * Info notification
+     */
+    info(message, duration) {
+        this.show(message, 'info', duration);
+    }
+
+    /**
+     * Force success notification (bỏ qua debounce)
+     */
+    forceSuccess(message, duration) {
+        this.forceShow(message, 'success', duration);
+    }
+
+    /**
+     * Force error notification (bỏ qua debounce)
+     */
+    forceError(message, duration) {
+        this.forceShow(message, 'danger', duration);
+    }
+}
+
+// Khởi tạo notification system
+window.notificationSystem = new NotificationSystem();
+
+// Functions global cho tương thích với code cũ
+window.showNotification = function(message, type = 'info', duration = 4000) {
+    window.notificationSystem.show(message, type, duration);
+};

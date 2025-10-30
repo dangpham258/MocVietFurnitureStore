@@ -148,12 +148,12 @@ public class ProductServiceImpl implements IProductService {
                  .findFirst();
          }
 
-         // Nếu có ảnh, tạo URL placeholder, nếu không, dùng placeholder mặc định
-         if (targetImage.isPresent()) {
-            return getPlaceholderImageUrl(targetImage.get()); // Dùng hàm tạo ảnh tạm
-         } else {
-             return "https://via.placeholder.com/400x400.png?text=" + product.getSlug().replace("-", "+");
-         }
+        // Nếu có ảnh, trả về URL ảnh thật trong static; nếu không có, trả về null để view tự fallback
+        if (targetImage.isPresent()) {
+            return targetImage.get().getUrl();
+        } else {
+            return null;
+        }
      }
 
     // --- findProductDetailBySlug và các hàm helper khác ---
@@ -176,7 +176,7 @@ public class ProductServiceImpl implements IProductService {
                 .filter(img -> img.getColor() != null) // Bỏ qua ảnh không có màu (nếu có)
                 .collect(Collectors.groupingBy(
                         img -> img.getColor().getId(),
-                        Collectors.mapping(this::getPlaceholderImageUrl, Collectors.toList())
+                        Collectors.mapping(ProductImage::getUrl, Collectors.toList())
                 ));
         dto.setImagesByColor(imagesByColor);
 

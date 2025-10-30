@@ -75,15 +75,15 @@ INSERT INTO dbo.Users(role_id, full_name, username, email, password_hash, gender
 
 SELECT id, N'Phạm Giao nhận',N'delivery',N'delivery@mocviet.vn',N'$2a$12$XP/thldHL.FqZUQmozamNeGXlijdtS7.E5aVolRvLToDjEMXgCkfC',N'Nam',N'0900000006' FROM dbo.Roles WHERE name=N'DELIVERY';
 INSERT INTO dbo.Users(role_id, full_name, username, email, password_hash, gender, phone)
-SELECT id, N'Đội Giao Khu Vực Bắc',N'delivery_north',N'delivery_north@mocviet.local',N'$2a$12$XP/thldHL.FqZUQmozamNeGXlijdtS7.E5aVolRvLToDjEMXgCkfC',N'Nam',N'0911001100' FROM dbo.Roles WHERE name=N'DELIVERY';
+SELECT id, N'Phan Thành Tài',N'delivery_north',N'delivery_north@mocviet.local',N'$2a$12$XP/thldHL.FqZUQmozamNeGXlijdtS7.E5aVolRvLToDjEMXgCkfC',N'Nam',N'0911001100' FROM dbo.Roles WHERE name=N'DELIVERY';
 INSERT INTO dbo.Users(role_id, full_name, username, email, password_hash, gender, phone)
-SELECT id, N'Đội Giao Khu Vực Bắc 2',N'delivery_north2',N'delivery_north2@mocviet.local',N'$2a$12$XP/thldHL.FqZUQmozamNeGXlijdtS7.E5aVolRvLToDjEMXgCkfC',N'Nam',N'0911001200' FROM dbo.Roles WHERE name=N'DELIVERY';
+SELECT id, N'Đỗ Duy Khánh',N'delivery_north2',N'delivery_north2@mocviet.local',N'$2a$12$XP/thldHL.FqZUQmozamNeGXlijdtS7.E5aVolRvLToDjEMXgCkfC',N'Nam',N'0911001200' FROM dbo.Roles WHERE name=N'DELIVERY';
 INSERT INTO dbo.Users(role_id, full_name, username, email, password_hash, gender, phone)
-SELECT id, N'Đội Giao Khu Vực Trung',N'delivery_central',N'delivery_central@mocviet.local',N'$2a$12$XP/thldHL.FqZUQmozamNeGXlijdtS7.E5aVolRvLToDjEMXgCkfC',N'Nam',N'0911002200' FROM dbo.Roles WHERE name=N'DELIVERY';
+SELECT id, N'Nguyễn Văn Khánh',N'delivery_central',N'delivery_central@mocviet.local',N'$2a$12$XP/thldHL.FqZUQmozamNeGXlijdtS7.E5aVolRvLToDjEMXgCkfC',N'Nam',N'0911002200' FROM dbo.Roles WHERE name=N'DELIVERY';
 INSERT INTO dbo.Users(role_id, full_name, username, email, password_hash, gender, phone)
-SELECT id, N'Đội Giao Khu Vực Nam',N'delivery_south',N'delivery_south@mocviet.local',N'$2a$12$XP/thldHL.FqZUQmozamNeGXlijdtS7.E5aVolRvLToDjEMXgCkfC',N'Nam',N'0911003300' FROM dbo.Roles WHERE name=N'DELIVERY';
+SELECT id, N'Lê Văn Nam',N'delivery_south',N'delivery_south@mocviet.local',N'$2a$12$XP/thldHL.FqZUQmozamNeGXlijdtS7.E5aVolRvLToDjEMXgCkfC',N'Nam',N'0911003300' FROM dbo.Roles WHERE name=N'DELIVERY';
 INSERT INTO dbo.Users(role_id, full_name, username, email, password_hash, gender, phone)
-SELECT id, N'Đội Giao Khu Vực Nam 2',N'delivery_south2',N'delivery_south2@mocviet.local',N'$2a$12$XP/thldHL.FqZUQmozamNeGXlijdtS7.E5aVolRvLToDjEMXgCkfC',N'Nam',N'0911003400' FROM dbo.Roles WHERE name=N'DELIVERY';
+SELECT id, N'Trần Văn Nam',N'delivery_south2',N'delivery_south2@mocviet.local',N'$2a$12$XP/thldHL.FqZUQmozamNeGXlijdtS7.E5aVolRvLToDjEMXgCkfC',N'Nam',N'0911003400' FROM dbo.Roles WHERE name=N'DELIVERY';
 INSERT INTO dbo.Users(role_id, full_name, username, email, password_hash, gender, phone)
 
 SELECT id, N'Trần Khách A',  N'cust_a',  N'cust_a@mocviet.vn',  N'$2a$12$XP/thldHL.FqZUQmozamNeGXlijdtS7.E5aVolRvLToDjEMXgCkfC',       N'Nữ', N'0900000007' FROM dbo.Roles WHERE name=N'CUSTOMER';
@@ -158,33 +158,375 @@ INSERT INTO dbo.Banner(title, image_url, link_url, is_active) VALUES
  (N'Black Friday',   N'/static/images/banners/02_black-friday.jpg', N'/bo-suu-tap', 1);
 
 ------------------------------------------------------------
--- 5) STATIC PAGES (content ngắn + css/ảnh)
+-- 5) STATIC PAGES (content chi tiết - Admin có thể chỉnh sửa)
 ------------------------------------------------------------
 INSERT INTO dbo.StaticPage(slug, title, content, is_active)
 VALUES
- (N'chinh-sach-bao-hanh', N'Chính sách bảo hành',
-  N'<link rel="stylesheet" href="/static/css/pages/chinh-sach-bao-hanh.css" />' +
-  N'<h2>Bảo hành Mộc Việt</h2><p>Chi tiết...</p>' +
-  N'<img src="/static/images/pages/chinh-sach-bao-hanh/00_chinh-sach-bao-hanh.jpg" />', 1),
  (N'gioi-thieu', N'Giới thiệu Mộc Việt',
-  N'<h2>Về chúng tôi</h2><p>Mộc Việt...</p>' +
-  N'<img src="/static/images/pages/gioi-thieu/00_gioi-thieu.jpg" />', 1),
- (N'chinh-sach-ban-hang', N'Chính sách bán hàng',
-  N'<h2>Chính sách bán hàng</h2><p>Quy định về việc mua bán sản phẩm...</p>', 1),
+  N'<div class="content-wrapper">
+    <h2>Về Mộc Việt</h2>
+    <p><strong>Mộc Việt</strong> là thương hiệu nội thất gỗ hàng đầu Việt Nam, chuyên sản xuất và cung cấp các sản phẩm nội thất gỗ tự nhiên chất lượng cao với thiết kế hiện đại, sang trọng.</p>
+    
+    <h3>Lịch sử hình thành</h3>
+    <p>Được thành lập vào năm 2010, Mộc Việt bắt đầu như một xưởng sản xuất nội thất nhỏ tại Thành phố Hồ Chí Minh. Với tầm nhìn mang đến những sản phẩm nội thất gỗ chất lượng cao cho người Việt, chúng tôi đã không ngừng phát triển và mở rộng quy mô.</p>
+    
+    <h3>Sứ mệnh của chúng tôi</h3>
+    <p>Mộc Việt cam kết:</p>
+    <ul>
+      <li>Mang đến cho mọi gia đình Việt những sản phẩm nội thất chất lượng cao với giá cả hợp lý</li>
+      <li>Sử dụng 100% gỗ tự nhiên, đảm bảo an toàn sức khỏe cho gia đình</li>
+      <li>Thiết kế hiện đại, phù hợp với không gian sống của người Việt</li>
+      <li>Chế tác thủ công tỉ mỉ, đảm bảo độ bền và tính thẩm mỹ</li>
+    </ul>
+    
+    <h3>Giá trị cốt lõi</h3>
+    <p><strong>Chất lượng:</strong> Chúng tôi sử dụng gỗ tự nhiên cao cấp, được kiểm định kỹ lưỡng trước khi đưa vào sản xuất.</p>
+    <p><strong>Độ bền:</strong> Mỗi sản phẩm được chế tác kỹ lưỡng, đảm bảo độ bền theo thời gian.</p>
+    <p><strong>Thẩm mỹ:</strong> Thiết kế hiện đại, sang trọng, phù hợp với nhiều phong cách nội thất.</p>
+    <p><strong>An toàn:</strong> Không sử dụng hóa chất độc hại, thân thiện với môi trường và sức khỏe.</p>
+    
+    <h3>Cam kết với khách hàng</h3>
+    <p>Mộc Việt luôn đặt khách hàng làm trung tâm, cam kết:</p>
+    <ul>
+      <li>Chất lượng sản phẩm vượt trội</li>
+      <li>Bảo hành chính hãng 12 tháng</li>
+      <li>Dịch vụ hỗ trợ tận tâm 24/7</li>
+      <li>Giao hàng và lắp đặt miễn phí</li>
+      <li>Chế độ bảo trì định kỳ</li>
+    </ul>
+    
+    <h3>Địa chỉ liên hệ</h3>
+    <p><i class="bi bi-geo-alt"></i> <strong>Showroom chính:</strong> 162 HT17, Phường Hiệp Thành, Quận 12, TP. HCM</p>
+    <p><i class="bi bi-telephone"></i> <strong>Hotline:</strong> 0971 141 140</p>
+    <p><i class="bi bi-envelope"></i> <strong>Email:</strong> cskh@mocviet.vn</p>
+    <p><i class="bi bi-clock"></i> <strong>Giờ làm việc:</strong> 8:00 - 21:00 (Cả tuần)</p>
+  </div>'
+  , 1),
+ 
+ (N'chinh-sach-bao-hanh', N'Chính sách bảo hành', 
+  N'<div class="content-wrapper">
+    <h2>Chính sách bảo hành sản phẩm</h2>
+    <p>Mộc Việt tự hào mang đến cho khách hàng dịch vụ bảo hành chuyên nghiệp và đáng tin cậy.</p>
+    
+    <h3>1. Thời gian bảo hành</h3>
+    <p><strong>Bảo hành chính hãng 12 tháng</strong> kể từ ngày giao hàng và lắp đặt hoàn tất. Trong thời gian này, mọi hư hỏng do lỗi sản xuất hoặc vật liệu sẽ được chúng tôi bảo hành miễn phí.</p>
+    
+    <h3>2. Điều kiện bảo hành</h3>
+    <p>Sản phẩm được bảo hành khi đáp ứng các điều kiện sau:</p>
+    <ul>
+      <li>Có hóa đơn mua hàng hợp lệ hoặc giấy tờ chứng minh việc mua hàng tại Mộc Việt</li>
+      <li>Hư hỏng xuất phát từ lỗi kỹ thuật, sai sót trong quá trình sản xuất</li>
+      <li>Sản phẩm còn trong thời hạn bảo hành</li>
+      <li>Sản phẩm được bảo quản và sử dụng đúng hướng dẫn</li>
+    </ul>
+    
+    <h3>3. Các trường hợp KHÔNG được bảo hành</h3>
+    <ul>
+      <li>Hư hỏng do va đập, rơi vỡ hoặc tai nạn do người sử dụng</li>
+      <li>Biến dạng do thời tiết, độ ẩm, nhiệt độ cao</li>
+      <li>Sử dụng sai mục đích hoặc không tuân thủ hướng dẫn</li>
+      <li>Sản phẩm đã được sửa chữa, thay đổi bởi bên thứ ba</li>
+      <li>Mất phiếu bảo hành hoặc tem bảo hành</li>
+    </ul>
+    
+    <h3>4. Quy trình yêu cầu bảo hành</h3>
+    <ol>
+      <li>Liên hệ hotline <strong>0971 141 140</strong> hoặc gửi email đến <strong>cskh@mocviet.vn</strong></li>
+      <li>Cung cấp thông tin: Họ tên, Số điện thoại, Mã đơn hàng, Mô tả sự cố</li>
+      <li>Nhân viên kỹ thuật sẽ đến kiểm tra trong vòng 48 giờ (tại TP.HCM)</li>
+      <li>Nếu thuộc diện bảo hành, chúng tôi sẽ sửa chữa hoặc thay thế miễn phí</li>
+    </ol>
+    
+    <h3>5. Dịch vụ bảo trì</h3>
+    <ul>
+      <li><strong>Bảo trì định kỳ miễn phí:</strong> Trong 6 tháng đầu, chúng tôi sẽ thực hiện bảo trì và kiểm tra sản phẩm 1 lần</li>
+      <li><strong>Tư vấn bảo quản:</strong> Nhân viên sẽ hướng dẫn cách bảo quản sản phẩm để tăng tuổi thọ sử dụng</li>
+      <li><strong>Dịch vụ vệ sinh chuyên nghiệp:</strong> Cung cấp dịch vụ vệ sinh và đánh bóng gỗ (có phí)</li>
+    </ul>
+    
+    <h3>6. Cam kết bảo hành</h3>
+    <p>Mộc Việt cam kết xử lý tất cả yêu cầu bảo hành trong thời gian ngắn nhất, đảm bảo khách hàng có thể sử dụng sản phẩm một cách tốt nhất.</p>
+  </div>', 1),
+ 
  (N'chinh-sach-doi-tra', N'Chính sách đổi trả',
-  N'<h2>Chính sách đổi trả</h2><p>Quy định về việc đổi trả sản phẩm...</p>', 1),
+  N'<div class="content-wrapper">
+    <h2>Chính sách đổi trả sản phẩm</h2>
+    <p>Mộc Việt cam kết đảm bảo quyền lợi tối đa cho khách hàng với chính sách đổi trả linh hoạt.</p>
+    
+    <h3>1. Thời hạn đổi trả</h3>
+    <p>Khách hàng có thể yêu cầu đổi trả sản phẩm <strong>trong vòng 7 ngày</strong> kể từ ngày nhận hàng (đối với đơn hàng online) hoặc ngày giao hàng (đối với đơn COD).</p>
+    
+    <h3>2. Điều kiện đổi trả</h3>
+    <p>Sản phẩm phải đáp ứng các điều kiện sau:</p>
+    <ul>
+      <li>Sản phẩm còn nguyên vẹn, chưa qua sử dụng hoặc lắp đặt</li>
+      <li>Còn nguyên tem, nhãn mác, bao bì gốc</li>
+      <li>Có hóa đơn mua hàng hợp lệ</li>
+      <li>Không thuộc hàng custom theo yêu cầu riêng của khách hàng</li>
+      <li>Sản phẩm không bị hư hỏng do lỗi khách hàng</li>
+    </ul>
+    
+    <h3>3. Lý do được chấp nhận đổi trả</h3>
+    <ul>
+      <li>Sản phẩm bị lỗi từ phía Mộc Việt (lỗi sản xuất, thiếu phụ kiện, giao sai hàng)</li>
+      <li>Sản phẩm không đúng với thông tin đã mô tả trên website</li>
+      <li>Khách hàng không hài lòng với sản phẩm và thông báo trong vòng 24 giờ đầu</li>
+    </ul>
+    
+    <h3>4. Quy trình đổi trả</h3>
+    <ol>
+      <li><strong>Liên hệ chúng tôi:</strong> Gọi hotline <strong>0971 141 140</strong> hoặc email <strong>cskh@mocviet.vn</strong></li>
+      <li><strong>Cung cấp thông tin:</strong> Mã đơn hàng, lý do đổi trả, ảnh sản phẩm (nếu có)</li>
+      <li><strong>Xác nhận yêu cầu:</strong> Nhân viên CSKH sẽ xác nhận trong vòng 24 giờ</li>
+      <li><strong>Đóng gói và trả hàng:</strong> Khách hàng đóng gói sản phẩm an toàn và chờ nhân viên đến lấy</li>
+      <li><strong>Kiểm tra sản phẩm:</strong> Mộc Việt sẽ kiểm tra sản phẩm trả về</li>
+      <li><strong>Hoàn tiền hoặc giao sản phẩm mới:</strong> Trong vòng 5-7 ngày làm việc</li>
+    </ol>
+    
+    <h3>5. Phí đổi trả</h3>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Trường hợp</th>
+          <th>Phí vận chuyển</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Lỗi do bên bán (giao sai, hàng lỗi)</td>
+          <td>Miễn phí hoàn toàn</td>
+        </tr>
+        <tr>
+          <td>Khách hàng không hài lòng</td>
+          <td>Khách hàng chịu phí vận chuyển</td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <h3>6. Phương thức hoàn tiền</h3>
+    <ul>
+      <li>Nếu thanh toán bằng chuyển khoản: Hoàn tiền vào tài khoản trong 3-5 ngày</li>
+      <li>Nếu thanh toán COD: Hoàn tiền bằng chuyển khoản hoặc tiền mặt khi nhận lại hàng</li>
+      <li>Nếu thanh toán bằng thẻ: Hoàn tiền vào tài khoản thẻ trong 7-14 ngày</li>
+    </ul>
+    
+    <h3>7. Lưu ý</h3>
+    <p>Đối với sản phẩm đã lắp đặt và sử dụng, chúng tôi sẽ đánh giá từng trường hợp cụ thể. Vui lòng liên hệ CSKH để được tư vấn chi tiết.</p>
+  </div>', 1),
+ 
  (N'chinh-sach-van-chuyen', N'Chính sách vận chuyển',
-  N'<h2>Chính sách vận chuyển</h2><p>Thông tin về phí ship và thời gian giao hàng...</p>', 1),
+  N'<div class="content-wrapper">
+    <h2>Chính sách vận chuyển và lắp đặt</h2>
+    <p>Mộc Việt cam kết giao hàng nhanh chóng, an toàn và chuyên nghiệp đến tận nơi cho khách hàng.</p>
+    
+    <h3>1. Phạm vi giao hàng</h3>
+    <p>Chúng tôi giao hàng <strong>toàn quốc</strong> với chính sách phí ship chi tiết như sau:</p>
+    <ul>
+      <li><strong>Nội thành TP.HCM:</strong> Miễn phí giao hàng cho đơn từ 500.000đ</li>
+      <li><strong>Ngoại thành TP.HCM:</strong> Phí ship từ 30.000đ - 50.000đ tùy khu vực</li>
+      <li><strong>Tỉnh/Thành khác:</strong> Phí ship theo bảng giá của đơn vị vận chuyển (VNPost, Viettel Post...)</li>
+    </ul>
+    
+    <h3>2. Thời gian giao hàng</h3>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Loại sản phẩm</th>
+          <th>Thời gian giao hàng</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Hàng có sẵn trong kho</td>
+          <td>2-3 ngày làm việc</td>
+        </tr>
+        <tr>
+          <td>Hàng đặt hàng</td>
+          <td>7-15 ngày làm việc</td>
+        </tr>
+        <tr>
+          <td>Hàng custom theo yêu cầu</td>
+          <td>14-30 ngày làm việc</td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <h3>3. Dịch vụ lắp đặt</h3>
+    <ul>
+      <li><strong>Miễn phí lắp đặt</strong> tại TP.HCM và một số tỉnh thành lân cận (áp dụng cho sản phẩm cần lắp đặt)</li>
+      <li>Nhân viên kỹ thuật chuyên nghiệp, có kinh nghiệm nhiều năm trong lĩnh vực nội thất</li>
+      <li>Đảm bảo chất lượng lắp đặt và hướng dẫn sử dụng sản phẩm</li>
+      <li>Tận nơi tư vấn và thiết kế không gian (theo yêu cầu, có phí)</li>
+      <li>Cam kết lắp đặt đúng theo thiết kế, đẹp mắt và bền chắc</li>
+    </ul>
+    
+    <h3>4. Quy trình giao hàng</h3>
+    <ol>
+      <li><strong>Xác nhận đơn hàng:</strong> Nhân viên CSKH sẽ gọi điện xác nhận thông tin đơn hàng trong vòng 24 giờ</li>
+      <li><strong>Chuẩn bị hàng:</strong> Kiểm tra kỹ chất lượng sản phẩm trước khi giao</li>
+      <li><strong>Thông báo giao hàng:</strong> Gọi điện thông báo trước 30 phút khi đến giao</li>
+      <li><strong>Giao hàng:</strong> Nhân viên giao hàng sẽ đến đúng địa chỉ đã đăng ký</li>
+      <li><strong>Kiểm tra và nhận hàng:</strong> Khách hàng kiểm tra sản phẩm trước khi ký nhận</li>
+      <li><strong>Lắp đặt (nếu có):</strong> Nhân viên kỹ thuật tiến hành lắp đặt nếu sản phẩm yêu cầu</li>
+    </ol>
+    
+    <h3>5. Xử lý khi hàng bị hư hỏng</h3>
+    <p>Nếu phát hiện hàng bị hư hỏng khi nhận:</p>
+    <ul>
+      <li>Vui lòng <strong>KHÔNG ký nhận</strong> và chụp ảnh bằng chứng</li>
+      <li>Liên hệ ngay hotline <strong>0971 141 140</strong> để báo cáo</li>
+      <li>Chúng tôi sẽ gửi hàng thay thế hoặc hoàn tiền 100%</li>
+    </ul>
+    
+    <h3>6. Chính sách đặc biệt</h3>
+    <ul>
+      <li>Giao hàng trong ngày tại TP.HCM (với đơn hàng trước 12h trưa)</li>
+      <li>Giao hàng cuối tuần (thứ 7, Chủ nhật) có thêm phí 50.000đ</li>
+      <li>Dịch vụ lắp đặt ngoài giờ (sau 18h) có thêm phí 100.000đ</li>
+    </ul>
+  </div>', 1),
+ 
  (N'chinh-sach-thanh-toan', N'Chính sách thanh toán',
-  N'<h2>Chính sách thanh toán</h2><p>Các phương thức thanh toán được chấp nhận...</p>', 1),
- (N'dieu-khoan-su-dung', N'Điều khoản sử dụng',
-  N'<h2>Điều khoản sử dụng</h2><p>Quy định sử dụng website...</p>', 1),
+  N'<div class="content-wrapper">
+    <h2>Chính sách thanh toán</h2>
+    <p>Mộc Việt cung cấp nhiều phương thức thanh toán linh hoạt, tiện lợi và an toàn cho khách hàng.</p>
+    
+    <h3>1. Phương thức thanh toán</h3>
+    
+    <h4>1.1. Thanh toán khi nhận hàng (COD)</h4>
+    <ul>
+      <li>Thanh toán trực tiếp khi nhận hàng, chỉ thanh toán sau khi đã kiểm tra hàng</li>
+      <li>Hỗ trợ khắp toàn quốc</li>
+      <li>Phí COD: <strong>30.000đ/đơn</strong> (áp dụng ngoại tỉnh TP.HCM)</li>
+      <li>Miễn phí COD cho đơn hàng từ 1.000.000đ</li>
+    </ul>
+    
+    <h4>1.2. Chuyển khoản ngân hàng</h4>
+    <ul>
+      <li>Chuyển khoản trước khi giao hàng để nhận ưu đãi</li>
+      <li><strong>Giảm ngay 2%</strong> cho đơn hàng từ 2.000.000đ trở lên khi thanh toán chuyển khoản</li>
+      <li>Thông tin chuyển khoản:
+        <ul>
+          <li><strong>Số tài khoản:</strong> 1234567890</li>
+          <li><strong>Ngân hàng:</strong> Vietcombank - Chi nhánh TP.HCM</li>
+          <li><strong>Chủ tài khoản:</strong> MỘC VIỆT FURNITURE CO., LTD</li>
+          <li><strong>Nội dung:</strong> Thanh toan don hang [Mã đơn hàng]</li>
+        </ul>
+      </li>
+    </ul>
+    
+    <h4>1.3. Thẻ tín dụng / Thẻ ghi nợ</h4>
+    <ul>
+      <li>Thanh toán online qua cổng thanh toán an toàn</li>
+      <li>Chấp nhận: Visa, Mastercard, JCB, American Express</li>
+      <li>Thanh toán an toàn với SSL 256-bit</li>
+      <li>Không thu thêm bất kỳ phí phụ thu nào</li>
+    </ul>
+    
+    <h4>1.4. Ví điện tử</h4>
+    <ul>
+      <li><strong>Momo:</strong> Quét QR code hoặc chuyển khoản qua số điện thoại</li>
+      <li><strong>ZaloPay:</strong> Thanh toán nhanh chóng qua app</li>
+      <li><strong>ShopeePay:</strong> Thanh toán tiện lợi</li>
+      <li>Giảm thêm 1% khi thanh toán bằng ví điện tử</li>
+    </ul>
+    
+    <h3>2. Quy trình thanh toán</h3>
+    <ol>
+      <li>Đặt hàng và chọn phương thức thanh toán phù hợp</li>
+      <li>Xác nhận đơn hàng qua SMS/Email trong vòng 5 phút</li>
+      <li>Thanh toán theo phương thức đã chọn</li>
+      <li>Nhận hàng và kiểm tra sản phẩm</li>
+      <li>Nếu hài lòng, xác nhận đã nhận hàng</li>
+    </ol>
+    
+    <h3>3. Bảo mật thông tin thanh toán</h3>
+    <ul>
+      <li>Tất cả giao dịch được mã hóa SSL/TLS 256-bit</li>
+      <li>Không lưu trữ thông tin thẻ tín dụng của khách hàng</li>
+      <li>Tuân thủ tiêu chuẩn bảo mật PCI DSS</li>
+      <li>Hợp tác với các đơn vị thanh toán uy tín (VNPAY, Payoo)</li>
+    </ul>
+    
+    <h3>4. Lưu ý quan trọng</h3>
+    <ul>
+      <li>Đơn hàng sẽ được giữ tối đa <strong>24 giờ</strong> chờ thanh toán, sau đó tự động hủy</li>
+      <li>Vui lòng <strong>giữ lại hóa đơn</strong> để phục vụ việc đổi trả, bảo hành</li>
+      <li>Nếu thanh toán chuyển khoản, vui lòng ghi rõ <strong>mã đơn hàng</strong> trong nội dung chuyển khoản</li>
+      <li>Liên hệ hotline nếu có thắc mắc về thanh toán: <strong>0971 141 140</strong></li>
+    </ul>
+    
+    <h3>5. Ưu đãi thanh toán</h3>
+    <ul>
+      <li>Giảm 2% cho đơn từ 2.000.000đ khi chuyển khoản</li>
+      <li>Giảm 1% cho đơn từ 500.000đ khi dùng ví điện tử</li>
+      <li>Miễn phí COD cho đơn từ 1.000.000đ</li>
+      <li>Ưu đãi không được cộng dồn</li>
+    </ul>
+  </div>', 1),
+ 
  (N'chinh-sach-bao-mat', N'Chính sách bảo mật',
-  N'<h2>Chính sách bảo mật</h2><p>Bảo vệ thông tin cá nhân...</p>', 1),
- (N'lien-he', N'Liên hệ',
-  N'<h2>Liên hệ với chúng tôi</h2><p>Thông tin liên hệ...</p>', 1),
- (N'huong-dan-mua-hang', N'Hướng dẫn mua hàng',
-  N'<h2>Hướng dẫn mua hàng</h2><p>Các bước đặt hàng...</p>', 1);
+  N'<div class="content-wrapper">
+    <h2>Chính sách bảo mật thông tin</h2>
+    <p>Mộc Việt cam kết bảo vệ thông tin cá nhân của khách hàng một cách tuyệt đối và chuyên nghiệp.</p>
+    
+    <h3>1. Thông tin thu thập</h3>
+    <p>Chúng tôi thu thập các thông tin sau để phục vụ khách hàng tốt nhất:</p>
+    <ul>
+      <li><strong>Thông tin cá nhân:</strong> Họ tên, số điện thoại, email, địa chỉ</li>
+      <li><strong>Thông tin thanh toán:</strong> Phương thức thanh toán, lịch sử giao dịch (không lưu thông tin thẻ tín dụng)</li>
+      <li><strong>Thông tin thiết bị:</strong> IP address, trình duyệt, thiết bị truy cập (để cải thiện trải nghiệm)</li>
+    </ul>
+    
+    <h3>2. Mục đích sử dụng thông tin</h3>
+    <p>Thông tin của bạn được sử dụng để:</p>
+    <ul>
+      <li>Xử lý và giao hàng đơn hàng</li>
+      <li>Gửi thông báo về đơn hàng qua SMS/Email</li>
+      <li>Liên hệ hỗ trợ khách hàng</li>
+      <li>Cải thiện chất lượng dịch vụ</li>
+      <li>Gửi ưu đãi và khuyến mãi (nếu đã đăng ký nhận)</li>
+    </ul>
+    
+    <h3>3. Biện pháp bảo vệ</h3>
+    <ul>
+      <li><strong>Mã hóa dữ liệu:</strong> Tất cả dữ liệu được mã hóa SSL/TLS 256-bit</li>
+      <li><strong>Không chia sẻ thông tin:</strong> Không bán, cho thuê hoặc chia sẻ thông tin cho bên thứ ba</li>
+      <li><strong>Bảo mật vật lý:</strong> Máy chủ được đặt trong môi trường an toàn, có camera giám sát 24/7</li>
+      <li><strong>Hệ thống firewall:</strong> Bảo vệ chống lại tấn công mạng</li>
+      <li><strong>Kiểm tra định kỳ:</strong> Hệ thống được kiểm tra và cập nhật bảo mật thường xuyên</li>
+    </ul>
+    
+    <h3>4. Quyền lợi của khách hàng</h3>
+    <p>Bạn có quyền:</p>
+    <ul>
+      <li><strong>Truy cập:</strong> Yêu cầu xem thông tin cá nhân đã lưu</li>
+      <li><strong>Chỉnh sửa:</strong> Yêu cầu sửa đổi thông tin không chính xác</li>
+      <li><strong>Xóa dữ liệu:</strong> Yêu cầu xóa tài khoản và dữ liệu cá nhân</li>
+      <li><strong>Từ chối marketing:</strong> Từ chối nhận email quảng cáo khuyến mãi</li>
+      <li><strong>Khiếu nại:</strong> Liên hệ nếu phát hiện sử dụng thông tin không đúng mục đích</li>
+    </ul>
+    
+    <h3>5. Cookie và công nghệ theo dõi</h3>
+    <p>Website sử dụng cookie để:</p>
+    <ul>
+      <li>Nhớ thông tin đăng nhập của bạn</li>
+      <li>Lưu giữ sản phẩm trong giỏ hàng</li>
+      <li>Cải thiện trải nghiệm người dùng</li>
+    </ul>
+    <p>Bạn có thể tắt cookie trong cài đặt trình duyệt, nhưng một số chức năng website có thể không hoạt động tốt.</p>
+    
+    <h3>6. Liên hệ về bảo mật</h3>
+    <p>Nếu có thắc mắc về chính sách bảo mật, vui lòng liên hệ:</p>
+    <ul>
+      <li><strong>Email:</strong> privacy@mocviet.vn</li>
+      <li><strong>Hotline:</strong> 0971 141 140</li>
+      <li><strong>Địa chỉ:</strong> 162 HT17, P. Hiệp Thành, Q. 12, TP. HCM</li>
+    </ul>
+    
+    <h3>7. Cập nhật chính sách</h3>
+    <p>Chúng tôi có thể cập nhật chính sách bảo mật này theo thời gian. Mọi thay đổi sẽ được thông báo trên website. Khách hàng nên thường xuyên kiểm tra để biết thông tin mới nhất.</p>
+  </div>', 1);
 
 ------------------------------------------------------------
 -- 6) COUPONS
@@ -910,7 +1252,7 @@ VALUES
 -- Review cho kệ tivi 2m (cust_b) — order B2 có item 'KETIVI2M_BE'
 INSERT INTO dbo.Review(product_id, user_id, order_item_id, rating, content, image_url)
 SELECT p.id, u.id, oi.id, 4, N'Kệ đẹp, chất lượng tốt.',
-       N'/static/images/reviews/3105/00_review_3105.jpg'
+       N'/static/images/reviews/1/00_review_1.jpg'
 FROM dbo.Product p
 JOIN dbo.Users u ON u.username = N'cust_b'
 JOIN dbo.OrderItems oi ON oi.order_id = @orderB2
@@ -920,7 +1262,7 @@ WHERE p.slug = N'ke-tivi-2m';
 -- Review cho bàn ăn 6 ghế (cust_a) — order A1 có 'BANOC6_DEN'
 INSERT INTO dbo.Review(product_id, user_id, order_item_id, rating, content, image_url)
 SELECT p.id, u.id, oi.id, 5, N'Rất chắc chắn.',
-       N'/static/images/reviews/3106/00_review_3106.jpg'
+       N'/static/images/reviews/2/00_review_2.jpg'
 FROM dbo.Product p
 JOIN dbo.Users u ON u.username = N'cust_a'
 JOIN dbo.OrderItems oi ON oi.order_id = @orderA1
@@ -930,7 +1272,7 @@ WHERE p.slug = N'ban-an-go-oc-cho-6-ghe';
 -- Review cho ghế ăn bọc nỉ (cust_a) — order A1 có 'GA_NI_BE' (cùng đơn với bàn ăn)
 INSERT INTO dbo.Review(product_id, user_id, order_item_id, rating, content, image_url)
 SELECT p.id, u.id, oi.id, 4, N'Ghế êm, ngồi thoải mái.',
-       N'/static/images/reviews/3107/00_review_3107.jpg'
+       N'/static/images/reviews/3/00_review_3.jpg'
 FROM dbo.Product p
 JOIN dbo.Users u ON u.username = N'cust_a'
 JOIN dbo.OrderItems oi ON oi.order_id = @orderA1
@@ -985,6 +1327,21 @@ INSERT INTO dbo.Showroom(name, address, city, district, phone, email, open_hours
  (N'Showroom Hà Nội', N'123 Đường Láng, Đống Đa', N'Hà Nội', N'Đống Đa', N'024.1234.5678', N'hn@mocviet.vn', N'8:00 - 22:00', 1),
  (N'Showroom TP.HCM', N'456 Nguyễn Huệ, Quận 1', N'TP.HCM', N'Quận 1', N'028.8765.4321', N'hcm@mocviet.vn', N'8:00 - 22:00', 1),
  (N'Showroom Đà Nẵng', N'789 Lê Duẩn, Hải Châu', N'Đà Nẵng', N'Hải Châu', N'0236.1111.2222', N'dn@mocviet.vn', N'8:00 - 22:00', 1);
+
+-- Cập nhật Google Maps iframe cho Showroom Hà Nội (id = 1)
+UPDATE dbo.Showroom
+SET map_embed = N'<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3724.414482540709!2d105.80169737503108!3d21.016095280630033!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3135ab5e6db3d941%3A0x571f62e3b5a69002!2zMTIzIMSQLiBMw6FuZywgVHJ1bmcgSG_DoCwgxJDhu5FuZyDEkGEsIEjDoCBO4buZaSwgVmlldG5hbQ!5e0!3m2!1sen!2s!4v1761750376622!5m2!1sen!2s" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>'
+WHERE name = N'Showroom Hà Nội';
+
+-- Cập nhật Google Maps iframe cho Showroom TP.HCM (id = 2)
+UPDATE dbo.Showroom
+SET map_embed = N'<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.456663700164!2d106.698383374805!3d10.776293589372532!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752f47975ce55f%3A0x26d4747546784ad5!2zNDU2IE5ndXnDqsyDbiBIdcOqzKMsIELhur9uIE5naMOpLCBRdeG6rW4gMSwgVGjDoG5oIHBo4buRIEjhu5MgQ2jDrSBNaW5oLCBWaWV0bmFt!5e0!3m2!1sen!2s!4v1761750423212!5m2!1sen!2s" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>'
+WHERE name = N'Showroom TP.HCM';
+
+-- Cập nhật Google Maps iframe cho Showroom Đà Nẵng (id = 3)
+UPDATE dbo.Showroom
+SET map_embed = N'<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3833.98124933477!2d108.20450247490396!3d16.06646278461262!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3142184cbc209153%3A0xa10ed2b7170cd131!2zNzg5IEzDqiBEdeG6qW4sIENow61uaCBHacOhbiwgVGhhbmggS2jDqiwgxJDDoCBO4bq1bmcgNTUwMDAwLCBWaWV0bmFt!5e0!3m2!1sen!2s!4v1761750494219!5m2!1sen!2s" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>'
+WHERE name = N'Showroom Đà Nẵng';
 
 ------------------------------------------------------------
 -- 21) SOCIAL LINKS (Liên kết mạng xã hội)

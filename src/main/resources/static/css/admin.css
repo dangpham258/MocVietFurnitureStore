@@ -1,56 +1,266 @@
-/* Admin Panel Styles */
-.admin-sidebar {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    min-height: 100vh;
+/* CSS ADMIN PANEL - MỘC VIỆT FURNITURE STORE */
+
+/* ========================================
+   1. RESET & BASE STYLES - Thiết lập cơ bản
+   ======================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
+body, html {
+    height: 100%;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* ========================================
+   2. LAYOUT CHÍNH - Cấu trúc trang
+   ======================================== */
+
+/* Container chính cho toàn bộ trang */
+.page-wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+
+/* Layout chính (sidebar + content) */
+.main-layout {
+    display: flex;
+    flex: 1;
+}
+
+/* ========================================
+   3. SIDEBAR - Thanh điều hướng bên trái
+   ======================================== */
+
+/* CSS Variables cho sidebar */
+:root {
+    --sidebar-width: 250px;
+    --sidebar-closed: -250px;
+    --sidebar-open: 0px;
+}
+
+/* Sidebar cố định - Phong cách hiện đại tối giản */
+.admin-sidebar {
+    background: #e9ecef;
+    border-right: 1px solid #dee2e6;
+    min-height: 100vh;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: var(--sidebar-closed);
+    z-index: 1000;
+    overflow-y: auto;
+    width: var(--sidebar-width);
+    min-width: var(--sidebar-width);
+    transition: none;
+    box-shadow: 2px 0 8px rgba(0,0,0,0.15);
+}
+
+/* DESKTOP: CHỈ DÙNG JAVASCRIPT STYLE TAG */
+
+/* TẮT TRANSITION HOÀN TOÀN */
+.admin-sidebar.no-transition {
+    transition: none !important;
+}
+
+/* BẬT TRANSITION CHỈ KHI USER TƯƠNG TÁC */
+.admin-sidebar.user-interacting {
+    transition: left 0.3s ease !important;
+}
+
+/* Sidebar header styling */
+.admin-sidebar .text-dark {
+    color: #212529 !important;
+}
+
+.admin-sidebar .text-muted {
+    color: #6c757d !important;
+}
+
+.admin-sidebar .btn-outline-dark {
+    border-color: #6c757d;
+    color: #6c757d;
+}
+
+.admin-sidebar .btn-outline-dark:hover {
+    background-color: #6c757d;
+    color: white;
+}
+
+/* Nút đăng xuất - Màu đỏ thay vì vàng */
+.admin-sidebar .nav-link.text-danger {
+    color: #dc3545 !important;
+}
+
+.admin-sidebar .nav-link.text-danger:hover {
+    color: #c82333 !important;
+    background-color: #f8d7da;
+}
+
+/* Link điều hướng trong sidebar - Phong cách tối giản */
 .admin-sidebar .nav-link {
-    color: rgba(255,255,255,0.8);
+    color: #495057;
     border-radius: 0.5rem;
     margin: 0.2rem 0;
     transition: all 0.3s ease;
+    padding: 0.75rem 1rem;
+    font-weight: 500;
 }
 
+/* Hiệu ứng hover cho nav-link */
 .admin-sidebar .nav-link:hover {
-    color: white;
-    background: rgba(255,255,255,0.1);
-    transform: translateX(5px);
+    color: #212529;
+    background: #f8f9fa;
+    transform: translateX(3px);
 }
 
+/* Trạng thái active của nav-link */
 .admin-sidebar .nav-link.active {
-    color: white;
-    background: rgba(255,255,255,0.2);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    color: #212529;
+    background: #e9ecef;
+    border-left: 3px solid #6c757d;
 }
 
+/* Thanh cuộn tùy chỉnh cho sidebar - Phong cách tối giản */
+.admin-sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.admin-sidebar::-webkit-scrollbar-track {
+    background: #f8f9fa;
+}
+
+.admin-sidebar::-webkit-scrollbar-thumb {
+    background: #dee2e6;
+    border-radius: 3px;
+}
+
+.admin-sidebar::-webkit-scrollbar-thumb:hover {
+    background: #adb5bd;
+}
+
+/* ========================================
+   4. CONTENT AREA - Khu vực nội dung chính
+   ======================================== */
+
+/* Khu vực nội dung (bên phải sidebar) */
+.content-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    transition: none;
+    margin: 0;
+    padding: 0;
+    margin-left: 0;
+}
+
+/* BẬT TRANSITION CHỈ KHI USER TƯƠNG TÁC */
+.content-area.user-interacting {
+    transition: margin-left 0.3s ease !important;
+}
+
+/* Nội dung chính - Phong cách tối giản */
+.main-content {
+    background-color: #f8f9fa;
+    flex: 1;
+    padding: 1.5rem;
+    margin: 0;
+}
+
+/* ========================================
+   5. HEADER - Phần đầu trang
+   ======================================== */
+
+/* Header admin */
 .admin-header {
-    background: white;
+    background: #ffffff;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     border-bottom: 1px solid #e9ecef;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 100 !important;
+    transition: all 0.3s ease;
+    width: 100%;
 }
 
-.admin-main-content {
-    background-color: #f8f9fa;
-    min-height: calc(100vh - 60px);
+/* Header khi scroll - hiệu ứng nổi bật */
+.admin-header.scrolled {
+    background: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+    border-bottom: 1px solid rgba(222, 226, 230, 0.8);
 }
 
-/* Cards */
+/* ========================================
+   6. FOOTER - Phần chân trang
+   ======================================== */
+
+/* Footer admin*/
+.admin-footer {
+    background: white;
+    border-top: 1px solid #dee2e6;
+    box-shadow: 0 -1px 2px rgba(0,0,0,0.05);
+    padding: 0.3rem 0 0.05rem 0;
+    height: auto;
+    min-height: 0.5rem;
+    max-height: 0.5rem;
+    margin: 0;
+    flex-shrink: 0;
+}
+
+/* Container của footer */
+.admin-footer .container-fluid {
+    padding: 0.1rem 1rem;
+}
+
+/* Text trong footer */
+.admin-footer small {
+    font-size: 0.75rem;
+    line-height: 1.2;
+    margin: 0;
+}
+
+/* Row trong footer */
+.admin-footer .row {
+    margin: 0;
+}
+
+/* Column trong footer */
+.admin-footer .col-md-6 {
+    padding: 0.1rem 0.5rem;
+}
+
+/* ========================================
+   7. CARDS - Thẻ hiển thị
+   ======================================== */
+
+/* Card cơ bản */
 .admin-card {
     border: none;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
+/* Hiệu ứng hover cho card */
 .admin-card:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0,0,0,0.15);
 }
 
-/* Stats Cards */
+/* Card thống kê*/
 .stats-card {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    border: none;
+    background: #ffffff;
+    color: #495057;
+    border: 1px solid #e9ecef;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 .stats-card .card-body {
@@ -63,7 +273,11 @@
     margin-bottom: 0.5rem;
 }
 
-/* Tables */
+/* ========================================
+   8. TABLES - Bảng dữ liệu
+   ======================================== */
+
+/* Bảng admin */
 .admin-table {
     background: white;
     border-radius: 0.5rem;
@@ -75,6 +289,7 @@
     margin-bottom: 0;
 }
 
+/* Header của bảng */
 .admin-table .table thead th {
     background-color: #f8f9fa;
     border-bottom: 2px solid #dee2e6;
@@ -82,7 +297,11 @@
     color: #495057;
 }
 
-/* Forms */
+/* ========================================
+   9. FORMS - Biểu mẫu
+   ======================================== */
+
+/* Form admin */
 .admin-form {
     background: white;
     padding: 2rem;
@@ -95,20 +314,26 @@
     color: #495057;
 }
 
-/* Buttons */
+/* ========================================
+   10. BUTTONS - Nút bấm
+   ======================================== */
+
+/* Nút primary admin*/
 .btn-admin-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #495057;
     border: none;
     color: white;
     font-weight: 500;
+    border-radius: 0.375rem;
 }
 
 .btn-admin-primary:hover {
-    background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+    background: #343a40;
     color: white;
     transform: translateY(-1px);
 }
 
+/* Nút danger admin */
 .btn-admin-danger {
     background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
     border: none;
@@ -120,17 +345,25 @@
     color: white;
 }
 
-/* Alerts */
+/* ========================================
+   11. ALERTS - Thông báo
+   ======================================== */
+
+/* Alert admin */
 .admin-alert {
     border: none;
     border-radius: 0.5rem;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-/* Breadcrumb */
+/* ========================================
+   12. BREADCRUMB - Đường dẫn điều hướng
+   ======================================== */
+
+/* Breadcrumb admin */
 .admin-breadcrumb {
     background-color: #f8f9fa;
-    border-bottom: 1px solid #dee2e6;
+    border-bottom: 1px solid #e9ecef;
     padding: 0.75rem 1rem;
 }
 
@@ -140,27 +373,11 @@
     padding: 0;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-    .admin-sidebar {
-        position: fixed;
-        top: 0;
-        left: -100%;
-        width: 250px;
-        z-index: 1050;
-        transition: left 0.3s ease;
-    }
-    
-    .admin-sidebar.show {
-        left: 0;
-    }
-    
-    .admin-main-content {
-        margin-left: 0;
-    }
-}
+/* ========================================
+   13. LOADING - Trạng thái tải
+   ======================================== */
 
-/* Loading */
+/* Container loading */
 .admin-loading {
     display: flex;
     justify-content: center;
@@ -168,6 +385,7 @@
     height: 200px;
 }
 
+/* Spinner loading */
 .admin-spinner {
     width: 3rem;
     height: 3rem;
@@ -177,25 +395,714 @@
     animation: spin 1s linear infinite;
 }
 
+/* Animation cho spinner */
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
 
-/* Custom scrollbar */
-.admin-sidebar::-webkit-scrollbar {
-    width: 6px;
+/* ========================================
+   14. FORM VALIDATION STYLES
+   ======================================== */
+
+.form-control.is-invalid,
+.form-select.is-invalid {
+    border-color: #dc3545 !important;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
 }
 
-.admin-sidebar::-webkit-scrollbar-track {
-    background: rgba(255,255,255,0.1);
+.invalid-feedback {
+    display: block;
+    width: 100%;
+    margin-top: 0.25rem;
+    font-size: 0.875rem;
+    color: #dc3545;
+    font-weight: 500;
 }
 
-.admin-sidebar::-webkit-scrollbar-thumb {
-    background: rgba(255,255,255,0.3);
-    border-radius: 3px;
+.form-control.is-valid,
+.form-select.is-valid {
+    border-color: #198754 !important;
+    box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.25) !important;
 }
 
-.admin-sidebar::-webkit-scrollbar-thumb:hover {
-    background: rgba(255,255,255,0.5);
+.valid-feedback {
+    display: block;
+    width: 100%;
+    margin-top: 0.25rem;
+    font-size: 0.875rem;
+    color: #198754;
+    font-weight: 500;
+}
+
+/* ========================================
+   15. TAB STYLES - Tab navigation
+   ======================================== */
+
+/* Fix chiều cao tab content */
+.tab-content {
+    min-height: 400px;
+}
+
+.tab-pane {
+    min-height: 400px;
+}
+
+.tab-pane .card {
+    min-height: 350px;
+}
+
+.tab-pane .card-body {
+    min-height: 300px;
+}
+
+/* Smooth transition khi chuyển tab */
+.tab-pane {
+    transition: opacity 0.15s linear;
+}
+
+.tab-pane.fade {
+    opacity: 0;
+}
+
+.tab-pane.fade.show {
+    opacity: 1;
+}
+
+/* Đảm bảo layout không bị nhảy */
+.profile-forms-container {
+    height: auto;
+    min-height: 500px;
+}
+
+/* Đảm bảo tab content có chiều cao cố định */
+#profileTabsContent {
+    min-height: 450px;
+}
+
+/* Đảm bảo các tab có chiều cao bằng nhau */
+#profile, #password, #activity {
+    min-height: 400px;
+}
+
+/* Smooth animation cho tab switching */
+.tab-content {
+    position: relative;
+}
+
+.tab-pane {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+}
+
+.tab-pane.active {
+    position: relative;
+    opacity: 1;
+}
+
+/* ========================================
+   16. NOTIFICATION SYSTEM STYLES
+   ======================================== */
+
+/* Notification Container */
+.notification-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    max-width: 400px;
+    width: 400px;
+    min-width: 300px;
+}
+
+/* Notification Item */
+.notification {
+    position: relative;
+    padding: 0;
+    margin-bottom: 10px;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+    overflow: hidden;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    width: 100%;
+    min-height: 70px;
+    display: flex;
+    flex-direction: column;
+}
+
+.notification-content {
+    padding: 18px;
+    position: relative;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.notification-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.notification-icon {
+    font-size: 1.3rem;
+    margin-right: 10px;
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.1));
+}
+
+.notification-title {
+    font-weight: 700;
+    font-size: 0.95rem;
+    flex: 1;
+    letter-spacing: 0.3px;
+}
+
+.notification-close {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 4px;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+    opacity: 0.7;
+}
+
+.notification-close:hover {
+    background-color: rgba(0,0,0,0.1);
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.notification-body {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: #374151;
+    margin-bottom: 8px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.notification-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background-color: rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.notification-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, rgba(255,255,255,0.8), rgba(255,255,255,0.4));
+    border-radius: 0 2px 2px 0;
+    box-shadow: 0 0 8px rgba(255,255,255,0.3);
+}
+
+/* Notification Types */
+.notification-success {
+    background-color: #f0f9ff;
+    border-left: 4px solid #10b981;
+}
+
+.notification-success .notification-icon {
+    color: #10b981;
+}
+
+.notification-success .notification-progress-bar {
+    background: linear-gradient(90deg, #10b981, #34d399);
+}
+
+.notification-danger {
+    background-color: #fef2f2;
+    border-left: 4px solid #ef4444;
+}
+
+.notification-danger .notification-icon {
+    color: #ef4444;
+}
+
+.notification-danger .notification-progress-bar {
+    background: linear-gradient(90deg, #ef4444, #f87171);
+}
+
+.notification-warning {
+    background-color: #fffbeb;
+    border-left: 4px solid #f59e0b;
+}
+
+.notification-warning .notification-icon {
+    color: #f59e0b;
+}
+
+.notification-warning .notification-progress-bar {
+    background: linear-gradient(90deg, #f59e0b, #fbbf24);
+}
+
+.notification-info {
+    background-color: #f0f9ff;
+    border-left: 4px solid #3b82f6;
+}
+
+.notification-info .notification-icon {
+    color: #3b82f6;
+}
+
+.notification-info .notification-progress-bar {
+    background: linear-gradient(90deg, #3b82f6, #60a5fa);
+}
+
+/* Animation cho notification */
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideOutRight {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+}
+
+/* Notification hover effects */
+.notification:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 35px rgba(0,0,0,0.15);
+}
+
+/* ========================================
+   17. RESPONSIVE - Giao diện đáp ứng
+   ======================================== */
+
+/* Mobile và tablet - Sidebar đóng mặc định */
+@media (max-width: 991px) {
+    /* Mobile: Sidebar đóng mặc định */
+    .admin-sidebar {
+        left: var(--sidebar-closed) !important;
+        background: #e9ecef !important;
+    }
+    
+    /* Mobile: Content area đóng mặc định */
+    .content-area {
+        margin-left: 0 !important;
+    }
+    
+    /* Mobile: Sidebar mở khi có class show */
+    .admin-sidebar.show {
+        left: var(--sidebar-open) !important;
+    }
+    
+    /* Mobile: Content area mở khi sidebar có class show */
+    .admin-sidebar.show ~ .content-area {
+        margin-left: var(--sidebar-width) !important; /* MỞ KHI SIDEBAR MỞ */
+    }
+    
+    /* Mobile: Ẩn hamburger khi sidebar mở */
+    .admin-sidebar.show ~ .content-area .sidebar-toggle {
+        display: none !important;
+    }
+    
+    /* Mobile: Sidebar đóng khi có class collapsed */
+    .admin-sidebar.collapsed {
+        left: var(--sidebar-closed) !important;
+    }
+    
+    /* Mobile: Content area đóng khi sidebar có class collapsed */
+    .admin-sidebar.collapsed ~ .content-area {
+        margin-left: 0 !important;
+    }
+    
+    /* Header hamburger luôn hiển thị trên mobile */
+    .sidebar-toggle {
+        display: block !important;
+    }
+    
+    /* Notification responsive trên mobile */
+    .notification-container {
+        width: calc(100vw - 40px);
+        max-width: 350px;
+        min-width: 280px;
+        right: 20px;
+        left: 20px;
+    }
+    
+    .notification {
+        min-height: 60px;
+    }
+    
+    .notification-content {
+        padding: 14px 16px;
+    }
+    
+    .notification-icon {
+        font-size: 1.1rem;
+    }
+    
+    .notification-title {
+        font-size: 0.9rem;
+    }
+    
+    .notification-body {
+        font-size: 0.85rem;
+    }
+}
+
+
+/* ========================================
+   18. OTP VERIFICATION STYLES
+   ======================================== */
+
+/* OTP Modal Styles */
+#otpVerificationModal .modal-content {
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+#otpVerificationModal .modal-header {
+    border-radius: 12px 12px 0 0;
+    background: linear-gradient(135deg, #007bff, #0056b3);
+}
+
+#otpVerificationModal .otp-icon {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+#otpVerificationModal .otp-input {
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: 0.5rem;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+#otpVerificationModal .otp-input:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    transform: scale(1.02);
+}
+
+#otpVerificationModal .otp-input.is-valid {
+    border-color: #28a745;
+    background-color: rgba(40, 167, 69, 0.1);
+}
+
+#otpVerificationModal .otp-input.is-invalid {
+    border-color: #dc3545;
+    background-color: rgba(220, 53, 69, 0.1);
+}
+
+#otpVerificationModal #otpTimer {
+    font-family: 'Courier New', monospace;
+    font-size: 1.1rem;
+}
+
+#otpVerificationModal .btn-outline-secondary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* OTP Form Animation */
+#otpVerificationModal .modal-body {
+    animation: slideInUp 0.3s ease-out;
+}
+
+#otpVerificationModal .modal-footer {
+    border-top: 1px solid #e9ecef;
+    padding: 1rem 1.5rem;
+    background-color: #f8f9fa;
+    display: flex;
+    justify-content: center;
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ========================================
+   19. PASSWORD TOGGLE STYLES - Nút ẩn/hiện mật khẩu
+   ======================================== */
+
+.input-group {
+    display: flex !important;
+    height: 38px !important;
+    min-height: 38px !important;
+    max-height: 38px !important;
+}
+
+.input-group .form-control {
+    height: 38px !important;
+    min-height: 38px !important;
+    max-height: 38px !important;
+    line-height: 38px !important;
+    padding: 0.375rem 0.75rem !important;
+}
+
+.input-group .btn-outline-secondary {
+    height: 38px !important;
+    min-height: 38px !important;
+    max-height: 38px !important;
+    padding: 0 12px !important;
+    border-left: none !important;
+    border-color: #ced4da !important;
+    transition: all 0.3s ease !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+}
+
+.input-group .btn-outline-secondary:hover {
+    background-color: #e9ecef;
+    border-color: #ced4da;
+}
+
+.input-group .btn-outline-secondary:focus {
+    box-shadow: none;
+    border-color: #80bdff;
+}
+
+.input-group .btn-outline-secondary i {
+    font-size: 1.1rem;
+}
+
+/* Đảm bảo input không bị border conflict */
+.input-group .form-control:focus {
+    border-right: none;
+}
+
+.input-group .form-control:focus + .btn-outline-secondary {
+    border-left: none;
+    border-color: #80bdff;
+}
+
+/* ========================================
+   20. USER MANAGEMENT TABLE - Fixed height
+   ======================================== */
+#usersTable {
+    min-height: 400px;
+}
+
+.card-body[style*='min-height'] .table-responsive {
+    min-height: 400px;
+}
+
+/* ========================================
+   21. BANNER MANAGEMENT - Quản lý banner
+   ======================================== */
+
+/* Banner card */
+.banner-card {
+    transition: all 0.3s ease !important;
+}
+
+.banner-card:hover {
+    transform: translateY(-5px) !important;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+}
+
+/* Ảnh banner preview */
+.banner-image-preview {
+    height: 200px !important;
+    object-fit: cover !important;
+    border-radius: 8px !important;
+    width: 100% !important;
+}
+
+.banner-image-wrapper {
+    height: 200px !important;
+    position: relative !important;
+    overflow: hidden !important;
+    border-radius: 8px !important;
+}
+
+.banner-placeholder {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%) !important;
+}
+
+/* Vùng upload */
+.upload-area {
+    border: 2px dashed #dee2e6;
+    border-radius: 8px;
+    padding: 3rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.upload-area:hover {
+    border-color: #0d6efd;
+    background-color: #f8f9fa;
+}
+
+.upload-area.dragover {
+    border-color: #0d6efd;
+    background-color: #e7f1ff;
+}
+
+/* Badge custom */
+.badge-custom {
+    font-size: 0.75rem;
+    padding: 0.35rem 0.65rem;
+}
+
+/* Badge số thứ tự */
+.banner-card .badge.bg-primary {
+    font-size: 0.875rem !important;
+    padding: 0.5rem 0.75rem !important;
+    z-index: 10 !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2) !important;
+}
+
+/* ========================================
+   22. SHOWROOMS MANAGEMENT STYLES
+   ======================================== */
+
+/* Card cửa hàng */
+.showroom-card {
+    transition: box-shadow 0.2s;
+}
+
+.showroom-card:hover {
+    box-shadow: 0 0.5rem 1.5rem rgba(0,0,0,0.15) !important;
+}
+
+/* Padding cho card content */
+.showroom-card .card-body {
+    padding: 1.5rem;
+}
+
+/* Responsive: Mobile stack map lên trên */
+@media (max-width: 991.98px) {
+    .showroom-map-preview-full {
+        min-height: 350px;
+    }
+}
+
+/* Preview map cửa hàng */
+.showroom-map-preview {
+    height: 200px;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.showroom-map-preview iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+/* Preview map cửa hàng full width (view grid) */
+.showroom-map-preview-full {
+    height: 100%;
+    min-height: 400px;
+    border-radius: 0;
+    overflow: hidden;
+}
+
+.showroom-map-preview-full iframe {
+    width: 100%;
+    height: 100%;
+    min-height: 400px;
+    border: none;
+}
+
+/* Badge trạng thái */
+.status-badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 50px;
+}
+
+/* Vùng upload */
+.upload-area {
+    border: 2px dashed #dee2e6;
+    border-radius: 8px;
+    padding: 3rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.upload-area:hover {
+    border-color: #0d6efd;
+    background-color: #f8f9fa;
+}
+
+/* View grid specific styles */
+#showroomGrid .card {
+    margin-bottom: 1.5rem;
+}
+
+/* View list specific styles */
+#showroomList table {
+    margin-bottom: 0;
+}
+
+/* =========================================================
+   23. PAGES MANAGEMENT STYLES
+   ========================================================= */
+
+/* Textarea editor HTML */
+#pageContentTextarea {
+    font-family: 'Courier New', Consolas, monospace;
+    line-height: 1.6;
+}
+
+/* Preview trang trong modal */
+#viewContent {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+#viewContent img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Hiển thị mã slug */
+code.text-primary {
+    font-size: 0.9em;
+    font-weight: 500;
 }

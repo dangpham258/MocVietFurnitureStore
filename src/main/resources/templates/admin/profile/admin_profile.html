@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/fragments/admin_layout}">
+<head>
+    <title>Quản lý tài khoản - Admin Panel</title>
+</head>
+<body>
+<div layout:fragment="content" th:fragment="content" class="main-content">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">Quản lý tài khoản</h2>
+            <p class="text-muted mb-0">Cập nhật thông tin cá nhân và cài đặt tài khoản</p>
+        </div>
+        <div>
+            <span class="badge bg-success fs-6">
+                <i class="bi bi-shield-check me-1"></i>
+                Tài khoản Admin
+            </span>
+        </div>
+    </div>
+
+    <!-- Alert Messages -->
+    <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle me-2"></i>
+        <span th:text="${success}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        <span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div class="row">
+        <!-- Profile Information -->
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <!-- User Info -->
+                    <h5 class="card-title mb-1" th:text="${user?.fullName ?: 'Administrator'}">Administrator</h5>
+                    <p class="text-muted mb-2" th:text="${user?.roleName ?: 'ADMIN'}">ADMIN</p>
+                    <span class="badge bg-danger" th:text="${user?.roleName ?: 'ADMIN'}">ADMIN</span>
+                    
+                    <!-- Quick Stats -->
+                    <div class="row mt-4">
+                        <div class="col-6">
+                            <div class="border-end">
+                                <small class="text-muted">ID Admin</small>
+                                <h6 class="mb-0" th:text="${user?.id ?: 'N/A'}">1</h6>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted">Trạng thái</small>
+                            <h6 class="mb-0" th:text="${user?.isActive == true ? 'Hoạt động' : 'Khóa'}">Hoạt động</h6>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Security Info -->
+            <div class="card border-0 shadow-sm mt-3">
+                <div class="card-header bg-white">
+                    <h6 class="card-title mb-0">
+                        <i class="bi bi-shield-lock me-2"></i>
+                        Bảo mật
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span>Trạng thái tài khoản</span>
+                    <span class="badge" th:classappend="${user?.isActive == true ? 'bg-success' : 'bg-danger'}" th:text="${user?.isActive == true ? 'Hoạt động' : 'Tạm khóa'}">Hoạt động</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span>Vai trò</span>
+                    <span class="badge bg-primary" th:text="${user?.roleName ?: 'ADMIN'}">ADMIN</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span>Ngày tạo</span>
+                    <small class="text-muted" th:text="${user?.createdAt != null ? #temporals.format(user.createdAt, 'dd/MM/yyyy') : 'N/A'}">01/01/2024</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Profile Forms -->
+        <div class="col-md-8 profile-forms-container">
+            <!-- Tabs -->
+            <ul class="nav nav-tabs mb-4" id="profileTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab">
+                        <i class="bi bi-person me-1"></i>Thông tin cá nhân
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="password-tab" data-bs-toggle="tab" data-bs-target="#password" type="button" role="tab">
+                        <i class="bi bi-key me-1"></i>Đổi mật khẩu
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="activity-tab" data-bs-toggle="tab" data-bs-target="#activity" type="button" role="tab">
+                        <i class="bi bi-clock-history me-1"></i>Thông tin tài khoản
+                    </button>
+                </li>
+            </ul>
+            
+            <div class="tab-content" id="profileTabsContent">
+                <!-- Profile Information Tab -->
+                <div class="tab-pane fade show active" id="profile" role="tabpanel">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-white">
+                            <h5 class="card-title mb-0">
+                                <i class="bi bi-person me-2"></i>
+                                Thông tin cá nhân
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form class="needs-validation" th:action="@{/admin/profile/update}" method="post" th:object="${profileUpdateRequest}" novalidate>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Username *</label>
+                                        <input type="text" class="form-control" th:value="${user?.username}" readonly>
+                                        <div class="form-text">Username không thể thay đổi</div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Email *</label>
+                                        <input type="email" class="form-control" th:field="*{email}" required>
+                                        <div class="invalid-feedback" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Họ và tên *</label>
+                                        <input type="text" class="form-control" th:field="*{fullName}" required>
+                                        <div class="invalid-feedback" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}"></div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Số điện thoại</label>
+                                        <input type="tel" class="form-control" th:field="*{phone}">
+                                        <div class="invalid-feedback" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Giới tính</label>
+                                        <select class="form-select" th:field="*{gender}">
+                                            <option value="">Chọn giới tính</option>
+                                            <option value="Nam">Nam</option>
+                                            <option value="Nữ">Nữ</option>
+                                            <option value="Khác">Khác</option>
+                                        </select>
+                                        <div class="invalid-feedback" th:if="${#fields.hasErrors('gender')}" th:errors="*{gender}"></div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Ngày sinh</label>
+                                        <input type="date" class="form-control" id="dob" name="dob" th:value="${formattedDob}">
+                                        <div class="invalid-feedback" th:if="${#fields.hasErrors('dob')}" th:errors="*{dob}"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="d-flex justify-content-end">
+                                    <button type="submit" class="btn btn-primary btn-submit">
+                                        <i class="bi bi-check-lg me-1"></i>Cập nhật thông tin
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Change Password Tab -->
+                <div class="tab-pane fade" id="password" role="tabpanel">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-white">
+                            <h5 class="card-title mb-0">
+                                <i class="bi bi-key me-2"></i>
+                                Đổi mật khẩu
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form class="needs-validation" th:action="@{/admin/profile/change-password}" method="post" th:object="${passwordChangeRequest}" novalidate>
+                                <div class="mb-3">
+                                    <label class="form-label">Mật khẩu hiện tại *</label>
+                                    <div class="input-group">
+                                        <input type="password" class="form-control" name="currentPassword" id="currentPassword" required>
+                                        <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('currentPassword', this)">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </div>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('currentPassword')}" th:errors="*{currentPassword}"></div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">Mật khẩu mới *</label>
+                                    <div class="input-group">
+                                        <input type="password" class="form-control" name="newPassword" id="newPassword" required minlength="8">
+                                        <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('newPassword', this)">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </div>
+                                    <div class="form-text">Mật khẩu phải có ít nhất 8 ký tự</div>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('newPassword')}" th:errors="*{newPassword}"></div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">Xác nhận mật khẩu mới *</label>
+                                    <div class="input-group">
+                                        <input type="password" class="form-control" name="confirmPassword" id="confirmPassword" required minlength="8">
+                                        <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('confirmPassword', this)">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </div>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}"></div>
+                                </div>
+                                
+                                <div class="alert alert-warning">
+                                    <i class="bi bi-exclamation-triangle me-2"></i>
+                                    Sau khi đổi mật khẩu, bạn sẽ cần đăng nhập lại.
+                                </div>
+                                
+                                <div class="d-flex justify-content-end">
+                                    <button type="submit" class="btn btn-warning btn-submit">
+                                        <i class="bi bi-key me-1"></i>Đổi mật khẩu
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Account Information Tab -->
+                <div class="tab-pane fade" id="activity" role="tabpanel">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-white">
+                            <h5 class="card-title mb-0">
+                                <i class="bi bi-info-circle me-2"></i>
+                                Thông tin tài khoản
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>ID tài khoản:</strong>
+                            <span th:text="${user?.id ?: 'N/A'}">1</span>
+                                        </div>
+                        <div class="col-md-6">
+                            <strong>Username:</strong>
+                            <span th:text="${user?.username ?: 'admin'}">admin</span>
+                                    </div>
+                                </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Email:</strong>
+                            <span th:text="${user?.email ?: 'admin@mocviet.com'}">admin@mocviet.com</span>
+                                    </div>
+                        <div class="col-md-6">
+                            <strong>Vai trò:</strong>
+                            <span class="badge bg-danger" th:text="${user?.roleName ?: 'ADMIN'}">ADMIN</span>
+                                    </div>
+                                </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Trạng thái:</strong>
+                            <span class="badge" th:classappend="${user?.isActive == true ? 'bg-success' : 'bg-danger'}" th:text="${user?.isActive == true ? 'Hoạt động' : 'Tạm khóa'}">Hoạt động</span>
+                                    </div>
+                        <div class="col-md-6">
+                            <strong>Ngày tạo:</strong>
+                            <span th:text="${user?.createdAt != null ? #temporals.format(user.createdAt, 'dd/MM/yyyy HH:mm') : 'N/A'}">01/01/2024 00:00</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</div>
+
+</body>
+</html>

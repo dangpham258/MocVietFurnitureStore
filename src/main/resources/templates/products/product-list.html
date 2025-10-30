@@ -57,7 +57,20 @@
                 <div class="row">
                     <div th:each="product : ${productPage.content}" class="col-md-4 mb-4">
                         <div class="card h-100">
-                            <img th:src="${product.thumbnailUrl}" class="card-img-top" alt="Ảnh sản phẩm">
+                            <img th:if="${product.thumbnailUrl != null 
+                                           and (#strings.startsWith(product.thumbnailUrl, '/') 
+                                                or (#strings.startsWith(product.thumbnailUrl, 'http') 
+                                                    and !#strings.contains(product.thumbnailUrl, 'via.placeholder.com')))}"
+                                 th:src="${product.thumbnailUrl}"
+                                 class="card-img-top" alt="Ảnh sản phẩm" style="height: 250px; object-fit: cover;">
+                            <div th:unless="${product.thumbnailUrl != null 
+                                               and (#strings.startsWith(product.thumbnailUrl, '/') 
+                                                    or (#strings.startsWith(product.thumbnailUrl, 'http') 
+                                                        and !#strings.contains(product.thumbnailUrl, 'via.placeholder.com')))}"
+                                 class="card-img-top bg-light d-flex align-items-center justify-content-center"
+                                 style="height: 250px;">
+                                <span class="text-muted">Không có ảnh</span>
+                            </div>
                             
                             <div class="card-body d-flex flex-column">
                                 <h5 class="card-title" th:text="${product.name}">Tên sản phẩm</h5>

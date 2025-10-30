@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>Showroom - Mộc Việt</title>
+    <style>
+        .section-title { font-weight: bold; color: #8B4513; border-bottom: 2px solid #A0522D; padding-bottom: 10px; margin-bottom: 30px; }
+        .showroom-card { border: 1px solid #dee2e6; border-radius: 8px; overflow: hidden; background: #fff; transition: transform 0.2s, box-shadow 0.2s; }
+        .showroom-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .showroom-body { padding: 20px; }
+        .showroom-title { color: #8B4513; font-weight: 700; margin-bottom: 15px; }
+        .info-item { display: flex; align-items: center; margin-bottom: 8px; }
+        .info-item i { color: #8B4513; width: 24px; margin-right: 10px; text-align: center; }
+        .map-container { position: relative; height: 240px; border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+        .map-embed iframe { width: 100%; height: 100%; border: 0; object-fit: cover; }
+        .map-embed { width: 100%; height: 100%; }
+        .map-overlay { position: absolute; top: 8px; right: 8px; z-index: 10; }
+        .map-btn { background: #8B4513; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); transition: all 0.2s; }
+        .map-btn:hover { background: #A0522D; color: white; transform: translateY(-1px); box-shadow: 0 4px 8px rgba(0,0,0,0.3); }
+        .no-map { background: #f8f9fa; display: flex; align-items: center; justify-content: center; color: #6c757d; font-style: italic; }
+    </style>
+    </head>
+<body>
+
+<div layout:fragment="content">
+    <div class="container my-5">
+        <h1 class="text-center mb-4 section-title">Hệ thống Showroom</h1>
+        <p class="text-center text-muted mb-5">Xem thông tin địa chỉ các cửa hàng trưng bày: tên, địa chỉ, SĐT, email, giờ mở cửa, bản đồ.</p>
+
+        <div class="row g-4" th:if="${showrooms} != null">
+            <div class="col-12" th:if="${#lists.isEmpty(showrooms)}">
+                <div class="alert alert-info">Hiện chưa có showroom nào.</div>
+            </div>
+
+            <div class="col-md-6" th:each="s : ${showrooms}">
+                <div class="showroom-card shadow-sm">
+                    <div class="map-container" th:with="addr=${s.address + (s.district != null ? ', ' + s.district : '') + (s.city != null ? ', ' + s.city : '')}, mapUrl=${'https://www.google.com/maps?q=' + #strings.replace(addr,' ', '+') + '&output=embed'}">
+                        <div class="map-embed" th:if="${s.mapEmbed != null}" th:utext="${s.mapEmbed}"></div>
+                        <div class="map-embed" th:if="${s.mapEmbed == null}">
+                            <iframe th:src="${mapUrl}" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                        </div>
+                        <div class="map-overlay">
+                            <button class="map-btn"
+                                    th:if="${s.mapEmbed != null}"
+                                    th:attr="data-map-type=${'embed'},data-map-content=${s.mapEmbed}"
+                                    onclick="openMapModalFromButton(this)"
+                                    title="Xem bản đồ toàn màn hình">
+                                <i class="bi bi-arrows-fullscreen"></i>
+                            </button>
+                            <button class="map-btn"
+                                    th:if="${s.mapEmbed == null}"
+                                    th:attr="data-map-type=${'url'},data-map-content=${mapUrl}"
+                                    onclick="openMapModalFromButton(this)"
+                                    title="Xem bản đồ toàn màn hình">
+                                <i class="bi bi-arrows-fullscreen"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="showroom-body">
+                        <h5 class="showroom-title" th:text="${s.name}">Tên showroom</h5>
+
+                        <div class="info-item" th:if="${s.address != null}">
+                            <i class="bi bi-geo-alt-fill"></i>
+                            <span th:text="${s.address + (s.district != null ? ', ' + s.district : '') + (s.city != null ? ', ' + s.city : '')}">Địa chỉ</span>
+                        </div>
+                        <div class="info-item" th:if="${s.phone != null}">
+                            <i class="bi bi-telephone-fill"></i>
+                            <a th:href="${'tel:' + s.phone}" class="text-decoration-none text-dark" th:text="${s.phone}">SĐT</a>
+                        </div>
+                        <div class="info-item" th:if="${s.email != null}">
+                            <i class="bi bi-envelope-fill"></i>
+                            <a th:href="${'mailto:' + s.email}" class="text-decoration-none text-dark" th:text="${s.email}">Email</a>
+                        </div>
+                        <div class="info-item" th:if="${s.openHours != null}">
+                            <i class="bi bi-clock-fill"></i>
+                            <span th:text="${s.openHours}">Giờ mở cửa</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Map Modal -->
+    <div class="modal fade" id="mapModal" tabindex="-1" aria-labelledby="mapModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="mapModalLabel">Bản đồ Showroom</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <div id="modalMapContainer" style="height: 70vh; width: 100%;">
+                        <!-- Map will be loaded here -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openMapModalFromButton(button) {
+            const type = button.getAttribute('data-map-type');
+            const content = button.getAttribute('data-map-content');
+            const container = document.getElementById('modalMapContainer');
+            container.innerHTML = '';
+            if (type === 'embed') {
+                container.innerHTML = content;
+            } else if (type === 'url') {
+                const iframe = document.createElement('iframe');
+                iframe.src = content;
+                iframe.style.width = '100%';
+                iframe.style.height = '100%';
+                iframe.style.border = '0';
+                iframe.setAttribute('loading', 'lazy');
+                iframe.setAttribute('referrerpolicy', 'no-referrer-when-downgrade');
+                container.appendChild(iframe);
+            }
+
+            const mapModal = new bootstrap.Modal(document.getElementById('mapModal'));
+            mapModal.show();
+        }
+
+        document.getElementById('mapModal').addEventListener('hidden.bs.modal', function () {
+            document.getElementById('modalMapContainer').innerHTML = '';
+        });
+    </script>
+    </div>
+
+    </body>
+</html>

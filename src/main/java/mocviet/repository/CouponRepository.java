@@ -1,18 +1,23 @@
 package mocviet.repository;
 
-import mocviet.entity.Coupon;
+import java.util.Optional;
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import mocviet.entity.Coupon;
+
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+
 
 @Repository
 public interface CouponRepository extends JpaRepository<Coupon, String> {
-    
+
+    Optional<Coupon> findByCode(String code);
+
     /**
      * Validate coupon code với điều kiện thời gian và số tiền tối thiểu
      */

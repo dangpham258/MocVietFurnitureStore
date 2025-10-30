@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{manager/fragments/manager_layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>Quản lý Tin nhắn - Mộc Việt Manager</title>
+</head>
+<body>
+
+<div layout:fragment="content">
+    <div class="container-fluid my-4">
+        <div class="row">
+            <div class="col-12">
+                <h2 class="mb-4">Quản lý Tin nhắn</h2>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Danh sách Conversations -->
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Cuộc hội thoại</h5>
+                        <small id="manager-chat-status" class="text-light">Đang kết nối...</small>
+                    </div>
+                    <div class="list-group list-group-flush" id="manager-conversations-list" style="max-height: 600px; overflow-y: auto;">
+                        <div class="text-center text-muted p-3">Đang tải...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chi tiết Conversation và Messages -->
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Tin nhắn</h5>
+                        <button class="btn btn-sm btn-danger" id="manager-chat-close-conversation">
+                            <i class="bi bi-x-circle"></i> Đóng cuộc hội thoại
+                        </button>
+                    </div>
+                    <div id="manager-chat-messages" class="card-body" style="height: 400px; overflow-y: auto; background: #f8f9fa;">
+                        <div class="text-center text-muted p-3">Chọn một cuộc hội thoại để xem tin nhắn</div>
+                    </div>
+                    <div class="card-footer">
+                        <div class="input-group">
+                            <input type="text" id="manager-chat-input" class="form-control" 
+                                   placeholder="Nhập tin nhắn..." disabled>
+                            <button class="btn btn-primary" id="manager-chat-send" type="button" disabled>
+                                <i class="bi bi-send"></i> Gửi
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="extra-scripts">
+    <!-- WebSocket Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2/lib/stomp.min.js"></script>
+    <script src="/js/manager/chat.js"></script>
+  </th:block>
+
+</body>
+</html>

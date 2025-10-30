@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -41,4 +42,10 @@ public interface UserRepository extends JpaRepository<User, Integer> {
      * Kiểm tra email đã tồn tại chưa (trừ user hiện tại)
      */
     boolean existsByEmailAndIdNot(String email, Integer id);
+    
+    /**
+     * Tìm tất cả user theo role name
+     */
+    @Query("SELECT u FROM User u JOIN u.role r WHERE r.name = :roleName")
+    List<User> findByRoleName(@Param("roleName") String roleName);
 }

@@ -8,28 +8,37 @@
 <header th:fragment="header" class="admin-header">
     <div class="d-flex justify-content-between align-items-center p-3">
         <!-- Page Title -->
-        <div>
-            <h4 class="mb-0" th:text="${pageTitle ?: 'Admin Panel'}">Admin Panel</h4>
-            <small class="text-muted" th:text="${pageDescription ?: 'Quản trị hệ thống Mộc Việt'}">Quản trị hệ thống Mộc Việt</small>
+        <div class="d-flex align-items-center">
+            <!-- Desktop & Mobile Menu Toggle -->
+            <button class="btn btn-outline-secondary btn-sm me-3 sidebar-toggle" type="button">
+                <i class="bi bi-list"></i>
+            </button>
+            
+            <div>
+                <h4 class="mb-0" th:text="${pageTitle ?: 'Admin Panel'}">Admin Panel</h4>
+                <small class="text-muted" th:text="${pageDescription ?: ''}"></small>
+            </div>
         </div>
         
         <!-- Right Side -->
         <div class="d-flex align-items-center">
             <!-- Notifications -->
             <div class="dropdown me-3">
-                <button class="btn btn-outline-secondary btn-sm position-relative" type="button" data-bs-toggle="dropdown">
+                <button class="btn btn-outline-secondary btn-sm position-relative" type="button" id="notificationDropdown" data-bs-toggle="dropdown">
                     <i class="bi bi-bell"></i>
-                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                        3
+                    <span id="notificationBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="display: none;">
+                        0
                     </span>
                 </button>
-                <ul class="dropdown-menu dropdown-menu-end">
-                    <li><h6 class="dropdown-header">Thông báo mới</h6></li>
-                    <li><a class="dropdown-item" href="#"><small>Bài viết mới từ Manager</small></a></li>
-                    <li><a class="dropdown-item" href="#"><small>Đơn hàng cần xử lý</small></a></li>
-                    <li><a class="dropdown-item" href="#"><small>Tồn kho thấp</small></a></li>
+                <ul class="dropdown-menu dropdown-menu-end" style="min-width: 300px; max-width: 400px;">
+                    <li><h6 class="dropdown-header">Thông báo mới (<span id="headerUnreadCount">0</span>)</h6></li>
+                    <div id="headerNotificationsList">
+                        <li class="px-3 py-2 text-center text-muted"><small>Đang tải...</small></li>
+                    </div>
                     <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item text-center" href="/admin/notifications">Xem tất cả</a></li>
+                    <li><a class="dropdown-item text-center" href="/admin/notifications">
+                        <i class="bi bi-arrow-right me-2"></i>Xem tất cả thông báo
+                    </a></li>
                 </ul>
             </div>
             
@@ -44,8 +53,8 @@
                     <li><a class="dropdown-item" href="/admin/profile">
                         <i class="bi bi-person me-2"></i>Thông tin cá nhân
                     </a></li>
-                    <li><a class="dropdown-item" href="/admin/settings">
-                        <i class="bi bi-gear me-2"></i>Cài đặt
+                    <li><a class="dropdown-item" href="/admin/notifications">
+                        <i class="bi bi-bell me-2"></i>Thông báo
                     </a></li>
                     <li><hr class="dropdown-divider"></li>
                     <li><a class="dropdown-item text-danger" href="/logout">

@@ -78,13 +78,19 @@ public class SecurityConfig {
                     // --- Các trang Guest có thể xem ---
                     "/products",        // Danh sách sản phẩm
                     "/products/**",     // Chi tiết sản phẩm
-                    "/about",           // Trang giới thiệu
+                    "/gioi-thieu",      // Trang giới thiệu
                     "/contact",         // Trang liên hệ
                     "/contact/send-message", // Endpoint xử lý form liên hệ
                     "/news",            // Danh sách tin tức
                     "/news/**",         // Chi tiết tin tức
-                    "/stores",          // Trang showroom (Giả định URL)
-                    "/policy/**",       // Các trang chính sách (Giả định URL)
+                    "/showroom",        // Trang showroom (guest)
+                    
+                    // --- Các trang chính sách trong footer ---
+                    "/chinh-sach-van-chuyen",
+                    "/chinh-sach-bao-hanh",
+                    "/chinh-sach-doi-tra",
+                    "/chinh-sach-bao-mat",
+                    "/chinh-sach-thanh-toan",
                     "/search",          // Trang tìm kiếm (nếu có)
 
                     // --- Tài nguyên tĩnh (QUAN TRỌNG) ---
@@ -92,6 +98,18 @@ public class SecurityConfig {
                     "/js/**",           // Cho phép truy cập JavaScript
                     "/images/**",       // Cho phép truy cập hình ảnh (nếu lưu trong static/images)
                     "/static/**",       // Cho phép truy cập toàn bộ thư mục static
+
+                    // --- Public APIs for chatbox ---
+                    "/api/chat/conversation/open",
+                    "/api/chat/messages",
+                    "/api/chat/conversation/customer-open",
+                    "/api/chat/conversation/info",
+                    "/api/chat/upload-image",
+                    "/api/chat/image/**",
+
+                    // --- WebSocket endpoints ---
+                    "/ws/**",           // WebSocket endpoint cho chat
+                    "/app/**",          // WebSocket message destinations
 
                     // --- API Công khai ---
                     "/api/auth/**",     // API login/register

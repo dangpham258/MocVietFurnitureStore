@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/fragments/admin_layout}">
+<head>
+    <title>Quản lý thông báo</title>
+</head>
+<body>
+    <div layout:fragment="content" th:fragment="content" class="main-content">
+        <!-- Page Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="mb-1">Quản lý thông báo</h2>
+            <p class="text-muted mb-0">Theo dõi và quản lý thông báo hệ thống</p>
+            </div>
+            <div>
+            <button class="btn btn-primary" onclick="notificationsManagement.markAllAsRead()">
+                <i class="bi bi-check-all me-2"></i>
+                Đánh dấu tất cả đã đọc
+            </button>
+            <button class="btn btn-danger ms-2" onclick="notificationsManagement.deleteAllRead()">
+                <i class="bi bi-trash me-2"></i>
+                Xóa tất cả đã đọc
+                </button>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="row mb-4">
+        <div class="col-md-4 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-primary bg-opacity-10 rounded-circle p-3">
+                                <i class="bi bi-bell text-primary fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h5 class="card-title mb-0" id="totalNotifications">0</h5>
+                            <small class="text-muted">Tổng thông báo</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-warning bg-opacity-10 rounded-circle p-3">
+                                <i class="bi bi-envelope-exclamation text-warning fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h5 class="card-title mb-0" id="unreadNotifications">0</h5>
+                            <small class="text-muted">Chưa đọc</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-success bg-opacity-10 rounded-circle p-3">
+                                <i class="bi bi-check-circle text-success fs-4"></i>
+                    </div>
+                </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h5 class="card-title mb-0" id="readNotifications">0</h5>
+                            <small class="text-muted">Đã đọc</small>
+            </div>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <!-- Search and Filter -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <input type="text" id="searchInput" class="form-control" placeholder="Tìm kiếm thông báo..." onkeyup="notificationsManagement.searchNotifications()">
+        </div>
+                    <div class="col-md-3">
+            <select id="statusFilter" class="form-select" onchange="notificationsManagement.filterByStatus()">
+                <option value="all">Tất cả</option>
+                            <option value="unread">Chưa đọc</option>
+                            <option value="read">Đã đọc</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+            <button class="btn btn-outline-secondary w-100" onclick="notificationsManagement.resetFilters()">
+                <i class="bi bi-arrow-counterclockwise me-2"></i>
+                Reset
+                        </button>
+                    </div>
+                </div>
+
+    <!-- Notifications List -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            <div id="notificationsList">
+                <!-- Notifications will be loaded here -->
+            </div>
+        </div>
+                </div>
+
+    <!-- View Notification Modal -->
+    <div class="modal fade" id="viewNotificationModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="viewNotificationTitle">Chi tiết thông báo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="text-muted small">Tiêu đề</label>
+                    <p class="fw-bold" id="viewTitleText"></p>
+                                    </div>
+                <div class="mb-3">
+                    <label class="text-muted small">Nội dung</label>
+                    <p id="viewMessageText"></p>
+                                </div>
+                <div class="mb-3">
+                    <label class="text-muted small">Thời gian</label>
+                    <p id="viewCreatedAtText"></p>
+                                    </div>
+                                </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-primary" onclick="notificationsManagement.markAsReadFromModal()">
+                    <i class="bi bi-check-circle me-2"></i>
+                    Đánh dấu đã đọc
+                                    </button>
+            </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

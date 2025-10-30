@@ -1,19 +1,20 @@
 package mocviet.repository;
 
-import mocviet.entity.StaticPage;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
+import mocviet.entity.StaticPage;
 
 @Repository
 public interface StaticPageRepository extends JpaRepository<StaticPage, Integer> {
 
-    /**
-     * Tìm một trang tĩnh theo slug và đảm bảo trang đó đang hoạt động (isActive = true)
-     * @param slug Slug của trang cần tìm
-     * @return Optional chứa StaticPage nếu tìm thấy
-     */
-    Optional<StaticPage> findBySlugAndIsActiveTrue(String slug);
+    boolean existsBySlugIgnoreCase(String slug);
 
+    boolean existsBySlugIgnoreCaseAndIdNot(String slug, Integer id);
+
+    Optional<StaticPage> findBySlugIgnoreCase(String slug);
+
+    Optional<StaticPage> findBySlugAndIsActiveTrue(String slug);
 }

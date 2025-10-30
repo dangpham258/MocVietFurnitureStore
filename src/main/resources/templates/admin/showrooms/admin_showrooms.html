@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/fragments/admin_layout}">
+<head>
+    <title>Quản lý Showroom - Admin Panel</title>
+</head>
+<body>
+<div layout:fragment="content" th:fragment="content" class="main-content">
+    
+    <div class="container-fluid p-4">
+        <!-- Header Section -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="mb-1">
+                    <i class="bi bi-shop me-2 text-primary"></i>Quản lý Showroom
+                </h3>
+                <p class="text-muted small mb-0">Quản lý thông tin các cửa hàng trưng bày</p>
+            </div>
+            <button class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#addShowroomModal">
+                <i class="bi bi-plus-circle me-2"></i>Thêm Showroom
+            </button>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="row mb-4">
+            <div class="col-12 mb-2">
+                <small class="text-muted">
+                    <i class="bi bi-info-circle me-1"></i>
+                    Thống kê dựa trên bộ lọc hiện tại
+                </small>
+            </div>
+            
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <div class="bg-primary bg-opacity-10 rounded-circle p-3">
+                                    <i class="bi bi-shop text-primary fs-4"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h5 class="card-title mb-0" id="totalShowrooms">0</h5>
+                                <small class="text-muted">Tổng showroom</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <div class="bg-success bg-opacity-10 rounded-circle p-3">
+                                    <i class="bi bi-check-circle text-success fs-4"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h5 class="card-title mb-0" id="activeShowrooms">0</h5>
+                                <small class="text-muted">Đang hoạt động</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <div class="bg-secondary bg-opacity-10 rounded-circle p-3">
+                                    <i class="bi bi-pause-circle text-secondary fs-4"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h5 class="card-title mb-0" id="inactiveShowrooms">0</h5>
+                                <small class="text-muted">Đã tắt</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <div class="bg-info bg-opacity-10 rounded-circle p-3">
+                                    <i class="bi bi-geo-alt text-info fs-4"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h5 class="card-title mb-0" id="totalCities">0</h5>
+                                <small class="text-muted">Tỉnh/Thành</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-search me-1"></i>Tìm kiếm
+                        </label>
+                        <input type="text" class="form-control" id="searchInput" 
+                               placeholder="Tìm theo tên, địa chỉ, tỉnh/thành...">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-filter me-1"></i>Tỉnh/Thành
+                        </label>
+                        <select class="form-select" id="filterCity">
+                            <option value="">Tất cả</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-toggle-on me-1"></i>Trạng thái
+                        </label>
+                        <select class="form-select" id="filterStatus">
+                            <option value="">Tất cả</option>
+                            <option value="active">Đang hoạt động</option>
+                            <option value="inactive">Đã tắt</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="button" class="btn btn-outline-secondary w-100" onclick="resetFilters()">
+                            <i class="bi bi-arrow-clockwise"></i> Reset
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- View Toggle -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="text-muted mb-0">
+                <i class="bi bi-list-ul me-1"></i>Danh sách Showroom
+            </h6>
+            <div class="btn-group" role="group">
+                <button type="button" class="btn btn-sm btn-outline-primary" id="gridViewBtn" onclick="toggleView('grid')">
+                    <i class="bi bi-grid-3x3-gap"></i> Grid
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-primary" id="listViewBtn" onclick="toggleView('list')">
+                    <i class="bi bi-list"></i> List
+                </button>
+            </div>
+        </div>
+
+        <!-- Showroom Cards Container -->
+        <div id="showroomContainer">
+            <div class="row" id="showroomGrid" style="display: none;">
+                <!-- Grid view - Cards will be rendered here -->
+            </div>
+            <div id="showroomList" style="display: none;">
+                <!-- List view - Table will be rendered here -->
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div class="text-center py-5" id="loadingState">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Đang tải...</span>
+            </div>
+            <p class="text-muted mt-3 mb-0">Đang tải danh sách showroom...</p>
+        </div>
+
+        <!-- Empty State -->
+        <div class="text-center py-5" id="emptyState" style="display: none;">
+            <i class="bi bi-search text-muted" style="font-size: 4rem;"></i>
+            <h5 class="mt-3 text-muted" id="emptyStateTitle">Không có kết quả phù hợp</h5>
+            <p class="text-muted" id="emptyStateMessage">Thử thay đổi bộ lọc hoặc tìm kiếm khác</p>
+        </div>
+    </div>
+    
+    <!-- Add Showroom Modal -->
+    <div class="modal fade" id="addShowroomModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">
+                        <i class="bi bi-plus-circle me-2"></i>Thêm Showroom Mới
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="addShowroomForm">
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label fw-bold">Tên showroom *</label>
+                                <input type="text" class="form-control" id="showroomName" 
+                                       placeholder="VD: Mộc Việt - Showroom Hà Nội" required>
+                                <div class="form-text">
+                                    <i class="bi bi-info-circle me-1"></i>Tên hiển thị của showroom
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                <label class="form-label fw-bold">Địa chỉ chi tiết *</label>
+                                <textarea class="form-control" id="showroomAddress" rows="2" 
+                                          placeholder="VD: 123 Đường ABC, Phường 1" required></textarea>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label fw-bold">Quận/Huyện</label>
+                                <input type="text" class="form-control" id="showroomDistrict" 
+                                       placeholder="VD: Quận 1">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Tỉnh/Thành *</label>
+                                <select class="form-select" id="showroomCity" required>
+                                    <option value="">-- Chọn tỉnh/thành --</option>
+                                    <option value="An Giang">An Giang</option>
+                                    <option value="Bà Rịa - Vũng Tàu">Bà Rịa - Vũng Tàu</option>
+                                    <option value="Bắc Giang">Bắc Giang</option>
+                                    <option value="Bắc Kạn">Bắc Kạn</option>
+                                    <option value="Bạc Liêu">Bạc Liêu</option>
+                                    <option value="Bắc Ninh">Bắc Ninh</option>
+                                    <option value="Bến Tre">Bến Tre</option>
+                                    <option value="Bình Định">Bình Định</option>
+                                    <option value="Bình Dương">Bình Dương</option>
+                                    <option value="Bình Phước">Bình Phước</option>
+                                    <option value="Bình Thuận">Bình Thuận</option>
+                                    <option value="Cà Mau">Cà Mau</option>
+                                    <option value="Cần Thơ">Cần Thơ</option>
+                                    <option value="Cao Bằng">Cao Bằng</option>
+                                    <option value="Đà Nẵng">Đà Nẵng</option>
+                                    <option value="Đắk Lắk">Đắk Lắk</option>
+                                    <option value="Đắk Nông">Đắk Nông</option>
+                                    <option value="Điện Biên">Điện Biên</option>
+                                    <option value="Đồng Nai">Đồng Nai</option>
+                                    <option value="Đồng Tháp">Đồng Tháp</option>
+                                    <option value="Gia Lai">Gia Lai</option>
+                                    <option value="Hà Giang">Hà Giang</option>
+                                    <option value="Hà Nam">Hà Nam</option>
+                                    <option value="Hà Nội">Hà Nội</option>
+                                    <option value="Hà Tĩnh">Hà Tĩnh</option>
+                                    <option value="Hải Dương">Hải Dương</option>
+                                    <option value="Hải Phòng">Hải Phòng</option>
+                                    <option value="Hậu Giang">Hậu Giang</option>
+                                    <option value="Hòa Bình">Hòa Bình</option>
+                                    <option value="Hưng Yên">Hưng Yên</option>
+                                    <option value="Khánh Hòa">Khánh Hòa</option>
+                                    <option value="Kiên Giang">Kiên Giang</option>
+                                    <option value="Kon Tum">Kon Tum</option>
+                                    <option value="Lai Châu">Lai Châu</option>
+                                    <option value="Lâm Đồng">Lâm Đồng</option>
+                                    <option value="Lạng Sơn">Lạng Sơn</option>
+                                    <option value="Lào Cai">Lào Cai</option>
+                                    <option value="Long An">Long An</option>
+                                    <option value="Nam Định">Nam Định</option>
+                                    <option value="Nghệ An">Nghệ An</option>
+                                    <option value="Ninh Bình">Ninh Bình</option>
+                                    <option value="Ninh Thuận">Ninh Thuận</option>
+                                    <option value="Phú Thọ">Phú Thọ</option>
+                                    <option value="Phú Yên">Phú Yên</option>
+                                    <option value="Quảng Bình">Quảng Bình</option>
+                                    <option value="Quảng Nam">Quảng Nam</option>
+                                    <option value="Quảng Ngãi">Quảng Ngãi</option>
+                                    <option value="Quảng Ninh">Quảng Ninh</option>
+                                    <option value="Quảng Trị">Quảng Trị</option>
+                                    <option value="Sóc Trăng">Sóc Trăng</option>
+                                    <option value="Sơn La">Sơn La</option>
+                                    <option value="Tây Ninh">Tây Ninh</option>
+                                    <option value="Thái Bình">Thái Bình</option>
+                                    <option value="Thái Nguyên">Thái Nguyên</option>
+                                    <option value="Thanh Hóa">Thanh Hóa</option>
+                                    <option value="Thừa Thiên Huế">Thừa Thiên Huế</option>
+                                    <option value="Tiền Giang">Tiền Giang</option>
+                                    <option value="TP.HCM">TP.HCM</option>
+                                    <option value="Trà Vinh">Trà Vinh</option>
+                                    <option value="Tuyên Quang">Tuyên Quang</option>
+                                    <option value="Vĩnh Long">Vĩnh Long</option>
+                                    <option value="Vĩnh Phúc">Vĩnh Phúc</option>
+                                    <option value="Yên Bái">Yên Bái</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Số điện thoại</label>
+                                <input type="tel" class="form-control" id="showroomPhone" 
+                                       placeholder="VD: 0241234567">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Email</label>
+                                <input type="email" class="form-control" id="showroomEmail" 
+                                       placeholder="showroom@mocviet.vn">
+                                <div class="form-text">Email liên hệ của showroom</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Giờ mở cửa</label>
+                                <input type="text" class="form-control" id="showroomOpenHours" 
+                                       placeholder="VD: 8:00 - 22:00">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Mã nhúng Google Map</label>
+                            <textarea class="form-control" id="showroomMapEmbed" rows="4" 
+                                      placeholder="Dán iframe code từ Google Maps tại đây..."></textarea>
+                            <div class="form-text">
+                                <i class="bi bi-info-circle me-1"></i>
+                                <strong>Cách lấy mã:</strong> Mở 
+                                <a href="https://www.google.com/maps" target="_blank">Google Maps</a>
+                                → Tìm địa chỉ → "Chia sẻ" → "Nhúng bản đồ" → Copy iframe code
+                            </div>
+                        </div>
+
+                        <div class="mb-0">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="showroomIsActive" checked>
+                                <label class="form-check-label fw-bold" for="showroomIsActive">
+                                    Kích hoạt ngay sau khi tạo
+                                </label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-primary" onclick="createShowroom()">
+                        <i class="bi bi-check-circle me-1"></i>Thêm Showroom
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Showroom Modal -->
+    <div class="modal fade" id="editShowroomModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">
+                        <i class="bi bi-pencil-square me-2"></i>Sửa Showroom
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="editShowroomForm">
+                        <input type="hidden" id="editShowroomId">
+                        
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label fw-bold">Tên showroom *</label>
+                                <input type="text" class="form-control" id="editShowroomName" required>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                <label class="form-label fw-bold">Địa chỉ chi tiết *</label>
+                                <textarea class="form-control" id="editShowroomAddress" rows="2" required></textarea>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label fw-bold">Quận/Huyện</label>
+                                <input type="text" class="form-control" id="editShowroomDistrict">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Tỉnh/Thành *</label>
+                                <select class="form-select" id="editShowroomCity" required>
+                                    <option value="">-- Chọn tỉnh/thành --</option>
+                                    <option value="An Giang">An Giang</option>
+                                    <option value="Bà Rịa - Vũng Tàu">Bà Rịa - Vũng Tàu</option>
+                                    <option value="Bắc Giang">Bắc Giang</option>
+                                    <option value="Bắc Kạn">Bắc Kạn</option>
+                                    <option value="Bạc Liêu">Bạc Liêu</option>
+                                    <option value="Bắc Ninh">Bắc Ninh</option>
+                                    <option value="Bến Tre">Bến Tre</option>
+                                    <option value="Bình Định">Bình Định</option>
+                                    <option value="Bình Dương">Bình Dương</option>
+                                    <option value="Bình Phước">Bình Phước</option>
+                                    <option value="Bình Thuận">Bình Thuận</option>
+                                    <option value="Cà Mau">Cà Mau</option>
+                                    <option value="Cần Thơ">Cần Thơ</option>
+                                    <option value="Cao Bằng">Cao Bằng</option>
+                                    <option value="Đà Nẵng">Đà Nẵng</option>
+                                    <option value="Đắk Lắk">Đắk Lắk</option>
+                                    <option value="Đắk Nông">Đắk Nông</option>
+                                    <option value="Điện Biên">Điện Biên</option>
+                                    <option value="Đồng Nai">Đồng Nai</option>
+                                    <option value="Đồng Tháp">Đồng Tháp</option>
+                                    <option value="Gia Lai">Gia Lai</option>
+                                    <option value="Hà Giang">Hà Giang</option>
+                                    <option value="Hà Nam">Hà Nam</option>
+                                    <option value="Hà Nội">Hà Nội</option>
+                                    <option value="Hà Tĩnh">Hà Tĩnh</option>
+                                    <option value="Hải Dương">Hải Dương</option>
+                                    <option value="Hải Phòng">Hải Phòng</option>
+                                    <option value="Hậu Giang">Hậu Giang</option>
+                                    <option value="Hòa Bình">Hòa Bình</option>
+                                    <option value="Hưng Yên">Hưng Yên</option>
+                                    <option value="Khánh Hòa">Khánh Hòa</option>
+                                    <option value="Kiên Giang">Kiên Giang</option>
+                                    <option value="Kon Tum">Kon Tum</option>
+                                    <option value="Lai Châu">Lai Châu</option>
+                                    <option value="Lâm Đồng">Lâm Đồng</option>
+                                    <option value="Lạng Sơn">Lạng Sơn</option>
+                                    <option value="Lào Cai">Lào Cai</option>
+                                    <option value="Long An">Long An</option>
+                                    <option value="Nam Định">Nam Định</option>
+                                    <option value="Nghệ An">Nghệ An</option>
+                                    <option value="Ninh Bình">Ninh Bình</option>
+                                    <option value="Ninh Thuận">Ninh Thuận</option>
+                                    <option value="Phú Thọ">Phú Thọ</option>
+                                    <option value="Phú Yên">Phú Yên</option>
+                                    <option value="Quảng Bình">Quảng Bình</option>
+                                    <option value="Quảng Nam">Quảng Nam</option>
+                                    <option value="Quảng Ngãi">Quảng Ngãi</option>
+                                    <option value="Quảng Ninh">Quảng Ninh</option>
+                                    <option value="Quảng Trị">Quảng Trị</option>
+                                    <option value="Sóc Trăng">Sóc Trăng</option>
+                                    <option value="Sơn La">Sơn La</option>
+                                    <option value="Tây Ninh">Tây Ninh</option>
+                                    <option value="Thái Bình">Thái Bình</option>
+                                    <option value="Thái Nguyên">Thái Nguyên</option>
+                                    <option value="Thanh Hóa">Thanh Hóa</option>
+                                    <option value="Thừa Thiên Huế">Thừa Thiên Huế</option>
+                                    <option value="Tiền Giang">Tiền Giang</option>
+                                    <option value="TP.HCM">TP.HCM</option>
+                                    <option value="Trà Vinh">Trà Vinh</option>
+                                    <option value="Tuyên Quang">Tuyên Quang</option>
+                                    <option value="Vĩnh Long">Vĩnh Long</option>
+                                    <option value="Vĩnh Phúc">Vĩnh Phúc</option>
+                                    <option value="Yên Bái">Yên Bái</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Số điện thoại</label>
+                                <input type="tel" class="form-control" id="editShowroomPhone">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Email</label>
+                                <input type="email" class="form-control" id="editShowroomEmail">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Giờ mở cửa</label>
+                                <input type="text" class="form-control" id="editShowroomOpenHours">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Mã nhúng Google Map</label>
+                            <textarea class="form-control" id="editShowroomMapEmbed" rows="4"></textarea>
+                            <div class="form-text">
+                                <i class="bi bi-info-circle me-1"></i>
+                                <strong>Cách lấy mã:</strong> Mở 
+                                <a href="https://www.google.com/maps" target="_blank">Google Maps</a>
+                                → Tìm địa chỉ → "Chia sẻ" → "Nhúng bản đồ" → Copy iframe code
+                            </div>
+                        </div>
+
+                        <div class="mb-0">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="editShowroomIsActive">
+                                <label class="form-check-label fw-bold" for="editShowroomIsActive">
+                                    Đang hoạt động
+                                </label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-success" onclick="updateShowroom()">
+                        <i class="bi bi-check-circle me-1"></i>Cập nhật
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Showroom Modal -->
+    <div class="modal fade" id="viewShowroomModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title">
+                        <i class="bi bi-eye me-2"></i>Chi tiết Showroom
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div id="viewShowroomContent">
+                        <!-- Content will be loaded by JavaScript -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>
+

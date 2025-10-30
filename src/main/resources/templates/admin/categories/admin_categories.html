@@ -5,267 +5,273 @@
     <title>Quản lý Danh mục - Admin Panel</title>
 </head>
 <body>
-<div layout:fragment="content">
+<div layout:fragment="content" th:fragment="content" class="main-content">
+    
     <!-- Page Header -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h2 class="mb-1">Quản lý Danh mục & Bộ sưu tập</h2>
+            <h2 class="mb-1">Quản lý Danh mục</h2>
             <p class="text-muted mb-0">Quản lý danh mục sản phẩm và bộ sưu tập</p>
         </div>
         <div>
-            <button class="btn btn-admin-primary me-2" data-bs-toggle="modal" data-bs-target="#createCategoryModal">
-                <i class="bi bi-plus-circle me-2"></i>Tạo Danh mục
-            </button>
-            <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#createCollectionModal">
-                <i class="bi bi-collection me-2"></i>Tạo Bộ sưu tập
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
+                <i class="bi bi-plus-circle me-1"></i>Thêm danh mục
             </button>
         </div>
     </div>
-    
-    <!-- Categories Tree -->
-    <div class="row">
-        <div class="col-md-6">
-            <div class="card admin-card">
-                <div class="card-header bg-white">
-                    <h5 class="card-title mb-0">
-                        <i class="bi bi-diagram-3 me-2"></i>
-                        Danh mục sản phẩm
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="tree-view">
-                        <div class="tree-item">
-                            <i class="bi bi-folder me-2"></i>
-                            <strong>Phòng khách</strong>
-                            <div class="tree-children ms-4">
-                                <div class="tree-item">
-                                    <i class="bi bi-folder me-2"></i>
-                                    Ghế sofa
-                                </div>
-                                <div class="tree-item">
-                                    <i class="bi bi-folder me-2"></i>
-                                    Bàn sofa - Bàn cafe - Bàn trà
-                                </div>
-                                <div class="tree-item">
-                                    <i class="bi bi-folder me-2"></i>
-                                    Tủ kệ tivi
-                                </div>
-                                <div class="tree-item">
-                                    <i class="bi bi-folder me-2"></i>
-                                    Tủ giày - Tủ trang trí
-                                </div>
-                            </div>
-                        </div>
-                        <div class="tree-item">
-                            <i class="bi bi-folder me-2"></i>
-                            <strong>Phòng ngủ</strong>
-                            <div class="tree-children ms-4">
-                                <div class="tree-item">
-                                    <i class="bi bi-folder me-2"></i>
-                                    Combo phòng ngủ
-                                </div>
-                                <div class="tree-item">
-                                    <i class="bi bi-folder me-2"></i>
-                                    Tủ quần áo
-                                </div>
-                                <div class="tree-item">
-                                    <i class="bi bi-folder me-2"></i>
-                                    Giường ngủ
-                                </div>
-                                <div class="tree-item">
-                                    <i class="bi bi-folder me-2"></i>
-                                    Tủ đầu giường
-                                </div>
-                                <div class="tree-item">
-                                    <i class="bi bi-folder me-2"></i>
-                                    Bàn trang điểm
-                                </div>
-                            </div>
-                        </div>
-                        <div class="tree-item">
-                            <i class="bi bi-folder me-2"></i>
-                            <strong>Phòng ăn</strong>
-                            <div class="tree-children ms-4">
-                                <div class="tree-item">
-                                    <i class="bi bi-folder me-2"></i>
-                                    Bàn ăn
-                                </div>
-                                <div class="tree-item">
-                                    <i class="bi bi-folder me-2"></i>
-                                    Ghế ăn
-                                </div>
-                                <div class="tree-item">
-                                    <i class="bi bi-folder me-2"></i>
-                                    Bộ bàn ăn
-                                </div>
-                            </div>
-                        </div>
-                        <div class="tree-item">
-                            <i class="bi bi-folder me-2"></i>
-                            <strong>Phòng làm việc</strong>
-                            <div class="tree-children ms-4">
-                                <div class="tree-item">
-                                    <i class="bi bi-folder me-2"></i>
-                                    Bàn làm việc
-                                </div>
-                                <div class="tree-item">
-                                    <i class="bi bi-folder me-2"></i>
-                                    Ghế văn phòng
-                                </div>
-                                <div class="tree-item">
-                                    <i class="bi bi-folder me-2"></i>
-                                    Tủ và kệ
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-md-6">
-            <div class="card admin-card">
-                <div class="card-header bg-white">
-                    <h5 class="card-title mb-0">
-                        <i class="bi bi-collection me-2"></i>
-                        Bộ sưu tập
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <div class="card border">
-                                <div class="card-body text-center">
-                                    <h6 class="card-title">PREMIUM</h6>
-                                    <small class="text-muted">15 sản phẩm</small>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <div class="card border">
-                                <div class="card-body text-center">
-                                    <h6 class="card-title">SCARLET</h6>
-                                    <small class="text-muted">8 sản phẩm</small>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <div class="card border">
-                                <div class="card-body text-center">
-                                    <h6 class="card-title">SERENA</h6>
-                                    <small class="text-muted">12 sản phẩm</small>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <div class="card border">
-                                <div class="card-body text-center">
-                                    <h6 class="card-title">PLANK</h6>
-                                    <small class="text-muted">6 sản phẩm</small>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <div class="card border">
-                                <div class="card-body text-center">
-                                    <h6 class="card-title">KLINE</h6>
-                                    <small class="text-muted">9 sản phẩm</small>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <div class="card border">
-                                <div class="card-body text-center">
-                                    <h6 class="card-title">DALUMD</h6>
-                                    <small class="text-muted">7 sản phẩm</small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
-<!-- Create Category Modal -->
-<div class="modal fade" id="createCategoryModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Tạo Danh mục mới</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <form>
-                    <div class="mb-3">
-                        <label class="form-label">Danh mục cha</label>
-                        <select class="form-select">
-                            <option value="">Danh mục gốc</option>
-                            <option value="1">Phòng khách</option>
-                            <option value="2">Phòng ngủ</option>
-                            <option value="3">Phòng ăn</option>
-                            <option value="4">Phòng làm việc</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Tên danh mục</label>
-                        <input type="text" class="form-control" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Slug</label>
-                        <input type="text" class="form-control" placeholder="tu-dong-tao">
-                        <small class="form-text text-muted">Sẽ tự động tạo từ tên danh mục</small>
-                    </div>
-                    <div class="mb-3">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" checked>
-                            <label class="form-check-label">Kích hoạt</label>
+    <!-- Stats Cards -->
+    <div class="mb-3">
+        <p class="text-muted small mb-0">
+            <i class="bi bi-info-circle me-1"></i>
+            Thống kê dựa trên bộ lọc hiện tại
+        </p>
+    </div>
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-primary bg-opacity-10 rounded-circle p-3">
+                                <i class="bi bi-folder text-primary fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h5 class="card-title mb-0" id="totalCategories">0</h5>
+                            <small class="text-muted">Tổng danh mục</small>
                         </div>
                     </div>
-                </form>
+                </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                <button type="button" class="btn btn-admin-primary">Tạo Danh mục</button>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-success bg-opacity-10 rounded-circle p-3">
+                                <i class="bi bi-check-circle text-success fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h5 class="card-title mb-0" id="activeCategories">0</h5>
+                            <small class="text-muted">Đang kích hoạt</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-info bg-opacity-10 rounded-circle p-3">
+                                <i class="bi bi-tags text-info fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h5 class="card-title mb-0" id="categoryTypeCount">0</h5>
+                            <small class="text-muted">Danh mục cấp 1</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-warning bg-opacity-10 rounded-circle p-3">
+                                <i class="bi bi-collection text-warning fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h5 class="card-title mb-0" id="collectionType">0</h5>
+                            <small class="text-muted">Bộ sưu tập</small>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Create Collection Modal -->
-<div class="modal fade" id="createCollectionModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Tạo Bộ sưu tập mới</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <form>
-                    <div class="mb-3">
-                        <label class="form-label">Tên bộ sưu tập</label>
-                        <input type="text" class="form-control" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Slug</label>
-                        <input type="text" class="form-control" placeholder="tu-dong-tao">
-                        <small class="form-text text-muted">Sẽ tự động tạo từ tên bộ sưu tập</small>
-                    </div>
-                    <div class="mb-3">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" checked>
-                            <label class="form-check-label">Kích hoạt</label>
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                <button type="button" class="btn btn-admin-primary">Tạo Bộ sưu tập</button>
+    <!-- Filters -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">Tìm kiếm</label>
+                    <input type="text" class="form-control" id="searchInput" placeholder="Tìm theo tên, slug">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Loại</label>
+                    <select class="form-select" id="filterType">
+                        <option value="">Tất cả</option>
+                        <option value="CATEGORY">Danh mục</option>
+                        <option value="COLLECTION">Bộ sưu tập</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Trạng thái</label>
+                    <select class="form-select" id="filterStatus">
+                        <option value="">Tất cả</option>
+                        <option value="active">Đang kích hoạt</option>
+                        <option value="inactive">Đã vô hiệu hóa</option>
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="button" class="btn btn-secondary w-100" onclick="resetFilters()">
+                        <i class="bi bi-arrow-clockwise"></i> Reset
+                    </button>
+                </div>
             </div>
         </div>
     </div>
+
+    <!-- Tabs for Categories and Collections -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-white border-bottom p-0">
+            <ul class="nav nav-tabs card-header-tabs m-0" id="categoriesTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="categories-tab" data-bs-toggle="tab" 
+                            data-bs-target="#categories-panel" type="button" role="tab" aria-controls="categories-panel"
+                            aria-selected="true">
+                        <i class="bi bi-folder me-2"></i>Danh mục sản phẩm
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="collections-tab" data-bs-toggle="tab" 
+                            data-bs-target="#collections-panel" type="button" role="tab" aria-controls="collections-panel"
+                            aria-selected="false">
+                        <i class="bi bi-collection me-2"></i>Bộ sưu tập
+                    </button>
+                </li>
+            </ul>
+        </div>
+        <div class="tab-content card-body" id="categoriesTabContent">
+            <!-- Categories Panel -->
+            <div class="tab-pane fade show active" id="categories-panel" role="tabpanel">
+                <div id="categoriesTree">
+                    <!-- Categories tree will be rendered here -->
+                </div>
+            </div>
+            <!-- Collections Panel -->
+            <div class="tab-pane fade" id="collections-panel" role="tabpanel">
+                <div id="collectionsList">
+                    <!-- Collections list will be rendered here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Category Modal -->
+    <div class="modal fade" id="addCategoryModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Thêm danh mục mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addCategoryForm" class="needs-validation" novalidate>
+                        <div class="mb-3">
+                            <label class="form-label">Loại *</label>
+                            <select class="form-select" id="categoryType" required>
+                                <option value="">-- Chọn loại --</option>
+                                <option value="CATEGORY">Danh mục (Category)</option>
+                                <option value="COLLECTION">Bộ sưu tập (Collection)</option>
+                            </select>
+                            <div class="form-text">Danh mục cấp 1 hoặc Bộ sưu tập</div>
+                        </div>
+                        <div class="mb-3" id="parentCategoryGroup" style="display: none;">
+                            <label class="form-label">Danh mục cha (nếu là danh mục cấp 2)</label>
+                            <select class="form-select" id="parentCategoryId">
+                                <option value="">Không có (Danh mục cấp 1)</option>
+                            </select>
+                            <div class="form-text">Chọn danh mục cha nếu tạo danh mục cấp 2</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Tên danh mục *</label>
+                            <input type="text" class="form-control" id="categoryName" placeholder="VD: Phòng ăn" required>
+                            <div class="form-text">Tên hiển thị của danh mục</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Slug *</label>
+                            <input type="text" class="form-control" id="categorySlug" placeholder="phong-an" required>
+                            <div class="form-text">Tự động tạo từ tên hoặc nhập thủ công</div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="categoryIsActive" checked>
+                                <label class="form-check-label" for="categoryIsActive">
+                                    <strong>Kích hoạt ngay</strong>
+                                </label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-primary" onclick="createCategory()">Thêm danh mục</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Category Modal -->
+    <div class="modal fade" id="editCategoryModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Sửa danh mục</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editCategoryForm" class="needs-validation" novalidate>
+                        <input type="hidden" id="editCategoryId">
+                        <div class="mb-3">
+                            <label class="form-label">Loại</label>
+                            <input type="text" class="form-control" id="editCategoryType" readonly>
+                            <div class="form-text">Loại danh mục không thể thay đổi</div>
+                        </div>
+                        <div class="mb-3" id="editParentCategoryGroup">
+                            <label class="form-label">Danh mục cha</label>
+                            <select class="form-select" id="editParentCategoryId">
+                                <option value="">Không có (Danh mục cấp 1)</option>
+                            </select>
+                            <div class="form-text">Chỉ áp dụng cho danh mục cấp 2</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Tên danh mục *</label>
+                            <input type="text" class="form-control" id="editCategoryName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Slug *</label>
+                            <input type="text" class="form-control" id="editCategorySlug" required>
+                            <div class="form-text"></div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="editCategoryIsActive">
+                                <label class="form-check-label" for="editCategoryIsActive">
+                                    <strong>Kích hoạt</strong>
+                                </label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-primary" onclick="updateCategory()">Cập nhật</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 </body>
 </html>
+

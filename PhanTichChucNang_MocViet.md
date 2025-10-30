@@ -1,4 +1,4 @@
-# 3.1. PHÂN TÍCH CHỨC NĂNG HỆ THỐNG MỘC VIỆT
+﻿# 3.1. PHÂN TÍCH CHỨC NĂNG HỆ THỐNG MỘC VIỆT
 
 ## 3.1.1. Phía Khách (Guest)
 
@@ -48,24 +48,24 @@
 
 ## 3.1.4. Phía Admin
 
-| STT | Chức năng                      | Mô tả                                                                                      |
-| --- | ------------------------------ | ------------------------------------------------------------------------------------------ |
-| 1   | Quản lý tài khoản bản thân     | Cập nhật hồ sơ hoặc đổi mật khẩu tài khoản bản thân                                        |
-| 2   | Quản lý tài khoản hệ thống     | Tìm kiếm, xem danh sách tất cả User, xem chi tiết thông tin User, khóa/mở khóa tài khoản   |
-| 3   | Quản lý danh mục sản phẩm      | Thêm/sửa/vô hiệu hóa danh mục cấp 1, 2, quản lý bộ sưu tập (Collections)                   |
-| 4   | Quản lý màu sắc                | Thêm/sửa/vô hiệu hóa màu sắc sản phẩm                                                      |
-| 5   | Quản lý chi phí vận chuyển     | Cập nhật phí vận chuyển theo khu vực, quản lý mapping tỉnh/thành vào zone                  |
-| 6   | Quản lý đội giao hàng          | Tạo/quản lý đội giao hàng, phân công đội theo khu vực                                      |
-| 7   | Quản lý mã giảm giá            | Thêm/sửa/vô hiệu hóa mã giảm giá, thiết lập giá trị đơn hàng tối thiểu, thời gian hiệu lực |
-| 8   | Quản lý banner                 | Thêm/sửa/xóa banner trang chủ                                                              |
-| 9   | Quản lý trang tĩnh             | Thêm/sửa/xóa các trang chính sách, giới thiệu                                              |
-| 10  | Quản lý showroom               | Thêm/sửa/xóa thông tin cửa hàng trưng bày                                                  |
-| 11  | Quản lý liên kết mạng xã hội   | Cập nhật link Facebook, Zalo, Youtube                                                      |
-| 12  | Báo cáo và thống kê doanh thu  | Doanh thu theo ngày/tuần/tháng/năm, theo danh mục sản phẩm                                 |
-| 13  | Báo cáo và thống kê đơn hàng   | Tổng số đơn hàng theo trạng thái, giá trị đơn hàng trung bình, tỷ lệ hủy đơn/trả hàng      |
-| 14  | Báo cáo và thống kê khách hàng | Số lượng khách hàng mới, khách hàng mua nhiều nhất (top 10)                                |
-| 15  | Báo cáo và thống kê sản phẩm   | Sản phẩm bán chạy nhất, tồn kho nhiều, đánh giá cao nhất, lượt xem cao nhất                |
-| 16  | Nhận thông báo                 | Nhận thông báo khi có bài viết mới từ manager                                              |
+| STT | Chức năng                      | Mô tả                                                                                                                        |
+| --- | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Quản lý tài khoản bản thân     | Cập nhật hồ sơ hoặc đổi mật khẩu tài khoản bản thân                                                                          |
+| 2   | Quản lý tài khoản hệ thống     | Tìm kiếm, xem danh sách tất cả User, xem chi tiết thông tin User, khóa/mở khóa tài khoản                                     |
+| 3   | Quản lý danh mục sản phẩm      | Thêm/sửa/vô hiệu hóa danh mục cấp 1, 2, quản lý bộ sưu tập (Collections)                                                     |
+| 4   | Quản lý màu sắc                | Thêm/sửa/vô hiệu hóa màu sắc sản phẩm                                                                                        |
+| 5   | Quản lý chi phí vận chuyển     | Cập nhật phí vận chuyển theo khu vực, quản lý mapping tỉnh/thành vào zone                                                    |
+| 6   | Quản lý đội giao hàng          | Tạo/quản lý đội giao hàng, phân công đội theo khu vực                                                                        |
+| 7   | Quản lý mã giảm giá            | Thêm/sửa/vô hiệu hóa mã giảm giá, thiết lập giá trị đơn hàng tối thiểu, thời gian hiệu lực                                   |
+| 8   | Quản lý banner                 | Thêm/sửa/xóa banner trang chủ                                                                                                |
+| 9   | Quản lý trang tĩnh             | Thêm/sửa/xóa các trang chính sách, giới thiệu                                                                                |
+| 10  | Quản lý showroom               | Thêm/sửa/xóa thông tin cửa hàng trưng bày                                                                                    |
+| 11  | Quản lý liên kết mạng xã hội   | Cập nhật link Facebook, Zalo, Youtube                                                                                        |
+| 12  | Báo cáo và thống kê doanh thu  | Thống kê tổng doanh thu, doanh thu theo ngày/tuần/tháng/năm, doanh thu theo danh mục cấp 2 (chỉ DELIVERED)                   |
+| 13  | Báo cáo và thống kê đơn hàng   | Tổng số đơn hàng, phân bố đơn hàng theo trạng thái (PENDING/CONFIRMED/DISPATCHED/DELIVERED/CANCELLED), đơn hàng theo khu vực |
+| 14  | Báo cáo và thống kê khách hàng | Số lượng khách hàng, top 10 khách hàng mua nhiều nhất (chỉ đơn DELIVERED)                                                    |
+| 15  | Báo cáo và thống kê sản phẩm   | Top 10 sản phẩm bán chạy nhất (chỉ đơn DELIVERED), tổng số sản phẩm                                                          |
+| 16  | Nhận thông báo                 | Nhận thông báo khi có bài viết mới từ manager                                                                                |
 
 ## 3.1.5. Phía Delivery (Đội ngũ vận chuyển)
 
@@ -82,23 +82,6 @@
 
 ## 3.1.6. Hệ thống thông báo tự động
 
-| STT | Loại thông báo               | Người nhận | Điều kiện kích hoạt                          |
-| --- | ---------------------------- | ---------- | -------------------------------------------- |
-| 1   | Đặt hàng thành công          | Customer   | Khi tạo đơn hàng mới                         |
-| 2   | Thay đổi trạng thái đơn hàng | Customer   | Khi đơn hàng chuyển trạng thái               |
-| 3   | Sản phẩm có hàng trở lại     | Customer   | Khi sản phẩm yêu thích từ hết hàng → có hàng |
-| 4   | Phản hồi từ cửa hàng         | Customer   | Khi manager trả lời đánh giá                 |
-| 5   | Yêu cầu trả hàng được duyệt  | Customer   | Khi manager duyệt yêu cầu trả hàng           |
-| 6   | Đơn hàng đã được trả         | Customer   | Khi hoàn tất quy trình trả hàng & hoàn tiền  |
-| 7   | Yêu cầu trả hàng bị từ chối  | Customer   | Khi manager từ chối yêu cầu trả hàng         |
-| 8   | Đơn hàng mới cần xử lý       | Manager    | Khi có đơn hàng mới                          |
-| 9   | Yêu cầu trả hàng mới         | Manager    | Khi customer gửi yêu cầu trả hàng            |
-| 10  | Đánh giá mới                 | Manager    | Khi có đánh giá mới từ khách hàng            |
-| 11  | Tồn kho thấp/Hết hàng        | Manager    | Khi tồn kho xuống thấp hoặc hết              |
-| 12  | Tin nhắn mới từ khách        | Manager    | Khi có tin nhắn từ guest/customer            |
-| 13  | Bài viết mới                 | Admin      | Khi manager tạo bài viết mới                 |
-| 14  | Phân công đơn giao           | Delivery   | Khi được phân công đơn hàng mới              |
-| 15  | Yêu cầu thu hồi              | Delivery   | Khi đơn hàng cần thu hồi                     |
 
 **Lưu ý:** Trigger `TR_Orders_NotifyStatusChange` hiện không bắn cho `RETURNED` (đã loại trừ), nên thông báo "Đơn hàng đã được trả" đến Customer sẽ đến từ `sp_ReturnOrder` (INSERT thẳng vào UserNotification), không phải trigger đổi trạng thái đơn.
 

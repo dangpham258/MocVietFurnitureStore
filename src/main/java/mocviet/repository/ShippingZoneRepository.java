@@ -1,13 +1,20 @@
 package mocviet.repository;
 
-import mocviet.entity.ShippingZone;
+import java.util.Optional;
+import java.util.List;
+
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import mocviet.entity.ShippingZone;
 
 @Repository
 public interface ShippingZoneRepository extends JpaRepository<ShippingZone, Integer> {
-    
-    List<ShippingZone> findAll();
+    Optional<ShippingZone> findBySlug(String slug);
+
+    @EntityGraph(attributePaths = {"shippingFee"})
+    @Override
+    java.util.List<ShippingZone> findAll();
+
 }
